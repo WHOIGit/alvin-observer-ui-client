@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Container, Typography, Box } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import CameraAltIcon from "@material-ui/icons/CameraAlt";
+import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import ObserverUI from "./features/observer-ui/ObserverUI";
 
-function App() {
+const useStyles = makeStyles(theme => ({
+  sealogFrame: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    border: "none"
+  }
+}));
+export default function App() {
+  const classes = useStyles();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container maxWidth={false} disableGutters={true}>
+      <Box>
+        <ObserverUI />
+      </Box>
+
+      <Box>
+        <iframe
+          src="https://harmonyhill.whoi.edu/sealog-alvin/"
+          className={classes.sealogFrame}
+        />
+      </Box>
+    </Container>
   );
 }
-
-export default App;
