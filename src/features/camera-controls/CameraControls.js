@@ -4,11 +4,12 @@ import Link from "@material-ui/core/Link";
 import { Typography, Grid, Paper, Icon, Fab } from "@material-ui/core";
 import CameraAltIcon from "@material-ui/icons/CameraAlt";
 import CameraControlButtons from "./CameraControlButtons";
+import LargeVideo from "./LargeVideo";
 const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: "#f5f5f5",
     position: "absolute",
-    top: 220,
+    top: 290,
     left: 0,
     width: "100%",
     padding: theme.spacing(2),
@@ -16,7 +17,7 @@ const useStyles = makeStyles(theme => ({
     transition: "all 0.4s"
   },
   rootCollapse: {
-    top: "-410px"
+    top: "-564px"
   },
   paper: {
     padding: theme.spacing(2),
@@ -39,7 +40,9 @@ export default function CameraControls({
     >
       <Grid container spacing={2}>
         <Grid item xs={9}>
-          <Paper className={classes.paper}>xs=3</Paper>
+          <Paper className={classes.paper}>
+            <LargeVideo />
+          </Paper>
         </Grid>
         <Grid item xs={3}>
           <Paper className={classes.paper}>

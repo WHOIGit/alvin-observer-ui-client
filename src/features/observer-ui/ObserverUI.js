@@ -6,20 +6,24 @@ import CameraAltIcon from "@material-ui/icons/CameraAlt";
 import ControlButtons from "./ControlButtons";
 import NavOverlayData from "./NavOverlayData";
 import CameraControls from "../camera-controls/CameraControls";
+import MiniVideos from "./MiniVideos";
+import SelectVideoSource from "./SelectVideoSource";
+import SelectExposureMode from "./SelectExposureMode";
 
 const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: "#f5f5f5",
     position: "relative",
     marginTop: 0,
+    paddingBottom: 0,
     width: "100%",
     padding: theme.spacing(2),
     zIndex: 1000,
     transition: "all 0.4s",
-    minHeight: "220px"
+    minHeight: "290px"
   },
   rootCollapse: {
-    marginTop: "-220px",
+    marginTop: "-290px",
     height: 0
   },
   paper: {
@@ -35,7 +39,7 @@ const useStyles = makeStyles(theme => ({
     transition: "all 0.4s"
   },
   toggleButtonOff: {
-    bottom: "-470px"
+    bottom: "-460px"
   },
   extendedIcon: {
     marginRight: theme.spacing(1)
@@ -63,7 +67,7 @@ export default function ObserverUI() {
       >
         <Grid container spacing={2}>
           <Grid item xs={4}>
-            <Paper className={classes.paper}>xs=3</Paper>
+            <MiniVideos showFullCameraControls={showFullCameraControls} />
           </Grid>
           <Grid item xs={5}>
             <Paper className={classes.paper}>
@@ -77,6 +81,14 @@ export default function ObserverUI() {
                 setShowFullCameraControls={setShowFullCameraControls}
               />
             </Paper>
+          </Grid>
+        </Grid>
+        <Grid container spacing={0} justify="flex-start">
+          <Grid item>
+            <SelectVideoSource showTopControls={showTopControls} />
+          </Grid>
+          <Grid item>
+            <SelectExposureMode showTopControls={showTopControls} />
           </Grid>
         </Grid>
 
