@@ -22,6 +22,9 @@ const useStyles = makeStyles(theme => ({
   title: {
     fontSize: ".9em"
   },
+  inactiveVideo: {
+    border: "white solid 2px"
+  },
   activeVideo: {
     border: "red solid 2px"
   },
@@ -89,7 +92,10 @@ export default function MiniVideos({ showFullCameraControls }) {
                     title: classes.title
                   }}
                 />
-                <CardMedia className={classes.miniVidImage} image={film} />
+                <CardMedia
+                  className={`${classes.miniVidImage} ${classes.inactiveVideo}`}
+                  image={film}
+                />
 
                 <CardActions className={classes.videoAction}>
                   <Typography
