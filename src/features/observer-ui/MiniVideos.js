@@ -74,7 +74,7 @@ export default function MiniVideos({ showFullCameraControls }) {
                 color="textSecondary"
                 component="span"
               >
-                This
+                RECORDING
               </Typography>
             </CardActions>
           </Card>
@@ -104,7 +104,7 @@ export default function MiniVideos({ showFullCameraControls }) {
                     component="span"
                     align="center"
                   >
-                    This
+                    SOURCE
                   </Typography>
                 </CardActions>
               </Card>
