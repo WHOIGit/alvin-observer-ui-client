@@ -1,8 +1,6 @@
 import React from "react";
-import { Container, Typography, Box } from "@material-ui/core";
+import { Container, Box } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import CameraAltIcon from "@material-ui/icons/CameraAlt";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import ObserverUI from "./features/observer-ui/ObserverUI";
 
 const useStyles = makeStyles(theme => ({
@@ -25,6 +23,7 @@ export default function App() {
         <iframe
           src="https://harmonyhill.whoi.edu/sealog-alvin/"
           className={classes.sealogFrame}
+          title="sealog"
         />
       </Box>
     </Container>

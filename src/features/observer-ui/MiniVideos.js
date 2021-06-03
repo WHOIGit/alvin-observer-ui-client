@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import axios from "axios";
+import adapter from "webrtc-adapter";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Grid,
@@ -49,6 +51,71 @@ const useStyles = makeStyles(theme => ({
 
 export default function MiniVideos({ showFullCameraControls }) {
   const classes = useStyles();
+  const videoElem = useRef(null);
+
+  useEffect(() => {
+    let stream = new MediaStream();
+
+    let suuid = "demo1";
+
+    let config = {
+      iceServers: [
+        {
+          urls: ["stun:stun.l.google.com:19302"]
+        }
+      ]
+    };
+
+    let video = videoElem.current;
+
+    const pc = new RTCPeerConnection(config);
+    pc.onnegotiationneeded = handleNegotiationNeededEvent;
+    pc.addTransceiver("video", {
+      direction: "sendrecv"
+    });
+    pc.ontrack = function(event) {
+      stream.addTrack(event.track);
+      videoElem.srcObject = stream;
+      console.log(event.streams.length + " track is delivered");
+    };
+
+    pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
+
+    async function handleNegotiationNeededEvent() {
+      let offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      getRemoteSdp();
+    }
+
+    let sendChannel = null;
+
+    function getRemoteSdp() {
+      axios
+        .post("http://behemoth.whoi.edu:8083/stream/receiver/" + suuid, {
+          suuid: suuid,
+          data: btoa(pc.localDescription.sdp)
+        })
+        .then(
+          response => {
+            console.log(response);
+            try {
+              pc.setRemoteDescription(
+                new RTCSessionDescription({
+                  type: "answer",
+                  sdp: atob(response.data)
+                })
+              );
+            } catch (error) {
+              console.warn(error);
+            }
+          },
+          error => {
+            console.log(error);
+          }
+        );
+    }
+  }, []);
+
   return (
     <div className={classes.root}>
       <Grid container spacing={2}>
@@ -61,10 +128,18 @@ export default function MiniVideos({ showFullCameraControls }) {
                 title: classes.title
               }}
             />
-            <CardMedia
-              className={`${classes.miniVidImage} ${classes.activeVideo}`}
-              image={film}
-            />
+            <CardContent>
+              <div id="remoteVideos">
+                <video
+                  style={{ width: "300px" }}
+                  id="miniVideo1"
+                  ref={videoElem}
+                  autoPlay
+                  muted
+                  controls
+                ></video>
+              </div>
+            </CardContent>
 
             <CardActions
               className={`${classes.videoAction} ${classes.activeVideoAction}`}
