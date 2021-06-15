@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import film from "../../images/604015.png";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    height: "450px",
     overflowY: "hidden"
   },
   filmImage: {
@@ -15,9 +14,20 @@ const useStyles = makeStyles(theme => ({
 
 export default function LargeVideo() {
   const classes = useStyles();
+  const videoElem = useRef(null);
+
   return (
     <div className={classes.root}>
-      <img src={film} className={classes.filmImage} />
+      <div id="videoBoxMain">
+        <video
+          style={{ width: "100%" }}
+          id="videoMain"
+          ref={videoElem}
+          autoPlay
+          muted
+          controls
+        ></video>
+      </div>
     </div>
   );
 }

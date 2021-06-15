@@ -66,10 +66,10 @@ export default function ObserverUI() {
         }`}
       >
         <Grid container spacing={2}>
-          <Grid item xs={4}>
+          <Grid item xs={6}>
             <MiniVideos showFullCameraControls={showFullCameraControls} />
           </Grid>
-          <Grid item xs={5}>
+          <Grid item xs={3}>
             <Paper className={classes.paper}>
               <NavOverlayData />
             </Paper>

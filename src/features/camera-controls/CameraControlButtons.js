@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import nipplejs from "nipplejs";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
 import { Box, Grid, Button, Typography, Divider } from "@material-ui/core";
@@ -15,11 +16,27 @@ const useStyles = makeStyles(theme => ({
   ctrlButton: {
     width: "100%",
     fontSize: ".7em"
+  },
+  joystickContainer: {
+    position: "relative",
+    height: "100px"
   }
 }));
 
 export default function CameraControlButtons() {
   const classes = useStyles();
+  const joystickElem = useRef(null);
+
+  console.log(joystickElem.current);
+  useEffect(() => {
+    const joystick = nipplejs.create({
+      zone: joystickElem.current,
+      mode: "static",
+      position: { left: "50%", top: "50%" },
+      color: "blue"
+    });
+  }, []);
+
   return (
     <div className={classes.root}>
       <Box my={2}>
@@ -69,33 +86,10 @@ export default function CameraControlButtons() {
       </Box>
       <Divider />
       <Box my={3}>
-        <Grid container spacing={0}>
-          <Grid item xs={12}>
-            <Button variant="contained" color="secondary" size="small">
-              Down
-            </Button>
-          </Grid>
-          <Grid item xs={4}>
-            <Button variant="contained" color="secondary" size="small">
-              Left
-            </Button>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography variant="overline" gutterBottom>
-              P & T
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Button variant="contained" color="secondary" size="small">
-              Right
-            </Button>
-          </Grid>
-          <Grid item xs={12}>
-            <Button variant="contained" color="secondary" size="small">
-              Up
-            </Button>
-          </Grid>
-        </Grid>
+        <Typography variant="h6" gutterBottom>
+          P & T
+        </Typography>
+        <div className={classes.joystickContainer} ref={joystickElem}></div>
       </Box>
     </div>
   );

@@ -46,12 +46,16 @@ const useStyles = makeStyles(theme => ({
   infoChip: {
     marginTop: theme.spacing(1),
     width: "100%"
+  },
+  cardContent: {
+    padding: 0
   }
 }));
 
 export default function MiniVideos({ showFullCameraControls }) {
   const classes = useStyles();
-  const videoElem = useRef(null);
+  const videoElem1 = useRef(null);
+  const videoElem2 = useRef(null);
 
   useEffect(() => {
     let stream = new MediaStream();
@@ -66,7 +70,8 @@ export default function MiniVideos({ showFullCameraControls }) {
       ]
     };
 
-    let video = videoElem.current;
+    let video = videoElem1.current;
+    console.log(video);
 
     const pc = new RTCPeerConnection(config);
     pc.onnegotiationneeded = handleNegotiationNeededEvent;
@@ -75,7 +80,7 @@ export default function MiniVideos({ showFullCameraControls }) {
     });
     pc.ontrack = function(event) {
       stream.addTrack(event.track);
-      videoElem.srcObject = stream;
+      video.srcObject = stream;
       console.log(event.streams.length + " track is delivered");
     };
 
@@ -128,12 +133,12 @@ export default function MiniVideos({ showFullCameraControls }) {
                 title: classes.title
               }}
             />
-            <CardContent>
-              <div id="remoteVideos">
+            <CardContent className={classes.cardContent}>
+              <div id="videoBox1">
                 <video
-                  style={{ width: "300px" }}
+                  style={{ width: "100%" }}
                   id="miniVideo1"
-                  ref={videoElem}
+                  ref={videoElem1}
                   autoPlay
                   muted
                   controls
@@ -167,10 +172,18 @@ export default function MiniVideos({ showFullCameraControls }) {
                     title: classes.title
                   }}
                 />
-                <CardMedia
-                  className={`${classes.miniVidImage} ${classes.inactiveVideo}`}
-                  image={film}
-                />
+                <CardContent className={classes.cardContent}>
+                  <div id="videoBox2">
+                    <video
+                      style={{ width: "100%" }}
+                      id="miniVideo2"
+                      ref={videoElem2}
+                      autoPlay
+                      muted
+                      controls
+                    ></video>
+                  </div>
+                </CardContent>
 
                 <CardActions className={classes.videoAction}>
                   <Typography
