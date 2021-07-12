@@ -26,7 +26,12 @@ export default function LargeVideo() {
           autoPlay
           muted
           controls
-        ></video>
+        >
+          <source
+            src="http://128.128.184.12/httplive/stream.m3u8"
+            type="application/vnd.apple.mpegurl"
+          />
+        </video>
       </div>
     </div>
   );

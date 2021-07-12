@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
 import { Grid, Paper, Icon, Fab } from "@material-ui/core";
@@ -9,6 +9,8 @@ import CameraControls from "../camera-controls/CameraControls";
 import MiniVideos from "./MiniVideos";
 import SelectVideoSource from "./SelectVideoSource";
 import SelectExposureMode from "./SelectExposureMode";
+import { WebSocketContext } from "../../utils/WebSocket";
+import { initiateSocket, disconnectSocket } from "../../utils/Socket";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -39,7 +41,7 @@ const useStyles = makeStyles(theme => ({
     transition: "all 0.4s"
   },
   toggleButtonOff: {
-    bottom: "-460px"
+    bottom: "-500px"
   },
   extendedIcon: {
     marginRight: theme.spacing(1)
@@ -48,6 +50,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function ObserverUI() {
   const classes = useStyles();
+  //const socket = useContext(WebSocketContext);
   const [showTopControls, setShowTopControls] = useState(false);
   const [showFullCameraControls, setShowFullCameraControls] = useState(false);
 
@@ -58,6 +61,11 @@ export default function ObserverUI() {
     }
     setShowTopControls(!showTopControls);
   };
+
+  useEffect(() => {
+    initiateSocket();
+  }, []);
+
   return (
     <>
       <div

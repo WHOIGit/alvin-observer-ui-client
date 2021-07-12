@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Box } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+//import WebSocketProvider from "./utils/WebSocket";
 import ObserverUI from "./features/observer-ui/ObserverUI";
 
 const useStyles = makeStyles(theme => ({

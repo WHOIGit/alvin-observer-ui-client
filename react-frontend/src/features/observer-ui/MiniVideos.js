@@ -78,8 +78,11 @@ export default function MiniVideos({ showFullCameraControls }) {
     pc.addTransceiver("video", {
       direction: "sendrecv"
     });
+
     pc.ontrack = function(event) {
+      console.log(event);
       stream.addTrack(event.track);
+      console.log(stream);
       video.srcObject = stream;
       console.log(event.streams.length + " track is delivered");
     };
@@ -93,8 +96,29 @@ export default function MiniVideos({ showFullCameraControls }) {
     }
 
     let sendChannel = null;
+    sendChannel = pc.createDataChannel("foo");
+    sendChannel.onclose = () => console.log("sendChannel has closed");
+    sendChannel.onopen = () => {
+      console.log("sendChannel has opened");
+      sendChannel.send("ping");
+      setInterval(() => {
+        sendChannel.send("ping");
+      }, 1000);
+    };
 
     function getRemoteSdp() {
+      /*
+      try {
+        pc.setRemoteDescription(
+          new RTCSessionDescription({
+            type: "answer",
+            sdp: atob(receiver)
+          })
+        );
+      } catch (error) {
+        console.warn(error);
+      } */
+
       axios
         .post("http://behemoth.whoi.edu:8083/stream/receiver/" + suuid, {
           suuid: suuid,

@@ -1,0 +1,22 @@
+{
+  "server": {
+    "http_port": ":8083",
+    "ice_servers": ["stun:stun.l.google.com:19302"],
+    "ice_username": "",
+    "ice_credential": ""
+  },
+  "streams": {
+    "demo2": {
+      "on_demand": false,
+      "url": "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
+    },
+    "PCM": {
+      "on_demand": true,
+      "url": "rtsp://admin:admin123@10.128.18.224/mpeg4"
+    },
+    "H264_PCMALAW": {
+      "on_demand": true,
+      "url": "rtsp://admin:admin123@10.128.18.224/mpeg4"
+    }
+  }
+}

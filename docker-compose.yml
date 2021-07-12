@@ -1,12 +1,19 @@
 version: "3.7"
 
 services:
-  nginx-react:
-    container_name: nginx-react
-    build:
-      context: .
-      dockerfile: ./compose/Dockerfile
+  react_frontend:
+    build: ./react-frontend/
+    volumes:
+      - ./react-frontend:/app
+      - /app/node_modules #<- Use anonymous volume to keep node_modules directory
     ports:
-      - 8080:80
+      - 3000:3000
+    command: npm start
+
+  server:
+    build: ./node-server/
     environment:
-      NODE_ENV: production
+      - PORT=4040
+    ports:
+      - 4040:4040
+    command: node main.js
