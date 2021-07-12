@@ -1,9 +1,12 @@
-# generic local version for basic testing
+# For local React development
 version: "3.7"
 
 services:
   react_frontend:
     build: ./react-frontend/
+    volumes:
+      - ./react-frontend:/app
+      - /app/node_modules #<- Use anonymous volume to keep node_modules directory
     ports:
       - 3000:3000
     command: npm start
@@ -15,3 +18,8 @@ services:
     ports:
       - 4040:4040
     command: node main.js
+
+  video_server:
+    build: ./video-stream-server/
+    ports:
+      - 8083:8083
