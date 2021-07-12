@@ -11,19 +11,20 @@ const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
 io.on("connection", socket => {
   console.log(socket.handshake.query);
 
-  // Join a conversation
-  const { roomId } = socket.handshake.query;
-  socket.join(roomId);
-
   // Listen for new messages
   socket.on(NEW_CAMERA_COMMAND_EVENT, data => {
-    io.in(roomId).emit(NEW_CAMERA_COMMAND_EVENT, data);
+    console.log(data);
+    // Do something with the data object here
+    // Then emit a response with eventID, success/error status
+    const responsePayload = {
+      eventId: data.eventId,
+      receipt: "COVP_OK"
+    };
+    socket.emit(NEW_CAMERA_COMMAND_EVENT, responsePayload);
   });
 
-  // Leave the room if the user closes the socket
   socket.on("disconnect", reason => {
-    socket.leave(roomId);
-    console.log(type + " disconnected (" + reason + ")");
+    console.log("disconnected (" + reason + ")");
   });
 });
 

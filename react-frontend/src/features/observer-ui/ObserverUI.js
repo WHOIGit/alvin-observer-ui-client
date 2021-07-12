@@ -9,8 +9,6 @@ import CameraControls from "../camera-controls/CameraControls";
 import MiniVideos from "./MiniVideos";
 import SelectVideoSource from "./SelectVideoSource";
 import SelectExposureMode from "./SelectExposureMode";
-import { WebSocketContext } from "../../utils/WebSocket";
-import { initiateSocket, disconnectSocket } from "../../utils/Socket";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -61,10 +59,6 @@ export default function ObserverUI() {
     }
     setShowTopControls(!showTopControls);
   };
-
-  useEffect(() => {
-    initiateSocket();
-  }, []);
 
   return (
     <>

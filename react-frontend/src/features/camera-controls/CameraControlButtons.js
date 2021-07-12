@@ -1,10 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 //import nipplejs from "nipplejs";
 import ReactNipple from "react-nipple";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
 import { Box, Grid, Button, Typography, Divider } from "@material-ui/core";
 import CenterFocusStrongIcon from "@material-ui/icons/CenterFocusStrong";
+import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+
+const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand"; // Name of the event
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -30,6 +33,50 @@ const useStyles = makeStyles(theme => ({
 export default function CameraControlButtons() {
   const classes = useStyles();
   const joystickElem = useRef(null);
+  const { messages, sendMessage } = useCameraWebSocket(
+    NEW_CAMERA_COMMAND_EVENT
+  );
+  // Creates a websocket and manages messaging
+  //const [newMessage, setNewMessage] = useState(""); // Message to be sent
+  const [focusMode, setFocusMode] = useState("AF");
+
+  console.log(messages);
+
+  const handleSendMessage = () => {
+    const payload = {
+      command: "COVP",
+      camera: "camera1",
+      action: {
+        name: "FCM",
+        value: focusMode
+      }
+    };
+    sendMessage(payload);
+    //setNewMessage("");
+  };
+
+  const changeFocusMode = () => {
+    if (focusMode === "AF") {
+      setFocusMode("MF");
+    } else {
+      setFocusMode("AF");
+    }
+    handleSendMessage();
+  };
+
+  const renderCmdReceipt = () => {
+    if (messages.length) {
+      const lastMessage = messages[messages.length - 1];
+      console.log(lastMessage);
+      return (
+        <span>
+          {lastMessage.receipt}
+          <br />
+          {lastMessage.eventId}
+        </span>
+      );
+    }
+  };
 
   return (
     <div className={classes.root}>
@@ -39,9 +86,12 @@ export default function CameraControlButtons() {
           color="secondary"
           size="small"
           startIcon={<CenterFocusStrongIcon />}
+          onClick={changeFocusMode}
         >
           Focus AF/MF
         </Button>
+
+        <div>{renderCmdReceipt()}</div>
       </Box>
 
       <Box my={3}>
