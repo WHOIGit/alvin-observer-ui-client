@@ -12,6 +12,7 @@ import (
 
 	webrtc "github.com/deepch/vdk/format/webrtcv3"
 	"github.com/gin-gonic/gin"
+  "github.com/gin-contrib/cors"
 )
 
 type JCodec struct {
@@ -22,8 +23,18 @@ func serveHTTP() {
 	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.Default()
-	router.Use(CORSMiddleware())
-	
+
+  corsConfig := cors.DefaultConfig()
+
+  //corsConfig.AllowOrigins = []string{"*"}
+  // To be able to send tokens to the server.
+  corsConfig.AllowCredentials = true
+  corsConfig.AllowAllOrigins = true
+  // OPTIONS method for ReactJS
+  corsConfig.AddAllowMethods("OPTIONS")
+
+	router.Use(cors.New(corsConfig))
+
 	if _, err := os.Stat("./web"); !os.IsNotExist(err) {
 		router.LoadHTMLGlob("web/templates/*")
 		router.GET("/", HTTPAPIServerIndex)
@@ -152,23 +163,6 @@ func HTTPAPIServerStreamWebRTC(c *gin.Context) {
 			}
 		}
 	}()
-}
-
-func CORSMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Credentials", "true")
-		c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, x-access-token")
-		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
-		c.Header("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
-			return
-		}
-
-		c.Next()
-	}
 }
 
 type Response struct {

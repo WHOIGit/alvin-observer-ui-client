@@ -46,7 +46,9 @@ export default function CameraControls({
         </Grid>
         <Grid item xs={3}>
           <Paper className={classes.paper}>
-            <CameraControlButtons />
+            <CameraControlButtons
+              showFullCameraControls={showFullCameraControls}
+            />
           </Paper>
         </Grid>
       </Grid>

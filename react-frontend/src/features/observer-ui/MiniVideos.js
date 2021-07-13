@@ -15,6 +15,9 @@ import {
 } from "@material-ui/core";
 import InfoChips from "./InfoChips";
 import film from "../../images/604015.png";
+import WebRtcPlayer from "../../utils/webrtcplayer";
+
+WebRtcPlayer.setServer("128.128.181.215:8083");
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -58,9 +61,15 @@ export default function MiniVideos({ showFullCameraControls }) {
   const videoElem2 = useRef(null);
 
   useEffect(() => {
+    let video = videoElem1.current;
+    console.log(video);
+    const player = new WebRtcPlayer("miniVideo1", "teradek");
+  }, []);
+  /*
+  useEffect(() => {
     let stream = new MediaStream();
 
-    let suuid = "demo1";
+    let suuid = "H264_AAC";
 
     let config = {
       iceServers: [
@@ -107,7 +116,6 @@ export default function MiniVideos({ showFullCameraControls }) {
     };
 
     function getRemoteSdp() {
-      /*
       try {
         pc.setRemoteDescription(
           new RTCSessionDescription({
@@ -117,10 +125,10 @@ export default function MiniVideos({ showFullCameraControls }) {
         );
       } catch (error) {
         console.warn(error);
-      } */
+      }
 
       axios
-        .post("http://behemoth.whoi.edu:8083/stream/receiver/" + suuid, {
+        .post("http://128.128.181.215:8083/stream/receiver/" + suuid, {
           suuid: suuid,
           data: btoa(pc.localDescription.sdp)
         })
@@ -144,7 +152,7 @@ export default function MiniVideos({ showFullCameraControls }) {
         );
     }
   }, []);
-
+  */
   return (
     <div className={classes.root}>
       <Grid container spacing={2}>

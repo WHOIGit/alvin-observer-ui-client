@@ -30,7 +30,8 @@ const useStyles = makeStyles(theme => ({
   */
 }));
 
-export default function CameraControlButtons() {
+export default function CameraControlButtons({ showFullCameraControls }) {
+  console.log(showFullCameraControls);
   const classes = useStyles();
   const joystickElem = useRef(null);
   const { messages, sendMessage } = useCameraWebSocket(
@@ -129,24 +130,26 @@ export default function CameraControlButtons() {
         </Grid>
       </Box>
       <Divider />
-      <Box mt={3}>
-        <Typography variant="h6">P & T</Typography>
+      {showFullCameraControls && (
+        <Box mt={3}>
+          <Typography variant="h6">P & T</Typography>
 
-        <ReactNipple
-          options={{
-            mode: "static",
-            position: { top: "50%", left: "50%" },
-            color: "blue"
-          }}
-          style={{
-            position: "relative",
-            width: "100%",
-            height: 120
-            // if you pass position: 'relative', you don't need to import the stylesheet
-          }}
-          onMove={(evt, data) => console.log(evt, data)}
-        />
-      </Box>
+          <ReactNipple
+            options={{
+              mode: "static",
+              position: { top: "50%", left: "50%" },
+              color: "blue"
+            }}
+            style={{
+              position: "relative",
+              width: "100%",
+              height: 120
+              // if you pass position: 'relative', you don't need to import the stylesheet
+            }}
+            onMove={(evt, data) => console.log(evt, data)}
+          />
+        </Box>
+      )}
     </div>
   );
 }
