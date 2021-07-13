@@ -30,8 +30,7 @@ const useStyles = makeStyles(theme => ({
   */
 }));
 
-export default function CameraControlButtons({ showFullCameraControls }) {
-  console.log(showFullCameraControls);
+export default function CameraControlButtons() {
   const classes = useStyles();
   const joystickElem = useRef(null);
   const { messages, sendMessage } = useCameraWebSocket(
@@ -39,9 +38,17 @@ export default function CameraControlButtons({ showFullCameraControls }) {
   );
   // Creates a websocket and manages messaging
   //const [newMessage, setNewMessage] = useState(""); // Message to be sent
+  const [showJoystick, setShowJoystick] = useState(false);
   const [focusMode, setFocusMode] = useState("AF");
 
   console.log(messages);
+
+  useEffect(() => {
+    // delay loading of the virtual joystick until CSS transtion ends (.4s)
+    setTimeout(() => {
+      setShowJoystick(true);
+    }, 500);
+  }, []);
 
   const handleSendMessage = () => {
     const payload = {
@@ -130,7 +137,7 @@ export default function CameraControlButtons({ showFullCameraControls }) {
         </Grid>
       </Box>
       <Divider />
-      {showFullCameraControls && (
+      {showJoystick && (
         <Box mt={3}>
           <Typography variant="h6">P & T</Typography>
 

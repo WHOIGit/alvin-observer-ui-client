@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
 import { Typography, Grid, Paper, Icon, Fab } from "@material-ui/core";
 import CameraAltIcon from "@material-ui/icons/CameraAlt";
 import CameraControlButtons from "./CameraControlButtons";
 import LargeVideo from "./LargeVideo";
+
 const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: "#f5f5f5",
@@ -46,9 +47,7 @@ export default function CameraControls({
         </Grid>
         <Grid item xs={3}>
           <Paper className={classes.paper}>
-            <CameraControlButtons
-              showFullCameraControls={showFullCameraControls}
-            />
+            {showFullCameraControls && <CameraControlButtons />}
           </Paper>
         </Grid>
       </Grid>
