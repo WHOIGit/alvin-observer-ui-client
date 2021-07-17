@@ -14,7 +14,6 @@ import {
   Chip
 } from "@material-ui/core";
 import InfoChips from "./InfoChips";
-import film from "../../images/604015.png";
 import WebRtcPlayer from "../../utils/webrtcplayer";
 
 WebRtcPlayer.setServer("128.128.181.215:8083");

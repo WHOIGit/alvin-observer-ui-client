@@ -18,7 +18,10 @@ io.on("connection", socket => {
     // Then emit a response with eventID, success/error status
     const responsePayload = {
       eventId: data.eventId,
-      receipt: "COVP_OK"
+      receipt: {
+        command: "COVP",
+        status: "OK"
+      }
     };
     socket.emit(NEW_CAMERA_COMMAND_EVENT, responsePayload);
   });

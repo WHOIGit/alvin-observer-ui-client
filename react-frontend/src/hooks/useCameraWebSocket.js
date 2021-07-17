@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import socketIOClient from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
+import {
+  setLastCommand,
+  changeCameraSettings
+} from "../features/camera-controls/cameraControlsSlice";
 
 const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand"; // Name of the event
 const SOCKET_SERVER_URL = "http://localhost:4040";
@@ -9,6 +14,7 @@ const useCameraWebSocket = socketEvent => {
   console.log(socketEvent);
   const [messages, setMessages] = useState([]); // Sent and received messages
   const socketRef = useRef();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Creates a WebSocket connection
@@ -25,6 +31,7 @@ const useCameraWebSocket = socketEvent => {
       */
       console.log(incomingMessage);
       setMessages(messages => [...messages, incomingMessage]);
+      dispatch(changeCameraSettings(incomingMessage));
     });
 
     // Destroys the socket reference
@@ -45,7 +52,13 @@ const useCameraWebSocket = socketEvent => {
         camera: messageBody.camera,
         action: messageBody.action
       };
-      socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
+      try {
+        console.log(payload);
+        socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
+        dispatch(setLastCommand(payload));
+      } catch {
+        console.log("Error sending socket message");
+      }
     }
   };
 

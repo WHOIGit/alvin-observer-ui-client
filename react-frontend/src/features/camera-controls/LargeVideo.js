@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import film from "../../images/604015.png";
 
 const useStyles = makeStyles(theme => ({
   root: {

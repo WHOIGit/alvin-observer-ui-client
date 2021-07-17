@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-//import nipplejs from "nipplejs";
+import { useSelector, useDispatch } from "react-redux";
 import ReactNipple from "react-nipple";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
 import { Box, Grid, Button, Typography, Divider } from "@material-ui/core";
 import CenterFocusStrongIcon from "@material-ui/icons/CenterFocusStrong";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-
+import {
+  selectActiveCamera,
+  changeCameraSettings
+} from "./cameraControlsSlice";
 const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand"; // Name of the event
 
 const useStyles = makeStyles(theme => ({
@@ -33,6 +36,8 @@ const useStyles = makeStyles(theme => ({
 export default function CameraControlButtons() {
   const classes = useStyles();
   const joystickElem = useRef(null);
+  const activeCamera = useSelector(selectActiveCamera);
+
   const { messages, sendMessage } = useCameraWebSocket(
     NEW_CAMERA_COMMAND_EVENT
   );
@@ -78,7 +83,7 @@ export default function CameraControlButtons() {
       console.log(lastMessage);
       return (
         <span>
-          {lastMessage.receipt}
+          {lastMessage.receipt.status}
           <br />
           {lastMessage.eventId}
         </span>
