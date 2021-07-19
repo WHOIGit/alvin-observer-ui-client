@@ -6,6 +6,7 @@ import Link from "@material-ui/core/Link";
 import { Box, Grid, Button, Typography, Divider } from "@material-ui/core";
 import CenterFocusStrongIcon from "@material-ui/icons/CenterFocusStrong";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import useLongPress from "../../hooks/useLongPress";
 import {
   selectActiveCamera,
   changeCameraSettings
@@ -38,6 +39,7 @@ const useStyles = makeStyles(theme => ({
 export default function CameraControlButtons() {
   const classes = useStyles();
   const joystickElem = useRef(null);
+  const timerRef = useRef(false);
   const activeCamera = useSelector(selectActiveCamera);
 
   const { messages, sendMessage } = useCameraWebSocket(
@@ -47,8 +49,6 @@ export default function CameraControlButtons() {
   //const [newMessage, setNewMessage] = useState(""); // Message to be sent
   const [showJoystick, setShowJoystick] = useState(false);
 
-  console.log(messages);
-
   useEffect(() => {
     // delay loading of the virtual joystick until CSS transtion ends (.4s)
     setTimeout(() => {
@@ -56,8 +56,69 @@ export default function CameraControlButtons() {
     }, 500);
   }, []);
 
-  const handleSendMessage = commandName => {
-    let commandValue;
+  const handleZoomHold = commandValue => {
+    console.log(commandValue);
+    handleSendMessage(COMMAND_STRINGS.focusControlCommand, commandValue);
+    // Set a Timeout to resend command every 1 sec
+    timerRef.current = setTimeout(handleZoomHold, 1000, commandValue);
+  };
+
+  const handleZoomStop = () => {
+    console.log();
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+
+      handleSendMessage(
+        COMMAND_STRINGS.focusControlCommand,
+        COMMAND_STRINGS.focusStop
+      );
+    }
+  };
+
+  const focusNearBtnProps = useLongPress({
+    onClick: () =>
+      handleSendMessage(
+        COMMAND_STRINGS.focusControlCommand,
+        COMMAND_STRINGS.focusNearOneStop
+      ),
+    onLongPress: () => handleZoomHold(COMMAND_STRINGS.focusNearContinuos),
+    onStop: () => handleZoomStop()
+  });
+
+  const focusFarBtnProps = useLongPress({
+    onClick: () =>
+      handleSendMessage(
+        COMMAND_STRINGS.focusControlCommand,
+        COMMAND_STRINGS.focusFarOneStop
+      ),
+    onLongPress: () => handleZoomHold(COMMAND_STRINGS.focusFarContinuos),
+    onStop: () => handleZoomStop()
+  });
+
+  const zoomNearBtnProps = useLongPress({
+    onClick: () =>
+      handleSendMessage(
+        COMMAND_STRINGS.focusControlCommand,
+        COMMAND_STRINGS.focusZoomNearOneStop
+      ),
+    onLongPress: () => handleZoomHold(COMMAND_STRINGS.focusZoomNearContinuos),
+    onStop: () => handleZoomStop()
+  });
+
+  const zoomFarBtnProps = useLongPress({
+    onClick: () =>
+      handleSendMessage(
+        COMMAND_STRINGS.focusControlCommand,
+        COMMAND_STRINGS.focusZoomFarOneStop
+      ),
+    onLongPress: () => handleZoomHold(COMMAND_STRINGS.focusZoomFarContinuos),
+    onStop: () => handleZoomStop()
+  });
+
+  const handleSendMessage = (commandName, commandValue) => {
+    if (commandValue === undefined) {
+      let commandValue;
+    }
 
     if (commandName === COMMAND_STRINGS.focusModeCommand) {
       if (activeCamera.settings.focusMode === COMMAND_STRINGS.focusAF) {
@@ -111,12 +172,22 @@ export default function CameraControlButtons() {
       <Box my={3}>
         <Grid container spacing={1}>
           <Grid item xs={6}>
-            <Button variant="contained" color="secondary" size="small">
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              {...focusNearBtnProps}
+            >
               Near
             </Button>
           </Grid>
           <Grid item xs={6}>
-            <Button variant="contained" color="secondary" size="small">
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              {...zoomNearBtnProps}
+            >
               Tele
             </Button>
           </Grid>
@@ -131,12 +202,22 @@ export default function CameraControlButtons() {
             </Typography>
           </Grid>
           <Grid item xs={6}>
-            <Button variant="contained" color="secondary" size="small">
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              {...focusFarBtnProps}
+            >
               Far
             </Button>
           </Grid>
           <Grid item xs={6}>
-            <Button variant="contained" color="secondary" size="small">
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              {...zoomFarBtnProps}
+            >
               Wide
             </Button>
           </Grid>
