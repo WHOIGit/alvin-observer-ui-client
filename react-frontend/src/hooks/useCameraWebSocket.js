@@ -39,7 +39,7 @@ const useCameraWebSocket = socketEvent => {
     return () => {
       socketRef.current.disconnect();
     };
-  }, [socketEvent]);
+  }, [socketEvent, dispatch]);
 
   // Sends a message to the server that
   // forwards it to all users in the same room

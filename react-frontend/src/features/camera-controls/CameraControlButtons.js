@@ -10,6 +10,8 @@ import {
   selectActiveCamera,
   changeCameraSettings
 } from "./cameraControlsSlice";
+import { COMMAND_STRINGS } from "../../config.js";
+
 const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand"; // Name of the event
 
 const useStyles = makeStyles(theme => ({
@@ -44,7 +46,6 @@ export default function CameraControlButtons() {
   // Creates a websocket and manages messaging
   //const [newMessage, setNewMessage] = useState(""); // Message to be sent
   const [showJoystick, setShowJoystick] = useState(false);
-  const [focusMode, setFocusMode] = useState("AF");
 
   console.log(messages);
 
@@ -55,26 +56,26 @@ export default function CameraControlButtons() {
     }, 500);
   }, []);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = commandName => {
+    let commandValue;
+
+    if (commandName === COMMAND_STRINGS.focusModeCommand) {
+      if (activeCamera.settings.focusMode === COMMAND_STRINGS.focusAF) {
+        commandValue = COMMAND_STRINGS.focusMF;
+      } else {
+        commandValue = COMMAND_STRINGS.focusAF;
+      }
+    }
+
     const payload = {
       command: "COVP",
       camera: "camera1",
       action: {
-        name: "FCM",
-        value: focusMode
+        name: commandName,
+        value: commandValue
       }
     };
     sendMessage(payload);
-    //setNewMessage("");
-  };
-
-  const changeFocusMode = () => {
-    if (focusMode === "AF") {
-      setFocusMode("MF");
-    } else {
-      setFocusMode("AF");
-    }
-    handleSendMessage();
   };
 
   const renderCmdReceipt = () => {
@@ -99,7 +100,7 @@ export default function CameraControlButtons() {
           color="secondary"
           size="small"
           startIcon={<CenterFocusStrongIcon />}
-          onClick={changeFocusMode}
+          onClick={() => handleSendMessage(COMMAND_STRINGS.focusModeCommand)}
         >
           Focus AF/MF
         </Button>

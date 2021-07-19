@@ -57,12 +57,10 @@ export const cameraControlsSlice = createSlice({
       });
     },
     changeCameraSettings: (state, action) => {
-      console.log(action);
       // need to check confirmation of successful command from WebSocket
       const cameras = state.cameras.filter(item => item.lastCommand);
       cameras.forEach(element => {
         if (element.lastCommand.eventID === action.payload.eventID) {
-          console.log("THIS IS TRUE?");
           console.log(current(state));
           // If websocket receipt returns OK, update the live settings
           if (action.payload.receipt.status === "OK") {
@@ -92,7 +90,7 @@ export default cameraControlsSlice.reducer;
 // Selector functions
 // return only the Active camera currently selected
 export const selectActiveCamera = state =>
-  state.cameraControls.cameras.filter(item => item.isActive);
+  state.cameraControls.cameras.filter(item => item.isActive)[0];
 
 // return a flat array of just the dataLayer IDs
 export const selectVisibleLayerIds = state => {
