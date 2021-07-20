@@ -12,8 +12,7 @@ import {
   changeCameraSettings
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
-
-const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand"; // Name of the event
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -240,7 +239,15 @@ export default function CameraControlButtons() {
               height: 120
               // if you pass position: 'relative', you don't need to import the stylesheet
             }}
-            onMove={(evt, data) => console.log(evt, data)}
+            onMove={(evt, data) => {
+              console.log(evt, data);
+              const payload = {
+                distance: data.distance,
+                angle: data.angle,
+                direction: data.direction
+              };
+              handleSendMessage(COMMAND_STRINGS.panTiltCommand, payload);
+            }}
           />
         </Box>
       )}

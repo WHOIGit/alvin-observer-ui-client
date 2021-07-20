@@ -1,9 +1,9 @@
 import { createSlice, current } from "@reduxjs/toolkit";
-
+import { COMMAND_STRINGS } from "../../config.js";
 // set default settings
 const defaultObserverSide = "P"; // P = Port/ S = Starboard
-const defaultFocusMode = "AF";
-const defaultExposureMode = "auto";
+const defaultFocusMode = COMMAND_STRINGS.focusAF;
+const defaultExposureMode = COMMAND_STRINGS.exposureModeOptions[0];
 
 const initialState = {
   observerSide: defaultObserverSide,
@@ -48,6 +48,7 @@ export const cameraControlsSlice = createSlice({
     },
     setLastCommand: (state, action) => {
       state.cameras.forEach(element => {
+        console.log(action.payload);
         if (element.camera === action.payload.camera) {
           element.lastCommand = action.payload;
           element.lastCommand.action.name = action.payload.action.name;
@@ -66,8 +67,16 @@ export const cameraControlsSlice = createSlice({
           if (action.payload.receipt.status === "OK") {
             element.lastCommand.status = "OK";
             // change the setting variable
-            if (element.lastCommand.action.name === "FCM") {
+            if (
+              element.lastCommand.action.name ===
+              COMMAND_STRINGS.focusModeCommand
+            ) {
               element.settings.focusMode = element.lastCommand.action.value;
+            } else if (
+              element.lastCommand.action.name ===
+              COMMAND_STRINGS.exposureModeCommand
+            ) {
+              element.settings.exposureMode = element.lastCommand.action.value;
             }
           } else {
             element.lastCommand.status = "ERR";

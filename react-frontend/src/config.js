@@ -1,4 +1,6 @@
 export const WS_BASE = "http://localhost:9041/";
+// Web socket event names
+export const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
 
 export const COMMAND_STRINGS = {
   exposureModeCommand: "EXP",

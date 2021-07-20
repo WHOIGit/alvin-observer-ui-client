@@ -56,8 +56,8 @@ const useCameraWebSocket = socketEvent => {
         console.log(payload);
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));
-      } catch {
-        console.log("Error sending socket message");
+      } catch (err) {
+        console.log(err);
       }
     }
   };
