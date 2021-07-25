@@ -3,6 +3,7 @@ export const WS_BASE = "http://localhost:9041/";
 export const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
 
 export const COMMAND_STRINGS = {
+  cameraChangeCommand: "CAM",
   exposureModeCommand: "EXP",
   exposureModeOptions: ["AUTO", "MAN", "SP", "IP"],
   focusModeCommand: "FCM",

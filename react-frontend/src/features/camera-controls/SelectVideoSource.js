@@ -8,6 +8,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import {
   selectActiveCamera,
+  selectObserverSide,
   changeCameraSettings
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
@@ -24,9 +25,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function SelectExposureMode({ showTopControls }) {
+export default function SelectVideoSource({ showTopControls }) {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCamera);
+  const cameras = useSelector(state => state.cameraControls.cameras);
   const { messages, sendMessage } = useCameraWebSocket(
     NEW_CAMERA_COMMAND_EVENT
   );
@@ -35,7 +37,7 @@ export default function SelectExposureMode({ showTopControls }) {
     const payload = {
       camera: activeCamera.camera,
       action: {
-        name: COMMAND_STRINGS.exposureModeCommand,
+        name: COMMAND_STRINGS.cameraChangeCommand,
         value: event.target.value
       }
     };
@@ -45,25 +47,16 @@ export default function SelectExposureMode({ showTopControls }) {
   return (
     <div className={classes.root}>
       <FormControl className={classes.formControl}>
-        <InputLabel id="demo-simple-select-label">Exposure Mode</InputLabel>
+        <InputLabel id="video-select-label">Video Source</InputLabel>
         <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={activeCamera.settings.exposureMode}
+          labelId="video-select-label"
+          id="video-select"
+          value={activeCamera.camera}
           onChange={handleSendMessage}
         >
-          <MenuItem value={COMMAND_STRINGS.exposureModeOptions[0]}>
-            Auto
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.exposureModeOptions[1]}>
-            Manual
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.exposureModeOptions[2]}>
-            Shutter Priority
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.exposureModeOptions[3]}>
-            Iris Priority
-          </MenuItem>
+          {cameras.map(item => (
+            <MenuItem value={item.camera}>{item.cameraName}</MenuItem>
+          ))}
         </Select>
       </FormControl>
     </div>

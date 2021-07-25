@@ -7,7 +7,7 @@ import ControlButtons from "./ControlButtons";
 import NavOverlayData from "./NavOverlayData";
 import CameraControls from "../camera-controls/CameraControls";
 import MiniVideos from "./MiniVideos";
-import SelectVideoSource from "./SelectVideoSource";
+import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
 
 const useStyles = makeStyles(theme => ({

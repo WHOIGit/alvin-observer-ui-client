@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import socketIOClient from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import {
   setLastCommand,
-  changeCameraSettings
+  changeCameraSettings,
+  selectObserverSide
 } from "../features/camera-controls/cameraControlsSlice";
 
 const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand"; // Name of the event
 const SOCKET_SERVER_URL = "http://localhost:4040";
 
 const useCameraWebSocket = socketEvent => {
-  console.log(socketEvent);
+  const observerSide = useSelector(selectObserverSide);
   const [messages, setMessages] = useState([]); // Sent and received messages
   const socketRef = useRef();
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ const useCameraWebSocket = socketEvent => {
     if (socketRef.current !== undefined) {
       const payload = {
         eventId: uuidv4(),
-        command: messageBody.command,
+        command: observerSide,
         camera: messageBody.camera,
         action: messageBody.action
       };

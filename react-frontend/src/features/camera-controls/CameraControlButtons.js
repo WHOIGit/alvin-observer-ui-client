@@ -128,8 +128,7 @@ export default function CameraControlButtons() {
     }
 
     const payload = {
-      command: "COVP",
-      camera: "camera1",
+      camera: activeCamera.camera,
       action: {
         name: commandName,
         value: commandValue

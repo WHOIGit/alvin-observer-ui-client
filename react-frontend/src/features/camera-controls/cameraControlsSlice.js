@@ -1,7 +1,7 @@
 import { createSlice, current } from "@reduxjs/toolkit";
 import { COMMAND_STRINGS } from "../../config.js";
 // set default settings
-const defaultObserverSide = "P"; // P = Port/ S = Starboard
+const defaultObserverSide = "COVP"; // P = Port/ S = Starboard
 const defaultFocusMode = COMMAND_STRINGS.focusAF;
 const defaultExposureMode = COMMAND_STRINGS.exposureModeOptions[0];
 
@@ -10,6 +10,7 @@ const initialState = {
   cameras: [
     {
       camera: "camera1",
+      cameraName: "Camera 1",
       settings: {
         focusMode: defaultFocusMode,
         exposureMode: defaultExposureMode
@@ -21,6 +22,7 @@ const initialState = {
     },
     {
       camera: "camera2",
+      cameraName: "Camera 2",
       settings: {
         focusMode: defaultFocusMode,
         exposureMode: defaultExposureMode
@@ -66,17 +68,25 @@ export const cameraControlsSlice = createSlice({
           // If websocket receipt returns OK, update the live settings
           if (action.payload.receipt.status === "OK") {
             element.lastCommand.status = "OK";
-            // change the setting variable
-            if (
-              element.lastCommand.action.name ===
-              COMMAND_STRINGS.focusModeCommand
-            ) {
-              element.settings.focusMode = element.lastCommand.action.value;
-            } else if (
-              element.lastCommand.action.name ===
-              COMMAND_STRINGS.exposureModeCommand
-            ) {
-              element.settings.exposureMode = element.lastCommand.action.value;
+            // change the camera settings
+            switch (element.lastCommand.action.name) {
+              // change observer camera
+              case COMMAND_STRINGS.cameraChangeCommand:
+                element.isActive = false;
+                // set the new active camera
+                const newCamera = state.cameras.filter(
+                  item => item.camera === element.lastCommand.action.value
+                )[0];
+                newCamera.isActive = true;
+                break;
+              // change focus mode
+              case COMMAND_STRINGS.focusModeCommand:
+                element.settings.focusMode = element.lastCommand.action.value;
+                break;
+              // change exposure mode
+              case COMMAND_STRINGS.exposureModeCommand:
+                element.settings.exposureMode =
+                  element.lastCommand.action.value;
             }
           } else {
             element.lastCommand.status = "ERR";
@@ -100,6 +110,9 @@ export default cameraControlsSlice.reducer;
 // return only the Active camera currently selected
 export const selectActiveCamera = state =>
   state.cameraControls.cameras.filter(item => item.isActive)[0];
+
+// return only the Active camera currently selected
+export const selectObserverSide = state => state.cameraControls.observerSide;
 
 // return a flat array of just the dataLayer IDs
 export const selectVisibleLayerIds = state => {

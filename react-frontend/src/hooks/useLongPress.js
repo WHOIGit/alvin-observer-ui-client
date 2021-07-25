@@ -37,7 +37,7 @@ export default function useLongPress({
       // call custom onStop function if provided
       onStop();
     },
-    [onClick]
+    [onClick, onStop]
   );
 
   return useMemo(
