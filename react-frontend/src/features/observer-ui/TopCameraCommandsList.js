@@ -1,17 +1,17 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { List, ListItem, Chip } from "@material-ui/core";
 import SelectShutterMode from "../camera-controls/SelectShutterMode";
 import SelectIrisMode from "../camera-controls/SelectIrisMode";
 import SelectIsoMode from "../camera-controls/SelectIsoMode";
-const useStyles = makeStyles(theme => ({
-  listItem: {
-    width: "100%"
-  }
-}));
+import FocusModeDisplayChip from "./FocusModeDisplayChip";
+import { selectActiveCamera } from "../camera-controls/cameraControlsSlice";
 
 export default function TopCameraCommandsList() {
-  const classes = useStyles();
+  const activeCamera = useSelector(selectActiveCamera);
+
+  const focusLabel = `FOCUS: ${activeCamera.settings.focusMode}`;
   return (
     <List>
       <ListItem disableGutters={true}>
@@ -24,11 +24,7 @@ export default function TopCameraCommandsList() {
         <SelectIsoMode />
       </ListItem>
       <ListItem disableGutters={true}>
-        <Chip
-          label="FOCUS: AF/MF"
-          color="secondary"
-          className={classes.listItem}
-        />
+        <FocusModeDisplayChip />
       </ListItem>
     </List>
   );

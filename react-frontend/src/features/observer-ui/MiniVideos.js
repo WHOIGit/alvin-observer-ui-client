@@ -14,6 +14,7 @@ import {
   Chip
 } from "@material-ui/core";
 import TopCameraCommandsList from "./TopCameraCommandsList";
+import FocusModeDisplayChip from "./FocusModeDisplayChip";
 import WebRtcPlayer from "../../utils/webrtcplayer";
 
 WebRtcPlayer.setServer("128.128.181.215:8083");
@@ -140,7 +141,7 @@ export default function MiniVideos({ showFullCameraControls }) {
                   </Typography>
                 </CardActions>
               </Card>
-              <Chip label="FOCUS: AF/MF" className={classes.infoChip} />
+              <FocusModeDisplayChip className={classes.infoChip} />
             </>
           )}
         </Grid>
