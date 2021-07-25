@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
 import { Grid, Paper, Icon, Fab } from "@material-ui/core";
 import CameraAltIcon from "@material-ui/icons/CameraAlt";
-import ControlButtons from "./ControlButtons";
+import UpperRightBtns from "./UpperRightBtns";
 import NavOverlayData from "./NavOverlayData";
 import CameraControls from "../camera-controls/CameraControls";
 import MiniVideos from "./MiniVideos";
@@ -78,7 +78,7 @@ export default function ObserverUI() {
           </Grid>
           <Grid item xs={3}>
             <Paper className={classes.paper}>
-              <ControlButtons
+              <UpperRightBtns
                 showFullCameraControls={showFullCameraControls}
                 setShowFullCameraControls={setShowFullCameraControls}
               />

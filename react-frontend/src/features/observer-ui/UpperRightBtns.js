@@ -4,6 +4,11 @@ import Link from "@material-ui/core/Link";
 import { Grid, Button } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+// local imports
+import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { COMMAND_STRINGS } from "../../config.js";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import CaptureButtons from "../camera-controls/CaptureButtons";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -40,47 +45,7 @@ export default function ControlButtons({
             Goto {showFullCameraControls ? "SEALOG" : "Cam Control"}
           </Button>
         </Grid>
-        <Grid item xs={6}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            className={classes.ctrlButton}
-          >
-            Still Img Capture
-          </Button>
-        </Grid>
-        <Grid item xs={6}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            className={classes.ctrlButton}
-          >
-            Event <br />
-            Trigger
-          </Button>
-        </Grid>
-        <Grid item xs={6}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            className={classes.ctrlButton}
-          >
-            Quick <br /> Clip
-          </Button>
-        </Grid>
-        <Grid item xs={6}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            className={classes.ctrlButton}
-          >
-            Record Source
-          </Button>
-        </Grid>
+        <CaptureButtons />
       </Grid>
     </div>
   );

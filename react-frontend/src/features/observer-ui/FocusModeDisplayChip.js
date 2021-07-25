@@ -5,7 +5,7 @@ import { Chip } from "@material-ui/core";
 import { selectActiveCamera } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles(theme => ({
-  listItem: {
+  chip: {
     width: "100%"
   }
 }));
@@ -15,7 +15,5 @@ export default function FocusModeDisplayChip() {
   const activeCamera = useSelector(selectActiveCamera);
 
   const focusLabel = `FOCUS: ${activeCamera.settings.focusMode}`;
-  return (
-    <Chip label={focusLabel} color="secondary" className={classes.listItem} />
-  );
+  return <Chip label={focusLabel} color="secondary" className={classes.chip} />;
 }

@@ -21,7 +21,8 @@ WebRtcPlayer.setServer("128.128.181.215:8083");
 
 const useStyles = makeStyles(theme => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
+    marginBottom: theme.spacing(1)
   },
   headerRoot: { padding: "4px" },
   title: {
