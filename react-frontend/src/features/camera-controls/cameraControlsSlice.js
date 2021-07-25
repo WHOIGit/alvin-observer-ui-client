@@ -4,6 +4,9 @@ import { COMMAND_STRINGS } from "../../config.js";
 const defaultObserverSide = "COVP"; // P = Port/ S = Starboard
 const defaultFocusMode = COMMAND_STRINGS.focusAF;
 const defaultExposureMode = COMMAND_STRINGS.exposureModeOptions[0];
+const defaultShutterMode = COMMAND_STRINGS.shutterModeOptions[0];
+const defaultIrisMode = COMMAND_STRINGS.irisModeOptions[0];
+const defaultIsoMode = COMMAND_STRINGS.isoModeOptions[0];
 
 const initialState = {
   observerSide: defaultObserverSide,
@@ -13,7 +16,10 @@ const initialState = {
       cameraName: "Camera 1",
       settings: {
         focusMode: defaultFocusMode,
-        exposureMode: defaultExposureMode
+        exposureMode: defaultExposureMode,
+        shutterMode: defaultShutterMode,
+        irisMode: defaultIrisMode,
+        isoMode: defaultIsoMode
       },
       lastCommand: null,
       data: {},
@@ -25,7 +31,10 @@ const initialState = {
       cameraName: "Camera 2",
       settings: {
         focusMode: defaultFocusMode,
-        exposureMode: defaultExposureMode
+        exposureMode: defaultExposureMode,
+        shutterMode: defaultShutterMode,
+        irisMode: defaultIrisMode,
+        isoMode: defaultIsoMode
       },
       lastCommand: null,
       data: {},
@@ -61,10 +70,10 @@ export const cameraControlsSlice = createSlice({
     },
     changeCameraSettings: (state, action) => {
       // need to check confirmation of successful command from WebSocket
-      const cameras = state.cameras.filter(item => item.lastCommand);
+      const cameras = state.cameras.filter(item => item.isActive);
       cameras.forEach(element => {
         if (element.lastCommand.eventID === action.payload.eventID) {
-          console.log(current(state));
+          console.log(current(element));
           // If websocket receipt returns OK, update the live settings
           if (action.payload.receipt.status === "OK") {
             element.lastCommand.status = "OK";
@@ -72,6 +81,7 @@ export const cameraControlsSlice = createSlice({
             switch (element.lastCommand.action.name) {
               // change observer camera
               case COMMAND_STRINGS.cameraChangeCommand:
+                console.log("CAM CHANGE");
                 element.isActive = false;
                 // set the new active camera
                 const newCamera = state.cameras.filter(
@@ -81,7 +91,20 @@ export const cameraControlsSlice = createSlice({
                 break;
               // change focus mode
               case COMMAND_STRINGS.focusModeCommand:
+                console.log("FOCUS");
                 element.settings.focusMode = element.lastCommand.action.value;
+                break;
+              // change shutter mode
+              case COMMAND_STRINGS.shutterModeCommand:
+                element.settings.shutterMode = element.lastCommand.action.value;
+                break;
+              // change iris mode
+              case COMMAND_STRINGS.irisModeCommand:
+                element.settings.irisMode = element.lastCommand.action.value;
+                break;
+              // change iso mode
+              case COMMAND_STRINGS.isoModeCommand:
+                element.settings.isoMode = element.lastCommand.action.value;
                 break;
               // change exposure mode
               case COMMAND_STRINGS.exposureModeCommand:

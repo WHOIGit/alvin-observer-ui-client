@@ -1,28 +1,34 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { List, ListItem, Chip } from "@material-ui/core";
-
+import SelectShutterMode from "../camera-controls/SelectShutterMode";
+import SelectIrisMode from "../camera-controls/SelectIrisMode";
+import SelectIsoMode from "../camera-controls/SelectIsoMode";
 const useStyles = makeStyles(theme => ({
-  infoChip: {
+  listItem: {
     width: "100%"
   }
 }));
 
-export default function InfoChips() {
+export default function TopCameraCommandsList() {
   const classes = useStyles();
   return (
     <List>
       <ListItem disableGutters={true}>
-        <Chip label="SHUTTER: [value]" className={classes.infoChip} />
+        <SelectShutterMode />
       </ListItem>
       <ListItem disableGutters={true}>
-        <Chip label="IRIS: [value]" className={classes.infoChip} />
+        <SelectIrisMode />
       </ListItem>
       <ListItem disableGutters={true}>
-        <Chip label="ISO: [value]" className={classes.infoChip} />
+        <SelectIsoMode />
       </ListItem>
       <ListItem disableGutters={true}>
-        <Chip label="FOCUS: AF/MF" className={classes.infoChip} />
+        <Chip
+          label="FOCUS: AF/MF"
+          color="secondary"
+          className={classes.listItem}
+        />
       </ListItem>
     </List>
   );

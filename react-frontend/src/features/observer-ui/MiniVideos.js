@@ -13,7 +13,7 @@ import {
   Button,
   Chip
 } from "@material-ui/core";
-import InfoChips from "./InfoChips";
+import TopCameraCommandsList from "./TopCameraCommandsList";
 import WebRtcPlayer from "../../utils/webrtcplayer";
 
 WebRtcPlayer.setServer("128.128.181.215:8083");
@@ -64,94 +64,7 @@ export default function MiniVideos({ showFullCameraControls }) {
     console.log(video);
     const player = new WebRtcPlayer("miniVideo1", "teradek");
   }, []);
-  /*
-  useEffect(() => {
-    let stream = new MediaStream();
 
-    let suuid = "H264_AAC";
-
-    let config = {
-      iceServers: [
-        {
-          urls: ["stun:stun.l.google.com:19302"]
-        }
-      ]
-    };
-
-    let video = videoElem1.current;
-    console.log(video);
-
-    const pc = new RTCPeerConnection(config);
-    pc.onnegotiationneeded = handleNegotiationNeededEvent;
-    pc.addTransceiver("video", {
-      direction: "sendrecv"
-    });
-
-    pc.ontrack = function(event) {
-      console.log(event);
-      stream.addTrack(event.track);
-      console.log(stream);
-      video.srcObject = stream;
-      console.log(event.streams.length + " track is delivered");
-    };
-
-    pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
-
-    async function handleNegotiationNeededEvent() {
-      let offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      getRemoteSdp();
-    }
-
-    let sendChannel = null;
-    sendChannel = pc.createDataChannel("foo");
-    sendChannel.onclose = () => console.log("sendChannel has closed");
-    sendChannel.onopen = () => {
-      console.log("sendChannel has opened");
-      sendChannel.send("ping");
-      setInterval(() => {
-        sendChannel.send("ping");
-      }, 1000);
-    };
-
-    function getRemoteSdp() {
-      try {
-        pc.setRemoteDescription(
-          new RTCSessionDescription({
-            type: "answer",
-            sdp: atob(receiver)
-          })
-        );
-      } catch (error) {
-        console.warn(error);
-      }
-
-      axios
-        .post("http://128.128.181.215:8083/stream/receiver/" + suuid, {
-          suuid: suuid,
-          data: btoa(pc.localDescription.sdp)
-        })
-        .then(
-          response => {
-            console.log(response);
-            try {
-              pc.setRemoteDescription(
-                new RTCSessionDescription({
-                  type: "answer",
-                  sdp: atob(response.data)
-                })
-              );
-            } catch (error) {
-              console.warn(error);
-            }
-          },
-          error => {
-            console.log(error);
-          }
-        );
-    }
-  }, []);
-  */
   return (
     <div className={classes.root}>
       <Grid container spacing={2}>
@@ -192,7 +105,7 @@ export default function MiniVideos({ showFullCameraControls }) {
         </Grid>
         <Grid item xs={6}>
           {showFullCameraControls ? (
-            <InfoChips />
+            <TopCameraCommandsList />
           ) : (
             <>
               <Card className={classes.root}>
