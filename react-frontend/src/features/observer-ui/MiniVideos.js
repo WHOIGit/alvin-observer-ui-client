@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import axios from "axios";
+import { useSelector } from "react-redux";
 import adapter from "webrtc-adapter";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -13,6 +13,7 @@ import {
   Button,
   Chip
 } from "@material-ui/core";
+// local import
 import TopCameraCommandsList from "./TopCameraCommandsList";
 import FocusModeDisplayChip from "./FocusModeDisplayChip";
 import WebRtcPlayer from "../../utils/webrtcplayer";
@@ -58,14 +59,29 @@ const useStyles = makeStyles(theme => ({
 
 export default function MiniVideos({ showFullCameraControls }) {
   const classes = useStyles();
-  const videoElem1 = useRef(null);
-  const videoElem2 = useRef(null);
+  const videoElemRecord = useRef(null);
+  const videoElemObserver = useRef(null);
+  const observerVideoSrc = useSelector(
+    state => state.cameraControls.observerVideoSrc
+  );
+  const recordVideoSrc = useSelector(
+    state => state.cameraControls.recordVideoSrc
+  );
 
   useEffect(() => {
-    let video = videoElem1.current;
-    console.log(video);
-    const player = new WebRtcPlayer("miniVideo1", "teradek");
-  }, []);
+    const videoObserver = videoElemObserver.current;
+    if (videoObserver) {
+      const playerObserver = new WebRtcPlayer(
+        videoObserver.id,
+        observerVideoSrc
+      );
+    }
+
+    const videoRecord = videoElemRecord.current;
+    if (videoRecord) {
+      const playerRecord = new WebRtcPlayer(videoRecord.id, recordVideoSrc);
+    }
+  }, [showFullCameraControls, observerVideoSrc, recordVideoSrc]);
 
   return (
     <div className={classes.root}>
@@ -83,8 +99,8 @@ export default function MiniVideos({ showFullCameraControls }) {
               <div id="videoBox1">
                 <video
                   style={{ width: "100%" }}
-                  id="miniVideo1"
-                  ref={videoElem1}
+                  id="miniVideoRecord"
+                  ref={videoElemRecord}
                   autoPlay
                   muted
                   controls
@@ -122,8 +138,8 @@ export default function MiniVideos({ showFullCameraControls }) {
                   <div id="videoBox2">
                     <video
                       style={{ width: "100%" }}
-                      id="miniVideo2"
-                      ref={videoElem2}
+                      id="miniVideoObserver"
+                      ref={videoElemObserver}
                       autoPlay
                       muted
                       controls

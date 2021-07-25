@@ -3,7 +3,7 @@
     "http_port": ":8083"
   },
   "streams": {
-    "teradek": {
+    "portObserverVideo": {
       "on_demand": false,
       "url": "rtsp://128.128.184.12/stream1"
     }

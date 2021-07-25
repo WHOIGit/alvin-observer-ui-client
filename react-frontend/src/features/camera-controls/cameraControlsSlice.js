@@ -1,7 +1,9 @@
 import { createSlice, current } from "@reduxjs/toolkit";
-import { COMMAND_STRINGS } from "../../config.js";
+import { COMMAND_STRINGS, VIDEO_STREAM_CONFIG } from "../../config.js";
 // set default settings
 const defaultObserverSide = "COVP"; // P = Port/ S = Starboard
+const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
+const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
 const defaultFocusMode = COMMAND_STRINGS.focusAF;
 const defaultExposureMode = COMMAND_STRINGS.exposureModeOptions[0];
 const defaultShutterMode = COMMAND_STRINGS.shutterModeOptions[0];
@@ -10,6 +12,8 @@ const defaultIsoMode = COMMAND_STRINGS.isoModeOptions[0];
 
 const initialState = {
   observerSide: defaultObserverSide,
+  observerVideoSrc: defaultObserverVideoSrc,
+  recordVideoSrc: defaultRecordVideoSrc,
   cameras: [
     {
       camera: "camera1",
@@ -134,7 +138,7 @@ export default cameraControlsSlice.reducer;
 export const selectActiveCamera = state =>
   state.cameraControls.cameras.filter(item => item.isActive)[0];
 
-// return only the Active camera currently selected
+// return the current Observer Side
 export const selectObserverSide = state => state.cameraControls.observerSide;
 
 // return a flat array of just the dataLayer IDs

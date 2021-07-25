@@ -30,3 +30,12 @@ export const COMMAND_STRINGS = {
   quickClickCommand: "QCV",
   recordSourceCommand: "REC"
 };
+
+export const VIDEO_STREAM_CONFIG = {
+  server: "128.128.181.215:8083",
+  portObserverVideo: "teradek",
+  stbdObserverVideo: "stbdObserverVideo",
+  portRecordVideo: "portRecordVideo",
+  stbdRecordVideo: "stbdRecordVideo",
+  pilotVideo: "pilotVideo"
+};
