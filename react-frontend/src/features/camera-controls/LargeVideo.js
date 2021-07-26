@@ -1,5 +1,11 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
+// local imports
+import WebRtcPlayer from "../../utils/webrtcplayer";
+import { VIDEO_STREAM_CONFIG } from "../../config.js";
+
+WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -14,6 +20,19 @@ const useStyles = makeStyles(theme => ({
 export default function LargeVideo() {
   const classes = useStyles();
   const videoElem = useRef(null);
+  const observerVideoSrc = useSelector(
+    state => state.cameraControls.observerVideoSrc
+  );
+
+  useEffect(() => {
+    const videoObserver = videoElem.current;
+    if (videoObserver) {
+      const playerObserver = new WebRtcPlayer(
+        videoObserver.id,
+        observerVideoSrc
+      );
+    }
+  }, [observerVideoSrc]);
 
   return (
     <div className={classes.root}>
@@ -25,12 +44,7 @@ export default function LargeVideo() {
           autoPlay
           muted
           controls
-        >
-          <source
-            src="http://128.128.184.12/httplive/stream.m3u8"
-            type="application/vnd.apple.mpegurl"
-          />
-        </video>
+        ></video>
       </div>
     </div>
   );

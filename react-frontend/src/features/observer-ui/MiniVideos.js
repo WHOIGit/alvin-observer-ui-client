@@ -17,8 +17,9 @@ import {
 import TopCameraCommandsList from "./TopCameraCommandsList";
 import FocusModeDisplayChip from "./FocusModeDisplayChip";
 import WebRtcPlayer from "../../utils/webrtcplayer";
+import { VIDEO_STREAM_CONFIG } from "../../config.js";
 
-WebRtcPlayer.setServer("128.128.181.215:8083");
+WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
 const useStyles = makeStyles(theme => ({
   root: {
