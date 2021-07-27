@@ -97,20 +97,20 @@ export default function CameraControlButtons() {
   const zoomNearBtnProps = useLongPress({
     onClick: () =>
       handleSendMessage(
-        COMMAND_STRINGS.focusControlCommand,
-        COMMAND_STRINGS.focusZoomNearOneStop
+        COMMAND_STRINGS.zoomControlCommand,
+        COMMAND_STRINGS.zoomNearOneStop
       ),
-    onLongPress: () => handleZoomHold(COMMAND_STRINGS.focusZoomNearContinuos),
+    onLongPress: () => handleZoomHold(COMMAND_STRINGS.zoomNearContinuos),
     onStop: () => handleZoomStop()
   });
 
   const zoomFarBtnProps = useLongPress({
     onClick: () =>
       handleSendMessage(
-        COMMAND_STRINGS.focusControlCommand,
-        COMMAND_STRINGS.focusZoomFarOneStop
+        COMMAND_STRINGS.zoomControlCommand,
+        COMMAND_STRINGS.zoomFarOneStop
       ),
-    onLongPress: () => handleZoomHold(COMMAND_STRINGS.focusZoomFarContinuos),
+    onLongPress: () => handleZoomHold(COMMAND_STRINGS.zoomFarContinuos),
     onStop: () => handleZoomStop()
   });
 

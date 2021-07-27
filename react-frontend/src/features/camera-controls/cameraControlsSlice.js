@@ -95,7 +95,6 @@ export const cameraControlsSlice = createSlice({
                 break;
               // change focus mode
               case COMMAND_STRINGS.focusModeCommand:
-                console.log("FOCUS");
                 element.settings.focusMode = element.lastCommand.action.value;
                 break;
               // change shutter mode
