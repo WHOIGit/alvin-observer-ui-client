@@ -2,6 +2,9 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
 import { Typography } from "@material-ui/core";
+import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { COMMAND_STRINGS } from "../../config.js";
+import { NAV_HEARTBEAT } from "../../config.js";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -12,6 +15,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function NavOverlayData() {
   const classes = useStyles();
+  const { messages, sendMessage } = useCameraWebSocket(NAV_HEARTBEAT);
+  console.log(messages);
   return (
     <div className={classes.root}>
       <Typography variant="h6" gutterBottom>

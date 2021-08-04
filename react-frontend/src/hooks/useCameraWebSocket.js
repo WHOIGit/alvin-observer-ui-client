@@ -7,9 +7,7 @@ import {
   changeCameraSettings,
   selectObserverSide
 } from "../features/camera-controls/cameraControlsSlice";
-
-const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand"; // Name of the event
-const SOCKET_SERVER_URL = "http://localhost:4040";
+import { WS_SERVER, NEW_CAMERA_COMMAND_EVENT } from "../config";
 
 const useCameraWebSocket = socketEvent => {
   const observerSide = useSelector(selectObserverSide);
@@ -19,8 +17,9 @@ const useCameraWebSocket = socketEvent => {
 
   useEffect(() => {
     // Creates a WebSocket connection
-    socketRef.current = socketIOClient(SOCKET_SERVER_URL);
+    socketRef.current = socketIOClient(WS_SERVER);
     console.log(socketRef);
+    console.log(socketEvent);
 
     // Listens for incoming messages
     socketRef.current.on(socketEvent, incomingMessage => {
@@ -32,7 +31,9 @@ const useCameraWebSocket = socketEvent => {
       */
       console.log(incomingMessage);
       setMessages(messages => [...messages, incomingMessage]);
-      dispatch(changeCameraSettings(incomingMessage));
+      if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
+        dispatch(changeCameraSettings(incomingMessage));
+      }
     });
 
     // Destroys the socket reference

@@ -1,6 +1,8 @@
-export const WS_BASE = "http://localhost:9041/";
+// Web socket server
+export const WS_SERVER = "http://128.128.184.62:4040";
 // Web socket event names
 export const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
+export const NAV_HEARTBEAT = "NavHeartbeat";
 
 export const COMMAND_STRINGS = {
   cameraChangeCommand: "CAM",
