@@ -19,7 +19,6 @@ const useCameraWebSocket = socketEvent => {
     // Creates a WebSocket connection
     socketRef.current = socketIOClient(WS_SERVER);
     console.log(socketRef);
-    console.log(socketEvent);
 
     // Listens for incoming messages
     socketRef.current.on(socketEvent, incomingMessage => {
@@ -29,7 +28,10 @@ const useCameraWebSocket = socketEvent => {
         ownedByCurrentUser: message.senderId === socketRef.current.id
       };
       */
-      console.log(incomingMessage);
+      //console.log(incomingMessage);
+
+      const lastMessage = messages[messages.length - 1];
+
       setMessages(messages => [...messages, incomingMessage]);
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
         dispatch(changeCameraSettings(incomingMessage));

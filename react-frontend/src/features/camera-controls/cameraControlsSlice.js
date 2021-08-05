@@ -1,4 +1,5 @@
 import { createSlice, current } from "@reduxjs/toolkit";
+import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS, VIDEO_STREAM_CONFIG } from "../../config.js";
 // set default settings
 const defaultObserverSide = "COVP"; // P = Port/ S = Starboard
@@ -74,9 +75,9 @@ export const cameraControlsSlice = createSlice({
     },
     changeCameraSettings: (state, action) => {
       // need to check confirmation of successful command from WebSocket
-      const cameras = state.cameras.filter(item => item.isActive);
+      const cameras = state.cameras.filter(item => item.lastCommand);
       cameras.forEach(element => {
-        if (element.lastCommand.eventID === action.payload.eventID) {
+        if (element.lastCommand.eventId === action.payload.eventId) {
           console.log(current(element));
           // If websocket receipt returns OK, update the live settings
           if (action.payload.receipt.status === "OK") {

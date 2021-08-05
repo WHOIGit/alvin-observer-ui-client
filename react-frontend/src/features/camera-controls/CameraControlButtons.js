@@ -140,7 +140,6 @@ export default function CameraControlButtons() {
   const renderCmdReceipt = () => {
     if (messages.length) {
       const lastMessage = messages[messages.length - 1];
-      console.log(lastMessage);
       return (
         <span>
           {lastMessage.receipt.status}
@@ -163,8 +162,6 @@ export default function CameraControlButtons() {
         >
           Focus AF/MF
         </Button>
-
-        <div>{renderCmdReceipt()}</div>
       </Box>
 
       <Box my={3}>

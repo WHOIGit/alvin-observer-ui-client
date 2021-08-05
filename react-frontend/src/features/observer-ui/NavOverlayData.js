@@ -16,7 +16,9 @@ const useStyles = makeStyles(theme => ({
 export default function NavOverlayData() {
   const classes = useStyles();
   const { messages, sendMessage } = useCameraWebSocket(NAV_HEARTBEAT);
-  console.log(messages);
+  const lastMessage = messages[messages.length - 1];
+  //console.log(lastMessage);
+
   return (
     <div className={classes.root}>
       <Typography variant="h6" gutterBottom>
