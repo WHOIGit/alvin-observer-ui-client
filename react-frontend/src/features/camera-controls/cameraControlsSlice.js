@@ -2,7 +2,6 @@ import { createSlice, current } from "@reduxjs/toolkit";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS, VIDEO_STREAM_CONFIG } from "../../config.js";
 // set default settings
-const defaultObserverSide = "COVP"; // P = Port/ S = Starboard
 const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
 const defaultFocusMode = COMMAND_STRINGS.focusAF;
@@ -12,7 +11,7 @@ const defaultIrisMode = COMMAND_STRINGS.irisModeOptions[0];
 const defaultIsoMode = COMMAND_STRINGS.isoModeOptions[0];
 
 const initialState = {
-  observerSide: defaultObserverSide,
+  observerSide: null, // P = Port/ S = Starboard
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
   cameras: [
@@ -53,6 +52,9 @@ export const cameraControlsSlice = createSlice({
   name: "cameraControls",
   initialState: initialState,
   reducers: {
+    setObserverSide: (state, action) => {
+      state.observerSide = action.payload;
+    },
     changeActiveCamera: (state, action) => {
       state.cameras.forEach(element => {
         if (element.camera === action.payload.camera) {
@@ -79,6 +81,7 @@ export const cameraControlsSlice = createSlice({
       cameras.forEach(element => {
         if (element.lastCommand.eventId === action.payload.eventId) {
           console.log(current(element));
+          console.log(action.payload);
           // If websocket receipt returns OK, update the live settings
           if (action.payload.receipt.status === "OK") {
             element.lastCommand.status = "OK";
@@ -128,7 +131,8 @@ export const cameraControlsSlice = createSlice({
 export const {
   changeActiveCamera,
   changeCameraSettings,
-  setLastCommand
+  setLastCommand,
+  setObserverSide
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -140,31 +144,3 @@ export const selectActiveCamera = state =>
 
 // return the current Observer Side
 export const selectObserverSide = state => state.cameraControls.observerSide;
-
-// return a flat array of just the dataLayer IDs
-export const selectVisibleLayerIds = state => {
-  const layerIds = state.dataLayers.layers
-    .filter(layer => layer.visibility)
-    .map(layer => layer.id);
-  return layerIds;
-};
-
-// return a flat array of just the dataLayer IDs that are interactive with Mapbox Layer propery
-export const selectInteractiveLayerIds = state => {
-  const layerIds = state.dataLayers.layers
-    .filter(layer => layer.visibility)
-    .filter(layer => layer.interactiveLayer)
-    .map(layer => layer.id);
-  return layerIds;
-};
-
-// return a flat array of just the dataLayer IDs that have a Legend pane
-export const selectLayerLegendIds = state => {
-  const layerIds = state.dataLayers.layers
-    .filter(layer => layer.legendVisibility)
-    .map(layer => layer.id);
-  return layerIds;
-};
-
-// return max/mean value selection
-export const selectMaxMeanOption = state => state.dataLayers.showMaxMean;

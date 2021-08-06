@@ -10,7 +10,7 @@ import {
 import { WS_SERVER, NEW_CAMERA_COMMAND_EVENT } from "../config";
 
 const useCameraWebSocket = socketEvent => {
-  const observerSide = useSelector(selectObserverSide);
+  const observerSideCmd = "COV" + useSelector(selectObserverSide);
   const [messages, setMessages] = useState([]); // Sent and received messages
   const socketRef = useRef();
   const dispatch = useDispatch();
@@ -52,7 +52,7 @@ const useCameraWebSocket = socketEvent => {
     if (socketRef.current !== undefined) {
       const payload = {
         eventId: uuidv4(),
-        command: observerSide,
+        command: observerSideCmd,
         camera: messageBody.camera,
         action: messageBody.action
       };

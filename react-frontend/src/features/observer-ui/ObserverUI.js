@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
 import { Grid, Paper, Icon, Fab } from "@material-ui/core";
 import CameraAltIcon from "@material-ui/icons/CameraAlt";
-import UpperRightBtns from "./UpperRightBtns";
-import NavOverlayData from "./NavOverlayData";
 import CameraControls from "../camera-controls/CameraControls";
-import MiniVideos from "./MiniVideos";
-import SelectVideoSource from "../camera-controls/SelectVideoSource";
-import SelectExposureMode from "../camera-controls/SelectExposureMode";
+import TopControlPanel from "./TopControlPanel";
+import ObserverSideSelect from "./ObserverSideSelect";
+import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -25,11 +24,6 @@ const useStyles = makeStyles(theme => ({
   rootCollapse: {
     marginTop: "-290px",
     height: 0
-  },
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: "center",
-    color: theme.palette.text.secondary
   },
   toggleButton: {
     position: "absolute",
@@ -48,7 +42,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function ObserverUI() {
   const classes = useStyles();
-  //const socket = useContext(WebSocketContext);
+  const observerSide = useSelector(selectObserverSide);
   const [showTopControls, setShowTopControls] = useState(false);
   const [showFullCameraControls, setShowFullCameraControls] = useState(false);
 
@@ -67,32 +61,15 @@ export default function ObserverUI() {
           showTopControls ? "active" : classes.rootCollapse
         }`}
       >
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <MiniVideos showFullCameraControls={showFullCameraControls} />
-          </Grid>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>
-              <NavOverlayData />
-            </Paper>
-          </Grid>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>
-              <UpperRightBtns
-                showFullCameraControls={showFullCameraControls}
-                setShowFullCameraControls={setShowFullCameraControls}
-              />
-            </Paper>
-          </Grid>
-        </Grid>
-        <Grid container spacing={0} justify="flex-start">
-          <Grid item>
-            <SelectVideoSource showTopControls={showTopControls} />
-          </Grid>
-          <Grid item>
-            <SelectExposureMode showTopControls={showTopControls} />
-          </Grid>
-        </Grid>
+        {/* force user to choose ObserverSide if not set */}
+        {!observerSide ? (
+          <ObserverSideSelect />
+        ) : (
+          <TopControlPanel
+            showFullCameraControls={showFullCameraControls}
+            setShowFullCameraControls={setShowFullCameraControls}
+          />
+        )}
 
         <Fab
           variant="extended"
