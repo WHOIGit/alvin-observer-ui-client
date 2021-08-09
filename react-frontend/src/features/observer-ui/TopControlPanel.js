@@ -10,7 +10,7 @@ import {
   changeCameraSettings
 } from "../camera-controls/cameraControlsSlice";
 import UpperRightBtns from "./UpperRightBtns";
-import NavOverlayData from "./NavOverlayData";
+import NavDataDisplay from "./NavDataDisplay";
 import MiniVideos from "./MiniVideos";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
@@ -35,8 +35,7 @@ export default function TopControlPanel({
   useEffect(() => {
     // set initial camera state
     console.log(camHeartbeatData);
-    const payload = { camera: camHeartbeatData.camera };
-    dispatch(changeActiveCamera(payload));
+    dispatch(changeActiveCamera(camHeartbeatData));
   }, []);
 
   return (
@@ -46,9 +45,7 @@ export default function TopControlPanel({
           <MiniVideos showFullCameraControls={showFullCameraControls} />
         </Grid>
         <Grid item xs={3}>
-          <Paper className={classes.paper}>
-            <NavOverlayData />
-          </Paper>
+          <NavDataDisplay />
         </Grid>
         <Grid item xs={3}>
           <Paper className={classes.paper}>

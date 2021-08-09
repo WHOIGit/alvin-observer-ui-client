@@ -60,6 +60,8 @@ export const cameraControlsSlice = createSlice({
       state.cameras.forEach(element => {
         if (element.camera === action.payload.camera) {
           element.isActive = true;
+          // set camera settings from CamHeartbeat/newCameraCommand channel messages
+          element.settings.focusMode = action.payload.focus_mode;
         } else {
           element.isActive = false;
         }
