@@ -43,6 +43,10 @@ export default function SelectShutterMode() {
     sendMessage(payload);
   };
 
+  if (activeCamera === undefined) {
+    return null;
+  }
+
   return (
     <div className={classes.root}>
       <FormControl className={classes.formControl}>

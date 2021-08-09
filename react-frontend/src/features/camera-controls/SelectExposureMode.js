@@ -43,6 +43,10 @@ export default function SelectExposureMode({ showTopControls }) {
     sendMessage(payload);
   };
 
+  if (activeCamera === undefined) {
+    return null;
+  }
+
   return (
     <div className={classes.root}>
       <FormControl className={classes.formControl}>

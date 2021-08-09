@@ -18,7 +18,12 @@ export default function FocusModeDisplayChip() {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCamera);
 
+  if (activeCamera === undefined) {
+    return null;
+  }
+
   const focusLabel = `FOCUS: ${activeCamera.settings.focusMode}`;
+
   return (
     <Chip
       label={focusLabel}

@@ -14,6 +14,7 @@ const initialState = {
   observerSide: null, // P = Port/ S = Starboard
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
+  camHeartbeatData: null,
   cameras: [
     {
       camera: "camera1",
@@ -27,7 +28,7 @@ const initialState = {
       },
       lastCommand: null,
       data: {},
-      isActive: true,
+      isActive: false,
       isRecording: false
     },
     {
@@ -123,6 +124,9 @@ export const cameraControlsSlice = createSlice({
           }
         }
       });
+    },
+    changeCamHeartbeat: (state, action) => {
+      state.camHeartbeatData = action.payload;
     }
   }
 });
@@ -131,6 +135,7 @@ export const cameraControlsSlice = createSlice({
 export const {
   changeActiveCamera,
   changeCameraSettings,
+  changeCamHeartbeat,
   setLastCommand,
   setObserverSide
 } = cameraControlsSlice.actions;
@@ -144,3 +149,7 @@ export const selectActiveCamera = state =>
 
 // return the current Observer Side
 export const selectObserverSide = state => state.cameraControls.observerSide;
+
+// return the current Observer Side
+export const selectCamHeartbeatData = state =>
+  state.cameraControls.camHeartbeatData;

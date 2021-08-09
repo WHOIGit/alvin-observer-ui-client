@@ -1,10 +1,14 @@
 // Web socket server
 export const WS_SERVER = "http://128.128.184.62:4040";
+// sealog url for iframe
+export const SEALOG_URL = "https://harmonyhill.whoi.edu/sealog-alvin/";
 // Web socket event names
 export const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
 export const NAV_HEARTBEAT = "NavHeartbeat";
 export const CAM_HEARTBEAT = "CamHeartbeat";
 
+// Camera command constants
+export const COMMAND_PREFIX = "COV"; // Client Observer. Combines with ObserverSide P/S
 export const COMMAND_STRINGS = {
   cameraChangeCommand: "CAM",
   exposureModeCommand: "EXP",

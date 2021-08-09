@@ -5,13 +5,19 @@ import { v4 as uuidv4 } from "uuid";
 import {
   setLastCommand,
   changeCameraSettings,
+  changeCamHeartbeat,
   selectObserverSide
 } from "../features/camera-controls/cameraControlsSlice";
-import { WS_SERVER, NEW_CAMERA_COMMAND_EVENT } from "../config";
+import {
+  WS_SERVER,
+  NEW_CAMERA_COMMAND_EVENT,
+  CAM_HEARTBEAT,
+  COMMAND_PREFIX
+} from "../config";
 
 const useCameraWebSocket = socketEvent => {
-  const observerSideCmd = "COV" + useSelector(selectObserverSide);
-  const [messages, setMessages] = useState([]); // Sent and received messages
+  const observerSideCmd = COMMAND_PREFIX + useSelector(selectObserverSide);
+  const [messages, setMessages] = useState(null); // Sent and received messages
   const socketRef = useRef();
   const dispatch = useDispatch();
 
@@ -30,11 +36,13 @@ const useCameraWebSocket = socketEvent => {
       */
       //console.log(incomingMessage);
 
-      const lastMessage = messages[messages.length - 1];
-
-      setMessages(messages => [...messages, incomingMessage]);
+      setMessages(incomingMessage);
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
         dispatch(changeCameraSettings(incomingMessage));
+      }
+
+      if (socketEvent === CAM_HEARTBEAT) {
+        dispatch(changeCamHeartbeat(incomingMessage));
       }
     });
 
