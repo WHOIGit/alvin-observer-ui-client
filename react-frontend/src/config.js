@@ -40,10 +40,10 @@ export const COMMAND_STRINGS = {
 };
 
 export const VIDEO_STREAM_CONFIG = {
-  server: "128.128.181.215:8083",
-  portObserverVideo: "teradek",
-  stbdObserverVideo: "stbdObserverVideo",
-  portRecordVideo: "portRecordVideo",
-  stbdRecordVideo: "stbdRecordVideo",
-  pilotVideo: "pilotVideo"
+  server: "https://128.128.184.62/video",
+  portObserverVideo: "demo1",
+  stbdObserverVideo: "demo1",
+  portRecordVideo: "demo1",
+  stbdRecordVideo: "demo1",
+  pilotVideo: "demo1"
 };

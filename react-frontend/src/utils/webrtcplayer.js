@@ -1,5 +1,5 @@
 export default class WebRtcPlayer {
-  static server = "127.0.0.1:8083";
+  static server = "http://127.0.0.1:8083";
   webrtc = null;
   video = null;
   server = null;
@@ -16,8 +16,8 @@ export default class WebRtcPlayer {
   }
 
   createLinks() {
-    this.codecLink = "//" + this.server + "/stream/codec/" + this.uuid;
-    this.rsdpLink = "//" + this.server + "/stream/receiver/" + this.uuid;
+    this.codecLink = this.server + "/stream/codec/" + this.uuid;
+    this.rsdpLink = this.server + "/stream/receiver/" + this.uuid;
   }
 
   play() {
