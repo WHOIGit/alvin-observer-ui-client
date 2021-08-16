@@ -1,5 +1,8 @@
 // Web socket server
 export const WS_SERVER = "http://128.128.184.62:4040";
+export const WS_SERVER_NAMESPACE_PORT = "/port";
+export const WS_SERVER_NAMESPACE_STARBOARD = "/stbd";
+export const WS_SERVER_NAMESPACE_PILOT = "/pilot";
 // sealog url for iframe
 export const SEALOG_URL = "https://harmonyhill.whoi.edu/sealog-alvin/";
 // Web socket event names

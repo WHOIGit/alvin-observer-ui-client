@@ -3,9 +3,8 @@ import { useSelector } from "react-redux";
 import { Container, Box } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 //import SocketProvider from "./utils/SocketProvider";
-import ObserverUI from "./features/observer-ui/ObserverUI";
-import { SEALOG_URL, CAM_HEARTBEAT } from "./config";
-import useCameraWebSocket from "./hooks/useCameraWebSocket";
+import ObserverUIContainer from "./features/observer-ui/ObserverUIContainer";
+import { SEALOG_URL } from "./config";
 
 const useStyles = makeStyles(theme => ({
   sealogFrame: {
@@ -17,13 +16,11 @@ const useStyles = makeStyles(theme => ({
 }));
 export default function App() {
   const classes = useStyles();
-  // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
-  const { messages, sendMessage } = useCameraWebSocket(CAM_HEARTBEAT);
 
   return (
     <Container maxWidth={false} disableGutters={true}>
       <Box>
-        <ObserverUI />
+        <ObserverUIContainer />
       </Box>
       <Box>
         <iframe

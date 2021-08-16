@@ -6,24 +6,36 @@ import {
   setLastCommand,
   changeCameraSettings,
   changeCamHeartbeat,
-  selectObserverSide
+  selectObserverSide,
+  selectWebSocketNamespace
 } from "../features/camera-controls/cameraControlsSlice";
 import {
   WS_SERVER,
   NEW_CAMERA_COMMAND_EVENT,
   CAM_HEARTBEAT,
+  NAV_HEARTBEAT,
   COMMAND_PREFIX
 } from "../config";
 
 const useCameraWebSocket = socketEvent => {
   const observerSideCmd = COMMAND_PREFIX + useSelector(selectObserverSide);
+  const socketNamespace = useSelector(selectWebSocketNamespace);
   const [messages, setMessages] = useState(null); // Sent and received messages
   const socketRef = useRef();
   const dispatch = useDispatch();
+  // need to set the web socket namespace depending on the event channel we need
+  let socketNs = "/";
+  if (
+    socketEvent === NEW_CAMERA_COMMAND_EVENT ||
+    socketEvent === CAM_HEARTBEAT
+  ) {
+    socketNs = socketNamespace;
+  }
 
   useEffect(() => {
     // Creates a WebSocket connection
-    socketRef.current = socketIOClient(WS_SERVER);
+    //socketRef.current = socketIOClient(WS_SERVER);
+    socketRef.current = socketIOClient(WS_SERVER + socketNs);
     console.log(socketRef);
 
     // Listens for incoming messages
@@ -34,7 +46,7 @@ const useCameraWebSocket = socketEvent => {
         ownedByCurrentUser: message.senderId === socketRef.current.id
       };
       */
-      //console.log(incomingMessage);
+      //console.log(socketEvent, incomingMessage);
 
       setMessages(incomingMessage);
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
@@ -51,7 +63,7 @@ const useCameraWebSocket = socketEvent => {
     return () => {
       socketRef.current.disconnect();
     };
-  }, [socketEvent, dispatch]);
+  }, [socketEvent, dispatch, socketNamespace]);
 
   // Sends a message to the server that
   // forwards it to all users in the same room

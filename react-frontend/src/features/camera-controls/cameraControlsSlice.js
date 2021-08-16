@@ -1,6 +1,12 @@
 import { createSlice, current } from "@reduxjs/toolkit";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { COMMAND_STRINGS, VIDEO_STREAM_CONFIG } from "../../config.js";
+import {
+  COMMAND_STRINGS,
+  VIDEO_STREAM_CONFIG,
+  WS_SERVER_NAMESPACE_PORT,
+  WS_SERVER_NAMESPACE_STARBOARD,
+  WS_SERVER_NAMESPACE_PILOT
+} from "../../config.js";
 // set default settings
 const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
@@ -12,6 +18,7 @@ const defaultIsoMode = COMMAND_STRINGS.isoModeOptions[0];
 
 const initialState = {
   observerSide: null, // P = Port/ S = Starboard
+  webSocketNamespace: null,
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
   camHeartbeatData: null,
@@ -55,6 +62,12 @@ export const cameraControlsSlice = createSlice({
   reducers: {
     setObserverSide: (state, action) => {
       state.observerSide = action.payload;
+      if (action.payload === "P") {
+        state.webSocketNamespace = WS_SERVER_NAMESPACE_PORT;
+      }
+      if (action.payload === "S") {
+        state.webSocketNamespace = WS_SERVER_NAMESPACE_STARBOARD;
+      }
     },
     changeActiveCamera: (state, action) => {
       state.cameras.forEach(element => {
@@ -151,6 +164,10 @@ export const selectActiveCamera = state =>
 
 // return the current Observer Side
 export const selectObserverSide = state => state.cameraControls.observerSide;
+
+// return the current Web Socket server namespace (port/stbd/pilot)
+export const selectWebSocketNamespace = state =>
+  state.cameraControls.webSocketNamespace;
 
 // return the current Observer Side
 export const selectCamHeartbeatData = state =>

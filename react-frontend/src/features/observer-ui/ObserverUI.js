@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
 import { Grid, Paper, Icon, Fab } from "@material-ui/core";
-import CameraAltIcon from "@material-ui/icons/CameraAlt";
-import CameraControls from "../camera-controls/CameraControls";
 import TopControlPanel from "./TopControlPanel";
-import ObserverSideSelect from "./ObserverSideSelect";
-import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
+import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import {
+  selectWebSocketNamespace,
+  selectCamHeartbeatData,
+  selectActiveCamera,
+  changeActiveCamera
+} from "../camera-controls/cameraControlsSlice";
+import { CAM_HEARTBEAT } from "../../config";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -40,50 +44,33 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function ObserverUI() {
+export default function ObserverUI({
+  showFullCameraControls,
+  setShowFullCameraControls
+}) {
   const classes = useStyles();
-  const observerSide = useSelector(selectObserverSide);
-  const [showTopControls, setShowTopControls] = useState(false);
-  const [showFullCameraControls, setShowFullCameraControls] = useState(false);
+  const dispatch = useDispatch();
+  // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
+  const { messages, sendMessage } = useCameraWebSocket(CAM_HEARTBEAT);
 
-  const handleControlToggle = () => {
-    // close CameraControls if we're hiding panels
-    if (showTopControls) {
-      setShowFullCameraControls(false);
+  const activeCamera = useSelector(selectActiveCamera);
+  const camHeartbeatData = useSelector(selectCamHeartbeatData);
+  // use CAM_HEARTBEAT parameters only on initial app load to set activeCamera
+  // keep camera params in local state otherwise
+  useEffect(() => {
+    // set initial camera state only if activeCamera is undefined
+    if (activeCamera === undefined) {
+      console.log(camHeartbeatData);
+      if (camHeartbeatData !== null) {
+        dispatch(changeActiveCamera(camHeartbeatData));
+      }
     }
-    setShowTopControls(!showTopControls);
-  };
+  }, [activeCamera]);
 
   return (
-    <>
-      <div
-        className={`${classes.root} ${
-          showTopControls ? "active" : classes.rootCollapse
-        }`}
-      >
-        {/* force user to choose ObserverSide if not set */}
-        {!observerSide ? (
-          <ObserverSideSelect />
-        ) : (
-          <TopControlPanel
-            showFullCameraControls={showFullCameraControls}
-            setShowFullCameraControls={setShowFullCameraControls}
-          />
-        )}
-
-        <Fab
-          variant="extended"
-          color="primary"
-          className={`${classes.toggleButton} ${
-            showFullCameraControls ? classes.toggleButtonOff : "camera-off"
-          }`}
-          onClick={() => handleControlToggle()}
-        >
-          <CameraAltIcon className={classes.extendedIcon} />
-          {showTopControls ? "Hide" : "Show"} Camera
-        </Fab>
-      </div>
-      <CameraControls showFullCameraControls={showFullCameraControls} />
-    </>
+    <TopControlPanel
+      showFullCameraControls={showFullCameraControls}
+      setShowFullCameraControls={setShowFullCameraControls}
+    />
   );
 }

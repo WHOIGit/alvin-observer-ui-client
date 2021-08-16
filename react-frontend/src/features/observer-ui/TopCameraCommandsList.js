@@ -11,6 +11,10 @@ import { selectActiveCamera } from "../camera-controls/cameraControlsSlice";
 export default function TopCameraCommandsList() {
   const activeCamera = useSelector(selectActiveCamera);
 
+  if (activeCamera === undefined) {
+    return null;
+  }
+
   const focusLabel = `FOCUS: ${activeCamera.settings.focusMode}`;
   return (
     <List>

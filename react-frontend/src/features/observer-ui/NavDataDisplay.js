@@ -25,7 +25,6 @@ const useStyles = makeStyles(theme => ({
 export default function NavDataDisplay() {
   const classes = useStyles();
   const { messages, sendMessage } = useCameraWebSocket(NAV_HEARTBEAT);
-
   if (messages === null) {
     return null;
   }

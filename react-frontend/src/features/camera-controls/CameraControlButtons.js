@@ -44,8 +44,6 @@ export default function CameraControlButtons() {
   const { messages, sendMessage } = useCameraWebSocket(
     NEW_CAMERA_COMMAND_EVENT
   );
-  // Creates a websocket and manages messaging
-  //const [newMessage, setNewMessage] = useState(""); // Message to be sent
   const [showJoystick, setShowJoystick] = useState(false);
 
   useEffect(() => {
