@@ -65,7 +65,7 @@ export default function ObserverUI({
         dispatch(changeActiveCamera(camHeartbeatData));
       }
     }
-  }, [activeCamera]);
+  }, [camHeartbeatData]);
 
   return (
     <TopControlPanel

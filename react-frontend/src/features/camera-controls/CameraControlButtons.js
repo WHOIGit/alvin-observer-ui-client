@@ -148,6 +148,10 @@ export default function CameraControlButtons() {
     }
   };
 
+  if (activeCamera === undefined) {
+    return null;
+  }
+
   return (
     <div className={classes.root}>
       <Box my={2}>

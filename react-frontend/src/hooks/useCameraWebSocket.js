@@ -25,10 +25,8 @@ const useCameraWebSocket = socketEvent => {
   const dispatch = useDispatch();
   // need to set the web socket namespace depending on the event channel we need
   let socketNs = "/";
-  if (
-    socketEvent === NEW_CAMERA_COMMAND_EVENT ||
-    socketEvent === CAM_HEARTBEAT
-  ) {
+
+  if (socketEvent === CAM_HEARTBEAT) {
     socketNs = socketNamespace;
   }
 
@@ -46,7 +44,7 @@ const useCameraWebSocket = socketEvent => {
         ownedByCurrentUser: message.senderId === socketRef.current.id
       };
       */
-      //console.log(socketEvent, incomingMessage);
+      console.log(socketEvent, incomingMessage);
 
       setMessages(incomingMessage);
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
@@ -63,7 +61,7 @@ const useCameraWebSocket = socketEvent => {
     return () => {
       socketRef.current.disconnect();
     };
-  }, [socketEvent, dispatch, socketNamespace]);
+  }, [socketEvent, dispatch, socketNs]);
 
   // Sends a message to the server that
   // forwards it to all users in the same room
