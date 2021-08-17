@@ -9,6 +9,8 @@ export const SEALOG_URL = "https://harmonyhill.whoi.edu/sealog-alvin/";
 export const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
 export const NAV_HEARTBEAT = "NavHeartbeat";
 export const CAM_HEARTBEAT = "CamHeartbeat";
+export const SENSOR_HEARTBEAT = "SensorHeartbeat";
+export const RECORDER_HEARTBEAT = "RecorderHeartbeat";
 
 // Camera command constants
 export const COMMAND_PREFIX = "COV"; // Client Observer. Combines with ObserverSide P/S

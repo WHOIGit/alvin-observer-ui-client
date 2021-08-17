@@ -13,7 +13,6 @@ import {
   WS_SERVER,
   NEW_CAMERA_COMMAND_EVENT,
   CAM_HEARTBEAT,
-  NAV_HEARTBEAT,
   COMMAND_PREFIX
 } from "../config";
 
@@ -26,7 +25,10 @@ const useCameraWebSocket = socketEvent => {
   // need to set the web socket namespace depending on the event channel we need
   let socketNs = "/";
 
-  if (socketEvent === CAM_HEARTBEAT) {
+  if (
+    socketEvent === NEW_CAMERA_COMMAND_EVENT ||
+    socketEvent === CAM_HEARTBEAT
+  ) {
     socketNs = socketNamespace;
   }
 
@@ -45,7 +47,6 @@ const useCameraWebSocket = socketEvent => {
       };
       */
       console.log(socketEvent, incomingMessage);
-
       setMessages(incomingMessage);
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
         dispatch(changeCameraSettings(incomingMessage));
