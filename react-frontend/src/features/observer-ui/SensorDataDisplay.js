@@ -21,7 +21,6 @@ const useStyles = makeStyles(theme => ({
 export default function SensorDataDisplay() {
   const classes = useStyles();
   const { messages, sendMessage } = useCameraWebSocket(SENSOR_HEARTBEAT);
-  console.log(messages);
   if (messages === null) {
     return null;
   }
