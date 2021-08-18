@@ -5,8 +5,11 @@ import { v4 as uuidv4 } from "uuid";
 import {
   setLastCommand,
   changeCameraSettings,
+  changeActiveCamera,
+  changeCurrentCamData,
   changeCamHeartbeat,
   selectObserverSide,
+  selectActiveCamera,
   selectWebSocketNamespace
 } from "../features/camera-controls/cameraControlsSlice";
 import {
@@ -19,7 +22,8 @@ import {
 const useCameraWebSocket = socketEvent => {
   const observerSideCmd = COMMAND_PREFIX + useSelector(selectObserverSide);
   const socketNamespace = useSelector(selectWebSocketNamespace);
-  const [messages, setMessages] = useState(null); // Sent and received messages
+  const activeCamera = useSelector(selectActiveCamera);
+  const [messages, setMessages] = useState(null);
   const socketRef = useRef();
   const dispatch = useDispatch();
   // need to set the web socket namespace depending on the event channel we need
@@ -46,14 +50,22 @@ const useCameraWebSocket = socketEvent => {
         ownedByCurrentUser: message.senderId === socketRef.current.id
       };
       */
-      console.log(socketEvent, incomingMessage);
+
       setMessages(incomingMessage);
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
-        dispatch(changeCameraSettings(incomingMessage));
+        console.log(socketEvent, incomingMessage);
+        // check if message is a Camera Change Package, else it's a Command Receipt
+        if (incomingMessage.hasOwnProperty("current_settings")) {
+          console.log("CAM CHANGE HERE");
+          dispatch(changeCurrentCamData(incomingMessage));
+        } else {
+          dispatch(changeCameraSettings(incomingMessage));
+        }
       }
 
       if (socketEvent === CAM_HEARTBEAT) {
         dispatch(changeCamHeartbeat(incomingMessage));
+        // dispatch changeActiveCamera ???
       }
     });
 
@@ -64,15 +76,14 @@ const useCameraWebSocket = socketEvent => {
     };
   }, [socketEvent, dispatch, socketNs]);
 
-  // Sends a message to the server that
-  // forwards it to all users in the same room
+  // Sends a message to the server
   const sendMessage = messageBody => {
     console.log(messageBody);
     if (socketRef.current !== undefined) {
       const payload = {
         eventId: uuidv4(),
         command: observerSideCmd,
-        camera: messageBody.camera,
+        camera: activeCamera,
         action: messageBody.action
       };
       try {

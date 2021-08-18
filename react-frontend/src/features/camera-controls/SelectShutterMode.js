@@ -7,7 +7,7 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import {
-  selectActiveCamera,
+  selectCurrentCamData,
   changeCameraSettings
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
@@ -27,14 +27,13 @@ const useStyles = makeStyles(theme => ({
 
 export default function SelectShutterMode() {
   const classes = useStyles();
-  const activeCamera = useSelector(selectActiveCamera);
+  const camData = useSelector(selectCurrentCamData);
   const { messages, sendMessage } = useCameraWebSocket(
     NEW_CAMERA_COMMAND_EVENT
   );
 
   const handleSendMessage = event => {
     const payload = {
-      camera: activeCamera.camera,
       action: {
         name: COMMAND_STRINGS.shutterModeCommand,
         value: event.target.value
@@ -43,7 +42,7 @@ export default function SelectShutterMode() {
     sendMessage(payload);
   };
 
-  if (activeCamera === undefined) {
+  if (camData === null) {
     return null;
   }
 
@@ -53,18 +52,12 @@ export default function SelectShutterMode() {
         <Select
           labelId="shutter-select-label"
           id="shutter-select"
-          value={activeCamera.settings.shutterMode}
+          value={camData.currentSettings.SHU}
           onChange={handleSendMessage}
         >
-          <MenuItem value={COMMAND_STRINGS.shutterModeOptions[0]}>
-            SHUTTER: Auto
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.shutterModeOptions[1]}>
-            SHUTTER: Value 1
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.shutterModeOptions[2]}>
-            SHUTTER: Value 2
-          </MenuItem>
+          {camData.SHU.map(item => (
+            <MenuItem value={item}>Shutter: {item}</MenuItem>
+          ))}
         </Select>
       </FormControl>
     </div>

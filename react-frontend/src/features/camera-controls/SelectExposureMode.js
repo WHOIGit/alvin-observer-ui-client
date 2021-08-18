@@ -9,6 +9,7 @@ import Select from "@material-ui/core/Select";
 // local imports
 import {
   selectActiveCamera,
+  selectCurrentCamData,
   changeCameraSettings
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
@@ -28,6 +29,7 @@ const useStyles = makeStyles(theme => ({
 export default function SelectExposureMode({ showTopControls }) {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCamera);
+  const currentCamData = useSelector(selectCurrentCamData);
   const { messages, sendMessage } = useCameraWebSocket(
     NEW_CAMERA_COMMAND_EVENT
   );

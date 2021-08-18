@@ -11,7 +11,11 @@ import {
   selectActiveCamera,
   changeActiveCamera
 } from "../camera-controls/cameraControlsSlice";
-import { CAM_HEARTBEAT } from "../../config";
+import {
+  CAM_HEARTBEAT,
+  NEW_CAMERA_COMMAND_EVENT,
+  COMMAND_STRINGS
+} from "../../config";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -51,7 +55,9 @@ export default function ObserverUI({
   const classes = useStyles();
   const dispatch = useDispatch();
   // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
-  const { messages, sendMessage } = useCameraWebSocket(CAM_HEARTBEAT);
+  const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
+  // connect to newCameraCommand
+  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
   const activeCamera = useSelector(selectActiveCamera);
   const camHeartbeatData = useSelector(selectCamHeartbeatData);
@@ -59,10 +65,20 @@ export default function ObserverUI({
   // keep camera params in local state otherwise
   useEffect(() => {
     // set initial camera state only if activeCamera is undefined
-    if (activeCamera === undefined) {
+    if (activeCamera === null) {
       console.log(camHeartbeatData);
       if (camHeartbeatData !== null) {
         dispatch(changeActiveCamera(camHeartbeatData));
+
+        // send camera change command to set available settings options
+        const payload = {
+          camera: camHeartbeatData.camera,
+          action: {
+            name: COMMAND_STRINGS.cameraChangeCommand,
+            value: camHeartbeatData.camera
+          }
+        };
+        sendMessage(payload);
       }
     }
   }, [camHeartbeatData]);

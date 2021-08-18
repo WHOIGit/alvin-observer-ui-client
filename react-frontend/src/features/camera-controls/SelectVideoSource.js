@@ -28,14 +28,13 @@ const useStyles = makeStyles(theme => ({
 export default function SelectVideoSource({ showTopControls }) {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCamera);
-  const cameras = useSelector(state => state.cameraControls.cameras);
+  const cameras = useSelector(state => state.cameraControls.availableCameras);
   const { messages, sendMessage } = useCameraWebSocket(
     NEW_CAMERA_COMMAND_EVENT
   );
 
   const handleSendMessage = event => {
     const payload = {
-      camera: activeCamera.camera,
       action: {
         name: COMMAND_STRINGS.cameraChangeCommand,
         value: event.target.value
@@ -44,7 +43,7 @@ export default function SelectVideoSource({ showTopControls }) {
     sendMessage(payload);
   };
 
-  if (activeCamera === undefined) {
+  if (activeCamera === null) {
     return null;
   }
 
@@ -55,11 +54,11 @@ export default function SelectVideoSource({ showTopControls }) {
         <Select
           labelId="video-select-label"
           id="video-select"
-          value={activeCamera.camera}
+          value={activeCamera}
           onChange={handleSendMessage}
         >
           {cameras.map(item => (
-            <MenuItem value={item.camera}>{item.cameraName}</MenuItem>
+            <MenuItem value={item.camera}>{item.displayName}</MenuItem>
           ))}
         </Select>
       </FormControl>

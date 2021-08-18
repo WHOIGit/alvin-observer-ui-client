@@ -12,6 +12,14 @@ export const CAM_HEARTBEAT = "CamHeartbeat";
 export const SENSOR_HEARTBEAT = "SensorHeartbeat";
 export const RECORDER_HEARTBEAT = "RecorderHeartbeat";
 
+// Camera definitions
+export const CAMERAS = [
+  { camera: "camera1", displayName: "Camera 1", owner: "P" },
+  { camera: "camera2", displayName: "Camera 2", owner: "P" },
+  { camera: "camera3", displayName: "Camera 3", owner: "S" },
+  { camera: "camera4", displayName: "Camera 4", owner: "S" }
+];
+
 // Camera command constants
 export const COMMAND_PREFIX = "COV"; // Client Observer. Combines with ObserverSide P/S
 export const COMMAND_STRINGS = {

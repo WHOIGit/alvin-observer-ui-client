@@ -12,7 +12,6 @@ export default function ObserverSideSelect() {
   const dispatch = useDispatch();
 
   const handleChange = event => {
-    console.log(event.target.value);
     setValue(event.target.value);
     dispatch(setObserverSide(event.target.value));
   };

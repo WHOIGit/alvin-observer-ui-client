@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Chip } from "@material-ui/core";
 import CenterFocusStrongIcon from "@material-ui/icons/CenterFocusStrong";
 // local
-import { selectActiveCamera } from "../camera-controls/cameraControlsSlice";
+import { selectCurrentCamData } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles(theme => ({
   chip: {
@@ -16,13 +16,13 @@ const useStyles = makeStyles(theme => ({
 
 export default function FocusModeDisplayChip() {
   const classes = useStyles();
-  const activeCamera = useSelector(selectActiveCamera);
+  const camData = useSelector(selectCurrentCamData);
 
-  if (activeCamera === undefined) {
+  if (camData === null) {
     return null;
   }
 
-  const focusLabel = `FOCUS: ${activeCamera.settings.focusMode}`;
+  const focusLabel = `FOCUS: ${camData.focusMode}`;
 
   return (
     <Chip

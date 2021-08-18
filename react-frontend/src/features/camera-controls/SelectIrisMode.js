@@ -6,10 +6,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
-import {
-  selectActiveCamera,
-  changeCameraSettings
-} from "./cameraControlsSlice";
+import { selectCurrentCamData } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
@@ -27,14 +24,13 @@ const useStyles = makeStyles(theme => ({
 
 export default function SelectIrisMode() {
   const classes = useStyles();
-  const activeCamera = useSelector(selectActiveCamera);
+  const currentCamData = useSelector(selectCurrentCamData);
   const { messages, sendMessage } = useCameraWebSocket(
     NEW_CAMERA_COMMAND_EVENT
   );
 
   const handleSendMessage = event => {
     const payload = {
-      camera: activeCamera.camera,
       action: {
         name: COMMAND_STRINGS.irisModeCommand,
         value: event.target.value
@@ -43,7 +39,7 @@ export default function SelectIrisMode() {
     sendMessage(payload);
   };
 
-  if (activeCamera === undefined) {
+  if (currentCamData === null) {
     return null;
   }
 
@@ -53,18 +49,12 @@ export default function SelectIrisMode() {
         <Select
           labelId="shutter-select-label"
           id="shutter-select"
-          value={activeCamera.settings.irisMode}
+          value={currentCamData.currentSettings.IRS}
           onChange={handleSendMessage}
         >
-          <MenuItem value={COMMAND_STRINGS.irisModeOptions[0]}>
-            IRIS: Auto
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.irisModeOptions[1]}>
-            IRIS: Value 1
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.irisModeOptions[2]}>
-            IRIS: Value 2
-          </MenuItem>
+          {currentCamData.IRS.map(item => (
+            <MenuItem value={item}>IRIS: {item}</MenuItem>
+          ))}
         </Select>
       </FormControl>
     </div>

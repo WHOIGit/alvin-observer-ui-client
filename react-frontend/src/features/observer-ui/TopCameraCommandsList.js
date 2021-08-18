@@ -6,16 +6,8 @@ import SelectShutterMode from "../camera-controls/SelectShutterMode";
 import SelectIrisMode from "../camera-controls/SelectIrisMode";
 import SelectIsoMode from "../camera-controls/SelectIsoMode";
 import FocusModeDisplayChip from "./FocusModeDisplayChip";
-import { selectActiveCamera } from "../camera-controls/cameraControlsSlice";
 
 export default function TopCameraCommandsList() {
-  const activeCamera = useSelector(selectActiveCamera);
-
-  if (activeCamera === undefined) {
-    return null;
-  }
-
-  const focusLabel = `FOCUS: ${activeCamera.settings.focusMode}`;
   return (
     <List>
       <ListItem disableGutters={true}>

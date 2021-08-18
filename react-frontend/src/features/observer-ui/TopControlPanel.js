@@ -45,9 +45,7 @@ export default function TopControlPanel({
         <Grid item>
           <SelectVideoSource />
         </Grid>
-        <Grid item>
-          <SelectExposureMode />
-        </Grid>
+        <Grid item>{/*  <SelectExposureMode /> */}</Grid>
       </Grid>
     </>
   );
