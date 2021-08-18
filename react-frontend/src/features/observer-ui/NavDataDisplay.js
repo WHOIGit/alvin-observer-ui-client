@@ -10,7 +10,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { NAV_HEARTBEAT } from "../../config.js";
+import { NAV_HEARTBEAT, CAM_HEARTBEAT } from "../../config.js";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -24,6 +24,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function NavDataDisplay() {
   const classes = useStyles();
+  // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
+  useCameraWebSocket(CAM_HEARTBEAT);
   const { messages, sendMessage } = useCameraWebSocket(NAV_HEARTBEAT);
 
   if (messages === null) {

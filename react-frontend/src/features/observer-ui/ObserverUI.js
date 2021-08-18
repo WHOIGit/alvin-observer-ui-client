@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
@@ -54,13 +54,27 @@ export default function ObserverUI({
 }) {
   const classes = useStyles();
   const dispatch = useDispatch();
-  // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
-  const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
+  console.log("RENDERING");
   // connect to newCameraCommand
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
   const activeCamera = useSelector(selectActiveCamera);
   const camHeartbeatData = useSelector(selectCamHeartbeatData);
+
+  const setInitialCamera = useCallback(() => {
+    dispatch(changeActiveCamera(camHeartbeatData));
+
+    // send camera change command to set available settings options
+    const payload = {
+      camera: camHeartbeatData.camera,
+      action: {
+        name: COMMAND_STRINGS.cameraChangeCommand,
+        value: camHeartbeatData.camera
+      }
+    };
+    sendMessage(payload);
+  });
+
   // use CAM_HEARTBEAT parameters only on initial app load to set activeCamera
   // keep camera params in local state otherwise
   useEffect(() => {
@@ -68,20 +82,10 @@ export default function ObserverUI({
     if (activeCamera === null) {
       console.log(camHeartbeatData);
       if (camHeartbeatData !== null) {
-        dispatch(changeActiveCamera(camHeartbeatData));
-
-        // send camera change command to set available settings options
-        const payload = {
-          camera: camHeartbeatData.camera,
-          action: {
-            name: COMMAND_STRINGS.cameraChangeCommand,
-            value: camHeartbeatData.camera
-          }
-        };
-        sendMessage(payload);
+        setInitialCamera();
       }
     }
-  }, [camHeartbeatData]);
+  }, [setInitialCamera]);
 
   return (
     <TopControlPanel

@@ -16,6 +16,7 @@ import {
 // local import
 import TopCameraCommandsList from "./TopCameraCommandsList";
 import FocusModeDisplayChip from "./FocusModeDisplayChip";
+import ObserverDisplayChip from "./ObserverDisplayChip";
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import { VIDEO_STREAM_CONFIG } from "../../config.js";
 
@@ -121,6 +122,8 @@ export default function MiniVideos({ showFullCameraControls }) {
               </Typography>
             </CardActions>
           </Card>
+
+          <ObserverDisplayChip className={classes.infoChip} />
         </Grid>
         <Grid item xs={6}>
           {showFullCameraControls ? (

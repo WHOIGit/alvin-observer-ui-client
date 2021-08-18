@@ -39,7 +39,7 @@ export default function SelectIsoMode() {
     sendMessage(payload);
   };
 
-  if (currentCamData === undefined) {
+  if (currentCamData === null) {
     return null;
   }
 

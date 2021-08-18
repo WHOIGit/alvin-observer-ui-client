@@ -2,13 +2,8 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Button, Typography } from "@material-ui/core";
-import {
-  selectActiveCamera,
-  changeCameraSettings
-} from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { COMMAND_STRINGS } from "../../config.js";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles(theme => ({
   ctrlButton: {
@@ -19,14 +14,12 @@ const useStyles = makeStyles(theme => ({
 
 export default function CaptureButtons() {
   const classes = useStyles();
-  const activeCamera = useSelector(selectActiveCamera);
   const { messages, sendMessage } = useCameraWebSocket(
     NEW_CAMERA_COMMAND_EVENT
   );
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
-      camera: activeCamera.camera,
       action: {
         name: commandName,
         value: commandValue

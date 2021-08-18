@@ -65,7 +65,6 @@ const useCameraWebSocket = socketEvent => {
 
       if (socketEvent === CAM_HEARTBEAT) {
         dispatch(changeCamHeartbeat(incomingMessage));
-        // dispatch changeActiveCamera ???
       }
     });
 

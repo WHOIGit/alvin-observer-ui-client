@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Chip } from "@material-ui/core";
 import CenterFocusStrongIcon from "@material-ui/icons/CenterFocusStrong";
 // local
-import { selectCurrentCamData } from "../camera-controls/cameraControlsSlice";
+import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles(theme => ({
   chip: {
@@ -14,22 +14,15 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function FocusModeDisplayChip() {
+export default function ObserverDisplayChip({}) {
   const classes = useStyles();
-  const camData = useSelector(selectCurrentCamData);
+  const observerSide = useSelector(selectObserverSide);
 
-  if (camData === null) {
+  if (observerSide === null) {
     return null;
   }
 
-  const focusLabel = `FOCUS: ${camData.currentSettings.focus_mode}`;
+  const label = `OBSERVER SIDE: ${observerSide}`;
 
-  return (
-    <Chip
-      label={focusLabel}
-      className={classes.chip}
-      color="primary"
-      icon={<CenterFocusStrongIcon />}
-    />
-  );
+  return <Chip label={label} className={classes.chip} color="primary" />;
 }

@@ -11,11 +11,6 @@ import {
 // set default settings
 const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
-const defaultFocusMode = COMMAND_STRINGS.focusAF;
-const defaultExposureMode = COMMAND_STRINGS.exposureModeOptions[0];
-const defaultShutterMode = COMMAND_STRINGS.shutterModeOptions[0];
-const defaultIrisMode = COMMAND_STRINGS.irisModeOptions[0];
-const defaultIsoMode = COMMAND_STRINGS.isoModeOptions[0];
 
 const initialState = {
   observerSide: null, // P = Port/ S = Starboard
@@ -26,39 +21,7 @@ const initialState = {
   camHeartbeatData: null,
   currentCamData: null,
   lastCommand: null,
-  availableCameras: null,
-  cameras: [
-    {
-      camera: "camera1",
-      cameraName: "Camera 1",
-      settings: {
-        focusMode: defaultFocusMode,
-        exposureMode: defaultExposureMode,
-        shutterMode: defaultShutterMode,
-        irisMode: defaultIrisMode,
-        isoMode: defaultIsoMode
-      },
-      lastCommand: null,
-      data: {},
-      isActive: false,
-      isRecording: false
-    },
-    {
-      camera: "camera2",
-      cameraName: "Camera 2",
-      settings: {
-        focusMode: defaultFocusMode,
-        exposureMode: defaultExposureMode,
-        shutterMode: defaultShutterMode,
-        irisMode: defaultIrisMode,
-        isoMode: defaultIsoMode
-      },
-      lastCommand: null,
-      data: {},
-      isActive: false,
-      isRecording: false
-    }
-  ]
+  availableCameras: null
 };
 
 export const cameraControlsSlice = createSlice({
@@ -169,6 +132,10 @@ export const selectWebSocketNamespace = state =>
 
 // return the current CamHeartbeat data
 export const selectCamHeartbeatData = state =>
+  state.cameraControls.camHeartbeatData;
+
+// return the latest CamHeartbeat data
+export const selectLastCamHeartbeatData = state =>
   state.cameraControls.camHeartbeatData;
 
 // return the current Camera data the socket returns on a camera change

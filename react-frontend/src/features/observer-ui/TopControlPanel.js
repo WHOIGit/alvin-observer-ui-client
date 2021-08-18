@@ -8,7 +8,7 @@ import NavDataDisplay from "./NavDataDisplay";
 import MiniVideos from "./MiniVideos";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
-
+import SensorDataDisplay from "./SensorDataDisplay";
 const useStyles = makeStyles(theme => ({
   paper: {
     padding: theme.spacing(2),
@@ -41,11 +41,21 @@ export default function TopControlPanel({
           </Paper>
         </Grid>
       </Grid>
-      <Grid container spacing={0} justify="flex-start">
-        <Grid item>
-          <SelectVideoSource />
+      <Grid container spacing={2} justify="flex-start" alignItems="center">
+        <Grid item xs={6}>
+          <Grid container spacing={0}>
+            <Grid item>
+              <SelectVideoSource />
+            </Grid>
+            <Grid item>
+              <SelectExposureMode />
+            </Grid>
+          </Grid>
         </Grid>
-        <Grid item>{/*  <SelectExposureMode /> */}</Grid>
+
+        <Grid item xs={6}>
+          <SensorDataDisplay />
+        </Grid>
       </Grid>
     </>
   );

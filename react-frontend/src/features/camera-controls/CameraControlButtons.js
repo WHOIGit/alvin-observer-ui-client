@@ -8,7 +8,7 @@ import CenterFocusStrongIcon from "@material-ui/icons/CenterFocusStrong";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import useLongPress from "../../hooks/useLongPress";
 import {
-  selectActiveCamera,
+  selectCurrentCamData,
   changeCameraSettings
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
@@ -39,7 +39,7 @@ export default function CameraControlButtons() {
   const classes = useStyles();
   const joystickElem = useRef(null);
   const timerRef = useRef(false);
-  const activeCamera = useSelector(selectActiveCamera);
+  const camData = useSelector(selectCurrentCamData);
 
   const { messages, sendMessage } = useCameraWebSocket(
     NEW_CAMERA_COMMAND_EVENT
@@ -118,7 +118,7 @@ export default function CameraControlButtons() {
     }
 
     if (commandName === COMMAND_STRINGS.focusModeCommand) {
-      if (activeCamera.settings.focusMode === COMMAND_STRINGS.focusAF) {
+      if (camData.currentSettings.focus_mode === COMMAND_STRINGS.focusAF) {
         commandValue = COMMAND_STRINGS.focusMF;
       } else {
         commandValue = COMMAND_STRINGS.focusAF;
@@ -126,7 +126,6 @@ export default function CameraControlButtons() {
     }
 
     const payload = {
-      camera: activeCamera.camera,
       action: {
         name: commandName,
         value: commandValue
@@ -148,7 +147,7 @@ export default function CameraControlButtons() {
     }
   };
 
-  if (activeCamera === undefined) {
+  if (camData === null) {
     return null;
   }
 
