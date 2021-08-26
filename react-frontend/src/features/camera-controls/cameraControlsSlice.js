@@ -13,8 +13,8 @@ const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
 
 const initialState = {
-  observerSide: null, // P = Port/ S = Starboard
-  webSocketNamespace: null,
+  observerSide: "PLT", // P = Port, S = Starboard, PLT = Pilot
+  webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
   activeCamera: null,

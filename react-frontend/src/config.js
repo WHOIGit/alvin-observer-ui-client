@@ -46,7 +46,8 @@ export const COMMAND_STRINGS = {
   panTiltCommand: "PANTILT",
   stillImageCaptureCommand: "SIC",
   quickClickCommand: "QCV",
-  recordSourceCommand: "REC"
+  recordSourceCommand: "REC",
+  routerIOCommand: "RTR"
 };
 
 export const VIDEO_STREAM_CONFIG = {
