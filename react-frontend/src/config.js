@@ -1,10 +1,10 @@
 // Web socket server
-export const WS_SERVER = "http://128.128.184.62:4040";
+export const WS_SERVER = process.env.REACT_APP_WS_SERVER;
 export const WS_SERVER_NAMESPACE_PORT = "/port";
 export const WS_SERVER_NAMESPACE_STARBOARD = "/stbd";
 export const WS_SERVER_NAMESPACE_PILOT = "/pilot";
 // sealog url for iframe
-export const SEALOG_URL = "https://harmonyhill.whoi.edu/sealog-alvin/";
+export const SEALOG_URL = process.env.REACT_APP_SEALOG_URL;
 // Web socket event names
 export const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
 export const NAV_HEARTBEAT = "NavHeartbeat";
@@ -50,10 +50,10 @@ export const COMMAND_STRINGS = {
 };
 
 export const VIDEO_STREAM_CONFIG = {
-  server: "https://128.128.184.62/video",
-  portObserverVideo: "demo1",
-  stbdObserverVideo: "demo1",
-  portRecordVideo: "demo1",
-  stbdRecordVideo: "demo1",
-  pilotVideo: "demo1"
+  server: process.env.REACT_APP_VIDEO_STREAM_SERVER,
+  portObserverVideo: process.env.REACT_APP_PORT_OBSERVER_VIDEO,
+  stbdObserverVideo: process.env.REACT_APP_STBD_OBSERVER_VIDEO,
+  portRecordVideo: process.env.REACT_APP_PORT_RECORDER_VIDEO,
+  stbdRecordVideo: process.env.REACT_APP_STBD_RECORDER_VIDEO,
+  pilotVideo: process.env.REACT_APP_PILOT_VIDEO
 };

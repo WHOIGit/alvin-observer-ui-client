@@ -12,8 +12,7 @@ import {
   changeCameraSettings
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { COMMAND_STRINGS } from "../../config.js";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles(theme => ({
   root: {

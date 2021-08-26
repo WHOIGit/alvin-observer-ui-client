@@ -61,6 +61,9 @@ export default function ObserverUI({
   const activeCamera = useSelector(selectActiveCamera);
   const camHeartbeatData = useSelector(selectCamHeartbeatData);
 
+  // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
+  useCameraWebSocket(CAM_HEARTBEAT);
+
   const setInitialCamera = useCallback(() => {
     dispatch(changeActiveCamera(camHeartbeatData));
 
