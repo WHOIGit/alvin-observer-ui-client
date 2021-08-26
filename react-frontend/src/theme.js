@@ -1,4 +1,4 @@
-import { red, green } from "@material-ui/core/colors";
+import { red, green, deepOrange } from "@material-ui/core/colors";
 import { createMuiTheme } from "@material-ui/core/styles";
 
 // A custom theme for this app
@@ -8,7 +8,7 @@ const theme = createMuiTheme({
       main: "#556cd6"
     },
     secondary: {
-      main: "#2195f2"
+      main: deepOrange[500]
     },
     success: {
       main: green.A700,
