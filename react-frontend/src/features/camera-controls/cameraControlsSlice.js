@@ -17,11 +17,11 @@ const initialState = {
   webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
-  activeCamera: null,
+  activeCamera: CAMERAS[0].camera,
   camHeartbeatData: null,
   currentCamData: null,
   lastCommand: null,
-  availableCameras: null
+  availableCameras: CAMERAS
 };
 
 export const cameraControlsSlice = createSlice({

@@ -11,10 +11,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function RouterControlContainer({
-  showFullCameraControls,
-  setShowFullCameraControls
-}) {
+export default function RouterControlContainer() {
   const classes = useStyles();
 
   return (

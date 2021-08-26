@@ -47,7 +47,9 @@ export const COMMAND_STRINGS = {
   stillImageCaptureCommand: "SIC",
   quickClickCommand: "QCV",
   recordSourceCommand: "REC",
-  routerIOCommand: "RTR"
+  routerIOCommand: "RTR",
+  whiteBalanceCommand: "WB",
+  whiteBalanceOptions: ["AUTO", "MAN", "SP", "IP"]
 };
 
 export const VIDEO_STREAM_CONFIG = {

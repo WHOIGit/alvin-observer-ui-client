@@ -8,6 +8,7 @@ import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 // local
 import RouterControlContainer from "./RouterControlContainer";
+import CameraControlContainer from "./CameraControlContainer";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -69,7 +70,7 @@ export default function SimpleTabs() {
         <RouterControlContainer />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Item Two
+        <CameraControlContainer />
       </TabPanel>
     </div>
   );
