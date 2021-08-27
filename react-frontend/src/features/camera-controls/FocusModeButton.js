@@ -4,6 +4,10 @@ import { Button } from "@material-ui/core";
 import CenterFocusStrongIcon from "@material-ui/icons/CenterFocusStrong";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+<<<<<<< HEAD
+=======
+import { selectCurrentCamData } from "./cameraControlsSlice";
+>>>>>>> main
 import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const FocusModeButton = () => {
@@ -13,6 +17,10 @@ const FocusModeButton = () => {
   );
 
   const handleSendMessage = commandName => {
+<<<<<<< HEAD
+=======
+    let commandValue;
+>>>>>>> main
     if (camData.currentSettings.focus_mode === COMMAND_STRINGS.focusAF) {
       commandValue = COMMAND_STRINGS.focusMF;
     } else {
@@ -40,3 +48,8 @@ const FocusModeButton = () => {
     </Button>
   );
 };
+<<<<<<< HEAD
+=======
+
+export default FocusModeButton;
+>>>>>>> main
