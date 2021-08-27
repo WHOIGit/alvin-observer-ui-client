@@ -11,6 +11,7 @@ import {
   selectCurrentCamData,
   changeCameraSettings
 } from "./cameraControlsSlice";
+import FocusModeButton from "./FocusModeButton";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
@@ -154,15 +155,7 @@ export default function CameraControlButtons() {
   return (
     <div className={classes.root}>
       <Box my={2}>
-        <Button
-          variant="contained"
-          color="secondary"
-          size="small"
-          startIcon={<CenterFocusStrongIcon />}
-          onClick={() => handleSendMessage(COMMAND_STRINGS.focusModeCommand)}
-        >
-          Focus AF/MF
-        </Button>
+        <FocusModeButton />
       </Box>
 
       <Box my={3}>
