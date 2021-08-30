@@ -6,7 +6,6 @@ import { List, ListItem, Chip } from "@material-ui/core";
 import SelectShutterMode from "../camera-controls/SelectShutterMode";
 import SelectIrisMode from "../camera-controls/SelectIrisMode";
 import SelectIsoMode from "../camera-controls/SelectIsoMode";
-import FocusModeDisplayChip from "./FocusModeDisplayChip";
 
 export default function TopCameraCommandsList() {
   return (
@@ -19,9 +18,6 @@ export default function TopCameraCommandsList() {
       </ListItem>
       <ListItem disableGutters={true}>
         <SelectIsoMode />
-      </ListItem>
-      <ListItem disableGutters={true}>
-        <FocusModeDisplayChip />
       </ListItem>
     </List>
   );

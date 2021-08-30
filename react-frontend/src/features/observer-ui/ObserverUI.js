@@ -7,7 +7,7 @@ import TopControlPanel from "./TopControlPanel";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import {
   selectWebSocketNamespace,
-  selectCamHeartbeatData,
+  selectInitialCamHeartbeatData,
   selectActiveCamera,
   changeActiveCamera
 } from "../camera-controls/cameraControlsSlice";
@@ -55,16 +55,12 @@ export default function ObserverUI({
   const classes = useStyles();
   const dispatch = useDispatch();
   console.log("RENDERING");
-  // connect to newCameraCommand
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
   useCameraWebSocket(CAM_HEARTBEAT);
-
+  // connect to newCameraCommand
+  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const activeCamera = useSelector(selectActiveCamera);
-  //const camHeartbeatData = useSelector(selectCamHeartbeatData);
-  const initialCamHeartbeat = useSelector(
-    state => state.cameraControls.initialCamHeartbeat
-  );
+  const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
 
   const setInitialCamera = () => {
     dispatch(changeActiveCamera(initialCamHeartbeat));

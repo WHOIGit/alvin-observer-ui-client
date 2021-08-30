@@ -34,6 +34,18 @@ export default function TopControlPanel({
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <MiniVideos showFullCameraControls={showFullCameraControls} />
+          <Grid container spacing={2} justify="flex-start" alignItems="center">
+            <Grid item xs>
+              <Grid container spacing={0}>
+                <Grid item>
+                  <SelectVideoSource />
+                </Grid>
+                <Grid item>
+                  <SelectExposureMode />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item xs={3}>
           <NavDataDisplay />
@@ -49,18 +61,6 @@ export default function TopControlPanel({
               setShowFullCameraControls={setShowFullCameraControls}
             />
           </Paper>
-        </Grid>
-      </Grid>
-      <Grid container spacing={2} justify="flex-start" alignItems="center">
-        <Grid item xs>
-          <Grid container spacing={0}>
-            <Grid item>
-              <SelectVideoSource />
-            </Grid>
-            <Grid item>
-              <SelectExposureMode />
-            </Grid>
-          </Grid>
         </Grid>
       </Grid>
     </>

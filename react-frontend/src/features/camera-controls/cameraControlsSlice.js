@@ -144,6 +144,10 @@ export const selectWebSocketNamespace = state =>
 export const selectCamHeartbeatData = state =>
   state.cameraControls.camHeartbeatData;
 
+// return the initial cached CamHeartbeat data
+export const selectInitialCamHeartbeatData = state =>
+  state.cameraControls.initialCamHeartbeat;
+
 // return the current Camera data the socket returns on a camera change
 export const selectCurrentCamData = state =>
   state.cameraControls.currentCamData;
