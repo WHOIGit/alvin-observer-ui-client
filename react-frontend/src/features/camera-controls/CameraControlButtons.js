@@ -148,10 +148,6 @@ export default function CameraControlButtons() {
     }
   };
 
-  if (camData === null) {
-    return null;
-  }
-
   return (
     <div className={classes.root}>
       <Box my={2}>
@@ -215,18 +211,17 @@ export default function CameraControlButtons() {
       <Divider />
       {showJoystick && (
         <Box mt={3}>
-          <Typography variant="h6">P & T</Typography>
-
           <ReactNipple
             options={{
               mode: "static",
+              size: 150,
               position: { top: "50%", left: "50%" },
               color: "blue"
             }}
             style={{
               position: "relative",
               width: "100%",
-              height: 120
+              height: 150
               // if you pass position: 'relative', you don't need to import the stylesheet
             }}
             onMove={(evt, data) => {
@@ -240,6 +235,7 @@ export default function CameraControlButtons() {
               handleSendMessage(COMMAND_STRINGS.panTiltCommand, payload);
             }}
           />
+          <Typography variant="h6">P & T</Typography>
         </Box>
       )}
     </div>

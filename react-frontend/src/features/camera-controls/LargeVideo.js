@@ -43,7 +43,6 @@ export default function LargeVideo() {
           ref={videoElem}
           autoPlay
           muted
-          controls
         ></video>
       </div>
     </div>

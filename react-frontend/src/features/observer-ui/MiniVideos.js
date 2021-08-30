@@ -105,7 +105,6 @@ export default function MiniVideos({ showFullCameraControls }) {
                   ref={videoElemRecord}
                   autoPlay
                   muted
-                  controls
                 ></video>
               </div>
             </CardContent>
@@ -146,7 +145,6 @@ export default function MiniVideos({ showFullCameraControls }) {
                       ref={videoElemObserver}
                       autoPlay
                       muted
-                      controls
                     ></video>
                   </div>
                 </CardContent>
