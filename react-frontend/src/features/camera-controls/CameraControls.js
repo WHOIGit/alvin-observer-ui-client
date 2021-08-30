@@ -41,9 +41,7 @@ export default function CameraControls({
     >
       <Grid container spacing={2}>
         <Grid item xs={9}>
-          <Paper className={classes.paper}>
-            <LargeVideo />
-          </Paper>
+          <LargeVideo />
         </Grid>
         <Grid item xs={3}>
           <Paper className={classes.paper}>

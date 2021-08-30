@@ -22,8 +22,7 @@ WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
 const useStyles = makeStyles(theme => ({
   root: {
-    flexGrow: 1,
-    marginBottom: theme.spacing(1)
+    flexGrow: 1
   },
   headerRoot: { padding: "4px" },
   title: {
