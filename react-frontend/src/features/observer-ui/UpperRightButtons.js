@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function ControlButtons({
+export default function UpperRightButtons({
   showFullCameraControls,
   setShowFullCameraControls
 }) {

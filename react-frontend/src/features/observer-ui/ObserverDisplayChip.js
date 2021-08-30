@@ -17,12 +17,14 @@ const useStyles = makeStyles(theme => ({
 export default function ObserverDisplayChip({}) {
   const classes = useStyles();
   const observerSide = useSelector(selectObserverSide);
-
+  let label;
   if (observerSide === null) {
     return null;
+  } else if (observerSide === "P") {
+    label = "OBSERVER SIDE: PORT";
+  } else if (observerSide === "S") {
+    label = "OBSERVER SIDE: STBD";
   }
-
-  const label = `OBSERVER SIDE: ${observerSide}`;
 
   return <Chip label={label} className={classes.chip} color="primary" />;
 }

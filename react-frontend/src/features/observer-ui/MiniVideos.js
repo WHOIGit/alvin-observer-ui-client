@@ -15,8 +15,6 @@ import {
 } from "@material-ui/core";
 // local import
 import TopCameraCommandsList from "./TopCameraCommandsList";
-import FocusModeDisplayChip from "./FocusModeDisplayChip";
-import ObserverDisplayChip from "./ObserverDisplayChip";
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import { VIDEO_STREAM_CONFIG } from "../../config.js";
 
@@ -49,10 +47,6 @@ const useStyles = makeStyles(theme => ({
     height: 0,
     paddingTop: "77%",
     maxWidth: "100%"
-  },
-  infoChip: {
-    marginTop: theme.spacing(1),
-    width: "100%"
   },
   cardContent: {
     padding: 0
@@ -121,8 +115,6 @@ export default function MiniVideos({ showFullCameraControls }) {
               </Typography>
             </CardActions>
           </Card>
-
-          <ObserverDisplayChip className={classes.infoChip} />
         </Grid>
         <Grid item xs={6}>
           {showFullCameraControls ? (
@@ -160,7 +152,6 @@ export default function MiniVideos({ showFullCameraControls }) {
                   </Typography>
                 </CardActions>
               </Card>
-              <FocusModeDisplayChip className={classes.infoChip} />
             </>
           )}
         </Grid>

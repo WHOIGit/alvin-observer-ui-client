@@ -10,7 +10,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { NAV_HEARTBEAT } from "../../config.js";
+import { NAV_HEARTBEAT, CAM_HEARTBEAT } from "../../config.js";
 
 const useStyles = makeStyles(theme => ({
   root: {

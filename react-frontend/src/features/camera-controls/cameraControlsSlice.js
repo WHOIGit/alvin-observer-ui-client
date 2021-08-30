@@ -17,6 +17,7 @@ const initialState = {
   webSocketNamespace: null,
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
+  initialCamHeartbeat: null,
   activeCamera: null,
   camHeartbeatData: null,
   currentCamData: null,
@@ -94,6 +95,9 @@ export const cameraControlsSlice = createSlice({
       }
     },
     changeCamHeartbeat: (state, action) => {
+      if (state.initialCamHeartbeat === null) {
+        state.initialCamHeartbeat = action.payload;
+      }
       const camHeartbeatData = action.payload;
       delete camHeartbeatData.eventId;
       delete camHeartbeatData.timestamp;
