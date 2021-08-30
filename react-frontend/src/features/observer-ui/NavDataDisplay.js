@@ -14,7 +14,6 @@ import { NAV_HEARTBEAT, CAM_HEARTBEAT } from "../../config.js";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    height: "179px",
     backgroundColor: "#f5f5f5"
   },
   table: {

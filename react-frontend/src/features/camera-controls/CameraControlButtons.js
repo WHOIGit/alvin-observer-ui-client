@@ -150,7 +150,7 @@ export default function CameraControlButtons() {
 
   return (
     <div className={classes.root}>
-      <Box my={2}>
+      <Box my={1}>
         <FocusModeButton />
       </Box>
 
