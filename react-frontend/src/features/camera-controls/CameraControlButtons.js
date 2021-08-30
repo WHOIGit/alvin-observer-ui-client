@@ -232,6 +232,7 @@ export default function CameraControlButtons() {
             onMove={(evt, data) => {
               console.log(evt, data);
               const payload = {
+                position: data.position,
                 distance: data.distance,
                 angle: data.angle,
                 direction: data.direction
