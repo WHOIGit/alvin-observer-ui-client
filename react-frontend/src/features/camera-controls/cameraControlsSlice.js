@@ -94,6 +94,12 @@ export const cameraControlsSlice = createSlice({
       }
     },
     changeCamHeartbeat: (state, action) => {
+      const camHeartbeatData = action.payload;
+      delete camHeartbeatData.eventId;
+      delete camHeartbeatData.timestamp;
+      if (state.camHeartbeatData === camHeartbeatData) {
+        return state;
+      }
       state.camHeartbeatData = action.payload;
     },
     changeCurrentCamData: (state, action) => {
@@ -132,10 +138,6 @@ export const selectWebSocketNamespace = state =>
 
 // return the current CamHeartbeat data
 export const selectCamHeartbeatData = state =>
-  state.cameraControls.camHeartbeatData;
-
-// return the latest CamHeartbeat data
-export const selectLastCamHeartbeatData = state =>
   state.cameraControls.camHeartbeatData;
 
 // return the current Camera data the socket returns on a camera change

@@ -10,11 +10,3 @@ services:
       - 8080:80
     environment:
       NODE_ENV: production
-
-  server:
-    build: ./node-server/
-    environment:
-      - PORT=4040
-    ports:
-      - 4040:4040
-    command: node main.js
