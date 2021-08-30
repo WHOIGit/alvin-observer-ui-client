@@ -26,14 +26,10 @@ const useStyles = makeStyles(theme => ({
   ctrlButton: {
     width: "100%",
     fontSize: ".7em"
+  },
+  noSelect: {
+    userSelect: "none"
   }
-  /*
-  joystickContainer: {
-    position: "relative",
-    width: "100%",
-    height: "200px"
-  }
-  */
 }));
 
 export default function CameraControlButtons() {
@@ -210,7 +206,7 @@ export default function CameraControlButtons() {
       </Box>
       <Divider />
       {showJoystick && (
-        <Box mt={3}>
+        <Box mt={3} className={classes.noSelect}>
           <ReactNipple
             options={{
               mode: "static",
