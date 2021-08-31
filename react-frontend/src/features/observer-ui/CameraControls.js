@@ -4,7 +4,7 @@ import Link from "@material-ui/core/Link";
 import { Typography, Grid, Paper, Icon, Fab } from "@material-ui/core";
 import CameraAltIcon from "@material-ui/icons/CameraAlt";
 import CameraControlButtons from "./CameraControlButtons";
-import LargeVideo from "./LargeVideo";
+import LargeVideo from "../camera-controls/LargeVideo";
 
 const useStyles = makeStyles(theme => ({
   root: {

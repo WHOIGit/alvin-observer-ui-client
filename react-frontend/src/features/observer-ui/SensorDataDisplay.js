@@ -1,12 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Typography, Grid } from "@material-ui/core";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
+import { Grid } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
@@ -21,7 +15,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function SensorDataDisplay() {
   const classes = useStyles();
-  const { messages, sendMessage } = useCameraWebSocket(SENSOR_HEARTBEAT);
+  const { messages } = useCameraWebSocket(SENSOR_HEARTBEAT);
   if (messages === null) {
     return null;
   }

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Paper, Icon, Box } from "@material-ui/core";
-import CameraAltIcon from "@material-ui/icons/CameraAlt";
+import { Grid, Paper, Box } from "@material-ui/core";
 // local
 import ObserverDisplayChip from "./ObserverDisplayChip";
 import UpperRightButtons from "./UpperRightButtons";
