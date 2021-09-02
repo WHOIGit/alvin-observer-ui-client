@@ -3,9 +3,7 @@ version: "3.7"
 services:
   nginx-react:
     container_name: nginx-react
-    build:
-      context: .
-      dockerfile: ./compose/Dockerfile
+    image: ghcr.io/whoigit/alvin-observer-ui:stable
     ports:
       - 3000:80
     volumes:
