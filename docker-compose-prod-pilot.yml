@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  nginx-react:
+    container_name: nginx-react
+    image: ghcr.io/whoigit/alvin-pilot-ui:stable
+    ports:
+      - 3000:80
+    volumes:
+      # allows env variables to be injected into production React app after image is built
+      - ./configEnv-production.js:/usr/share/nginx/html/configEnv.js
+    environment:
+      NODE_ENV: production
