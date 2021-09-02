@@ -15,6 +15,7 @@ import {
   WS_SERVER,
   NEW_CAMERA_COMMAND_EVENT,
   CAM_HEARTBEAT,
+  RECORDER_HEARTBEAT,
   COMMAND_PREFIX
 } from "../config";
 
@@ -30,7 +31,8 @@ const useCameraWebSocket = socketEvent => {
 
   if (
     socketEvent === NEW_CAMERA_COMMAND_EVENT ||
-    socketEvent === CAM_HEARTBEAT
+    socketEvent === CAM_HEARTBEAT ||
+    socketEvent === RECORDER_HEARTBEAT
   ) {
     socketNs = socketNamespace;
   }

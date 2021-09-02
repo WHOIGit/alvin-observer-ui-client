@@ -14,9 +14,11 @@ import {
   Chip
 } from "@material-ui/core";
 // local import
+import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import TopCameraCommandsList from "./TopCameraCommandsList";
 import WebRtcPlayer from "../../utils/webrtcplayer";
-import { VIDEO_STREAM_CONFIG } from "../../config.js";
+import { selectActiveCamera } from "../camera-controls/cameraControlsSlice";
+import { VIDEO_STREAM_CONFIG, RECORDER_HEARTBEAT } from "../../config.js";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
@@ -54,6 +56,9 @@ const useStyles = makeStyles(theme => ({
 
 export default function MiniVideos({ showFullCameraControls }) {
   const classes = useStyles();
+  const activeCamera = useSelector(selectActiveCamera);
+  const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
+  console.log(messages);
   const videoElemRecord = useRef(null);
   const videoElemObserver = useRef(null);
   const observerVideoSrc = useSelector(
@@ -84,7 +89,7 @@ export default function MiniVideos({ showFullCameraControls }) {
         <Grid item xs={6}>
           <Card className={`${classes.root}`}>
             <CardHeader
-              title="REC: Camera Name2"
+              title={messages && `REC: ${messages.camera}`}
               classes={{
                 root: classes.headerRoot,
                 title: classes.title
@@ -122,7 +127,7 @@ export default function MiniVideos({ showFullCameraControls }) {
             <>
               <Card className={classes.root}>
                 <CardHeader
-                  title="OBS: Camera Name1"
+                  title={`OBS: ${activeCamera}`}
                   classes={{
                     root: classes.headerRoot,
                     title: classes.title
