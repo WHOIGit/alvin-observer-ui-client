@@ -1,12 +1,9 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import { List, ListItem, Chip } from "@material-ui/core";
+import { List, ListItem } from "@material-ui/core";
 // local
 import SelectShutterMode from "../camera-controls/SelectShutterMode";
 import SelectIrisMode from "../camera-controls/SelectIrisMode";
 import SelectIsoMode from "../camera-controls/SelectIsoMode";
-import FocusModeDisplayChip from "./FocusModeDisplayChip";
 
 export default function TopCameraCommandsList() {
   return (
@@ -19,9 +16,6 @@ export default function TopCameraCommandsList() {
       </ListItem>
       <ListItem disableGutters={true}>
         <SelectIsoMode />
-      </ListItem>
-      <ListItem disableGutters={true}>
-        <FocusModeDisplayChip />
       </ListItem>
     </List>
   );

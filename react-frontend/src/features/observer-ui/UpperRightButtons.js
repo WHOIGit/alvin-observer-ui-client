@@ -1,13 +1,9 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Link from "@material-ui/core/Link";
 import { Grid, Button } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 // local imports
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { COMMAND_STRINGS } from "../../config.js";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 import CaptureButtons from "../camera-controls/CaptureButtons";
 
 const useStyles = makeStyles(theme => ({
@@ -24,7 +20,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function ControlButtons({
+export default function UpperRightButtons({
   showFullCameraControls,
   setShowFullCameraControls
 }) {

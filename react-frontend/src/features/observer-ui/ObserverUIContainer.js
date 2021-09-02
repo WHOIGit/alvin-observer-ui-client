@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import Link from "@material-ui/core/Link";
-import { Grid, Paper, Icon, Fab } from "@material-ui/core";
+import { Fab } from "@material-ui/core";
 import CameraAltIcon from "@material-ui/icons/CameraAlt";
-import CameraControls from "../camera-controls/CameraControls";
+import CameraControls from "./CameraControls";
 import ObserverSideSelect from "./ObserverSideSelect";
 import ObserverUI from "./ObserverUI";
 import { selectObserverSide } from "../camera-controls/cameraControlsSlice";

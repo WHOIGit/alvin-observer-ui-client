@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
@@ -7,7 +7,7 @@ import TopControlPanel from "./TopControlPanel";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import {
   selectWebSocketNamespace,
-  selectCamHeartbeatData,
+  selectInitialCamHeartbeatData,
   selectActiveCamera,
   changeActiveCamera
 } from "../camera-controls/cameraControlsSlice";
@@ -55,40 +55,38 @@ export default function ObserverUI({
   const classes = useStyles();
   const dispatch = useDispatch();
   console.log("RENDERING");
-  // connect to newCameraCommand
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
-
-  const activeCamera = useSelector(selectActiveCamera);
-  const camHeartbeatData = useSelector(selectCamHeartbeatData);
-
   // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
   useCameraWebSocket(CAM_HEARTBEAT);
+  // connect to newCameraCommand
+  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  const activeCamera = useSelector(selectActiveCamera);
+  const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
 
-  const setInitialCamera = useCallback(() => {
-    dispatch(changeActiveCamera(camHeartbeatData));
+  const setInitialCamera = () => {
+    dispatch(changeActiveCamera(initialCamHeartbeat));
 
     // send camera change command to set available settings options
     const payload = {
-      camera: camHeartbeatData.camera,
+      camera: initialCamHeartbeat.camera,
       action: {
         name: COMMAND_STRINGS.cameraChangeCommand,
-        value: camHeartbeatData.camera
+        value: initialCamHeartbeat.camera
       }
     };
     sendMessage(payload);
-  });
+  };
 
   // use CAM_HEARTBEAT parameters only on initial app load to set activeCamera
   // keep camera params in local state otherwise
   useEffect(() => {
     // set initial camera state only if activeCamera is undefined
     if (activeCamera === null) {
-      console.log(camHeartbeatData);
-      if (camHeartbeatData !== null) {
+      console.log(initialCamHeartbeat);
+      if (initialCamHeartbeat !== null) {
         setInitialCamera();
       }
     }
-  }, [setInitialCamera]);
+  }, [activeCamera, setInitialCamera, initialCamHeartbeat]);
 
   return (
     <TopControlPanel

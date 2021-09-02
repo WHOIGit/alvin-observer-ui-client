@@ -15,8 +15,6 @@ import {
 } from "@material-ui/core";
 // local import
 import TopCameraCommandsList from "./TopCameraCommandsList";
-import FocusModeDisplayChip from "./FocusModeDisplayChip";
-import ObserverDisplayChip from "./ObserverDisplayChip";
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import { VIDEO_STREAM_CONFIG } from "../../config.js";
 
@@ -24,8 +22,7 @@ WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
 const useStyles = makeStyles(theme => ({
   root: {
-    flexGrow: 1,
-    marginBottom: theme.spacing(1)
+    flexGrow: 1
   },
   headerRoot: { padding: "4px" },
   title: {
@@ -49,10 +46,6 @@ const useStyles = makeStyles(theme => ({
     height: 0,
     paddingTop: "77%",
     maxWidth: "100%"
-  },
-  infoChip: {
-    marginTop: theme.spacing(1),
-    width: "100%"
   },
   cardContent: {
     padding: 0
@@ -105,7 +98,6 @@ export default function MiniVideos({ showFullCameraControls }) {
                   ref={videoElemRecord}
                   autoPlay
                   muted
-                  controls
                 ></video>
               </div>
             </CardContent>
@@ -122,8 +114,6 @@ export default function MiniVideos({ showFullCameraControls }) {
               </Typography>
             </CardActions>
           </Card>
-
-          <ObserverDisplayChip className={classes.infoChip} />
         </Grid>
         <Grid item xs={6}>
           {showFullCameraControls ? (
@@ -146,7 +136,6 @@ export default function MiniVideos({ showFullCameraControls }) {
                       ref={videoElemObserver}
                       autoPlay
                       muted
-                      controls
                     ></video>
                   </div>
                 </CardContent>
@@ -162,7 +151,6 @@ export default function MiniVideos({ showFullCameraControls }) {
                   </Typography>
                 </CardActions>
               </Card>
-              <FocusModeDisplayChip className={classes.infoChip} />
             </>
           )}
         </Grid>

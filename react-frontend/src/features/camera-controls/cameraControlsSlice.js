@@ -17,7 +17,8 @@ const initialState = {
   webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
-  activeCamera: CAMERAS[0].camera,
+  initialCamHeartbeat: null,
+  activeCamera: null,
   camHeartbeatData: null,
   currentCamData: null,
   lastCommand: null,
@@ -94,6 +95,15 @@ export const cameraControlsSlice = createSlice({
       }
     },
     changeCamHeartbeat: (state, action) => {
+      if (state.initialCamHeartbeat === null) {
+        state.initialCamHeartbeat = action.payload;
+      }
+      const camHeartbeatData = action.payload;
+      delete camHeartbeatData.eventId;
+      delete camHeartbeatData.timestamp;
+      if (state.camHeartbeatData === camHeartbeatData) {
+        return state;
+      }
       state.camHeartbeatData = action.payload;
     },
     changeCurrentCamData: (state, action) => {
@@ -134,9 +144,9 @@ export const selectWebSocketNamespace = state =>
 export const selectCamHeartbeatData = state =>
   state.cameraControls.camHeartbeatData;
 
-// return the latest CamHeartbeat data
-export const selectLastCamHeartbeatData = state =>
-  state.cameraControls.camHeartbeatData;
+// return the initial cached CamHeartbeat data
+export const selectInitialCamHeartbeatData = state =>
+  state.cameraControls.initialCamHeartbeat;
 
 // return the current Camera data the socket returns on a camera change
 export const selectCurrentCamData = state =>

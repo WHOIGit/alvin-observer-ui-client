@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import {
   setLastCommand,
   changeCameraSettings,
-  changeActiveCamera,
   changeCurrentCamData,
   changeCamHeartbeat,
   selectObserverSide,
@@ -50,8 +49,9 @@ const useCameraWebSocket = socketEvent => {
         ownedByCurrentUser: message.senderId === socketRef.current.id
       };
       */
-
-      setMessages(incomingMessage);
+      if (socketEvent !== CAM_HEARTBEAT) {
+        setMessages(incomingMessage);
+      }
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
         console.log(socketEvent, incomingMessage);
         // check if message is a Camera Change Package, else it's a Command Receipt

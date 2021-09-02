@@ -1,11 +1,11 @@
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:16 AS builder
+FROM node:14 AS builder
 
 LABEL maintainer="Ethan Andrews <eandrews@whoi.edu>"
 
 WORKDIR /app
 
-COPY . /app
+COPY ./react-frontend /app
 
 # Install all node packages
 RUN npm install && npm run build

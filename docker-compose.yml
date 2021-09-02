@@ -7,11 +7,3 @@ services:
     ports:
       - 3000:3000
     command: npm start
-
-  server:
-    build: ./node-server/
-    environment:
-      - PORT=4040
-    ports:
-      - 4040:4040
-    command: node main.js
