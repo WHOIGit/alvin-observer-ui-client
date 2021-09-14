@@ -42,10 +42,6 @@ export default function SelectVideoSource({ showTopControls }) {
     sendMessage(payload);
   };
 
-  if (activeCamera === null) {
-    return null;
-  }
-
   return (
     <div className={classes.root}>
       <FormControl className={classes.formControl}>
@@ -57,7 +53,7 @@ export default function SelectVideoSource({ showTopControls }) {
           onChange={handleSendMessage}
         >
           {cameras.map(item => (
-            <MenuItem value={item.cam_name}>{item.cam_name}</MenuItem>
+            <MenuItem value={item.camera}>{item.cam_name}</MenuItem>
           ))}
         </Select>
       </FormControl>
