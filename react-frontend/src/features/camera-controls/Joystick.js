@@ -69,7 +69,8 @@ export default function Joystick() {
           size: 150,
           position: { top: "50%", left: "50%" },
           color: "blue",
-          dynamicPage: true
+          dynamicPage: true,
+          threshold: 0.3
         }}
         style={{
           position: "relative",
