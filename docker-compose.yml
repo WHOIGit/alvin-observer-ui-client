@@ -3,7 +3,14 @@ version: "3.7"
 
 services:
   react_frontend:
-    build: ./react-frontend/
+    build:
+      context: .
+      dockerfile: ./compose/Dockerfile
     ports:
-      - 3000:3000
-    command: npm start
+      - 3000:80
+    volumes:
+      # allows env variables to be injected into production React app after image is built
+      - ./configEnv-production.js:/usr/share/nginx/html/configEnv.js
+    environment:
+      NODE_ENV: production
+    #command: npm start

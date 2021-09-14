@@ -58,7 +58,6 @@ export default function MiniVideos({ showFullCameraControls }) {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCamera);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
-  console.log(messages);
   const videoElemRecord = useRef(null);
   const videoElemObserver = useRef(null);
   const observerVideoSrc = useSelector(

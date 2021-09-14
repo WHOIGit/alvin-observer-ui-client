@@ -19,7 +19,7 @@ import {
   COMMAND_PREFIX
 } from "../config";
 
-const useCameraWebSocket = socketEvent => {
+const useCameraWebSocket = (socketEvent, useNamespace = true) => {
   const observerSideCmd = COMMAND_PREFIX + useSelector(selectObserverSide);
   const socketNamespace = useSelector(selectWebSocketNamespace);
   const activeCamera = useSelector(selectActiveCamera);
@@ -29,12 +29,14 @@ const useCameraWebSocket = socketEvent => {
   // need to set the web socket namespace depending on the event channel we need
   let socketNs = "/";
 
-  if (
-    socketEvent === NEW_CAMERA_COMMAND_EVENT ||
-    socketEvent === CAM_HEARTBEAT ||
-    socketEvent === RECORDER_HEARTBEAT
-  ) {
-    socketNs = socketNamespace;
+  if (useNamespace) {
+    if (
+      socketEvent === NEW_CAMERA_COMMAND_EVENT ||
+      socketEvent === CAM_HEARTBEAT ||
+      socketEvent === RECORDER_HEARTBEAT
+    ) {
+      socketNs = socketNamespace;
+    }
   }
 
   useEffect(() => {
@@ -79,7 +81,7 @@ const useCameraWebSocket = socketEvent => {
 
   // Sends a message to the server
   const sendMessage = messageBody => {
-    console.log(messageBody);
+    console.log(messageBody.action);
     if (socketRef.current !== undefined) {
       const payload = {
         eventId: uuidv4(),
@@ -88,7 +90,6 @@ const useCameraWebSocket = socketEvent => {
         action: messageBody.action
       };
       try {
-        console.log(payload);
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));
       } catch (err) {
