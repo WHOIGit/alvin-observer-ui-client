@@ -59,8 +59,6 @@ export default function ObserverUI({
   useCameraWebSocket(CAM_HEARTBEAT);
   // connect to observer side newCameraCommand to send message
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
-  const { messages } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT, false);
-  console.log(messages);
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { Fab } from "@material-ui/core";
@@ -6,7 +6,9 @@ import CameraAltIcon from "@material-ui/icons/CameraAlt";
 import CameraControls from "./CameraControls";
 import ObserverSideSelect from "./ObserverSideSelect";
 import ObserverUI from "./ObserverUI";
+import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -44,6 +46,7 @@ export default function ObserverUIContainer() {
   const observerSide = useSelector(selectObserverSide);
   const [showTopControls, setShowTopControls] = useState(false);
   const [showFullCameraControls, setShowFullCameraControls] = useState(false);
+  const { messages } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT, false);
 
   const handleControlToggle = () => {
     // close CameraControls if we're hiding panels
@@ -52,6 +55,11 @@ export default function ObserverUIContainer() {
     }
     setShowTopControls(!showTopControls);
   };
+
+  useEffect(() => {
+    // set initial camera state only if activeCamera is undefined
+    console.log(messages);
+  }, [messages]);
 
   return (
     <>

@@ -55,7 +55,6 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       */
       if (socketEvent !== CAM_HEARTBEAT) {
         setMessages(incomingMessage);
-        console.log(messages);
       }
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
         console.log(socketEvent, incomingMessage);
@@ -82,7 +81,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
 
   // Sends a message to the server
   const sendMessage = messageBody => {
-    console.log(messageBody);
+    console.log(messageBody.action);
     if (socketRef.current !== undefined) {
       const payload = {
         eventId: uuidv4(),
@@ -91,7 +90,6 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
         action: messageBody.action
       };
       try {
-        console.log(payload);
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));
       } catch (err) {

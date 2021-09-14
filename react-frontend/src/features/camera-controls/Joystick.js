@@ -31,6 +31,18 @@ export default function Joystick() {
     }, 500);
   }, []);
 
+  const handleJoystickEvents = (evt, data) => {
+    console.log(evt, data);
+    const payload = {
+      actionType: evt.type,
+      position: data.position,
+      distance: data.distance,
+      angle: data.angle,
+      direction: data.direction
+    };
+    handleSendMessage(COMMAND_STRINGS.panTiltCommand, payload);
+  };
+
   const handleSendMessage = (commandName, commandValue) => {
     if (commandValue === undefined) {
       let commandValue;
@@ -65,9 +77,11 @@ export default function Joystick() {
           height: 150
           // if you pass position: 'relative', you don't need to import the stylesheet
         }}
+        onStart={(evt, data) => handleJoystickEvents(evt, data)}
+        onEnd={(evt, data) => handleJoystickEvents(evt, data)}
         onMove={(evt, data) => {
-          console.log(evt, data);
           const payload = {
+            actionType: evt.type,
             position: data.position,
             distance: data.distance,
             angle: data.angle,
