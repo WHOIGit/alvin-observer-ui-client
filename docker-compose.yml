@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: ./compose/Dockerfile
     ports:
-      - 3000:80
+      - 3100:80
     volumes:
       # allows env variables to be injected into production React app after image is built
       - ./configEnv-production.js:/usr/share/nginx/html/configEnv.js
