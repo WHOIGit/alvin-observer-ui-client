@@ -57,7 +57,7 @@ export default function SelectVideoSource({ showTopControls }) {
           onChange={handleSendMessage}
         >
           {cameras.map(item => (
-            <MenuItem value={item.camera}>{item.displayName}</MenuItem>
+            <MenuItem value={item.cam_name}>{item.cam_name}</MenuItem>
           ))}
         </Select>
       </FormControl>

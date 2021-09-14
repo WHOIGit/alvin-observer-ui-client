@@ -38,9 +38,18 @@ export const cameraControlsSlice = createSlice({
         state.webSocketNamespace = WS_SERVER_NAMESPACE_STARBOARD;
       }
       // set available cameras
-      const availableCameras = CAMERAS.filter(item => {
-        return item.owner === action.payload;
-      });
+      let availableCameras;
+      if (action.payload === "P") {
+        availableCameras = CAMERAS.filter(item => {
+          return item.owner === "port";
+        });
+      }
+      if (action.payload === "S") {
+        availableCameras = CAMERAS.filter(item => {
+          return item.owner === "stbd";
+        });
+      }
+
       state.availableCameras = availableCameras;
     },
     changeActiveCamera: (state, action) => {
