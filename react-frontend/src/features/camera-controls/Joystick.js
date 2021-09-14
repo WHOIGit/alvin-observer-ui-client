@@ -79,16 +79,7 @@ export default function Joystick() {
         }}
         onStart={(evt, data) => handleJoystickEvents(evt, data)}
         onEnd={(evt, data) => handleJoystickEvents(evt, data)}
-        onMove={(evt, data) => {
-          const payload = {
-            actionType: evt.type,
-            position: data.position,
-            distance: data.distance,
-            angle: data.angle,
-            direction: data.direction
-          };
-          handleSendMessage(COMMAND_STRINGS.panTiltCommand, payload);
-        }}
+        onMove={(evt, data) => handleJoystickEvents(evt, data)}
       />
       <Typography variant="h6">P & T</Typography>
     </Box>
