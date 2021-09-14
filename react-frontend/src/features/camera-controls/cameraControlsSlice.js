@@ -11,7 +11,7 @@ import {
 // set default settings
 const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
-
+console.log(CAMERAS);
 const initialState = {
   observerSide: "PLT", // P = Port, S = Starboard, PLT = Pilot
   webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
@@ -38,6 +38,7 @@ export const cameraControlsSlice = createSlice({
         state.webSocketNamespace = WS_SERVER_NAMESPACE_STARBOARD;
       }
       // set available cameras
+      /*
       let availableCameras;
       if (action.payload === "P") {
         availableCameras = CAMERAS.filter(item => {
@@ -49,8 +50,8 @@ export const cameraControlsSlice = createSlice({
           return item.owner === "stbd";
         });
       }
-
       state.availableCameras = availableCameras;
+      */
     },
     changeActiveCamera: (state, action) => {
       state.activeCamera = action.payload.camera;
