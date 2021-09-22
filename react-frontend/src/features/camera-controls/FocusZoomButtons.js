@@ -10,18 +10,18 @@ import { selectCurrentCamData } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     //flexGrow: 1
   },
   camButton: {
     width: "100%",
-    fontSize: ".8em"
+    fontSize: ".8em",
   },
   ctrlButton: {
     width: "100%",
-    fontSize: ".7em"
-  }
+    fontSize: ".7em",
+  },
 }));
 
 export default function FocusZoomButtons() {
@@ -29,17 +29,15 @@ export default function FocusZoomButtons() {
   const camData = useSelector(selectCurrentCamData);
   const timerRef = useRef(false);
 
-  const { messages, sendMessage } = useCameraWebSocket(
-    NEW_CAMERA_COMMAND_EVENT
-  );
+  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
-  const handleZoomHold = commandValue => {
-    handleSendMessage(COMMAND_STRINGS.focusControlCommand, commandValue);
+  const handleZoomHold = (commandName, commandValue) => {
+    handleSendMessage(commandName, commandValue);
     // Set a Timeout to resend command every 1 sec
     timerRef.current = setTimeout(handleZoomHold, 1000, commandValue);
   };
 
-  const handleStop = commandName => {
+  const handleStop = (commandName) => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       handleSendMessage(commandName, COMMAND_STRINGS.focusStop);
@@ -52,8 +50,12 @@ export default function FocusZoomButtons() {
         COMMAND_STRINGS.focusControlCommand,
         COMMAND_STRINGS.focusNearOneStop
       ),
-    onLongPress: () => handleZoomHold(COMMAND_STRINGS.focusNearContinuos),
-    onStop: () => handleStop(COMMAND_STRINGS.focusControlCommand)
+    onLongPress: () =>
+      handleZoomHold(
+        COMMAND_STRINGS.focusControlCommand,
+        COMMAND_STRINGS.focusNearContinuos
+      ),
+    onStop: () => handleStop(COMMAND_STRINGS.focusControlCommand),
   });
 
   const focusFarBtnProps = useLongPress({
@@ -62,8 +64,12 @@ export default function FocusZoomButtons() {
         COMMAND_STRINGS.focusControlCommand,
         COMMAND_STRINGS.focusFarOneStop
       ),
-    onLongPress: () => handleZoomHold(COMMAND_STRINGS.focusFarContinuos),
-    onStop: () => handleStop(COMMAND_STRINGS.focusControlCommand)
+    onLongPress: () =>
+      handleZoomHold(
+        COMMAND_STRINGS.focusControlCommand,
+        COMMAND_STRINGS.focusFarContinuos
+      ),
+    onStop: () => handleStop(COMMAND_STRINGS.focusControlCommand),
   });
 
   const zoomNearBtnProps = useLongPress({
@@ -72,8 +78,12 @@ export default function FocusZoomButtons() {
         COMMAND_STRINGS.zoomControlCommand,
         COMMAND_STRINGS.zoomNearOneStop
       ),
-    onLongPress: () => handleZoomHold(COMMAND_STRINGS.zoomNearContinuos),
-    onStop: () => handleStop(COMMAND_STRINGS.zoomControlCommand)
+    onLongPress: () =>
+      handleZoomHold(
+        COMMAND_STRINGS.zoomControlCommand,
+        COMMAND_STRINGS.zoomNearContinuos
+      ),
+    onStop: () => handleStop(COMMAND_STRINGS.zoomControlCommand),
   });
 
   const zoomFarBtnProps = useLongPress({
@@ -82,8 +92,12 @@ export default function FocusZoomButtons() {
         COMMAND_STRINGS.zoomControlCommand,
         COMMAND_STRINGS.zoomFarOneStop
       ),
-    onLongPress: () => handleZoomHold(COMMAND_STRINGS.zoomFarContinuos),
-    onStop: () => handleStop(COMMAND_STRINGS.zoomControlCommand)
+    onLongPress: () =>
+      handleZoomHold(
+        COMMAND_STRINGS.zoomControlCommand,
+        COMMAND_STRINGS.zoomFarContinuos
+      ),
+    onStop: () => handleStop(COMMAND_STRINGS.zoomControlCommand),
   });
 
   const handleSendMessage = (commandName, commandValue) => {
@@ -93,8 +107,8 @@ export default function FocusZoomButtons() {
     const payload = {
       action: {
         name: commandName,
-        value: commandValue
-      }
+        value: commandValue,
+      },
     };
     sendMessage(payload);
   };

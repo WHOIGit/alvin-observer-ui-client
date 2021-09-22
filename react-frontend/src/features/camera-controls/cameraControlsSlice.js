@@ -1,5 +1,4 @@
 import { createSlice, current } from "@reduxjs/toolkit";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import {
   COMMAND_STRINGS,
   CAMERAS,
@@ -8,6 +7,7 @@ import {
   WS_SERVER_NAMESPACE_STARBOARD,
   WS_SERVER_NAMESPACE_PILOT
 } from "../../config.js";
+
 // set default settings
 const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
@@ -98,6 +98,8 @@ export const cameraControlsSlice = createSlice({
             case COMMAND_STRINGS.exposureModeCommand:
               state.currentCamData.currentSettings.exposure_mode =
                 state.lastCommand.action.value;
+              break;
+            default:
           }
         } else {
           state.lastCommand.status = "ERR";
