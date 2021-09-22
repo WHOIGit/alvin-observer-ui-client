@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -11,29 +11,27 @@ import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    position: "relative"
+    position: "relative",
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120
-  }
+    minWidth: 120,
+  },
 }));
 
 export default function SelectExposureMode({ showTopControls }) {
   const classes = useStyles();
   const camData = useSelector(selectCurrentCamData);
-  const { messages, sendMessage } = useCameraWebSocket(
-    NEW_CAMERA_COMMAND_EVENT
-  );
+  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
-  const handleSendMessage = event => {
+  const handleSendMessage = (event) => {
     const payload = {
       action: {
         name: COMMAND_STRINGS.exposureModeCommand,
-        value: event.target.value
-      }
+        value: event.target.value,
+      },
     };
     sendMessage(payload);
   };
@@ -45,11 +43,12 @@ export default function SelectExposureMode({ showTopControls }) {
   return (
     <div className={classes.root}>
       <FormControl className={classes.formControl}>
-        <InputLabel id="demo-simple-select-label">Exposure Mode</InputLabel>
+        <InputLabel id="exposure-select-label">Exposure Mode</InputLabel>
         <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
+          labelId="exposure-select-label"
+          id="exposure-select"
           value={camData.currentSettings.exposure_mode}
+          label="Exposure Mode"
           onChange={handleSendMessage}
         >
           <MenuItem value={COMMAND_STRINGS.exposureModeOptions[0]}>

@@ -3,6 +3,6 @@ import cameraControlsReducer from "./features/camera-controls/cameraControlsSlic
 
 export default configureStore({
   reducer: {
-    cameraControls: cameraControlsReducer
-  }
+    cameraControls: cameraControlsReducer,
+  },
 });

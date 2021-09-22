@@ -6,12 +6,7 @@ import {
   Grid,
   Card,
   CardHeader,
-  CardMedia,
-  CardActions,
   CardContent,
-  Typography,
-  Button,
-  Chip
 } from "@material-ui/core";
 // local import
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
@@ -43,7 +38,10 @@ const useStyles = makeStyles(theme => ({
     border: "red solid 2px"
   },
   cardContent: {
-    padding: 0
+    padding: 0,
+    "&:last-child": {
+      paddingBottom: 0
+    }
   }
 }));
 
