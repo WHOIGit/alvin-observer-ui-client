@@ -47,7 +47,9 @@ export const COMMAND_STRINGS = {
   recordSourceCommand: "REC",
   routerIOCommand: "RTR",
   whiteBalanceCommand: "WB",
-  whiteBalanceOptions: ["AUTO", "MAN", "SP", "IP"]
+  whiteBalanceOptions: ["AUTO", "MAN", "SP", "IP"],
+  captureIntervalCommand: "CI",
+  captureIntervalOptions: ["1", "2", "3", "4"],
 };
 
 export const VIDEO_STREAM_CONFIG = {
@@ -56,5 +58,5 @@ export const VIDEO_STREAM_CONFIG = {
   stbdObserverVideo: envSettings.STBD_OBSERVER_VIDEO,
   portRecordVideo: envSettings.PORT_RECORDER_VIDEO,
   stbdRecordVideo: envSettings.STBD_RECORDER_VIDEO,
-  pilotVideo: envSettings.PILOT_VIDEO
+  pilotVideo: envSettings.PILOT_VIDEO,
 };

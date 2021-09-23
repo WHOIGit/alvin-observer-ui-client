@@ -12,6 +12,7 @@ import SelectExposureMode from "../camera-controls/SelectExposureMode";
 import FocusModeButton from "../camera-controls/FocusModeButton";
 import FocusZoomButtons from "../camera-controls/FocusZoomButtons";
 import Joystick from "../camera-controls/Joystick";
+import SetCaptureInterval from "../camera-controls/SetCaptureInterval";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import {
   selectInitialCamHeartbeatData,
@@ -106,7 +107,7 @@ export default function CameraControlContainer() {
 
       <Grid container spacing={2}>
         <Grid item xs>
-          Grid 1
+          <SetCaptureInterval />
         </Grid>
         <Grid item xs>
           <FocusModeButton />
