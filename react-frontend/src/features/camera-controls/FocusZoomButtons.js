@@ -1,12 +1,19 @@
 import React, { useRef } from "react";
-
+import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Button, Typography } from "@material-ui/core";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import useLongPress from "../../hooks/useLongPress";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    textAlign: "center",
+  },
+}));
+
 export default function FocusZoomButtons() {
+  const classes = useStyles();
   const timerRef = useRef(false);
 
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
@@ -105,7 +112,7 @@ export default function FocusZoomButtons() {
   };
 
   return (
-    <Grid container spacing={1}>
+    <Grid container spacing={1} className={classes.root}>
       <Grid item xs={6}>
         <Button
           variant="contained"
