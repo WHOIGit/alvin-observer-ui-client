@@ -1,32 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useRef } from "react";
 
 import { Grid, Button, Typography } from "@material-ui/core";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import useLongPress from "../../hooks/useLongPress";
-import { selectCurrentCamData } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    //flexGrow: 1
-  },
-  camButton: {
-    width: "100%",
-    fontSize: ".8em",
-  },
-  ctrlButton: {
-    width: "100%",
-    fontSize: ".7em",
-  },
-}));
-
 export default function FocusZoomButtons() {
-  const classes = useStyles();
-  const camData = useSelector(selectCurrentCamData);
   const timerRef = useRef(false);
 
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);

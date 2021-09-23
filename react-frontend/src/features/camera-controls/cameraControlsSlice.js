@@ -11,7 +11,7 @@ import {
 // set default settings
 const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
-console.log(CAMERAS);
+
 const initialState = {
   observerSide: null, // P = Port/ S = Starboard
   webSocketNamespace: null,

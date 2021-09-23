@@ -68,6 +68,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       }
 
       if (socketEvent === CAM_HEARTBEAT) {
+        console.log(incomingMessage);
         dispatch(changeCamHeartbeat(incomingMessage));
       }
     });
