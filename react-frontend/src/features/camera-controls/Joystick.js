@@ -13,7 +13,8 @@ import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
-  noSelect: {
+  root: {
+    textAlign: "center",
     userSelect: "none",
   },
 }));
@@ -92,7 +93,7 @@ export default function Joystick() {
   }
 
   return (
-    <Box mt={3} className={classes.noSelect}>
+    <Box mt={3} className={classes.root}>
       <ReactNipple
         options={{
           mode: "static",
