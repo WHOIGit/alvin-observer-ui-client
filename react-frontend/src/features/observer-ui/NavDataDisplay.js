@@ -1,22 +1,25 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  Grid,
+} from "@material-ui/core";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { NAV_HEARTBEAT } from "../../config.js";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: "#f5f5f5"
+    backgroundColor: "#f5f5f5",
   },
   table: {
-    width: "100%"
-  }
+    width: "100%",
+  },
 }));
 
 export default function NavDataDisplay() {
@@ -61,17 +64,27 @@ export default function NavDataDisplay() {
               </TableCell>
               <TableCell align="right">{messages.lon}</TableCell>
             </TableRow>
-            <TableRow key="x">
+            <TableRow key="x-y">
               <TableCell component="th" scope="row">
-                X
+                <Grid container spacing={2}>
+                  <Grid item xs={3}>
+                    X:
+                  </Grid>
+                  <Grid item xs={9}>
+                    {messages.x}
+                  </Grid>
+                </Grid>
               </TableCell>
-              <TableCell align="right">{messages.x}</TableCell>
-            </TableRow>
-            <TableRow key="y">
-              <TableCell component="th" scope="row">
-                Y
+              <TableCell>
+                <Grid container spacing={2}>
+                  <Grid item xs={3}>
+                    Y:
+                  </Grid>
+                  <Grid item xs={9}>
+                    {messages.y}
+                  </Grid>
+                </Grid>
               </TableCell>
-              <TableCell align="right">{messages.y}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

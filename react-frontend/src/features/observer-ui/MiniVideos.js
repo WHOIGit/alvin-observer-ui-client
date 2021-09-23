@@ -6,12 +6,7 @@ import {
   Grid,
   Card,
   CardHeader,
-  CardMedia,
-  CardActions,
   CardContent,
-  Typography,
-  Button,
-  Chip
 } from "@material-ui/core";
 // local import
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
@@ -26,7 +21,13 @@ const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1
   },
-  headerRoot: { padding: "4px" },
+  headerRoot: {
+    padding: "4px"
+  },
+  headerRecorderRoot: {
+    padding: "4px",
+    backgroundColor: "red"
+  },
   title: {
     fontSize: ".9em"
   },
@@ -36,21 +37,11 @@ const useStyles = makeStyles(theme => ({
   activeVideo: {
     border: "red solid 2px"
   },
-  videoAction: {
-    justifyContent: "center",
-    textTransform: "uppercase",
-    padding: "4px"
-  },
-  activeVideoAction: {
-    backgroundColor: "red"
-  },
-  miniVidImage: {
-    height: 0,
-    paddingTop: "77%",
-    maxWidth: "100%"
-  },
   cardContent: {
-    padding: 0
+    padding: 0,
+    "&:last-child": {
+      paddingBottom: 0
+    }
   }
 }));
 
@@ -90,7 +81,7 @@ export default function MiniVideos({ showFullCameraControls }) {
             <CardHeader
               title={messages && `REC: ${messages.camera}`}
               classes={{
-                root: classes.headerRoot,
+                root: classes.headerRecorderRoot,
                 title: classes.title
               }}
             />
@@ -105,18 +96,6 @@ export default function MiniVideos({ showFullCameraControls }) {
                 ></video>
               </div>
             </CardContent>
-
-            <CardActions
-              className={`${classes.videoAction} ${classes.activeVideoAction}`}
-            >
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                component="span"
-              >
-                RECORDING
-              </Typography>
-            </CardActions>
           </Card>
         </Grid>
         <Grid item xs={6}>
@@ -143,17 +122,6 @@ export default function MiniVideos({ showFullCameraControls }) {
                     ></video>
                   </div>
                 </CardContent>
-
-                <CardActions className={classes.videoAction}>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    component="span"
-                    align="center"
-                  >
-                    SOURCE
-                  </Typography>
-                </CardActions>
               </Card>
             </>
           )}

@@ -1,17 +1,17 @@
 import { createSlice, current } from "@reduxjs/toolkit";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import {
   COMMAND_STRINGS,
   CAMERAS,
   VIDEO_STREAM_CONFIG,
   WS_SERVER_NAMESPACE_PORT,
   WS_SERVER_NAMESPACE_STARBOARD,
-  WS_SERVER_NAMESPACE_PILOT
+  WS_SERVER_NAMESPACE_PILOT,
 } from "../../config.js";
+
 // set default settings
 const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
-console.log(CAMERAS);
+
 const initialState = {
   observerSide: "PLT", // P = Port, S = Starboard, PLT = Pilot
   webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
@@ -22,7 +22,8 @@ const initialState = {
   camHeartbeatData: null,
   currentCamData: null,
   lastCommand: null,
-  availableCameras: CAMERAS
+  availableCameras: CAMERAS,
+  joystickQueue: [],
 };
 
 export const cameraControlsSlice = createSlice({
@@ -98,6 +99,8 @@ export const cameraControlsSlice = createSlice({
             case COMMAND_STRINGS.exposureModeCommand:
               state.currentCamData.currentSettings.exposure_mode =
                 state.lastCommand.action.value;
+              break;
+            default:
           }
         } else {
           state.lastCommand.status = "ERR";
@@ -123,8 +126,14 @@ export const cameraControlsSlice = createSlice({
       state.currentCamData.ISO = action.payload.ISO;
       state.currentCamData.SHU = action.payload.SHU;
       state.currentCamData.currentSettings = action.payload.current_settings;
-    }
-  }
+    },
+    setJoystickQueue: (state, action) => {
+      state.joystickQueue.push(action.payload);
+    },
+    clearJoystickQueue: (state, action) => {
+      state.joystickQueue = [];
+    },
+  },
 });
 
 // Action creators are generated for each case reducer function
@@ -134,30 +143,36 @@ export const {
   changeCamHeartbeat,
   changeCurrentCamData,
   setLastCommand,
-  setObserverSide
+  setObserverSide,
+  setJoystickQueue,
+  clearJoystickQueue,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
 
 // Selector functions
 // return only the Active camera currently selected
-export const selectActiveCamera = state => state.cameraControls.activeCamera;
+export const selectActiveCamera = (state) => state.cameraControls.activeCamera;
 
 // return the current Observer Side
-export const selectObserverSide = state => state.cameraControls.observerSide;
+export const selectObserverSide = (state) => state.cameraControls.observerSide;
 
 // return the current Web Socket server namespace (port/stbd/pilot)
-export const selectWebSocketNamespace = state =>
+export const selectWebSocketNamespace = (state) =>
   state.cameraControls.webSocketNamespace;
 
 // return the current CamHeartbeat data
-export const selectCamHeartbeatData = state =>
+export const selectCamHeartbeatData = (state) =>
   state.cameraControls.camHeartbeatData;
 
 // return the initial cached CamHeartbeat data
-export const selectInitialCamHeartbeatData = state =>
+export const selectInitialCamHeartbeatData = (state) =>
   state.cameraControls.initialCamHeartbeat;
 
 // return the current Camera data the socket returns on a camera change
-export const selectCurrentCamData = state =>
+export const selectCurrentCamData = (state) =>
   state.cameraControls.currentCamData;
+
+// return the array of queued Joystick commands
+export const selectJoystickQueue = (state) =>
+  state.cameraControls.joystickQueue;

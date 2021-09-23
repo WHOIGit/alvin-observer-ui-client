@@ -10,21 +10,21 @@ import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
 import SensorDataDisplay from "./SensorDataDisplay";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   paper: {
     padding: theme.spacing(2),
     textAlign: "center",
-    color: theme.palette.text.secondary
+    color: theme.palette.text.secondary,
   },
   infoChip: {
     marginBottom: theme.spacing(1),
-    width: "100%"
-  }
+    width: "100%",
+  },
 }));
 
 export default function TopControlPanel({
   showFullCameraControls,
-  setShowFullCameraControls
+  setShowFullCameraControls,
 }) {
   const classes = useStyles();
 
@@ -33,7 +33,7 @@ export default function TopControlPanel({
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <MiniVideos showFullCameraControls={showFullCameraControls} />
-          <Grid container spacing={2} justify="flex-start" alignItems="center">
+          <Grid container spacing={0} justify="flex-start" alignItems="center">
             <Grid item xs>
               <Grid container spacing={0}>
                 <Grid item>

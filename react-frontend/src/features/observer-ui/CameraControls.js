@@ -1,12 +1,10 @@
-import React, { useState, Suspense } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Link from "@material-ui/core/Link";
-import { Typography, Grid, Paper, Icon, Fab } from "@material-ui/core";
-import CameraAltIcon from "@material-ui/icons/CameraAlt";
+import { Grid, Paper } from "@material-ui/core";
 import CameraControlButtons from "./CameraControlButtons";
 import LargeVideo from "../camera-controls/LargeVideo";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: "#f5f5f5",
     position: "absolute",
@@ -15,22 +13,19 @@ const useStyles = makeStyles(theme => ({
     width: "100%",
     padding: theme.spacing(2),
     zIndex: 500,
-    transition: "all 0.4s"
+    transition: "all 0.4s",
   },
   rootCollapse: {
-    top: "-564px"
+    top: "-564px",
   },
   paper: {
     padding: theme.spacing(2),
     textAlign: "center",
-    color: theme.palette.text.secondary
-  }
+    color: theme.palette.text.secondary,
+  },
 }));
 
-export default function CameraControls({
-  showFullCameraControls,
-  setShowFullCameraControls
-}) {
+export default function CameraControls({ showFullCameraControls }) {
   const classes = useStyles();
 
   return (
