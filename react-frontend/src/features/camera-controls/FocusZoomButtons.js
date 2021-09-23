@@ -34,7 +34,12 @@ export default function FocusZoomButtons() {
   const handleZoomHold = (commandName, commandValue) => {
     handleSendMessage(commandName, commandValue);
     // Set a Timeout to resend command every 1 sec
-    timerRef.current = setTimeout(handleZoomHold, 1000, commandValue);
+    timerRef.current = setTimeout(
+      handleZoomHold,
+      1000,
+      commandName,
+      commandValue
+    );
   };
 
   const handleStop = (commandName) => {
