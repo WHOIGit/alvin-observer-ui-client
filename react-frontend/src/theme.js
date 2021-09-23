@@ -1,26 +1,26 @@
-import { red, green, deepOrange } from "@material-ui/core/colors";
+import { red, green } from "@material-ui/core/colors";
 import { createMuiTheme } from "@material-ui/core/styles";
 
 // A custom theme for this app
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: "#556cd6"
+      main: "#556cd6",
     },
     secondary: {
-      main: deepOrange[500]
+      main: "#2195f2",
     },
     success: {
       main: green.A700,
-      contrastText: "#fff"
+      contrastText: "#fff",
     },
     error: {
-      main: red.A400
+      main: red.A400,
     },
     background: {
-      default: "#fff"
-    }
-  }
+      default: "#fff",
+    },
+  },
 });
 
 export default theme;

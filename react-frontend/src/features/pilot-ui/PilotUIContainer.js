@@ -6,6 +6,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
+import { deepOrange } from "@material-ui/core/colors";
 // local
 import RouterControlContainer from "./RouterControlContainer";
 import CameraControlContainer from "./CameraControlContainer";
@@ -33,22 +34,25 @@ function TabPanel(props) {
 TabPanel.propTypes = {
   children: PropTypes.node,
   index: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired
+  value: PropTypes.any.isRequired,
 };
 
 function tabProps(index) {
   return {
     id: `pilot-ui-tab-${index}`,
-    "aria-controls": `pilot-ui-tabpanel-${index}`
+    "aria-controls": `pilot-ui-tabpanel-${index}`,
   };
 }
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
-    userSelect: "none"
-  }
+    userSelect: "none",
+  },
+  indicator: {
+    backgroundColor: deepOrange[500],
+  },
 }));
 
 export default function SimpleTabs() {
@@ -62,7 +66,14 @@ export default function SimpleTabs() {
   return (
     <div className={classes.root}>
       <AppBar position="static">
-        <Tabs value={value} onChange={handleChange} aria-label="Pilot UI Tabs">
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          aria-label="Pilot UI Tabs"
+          classes={{
+            indicator: classes.indicator,
+          }}
+        >
           <Tab label="ROUTER CONTROL" {...tabProps(0)} />
           <Tab label="CAMERA CONTROL" {...tabProps(1)} />
         </Tabs>

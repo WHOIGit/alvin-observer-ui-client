@@ -93,7 +93,7 @@ export default function Joystick() {
   }
 
   return (
-    <Box mt={3} className={classes.root}>
+    <Box className={classes.root}>
       <ReactNipple
         options={{
           mode: "static",
