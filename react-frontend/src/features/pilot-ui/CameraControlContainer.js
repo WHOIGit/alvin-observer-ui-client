@@ -9,26 +9,28 @@ import SelectShutterMode from "../camera-controls/SelectShutterMode";
 import SelectIrisMode from "../camera-controls/SelectIrisMode";
 import SelectIsoMode from "../camera-controls/SelectIsoMode";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
+import FocusModeButton from "../camera-controls/FocusModeButton";
+import FocusZoomButtons from "../camera-controls/FocusZoomButtons";
+import Joystick from "../camera-controls/Joystick";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import {
-  selectWebSocketNamespace,
   selectInitialCamHeartbeatData,
   selectActiveCamera,
-  changeActiveCamera
+  changeActiveCamera,
 } from "../camera-controls/cameraControlsSlice";
 
 import {
   CAM_HEARTBEAT,
   NEW_CAMERA_COMMAND_EVENT,
-  COMMAND_STRINGS
+  COMMAND_STRINGS,
 } from "../../config";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   paper: {
     padding: theme.spacing(2),
     textAlign: "center",
-    color: theme.palette.text.secondary
-  }
+    color: theme.palette.text.secondary,
+  },
 }));
 
 export default function CameraControlContainer() {
@@ -42,23 +44,23 @@ export default function CameraControlContainer() {
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
 
-  const setInitialCamera = () => {
-    dispatch(changeActiveCamera(initialCamHeartbeat));
-
-    // send camera change command to set available settings options
-    const payload = {
-      camera: initialCamHeartbeat.camera,
-      action: {
-        name: COMMAND_STRINGS.cameraChangeCommand,
-        value: initialCamHeartbeat.camera
-      }
-    };
-    sendMessage(payload);
-  };
-
   // use CAM_HEARTBEAT parameters only on initial app load to set activeCamera
   // keep camera params in local state otherwise
   useEffect(() => {
+    const setInitialCamera = () => {
+      dispatch(changeActiveCamera(initialCamHeartbeat));
+
+      // send camera change command to set available settings options
+      const payload = {
+        camera: initialCamHeartbeat.camera,
+        action: {
+          name: COMMAND_STRINGS.cameraChangeCommand,
+          value: initialCamHeartbeat.camera,
+        },
+      };
+      sendMessage(payload);
+    };
+
     // set initial camera state only if activeCamera is undefined
     if (activeCamera === null) {
       console.log(initialCamHeartbeat);
@@ -66,7 +68,7 @@ export default function CameraControlContainer() {
         setInitialCamera();
       }
     }
-  }, [activeCamera, setInitialCamera, initialCamHeartbeat]);
+  }, [activeCamera, initialCamHeartbeat]);
 
   return (
     <>
@@ -107,13 +109,13 @@ export default function CameraControlContainer() {
           Grid 1
         </Grid>
         <Grid item xs>
-          Grid 2
+          <FocusModeButton />
         </Grid>
         <Grid item xs>
-          Grid 3
+          <FocusZoomButtons />
         </Grid>
         <Grid item xs>
-          Grid 4
+          <Joystick />
         </Grid>
       </Grid>
     </>

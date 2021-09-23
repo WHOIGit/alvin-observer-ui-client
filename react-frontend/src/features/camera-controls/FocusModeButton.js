@@ -20,7 +20,7 @@ const FocusModeButton = () => {
     }
   }, [camData]);
 
-  const handleSendMessage = commandName => {
+  const handleSendMessage = (commandName) => {
     let commandValue;
     if (camData.currentSettings.focus_mode === COMMAND_STRINGS.focusAF) {
       commandValue = COMMAND_STRINGS.focusMF;
@@ -31,8 +31,8 @@ const FocusModeButton = () => {
     const payload = {
       action: {
         name: commandName,
-        value: commandValue
-      }
+        value: commandValue,
+      },
     };
     sendMessage(payload);
   };
