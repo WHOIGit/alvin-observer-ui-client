@@ -45,7 +45,13 @@ export default function FocusZoomButtons() {
   const handleStop = (commandName) => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
-      handleSendMessage(commandName, COMMAND_STRINGS.focusStop);
+      // delay Stop message sending to avoid collisions with last button actions
+      setTimeout(
+        handleSendMessage,
+        1000,
+        commandName,
+        COMMAND_STRINGS.focusStop
+      );
     }
   };
 
