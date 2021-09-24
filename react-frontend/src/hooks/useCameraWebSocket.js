@@ -9,14 +9,14 @@ import {
   changeCamHeartbeat,
   selectObserverSide,
   selectActiveCamera,
-  selectWebSocketNamespace
+  selectWebSocketNamespace,
 } from "../features/camera-controls/cameraControlsSlice";
 import {
   WS_SERVER,
   NEW_CAMERA_COMMAND_EVENT,
   CAM_HEARTBEAT,
   RECORDER_HEARTBEAT,
-  COMMAND_PREFIX
+  COMMAND_PREFIX,
 } from "../config";
 
 const useCameraWebSocket = (socketEvent, useNamespace = true) => {
@@ -46,7 +46,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
     console.log(socketRef);
 
     // Listens for incoming messages
-    socketRef.current.on(socketEvent, incomingMessage => {
+    socketRef.current.on(socketEvent, (incomingMessage) => {
       /*
       const incomingMessage = {
         ...message,
@@ -80,14 +80,14 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
   }, [socketEvent, dispatch, socketNs]);
 
   // Sends a message to the server
-  const sendMessage = messageBody => {
+  const sendMessage = (messageBody) => {
     console.log(messageBody.action);
     if (socketRef.current !== undefined) {
       const payload = {
         eventId: uuidv4(),
         command: observerSideCmd,
         camera: activeCamera,
-        action: messageBody.action
+        action: messageBody.action,
       };
       try {
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);

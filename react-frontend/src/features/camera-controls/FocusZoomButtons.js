@@ -1,32 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-
+import React, { useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-
 import { Grid, Button, Typography } from "@material-ui/core";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import useLongPress from "../../hooks/useLongPress";
-import { selectCurrentCamData } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    //flexGrow: 1
-  },
-  camButton: {
-    width: "100%",
-    fontSize: ".8em",
-  },
-  ctrlButton: {
-    width: "100%",
-    fontSize: ".7em",
+    textAlign: "center",
   },
 }));
 
 export default function FocusZoomButtons() {
   const classes = useStyles();
-  const camData = useSelector(selectCurrentCamData);
   const timerRef = useRef(false);
 
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
@@ -34,13 +21,24 @@ export default function FocusZoomButtons() {
   const handleZoomHold = (commandName, commandValue) => {
     handleSendMessage(commandName, commandValue);
     // Set a Timeout to resend command every 1 sec
-    timerRef.current = setTimeout(handleZoomHold, 1000, commandValue);
+    timerRef.current = setTimeout(
+      handleZoomHold,
+      1000,
+      commandName,
+      commandValue
+    );
   };
 
   const handleStop = (commandName) => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
-      handleSendMessage(commandName, COMMAND_STRINGS.focusStop);
+      // delay Stop message sending to avoid collisions with last button actions
+      setTimeout(
+        handleSendMessage,
+        1000,
+        commandName,
+        COMMAND_STRINGS.focusStop
+      );
     }
   };
 
@@ -114,7 +112,7 @@ export default function FocusZoomButtons() {
   };
 
   return (
-    <Grid container spacing={1}>
+    <Grid container spacing={1} className={classes.root}>
       <Grid item xs={6}>
         <Button
           variant="contained"

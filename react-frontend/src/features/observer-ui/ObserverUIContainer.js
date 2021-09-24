@@ -10,7 +10,7 @@ import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: "#f5f5f5",
     position: "relative",
@@ -21,25 +21,24 @@ const useStyles = makeStyles(theme => ({
     zIndex: 1000,
     transition: "all 0.4s",
     minHeight: "290px",
-    userSelect: "none"
   },
   rootCollapse: {
     marginTop: "-290px",
-    height: 0
+    height: 0,
   },
   toggleButton: {
     position: "absolute",
     bottom: -Math.abs(theme.spacing(8)),
     right: theme.spacing(2),
     zIndex: 2000,
-    transition: "all 0.4s"
+    transition: "all 0.4s",
   },
   toggleButtonOff: {
-    bottom: "-500px"
+    bottom: "-500px",
   },
   extendedIcon: {
-    marginRight: theme.spacing(1)
-  }
+    marginRight: theme.spacing(1),
+  },
 }));
 
 export default function ObserverUIContainer() {

@@ -4,24 +4,28 @@ import ReactNipple from "react-nipple";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography } from "@material-ui/core";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { selectCurrentCamData } from "./cameraControlsSlice";
+import {
+  setJoystickQueue,
+  selectJoystickQueue,
+  clearJoystickQueue,
+} from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
-const useStyles = makeStyles(theme => ({
-  noSelect: {
-    userSelect: "none"
-  }
+const useStyles = makeStyles((theme) => ({
+  root: {
+    textAlign: "center",
+    userSelect: "none",
+  },
 }));
 
 export default function Joystick() {
   const classes = useStyles();
-  const camData = useSelector(selectCurrentCamData);
+  const dispatch = useDispatch();
+  const joystickQueue = useSelector(selectJoystickQueue);
   const joystickElem = useRef(null);
 
-  const { messages, sendMessage } = useCameraWebSocket(
-    NEW_CAMERA_COMMAND_EVENT
-  );
+  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const [showJoystick, setShowJoystick] = useState(false);
 
   useEffect(() => {
@@ -31,28 +35,55 @@ export default function Joystick() {
     }, 500);
   }, []);
 
+  useEffect(() => {
+    let intervalId;
+    if (joystickQueue.length) {
+      const lastAction = joystickQueue.slice(-1)[0];
+      // force send message on start/end events
+      if (
+        lastAction.actionType === "start" ||
+        lastAction.actionType === "end"
+      ) {
+        handleSendMessage(lastAction);
+      }
+
+      // set interval for function to throttle events send to imaging server
+      intervalId = setInterval(() => {
+        // assign interval to a variable to clear it.
+        console.log(lastAction);
+        handleSendMessage(lastAction);
+      }, 200);
+
+      console.log(lastAction.actionType);
+      // if we get the "end" event, stop the function cycle, reset the state
+      if (lastAction.actionType === "end") {
+        clearInterval(intervalId);
+        dispatch(clearJoystickQueue());
+      }
+    }
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [joystickQueue]);
+
   const handleJoystickEvents = (evt, data) => {
-    console.log(evt, data);
+    //console.log(evt, data);
     const payload = {
       actionType: evt.type,
       position: data.position,
       distance: data.distance,
       angle: data.angle,
-      direction: data.direction
+      direction: data.direction,
     };
-    handleSendMessage(COMMAND_STRINGS.panTiltCommand, payload);
+    dispatch(setJoystickQueue(payload));
   };
 
-  const handleSendMessage = (commandName, commandValue) => {
-    if (commandValue === undefined) {
-      let commandValue;
-    }
-
+  const handleSendMessage = (commandValue) => {
     const payload = {
       action: {
-        name: commandName,
-        value: commandValue
-      }
+        name: COMMAND_STRINGS.panTiltCommand,
+        value: commandValue,
+      },
     };
     sendMessage(payload);
   };
@@ -62,7 +93,7 @@ export default function Joystick() {
   }
 
   return (
-    <Box mt={3} className={classes.noSelect}>
+    <Box mt={3} className={classes.root}>
       <ReactNipple
         options={{
           mode: "static",
@@ -70,12 +101,12 @@ export default function Joystick() {
           position: { top: "50%", left: "50%" },
           color: "blue",
           dynamicPage: true,
-          threshold: 0.3
+          threshold: 0.3,
         }}
         style={{
           position: "relative",
           width: "100%",
-          height: 150
+          height: 150,
           // if you pass position: 'relative', you don't need to import the stylesheet
         }}
         onStart={(evt, data) => handleJoystickEvents(evt, data)}
