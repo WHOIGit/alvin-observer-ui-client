@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
@@ -43,13 +42,12 @@ export default function SelectExposureMode({ showTopControls }) {
   return (
     <div className={classes.root}>
       <FormControl className={classes.formControl}>
-        <InputLabel id="exposure-select-label">Exposure Mode</InputLabel>
         <Select
-          labelId="exposure-select-label"
           id="exposure-select"
           value={camData.currentSettings.exposure_mode}
           label="Exposure Mode"
           onChange={handleSendMessage}
+          displayEmpty
         >
           <MenuItem value={COMMAND_STRINGS.exposureModeOptions[0]}>
             Auto
