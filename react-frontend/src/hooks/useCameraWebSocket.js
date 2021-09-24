@@ -35,14 +35,15 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       socketEvent === CAM_HEARTBEAT ||
       socketEvent === RECORDER_HEARTBEAT
     ) {
-      socketNs = socketNamespace;
+      socketNs = socketNs + socketNamespace;
     }
   }
 
   useEffect(() => {
     // Creates a WebSocket connection
-    //socketRef.current = socketIOClient(WS_SERVER);
-    socketRef.current = socketIOClient(WS_SERVER + socketNs);
+    socketRef.current = socketIOClient(WS_SERVER + socketNs, {
+      query: { client: socketNamespace },
+    });
     console.log(socketRef);
 
     // Listens for incoming messages
