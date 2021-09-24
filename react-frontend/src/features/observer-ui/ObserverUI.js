@@ -9,15 +9,15 @@ import {
   selectWebSocketNamespace,
   selectInitialCamHeartbeatData,
   selectActiveCamera,
-  changeActiveCamera
+  changeActiveCamera,
 } from "../camera-controls/cameraControlsSlice";
 import {
   CAM_HEARTBEAT,
   NEW_CAMERA_COMMAND_EVENT,
-  COMMAND_STRINGS
+  COMMAND_STRINGS,
 } from "../../config";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: "#f5f5f5",
     position: "relative",
@@ -27,30 +27,30 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(2),
     zIndex: 1000,
     transition: "all 0.4s",
-    minHeight: "290px"
+    minHeight: "290px",
   },
   rootCollapse: {
     marginTop: "-290px",
-    height: 0
+    height: 0,
   },
   toggleButton: {
     position: "absolute",
     bottom: -Math.abs(theme.spacing(8)),
     right: theme.spacing(2),
     zIndex: 2000,
-    transition: "all 0.4s"
+    transition: "all 0.4s",
   },
   toggleButtonOff: {
-    bottom: "-500px"
+    bottom: "-500px",
   },
   extendedIcon: {
-    marginRight: theme.spacing(1)
-  }
+    marginRight: theme.spacing(1),
+  },
 }));
 
 export default function ObserverUI({
   showFullCameraControls,
-  setShowFullCameraControls
+  setShowFullCameraControls,
 }) {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -62,23 +62,23 @@ export default function ObserverUI({
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
 
-  const setInitialCamera = () => {
-    dispatch(changeActiveCamera(initialCamHeartbeat));
-
-    // send camera change command to set available settings options
-    const payload = {
-      camera: initialCamHeartbeat.camera,
-      action: {
-        name: COMMAND_STRINGS.cameraChangeCommand,
-        value: initialCamHeartbeat.camera
-      }
-    };
-    sendMessage(payload);
-  };
-
   // use CAM_HEARTBEAT parameters only on initial app load to set activeCamera
   // keep camera params in local state otherwise
   useEffect(() => {
+    const setInitialCamera = () => {
+      dispatch(changeActiveCamera(initialCamHeartbeat));
+
+      // send camera change command to set available settings options
+      const payload = {
+        camera: initialCamHeartbeat.camera,
+        action: {
+          name: COMMAND_STRINGS.cameraChangeCommand,
+          value: initialCamHeartbeat.camera,
+        },
+      };
+      sendMessage(payload);
+    };
+
     // set initial camera state only if activeCamera is undefined
     if (activeCamera === null) {
       console.log(initialCamHeartbeat);
@@ -86,7 +86,7 @@ export default function ObserverUI({
         setInitialCamera();
       }
     }
-  }, [activeCamera, setInitialCamera, initialCamHeartbeat]);
+  }, [activeCamera, initialCamHeartbeat]);
 
   return (
     <TopControlPanel
