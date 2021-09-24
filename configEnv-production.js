@@ -1,6 +1,7 @@
 // Web socket server
 //window.WS_SERVER = "http://128.128.184.62:4040";
-window.WS_SERVER = "http://199.92.162.205:4040";
+//window.WS_SERVER = "http://199.92.162.205:4040";
+window.WS_SERVER = "https://199.92.162.205";
 
 // sealog url for iframe
 window.SEALOG_URL = "https://sealog.whoi.edu/sealog-alvin/";
@@ -22,5 +23,5 @@ window.CAMERAS = [
   { camera: "camera5", cam_name: "aft_cam", owner: "none" },
   { camera: "camera6", cam_name: "down_cam", owner: "none" },
   { camera: "camera7", cam_name: "brow_wide", owner: "pilot" },
-  { camera: "camera8", cam_name: "sci_cam", owner: "port" }
+  { camera: "camera8", cam_name: "sci_cam", owner: "port" },
 ];
