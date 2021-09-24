@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import Link from "@material-ui/core/Link";
-import { Grid, Paper, Icon, Fab } from "@material-ui/core";
 import TopControlPanel from "./TopControlPanel";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import {
-  selectWebSocketNamespace,
   selectInitialCamHeartbeatData,
   selectActiveCamera,
   changeActiveCamera,

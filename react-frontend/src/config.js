@@ -3,9 +3,9 @@
 const envSettings = window;
 // Web socket server
 export const WS_SERVER = envSettings.WS_SERVER;
-export const WS_SERVER_NAMESPACE_PORT = "/port";
-export const WS_SERVER_NAMESPACE_STARBOARD = "/stbd";
-export const WS_SERVER_NAMESPACE_PILOT = "/pilot";
+export const WS_SERVER_NAMESPACE_PORT = "port";
+export const WS_SERVER_NAMESPACE_STARBOARD = "stbd";
+export const WS_SERVER_NAMESPACE_PILOT = "pilot";
 // sealog url for iframe
 export const SEALOG_URL = envSettings.SEALOG_URL;
 // Web socket event names
@@ -44,7 +44,7 @@ export const COMMAND_STRINGS = {
   panTiltCommand: "PANTILT",
   stillImageCaptureCommand: "SIC",
   quickClickCommand: "QCV",
-  recordSourceCommand: "REC"
+  recordSourceCommand: "REC",
 };
 
 export const VIDEO_STREAM_CONFIG = {
@@ -53,5 +53,5 @@ export const VIDEO_STREAM_CONFIG = {
   stbdObserverVideo: envSettings.STBD_OBSERVER_VIDEO,
   portRecordVideo: envSettings.PORT_RECORDER_VIDEO,
   stbdRecordVideo: envSettings.STBD_RECORDER_VIDEO,
-  pilotVideo: envSettings.PILOT_VIDEO
+  pilotVideo: envSettings.PILOT_VIDEO,
 };
