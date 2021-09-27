@@ -42,7 +42,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
   useEffect(() => {
     // Creates a WebSocket connection
     socketRef.current = socketIOClient(WS_SERVER + socketNs, {
-      //path: "/websocket-server/",
+      path: "/websocket-server/socket.io",
       query: { client: socketNamespace },
     });
     console.log(socketRef);
