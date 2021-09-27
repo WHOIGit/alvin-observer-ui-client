@@ -1,7 +1,7 @@
 // Web socket server
 //window.WS_SERVER = "http://128.128.184.62:4040";
 //window.WS_SERVER = "http://199.92.162.205:4040";
-window.WS_SERVER = "https://128.128.184.62/websocket-server";
+window.WS_SERVER = "https://128.128.184.62";
 
 // sealog url for iframe
 window.SEALOG_URL = "https://sealog.whoi.edu/sealog-alvin/";
