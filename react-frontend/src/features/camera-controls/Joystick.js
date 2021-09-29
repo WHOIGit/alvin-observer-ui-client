@@ -99,7 +99,7 @@ export default function Joystick() {
           mode: "static",
           size: 150,
           position: { top: "50%", left: "50%" },
-          color: "blue",
+          color: "lightblue",
           dynamicPage: true,
           threshold: 0.3,
         }}

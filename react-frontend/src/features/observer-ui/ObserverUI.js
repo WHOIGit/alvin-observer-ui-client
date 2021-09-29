@@ -16,7 +16,7 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: "#f5f5f5",
+    //backgroundColor: "#f5f5f5",
     position: "relative",
     marginTop: 0,
     paddingBottom: 0,

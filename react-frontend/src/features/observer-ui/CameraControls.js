@@ -6,7 +6,8 @@ import LargeVideo from "../camera-controls/LargeVideo";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: "#f5f5f5",
+    //backgroundColor: "#f5f5f5",
+    backgroundColor: "#282c34",
     position: "absolute",
     top: 290,
     left: 0,

@@ -50,16 +50,16 @@ export default function SelectExposureMode({ showTopControls }) {
           displayEmpty
         >
           <MenuItem value={COMMAND_STRINGS.exposureModeOptions[0]}>
-            Auto
+            Exposure Mode: Auto
           </MenuItem>
           <MenuItem value={COMMAND_STRINGS.exposureModeOptions[1]}>
-            Manual
+            Exposure Mode: Manual
           </MenuItem>
           <MenuItem value={COMMAND_STRINGS.exposureModeOptions[2]}>
-            Shutter Priority
+            Exposure Mode: Shutter Priority
           </MenuItem>
           <MenuItem value={COMMAND_STRINGS.exposureModeOptions[3]}>
-            Iris Priority
+            Exposure Mode: Iris Priority
           </MenuItem>
         </Select>
       </FormControl>

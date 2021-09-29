@@ -12,7 +12,8 @@ import { NEW_CAMERA_COMMAND_EVENT } from "../../config";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: "#f5f5f5",
+    //backgroundColor: "#f5f5f5",
+    backgroundColor: "#282c34",
     position: "relative",
     marginTop: 0,
     paddingBottom: 0,
@@ -70,7 +71,9 @@ export default function ObserverUIContainer() {
       >
         {/* force user to choose ObserverSide if not set */}
         {!observerSide ? (
-          <ObserverSideSelect />
+          <>
+            <ObserverSideSelect />
+          </>
         ) : (
           <ObserverUI
             showFullCameraControls={showFullCameraControls}

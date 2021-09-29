@@ -13,6 +13,7 @@ import {
 } from "../features/camera-controls/cameraControlsSlice";
 import {
   WS_SERVER,
+  WS_PATH,
   NEW_CAMERA_COMMAND_EVENT,
   CAM_HEARTBEAT,
   RECORDER_HEARTBEAT,
@@ -42,7 +43,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
   useEffect(() => {
     // Creates a WebSocket connection
     socketRef.current = socketIOClient(WS_SERVER + socketNs, {
-      path: "/websocket-server/socket.io",
+      path: WS_PATH + "socket.io",
       query: { client: socketNamespace },
     });
     console.log(socketRef);
