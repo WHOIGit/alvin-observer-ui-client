@@ -10,9 +10,11 @@ import {
   selectObserverSide,
   selectActiveCamera,
   selectWebSocketNamespace,
+  selectRecorderHeartbeatData,
 } from "../features/camera-controls/cameraControlsSlice";
 import {
   WS_SERVER,
+  WS_PATH,
   NEW_CAMERA_COMMAND_EVENT,
   CAM_HEARTBEAT,
   RECORDER_HEARTBEAT,
@@ -23,6 +25,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
   const observerSideCmd = COMMAND_PREFIX + useSelector(selectObserverSide);
   const socketNamespace = useSelector(selectWebSocketNamespace);
   const activeCamera = useSelector(selectActiveCamera);
+  const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
   const [messages, setMessages] = useState(null);
   const socketRef = useRef();
   const dispatch = useDispatch();
@@ -42,7 +45,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
   useEffect(() => {
     // Creates a WebSocket connection
     socketRef.current = socketIOClient(WS_SERVER + socketNs, {
-      path: "/websocket-server/socket.io",
+      path: WS_PATH + "socket.io",
       query: { client: socketNamespace },
     });
     console.log(socketRef);
@@ -85,12 +88,19 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
   const sendMessage = (messageBody) => {
     console.log(messageBody.action);
     if (socketRef.current !== undefined) {
+      // check if this a "Record Source" action, change "camera" prop to be current Recorder camera
+      let camera = activeCamera;
+      if (messageBody.hasOwnProperty("oldCamera")) {
+        camera = messageBody.oldCamera;
+      }
+
       const payload = {
         eventId: uuidv4(),
         command: observerSideCmd,
-        camera: activeCamera,
+        camera: camera,
         action: messageBody.action,
       };
+      console.log(payload);
       try {
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));

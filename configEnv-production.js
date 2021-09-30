@@ -1,7 +1,10 @@
-// Web socket server
+// Web socket server root URL
 //window.WS_SERVER = "http://128.128.184.62:4040";
-//window.WS_SERVER = "http://199.92.162.205:4040";
-window.WS_SERVER = "https://128.128.184.62";
+window.WS_SERVER = "https://199.92.162.205";
+//window.WS_SERVER = "https://128.128.184.62";
+
+// Web socket server path, ex: "/websocket-server-path/"
+window.WS_PATH = "/websocket-server/";
 
 // sealog url for iframe
 window.SEALOG_URL = "https://sealog.whoi.edu/sealog-alvin/";

@@ -6,13 +6,11 @@ import CameraAltIcon from "@material-ui/icons/CameraAlt";
 import CameraControls from "./CameraControls";
 import ObserverSideSelect from "./ObserverSideSelect";
 import ObserverUI from "./ObserverUI";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#282c34",
     position: "relative",
     marginTop: 0,
     paddingBottom: 0,
@@ -20,10 +18,10 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     zIndex: 1000,
     transition: "all 0.4s",
-    minHeight: "290px",
+    minHeight: "250px",
   },
   rootCollapse: {
-    marginTop: "-290px",
+    marginTop: "-250px",
     height: 0,
   },
   toggleButton: {
@@ -46,7 +44,6 @@ export default function ObserverUIContainer() {
   const observerSide = useSelector(selectObserverSide);
   const [showTopControls, setShowTopControls] = useState(false);
   const [showFullCameraControls, setShowFullCameraControls] = useState(false);
-  const { messages } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT, false);
 
   const handleControlToggle = () => {
     // close CameraControls if we're hiding panels
@@ -55,11 +52,6 @@ export default function ObserverUIContainer() {
     }
     setShowTopControls(!showTopControls);
   };
-
-  useEffect(() => {
-    // set initial camera state only if activeCamera is undefined
-    console.log(messages);
-  }, [messages]);
 
   return (
     <>
@@ -70,7 +62,9 @@ export default function ObserverUIContainer() {
       >
         {/* force user to choose ObserverSide if not set */}
         {!observerSide ? (
-          <ObserverSideSelect />
+          <>
+            <ObserverSideSelect />
+          </>
         ) : (
           <ObserverUI
             showFullCameraControls={showFullCameraControls}
