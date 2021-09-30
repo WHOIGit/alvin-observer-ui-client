@@ -52,7 +52,7 @@ export default function Joystick() {
         // assign interval to a variable to clear it.
         console.log(lastAction);
         handleSendMessage(lastAction);
-      }, 200);
+      }, 100);
 
       console.log(lastAction.actionType);
       // if we get the "end" event, stop the function cycle, reset the state
@@ -99,7 +99,8 @@ export default function Joystick() {
           mode: "static",
           size: 150,
           position: { top: "50%", left: "50%" },
-          color: "lightblue",
+          color: "#e1f5fe",
+          restOpacity: 0.8,
           dynamicPage: true,
           threshold: 0.3,
         }}

@@ -24,11 +24,6 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     zIndex: 1000,
     transition: "all 0.4s",
-    minHeight: "290px",
-  },
-  rootCollapse: {
-    marginTop: "-290px",
-    height: 0,
   },
   toggleButton: {
     position: "absolute",

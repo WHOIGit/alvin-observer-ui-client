@@ -1,62 +1,68 @@
 import React, { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
-import adapter from "webrtc-adapter";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  Grid,
-  Card,
-  CardHeader,
-  CardContent,
-} from "@material-ui/core";
+import { Grid, Card, CardHeader, CardContent } from "@material-ui/core";
 // local import
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import TopCameraCommandsList from "./TopCameraCommandsList";
 import WebRtcPlayer from "../../utils/webrtcplayer";
-import { selectActiveCamera } from "../camera-controls/cameraControlsSlice";
+import {
+  selectActiveCamera,
+  changeRecorderHeartbeat,
+} from "../camera-controls/cameraControlsSlice";
 import { VIDEO_STREAM_CONFIG, RECORDER_HEARTBEAT } from "../../config.js";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   headerRoot: {
-    padding: "4px"
+    padding: "4px",
   },
   headerRecorderRoot: {
     padding: "4px",
-    backgroundColor: "red"
+    backgroundColor: "red",
   },
   title: {
-    fontSize: ".9em"
+    fontSize: ".9em",
   },
   inactiveVideo: {
-    border: "white solid 2px"
+    border: "white solid 2px",
   },
   activeVideo: {
-    border: "red solid 2px"
+    border: "red solid 2px",
   },
   cardContent: {
     padding: 0,
     "&:last-child": {
-      paddingBottom: 0
-    }
-  }
+      paddingBottom: 0,
+    },
+  },
 }));
 
 export default function MiniVideos({ showFullCameraControls }) {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const activeCamera = useSelector(selectActiveCamera);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
+
   const videoElemRecord = useRef(null);
   const videoElemObserver = useRef(null);
   const observerVideoSrc = useSelector(
-    state => state.cameraControls.observerVideoSrc
+    (state) => state.cameraControls.observerVideoSrc
   );
   const recordVideoSrc = useSelector(
-    state => state.cameraControls.recordVideoSrc
+    (state) => state.cameraControls.recordVideoSrc
   );
+  /*
+  useEffect(() => {
+    if (messages) {
+      dispatch(changeRecorderHeartbeat(messages));
+    }
+  }, [dispatch, messages]);
+  */
 
   useEffect(() => {
     const videoObserver = videoElemObserver.current;
@@ -82,7 +88,7 @@ export default function MiniVideos({ showFullCameraControls }) {
               title={messages && `REC: ${messages.camera}`}
               classes={{
                 root: classes.headerRecorderRoot,
-                title: classes.title
+                title: classes.title,
               }}
             />
             <CardContent className={classes.cardContent}>
@@ -108,7 +114,7 @@ export default function MiniVideos({ showFullCameraControls }) {
                   title={`OBS: ${activeCamera}`}
                   classes={{
                     root: classes.headerRoot,
-                    title: classes.title
+                    title: classes.title,
                   }}
                 />
                 <CardContent className={classes.cardContent}>

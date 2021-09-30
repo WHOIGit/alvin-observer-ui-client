@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
     //backgroundColor: "#f5f5f5",
     backgroundColor: "#282c34",
     position: "absolute",
-    top: 290,
+    top: 250,
     left: 0,
     width: "100%",
     padding: theme.spacing(2),
@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     transition: "all 0.4s",
   },
   rootCollapse: {
-    top: "-564px",
+    top: "-524px",
   },
   paper: {
     padding: theme.spacing(2),
