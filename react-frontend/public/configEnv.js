@@ -1,8 +1,11 @@
 // Default local env variables
 // Use in place of the REACT_APP style env variables.
 
-// Web socket server
+// Web socket server root URL
 window.WS_SERVER = "http://128.128.184.62:4040";
+//window.WS_SERVER = "https://128.128.184.62";
+// Web socket server path, ex: "/websocket-server-path/"
+window.WS_PATH = "/";
 
 // sealog url for iframe
 window.SEALOG_URL = "https://sealog.whoi.edu/sealog-alvin/";
@@ -23,5 +26,5 @@ window.CAMERAS = [
   { camera: "camera5", cam_name: "aft_cam", owner: "none" },
   { camera: "camera6", cam_name: "down_cam", owner: "none" },
   { camera: "camera7", cam_name: "brow_wide", owner: "pilot" },
-  { camera: "camera8", cam_name: "sci_cam", owner: "port" }
+  { camera: "camera8", cam_name: "sci_cam", owner: "port" },
 ];

@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Paper, Box } from "@material-ui/core";
+import { Grid, Paper, Box, Typography } from "@material-ui/core";
 // local
 import ObserverDisplayChip from "./ObserverDisplayChip";
 import UpperRightButtons from "./UpperRightButtons";
@@ -19,6 +19,12 @@ const useStyles = makeStyles((theme) => ({
   infoChip: {
     marginBottom: theme.spacing(1),
     width: "100%",
+  },
+  horizLabel: {
+    paddingTop: theme.spacing(2),
+  },
+  exposureGrid: {
+    paddingLeft: theme.spacing(4),
   },
 }));
 
@@ -39,7 +45,7 @@ export default function TopControlPanel({
                 <Grid item>
                   <SelectVideoSource />
                 </Grid>
-                <Grid item>
+                <Grid item className={classes.exposureGrid}>
                   <SelectExposureMode />
                 </Grid>
               </Grid>

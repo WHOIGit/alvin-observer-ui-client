@@ -45,7 +45,9 @@ export default function SelectVideoSource({ showTopControls }) {
           inputProps={{ "aria-label": "Without label" }}
         >
           {cameras.map((item) => (
-            <MenuItem value={item.camera}>{item.cam_name}</MenuItem>
+            <MenuItem value={item.camera} key={item.camera}>
+              Video Source: {item.cam_name}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>

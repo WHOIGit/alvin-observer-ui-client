@@ -3,9 +3,10 @@
 const envSettings = window;
 // Web socket server
 export const WS_SERVER = envSettings.WS_SERVER;
-export const WS_SERVER_NAMESPACE_PORT = "/port";
-export const WS_SERVER_NAMESPACE_STARBOARD = "/stbd";
-export const WS_SERVER_NAMESPACE_PILOT = "/pilot";
+export const WS_PATH = envSettings.WS_PATH;
+export const WS_SERVER_NAMESPACE_PORT = "port";
+export const WS_SERVER_NAMESPACE_STARBOARD = "stbd";
+export const WS_SERVER_NAMESPACE_PILOT = "pilot";
 // sealog url for iframe
 export const SEALOG_URL = envSettings.SEALOG_URL;
 // Web socket event names

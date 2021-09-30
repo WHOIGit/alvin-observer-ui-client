@@ -20,6 +20,7 @@ const initialState = {
   initialCamHeartbeat: null,
   activeCamera: null,
   camHeartbeatData: null,
+  recorderHeartbeatData: null,
   currentCamData: null,
   lastCommand: null,
   availableCameras: CAMERAS,
@@ -119,6 +120,15 @@ export const cameraControlsSlice = createSlice({
       }
       state.camHeartbeatData = action.payload;
     },
+    changeRecorderHeartbeat: (state, action) => {
+      const data = action.payload;
+      delete data.eventId;
+      delete data.timestamp;
+      if (state.recorderHeartbeatData === data) {
+        return state;
+      }
+      state.recorderHeartbeatData = data;
+    },
     changeCurrentCamData: (state, action) => {
       console.log(action.payload);
       state.currentCamData = {};
@@ -141,6 +151,7 @@ export const {
   changeActiveCamera,
   changeCameraSettings,
   changeCamHeartbeat,
+  changeRecorderHeartbeat,
   changeCurrentCamData,
   setLastCommand,
   setObserverSide,
@@ -168,6 +179,10 @@ export const selectCamHeartbeatData = (state) =>
 // return the initial cached CamHeartbeat data
 export const selectInitialCamHeartbeatData = (state) =>
   state.cameraControls.initialCamHeartbeat;
+
+// return the current RecorderHeartbeat data
+export const selectRecorderHeartbeatData = (state) =>
+  state.cameraControls.recorderHeartbeatData;
 
 // return the current Camera data the socket returns on a camera change
 export const selectCurrentCamData = (state) =>

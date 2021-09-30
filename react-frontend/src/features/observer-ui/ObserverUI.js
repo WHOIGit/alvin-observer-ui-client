@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import Link from "@material-ui/core/Link";
-import { Grid, Paper, Icon, Fab } from "@material-ui/core";
 import TopControlPanel from "./TopControlPanel";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import {
-  selectWebSocketNamespace,
   selectInitialCamHeartbeatData,
   selectActiveCamera,
   changeActiveCamera,
@@ -19,7 +16,7 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: "#f5f5f5",
+    //backgroundColor: "#f5f5f5",
     position: "relative",
     marginTop: 0,
     paddingBottom: 0,
@@ -27,11 +24,6 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     zIndex: 1000,
     transition: "all 0.4s",
-    minHeight: "290px",
-  },
-  rootCollapse: {
-    marginTop: "-290px",
-    height: 0,
   },
   toggleButton: {
     position: "absolute",
