@@ -6,9 +6,7 @@ import CameraAltIcon from "@material-ui/icons/CameraAlt";
 import CameraControls from "./CameraControls";
 import ObserverSideSelect from "./ObserverSideSelect";
 import ObserverUI from "./ObserverUI";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config";
 
 const useStyles = makeStyles((theme) => ({
   root: {

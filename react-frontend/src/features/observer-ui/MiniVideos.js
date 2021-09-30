@@ -1,15 +1,12 @@
 import React, { useEffect, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Card, CardHeader, CardContent } from "@material-ui/core";
 // local import
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import TopCameraCommandsList from "./TopCameraCommandsList";
 import WebRtcPlayer from "../../utils/webrtcplayer";
-import {
-  selectActiveCamera,
-  changeRecorderHeartbeat,
-} from "../camera-controls/cameraControlsSlice";
+import { selectActiveCamera } from "../camera-controls/cameraControlsSlice";
 import { VIDEO_STREAM_CONFIG, RECORDER_HEARTBEAT } from "../../config.js";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
@@ -44,7 +41,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MiniVideos({ showFullCameraControls }) {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const activeCamera = useSelector(selectActiveCamera);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
 
@@ -56,13 +52,6 @@ export default function MiniVideos({ showFullCameraControls }) {
   const recordVideoSrc = useSelector(
     (state) => state.cameraControls.recordVideoSrc
   );
-  /*
-  useEffect(() => {
-    if (messages) {
-      dispatch(changeRecorderHeartbeat(messages));
-    }
-  }, [dispatch, messages]);
-  */
 
   useEffect(() => {
     const videoObserver = videoElemObserver.current;
