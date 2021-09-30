@@ -1,12 +1,9 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Button, Typography } from "@material-ui/core";
+import { Grid, Button } from "@material-ui/core";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import {
-  selectRecorderHeartbeatData,
-  selectActiveCamera,
-} from "./cameraControlsSlice";
+import { selectActiveCamera } from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
   NEW_CAMERA_COMMAND_EVENT,

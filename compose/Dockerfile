@@ -3,6 +3,8 @@ FROM node:16 AS builder
 
 LABEL maintainer="Ethan Andrews <eandrews@whoi.edu>"
 
+ENV NPM_CONFIG_LOGLEVEL=error
+
 WORKDIR /app
 
 COPY ./react-frontend /app
