@@ -79,7 +79,7 @@ export default function RouterControls({
       <Grid item xs={3}>
         <Button
           variant="contained"
-          //color="primary"
+          color="primary"
           size="small"
           className={btnStyle}
           onClick={() => setInputValue(value)}
