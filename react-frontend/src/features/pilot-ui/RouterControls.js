@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Paper, Icon, Button, Box } from "@material-ui/core";
+import { Grid, Button, Box } from "@material-ui/core";
 import { blue, green, deepOrange } from "@material-ui/core/colors";
 import CameraAltIcon from "@material-ui/icons/CameraAlt";
 // local
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   activeButton: {
-    backgroundColor: deepOrange[500],
+    backgroundColor: deepOrange[500] + " !important",
   },
   takeButton: {
     color: "white",
@@ -45,12 +45,10 @@ export default function RouterControls({
     .map((_, i) => i + 1);
   const [inputValue, setInputValue] = useState(null);
   const [outputValue, setOutputValue] = useState(null);
-  const { messages, sendMessage } = useCameraWebSocket(
-    NEW_CAMERA_COMMAND_EVENT
-  );
+  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   // disable Take button until both values have been selected
   const disabled = !inputValue || !outputValue;
-
+  console.log(inputValue);
   const handleSendMessage = () => {
     const payload = {
       action: {
@@ -71,6 +69,7 @@ export default function RouterControls({
 
   const renderInputBtns = (value) => {
     const activeBtn = value === inputValue;
+    console.log(activeBtn);
     const btnStyle = clsx({
       [classes.ctrlButton]: true, //always applies
       [classes.activeButton]: activeBtn, //only when open === true
@@ -80,7 +79,7 @@ export default function RouterControls({
       <Grid item xs={3}>
         <Button
           variant="contained"
-          color="primary"
+          //color="primary"
           size="small"
           className={btnStyle}
           onClick={() => setInputValue(value)}
