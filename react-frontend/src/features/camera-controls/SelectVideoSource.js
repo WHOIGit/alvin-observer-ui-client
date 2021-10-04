@@ -28,6 +28,7 @@ export default function SelectVideoSource({ showLabel }) {
   const activeCamera = useSelector(selectActiveCamera);
   const cameras = useSelector((state) => state.cameraControls.availableCameras);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  const labelText = "SRC:";
 
   const handleSendMessage = (event) => {
     const payload = {
@@ -43,7 +44,7 @@ export default function SelectVideoSource({ showLabel }) {
     <Grid container spacing={0}>
       {showLabel && (
         <Grid item xs className={classes.horizLabel}>
-          <Typography variant="body1">SRC:</Typography>
+          <Typography variant="body1">{labelText}</Typography>
         </Grid>
       )}
 
