@@ -86,6 +86,9 @@ export default function NavDataDisplay() {
                 </Grid>
               </TableCell>
             </TableRow>
+            <TableRow key="temp">
+              <TableCell component="th" scope="row"></TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
