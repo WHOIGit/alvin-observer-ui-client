@@ -93,10 +93,7 @@ export default function FocusZoomButtons() {
     onStop: () => handleStop(COMMAND_STRINGS.zoomControlCommand),
   });
 
-  const handleSendMessage = (commandName, commandValue) => {
-    if (commandValue === undefined) {
-      let commandValue;
-    }
+  const handleSendMessage = (commandName, commandValue = "UND") => {
     const payload = {
       action: {
         name: commandName,

@@ -1,24 +1,29 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
+import {
+  MenuItem,
+  FormControl,
+  Select,
+  Grid,
+  Typography,
+} from "@material-ui/core";
 import { selectActiveCamera } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    position: "relative",
-  },
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
   },
+  horizLabel: {
+    paddingTop: theme.spacing(2),
+    paddingRight: theme.spacing(1),
+  },
 }));
 
-export default function SelectVideoSource({ showTopControls }) {
+export default function SelectVideoSource({ showLabel }) {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCamera);
   const cameras = useSelector((state) => state.cameraControls.availableCameras);
@@ -35,22 +40,30 @@ export default function SelectVideoSource({ showTopControls }) {
   };
 
   return (
-    <div className={classes.root}>
-      <FormControl className={classes.formControl}>
-        <Select
-          id="video-select"
-          value={activeCamera}
-          onChange={handleSendMessage}
-          displayEmpty
-          inputProps={{ "aria-label": "Without label" }}
-        >
-          {cameras.map((item) => (
-            <MenuItem value={item.camera} key={item.camera}>
-              Video Source: {item.cam_name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </div>
+    <Grid container spacing={0}>
+      {showLabel && (
+        <Grid item xs className={classes.horizLabel}>
+          <Typography variant="body1">SRC:</Typography>
+        </Grid>
+      )}
+
+      <Grid item xs>
+        <FormControl className={classes.formControl}>
+          <Select
+            id="video-select"
+            value={activeCamera}
+            onChange={handleSendMessage}
+            displayEmpty
+            inputProps={{ "aria-label": "Without label" }}
+          >
+            {cameras.map((item) => (
+              <MenuItem value={item.camera} key={item.camera}>
+                {item.cam_name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+    </Grid>
   );
 }
