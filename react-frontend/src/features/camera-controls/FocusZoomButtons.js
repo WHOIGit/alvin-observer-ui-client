@@ -110,7 +110,6 @@ export default function FocusZoomButtons() {
   useEffect(() => {
     // set enabled status from camSettings.focus_mode
     // if AUTO focus, disable
-    console.log(camSettings.focus_mode);
     if (camSettings && camSettings.focus_mode === "AF") {
       setIsEnabled(false);
     } else {

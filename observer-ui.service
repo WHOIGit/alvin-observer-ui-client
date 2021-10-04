@@ -1,0 +1,15 @@
+# Copy this file to /etc/systemd/system
+
+[Unit]
+Description=Observer UI React frontend
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/alvin/alvin-observer-ui-client
+ExecStart=/usr/bin/docker-compose up -d -V
+ExecStop=/usr/bin/docker-compose down
+
+[Install]
+WantedBy=multi-user.target
