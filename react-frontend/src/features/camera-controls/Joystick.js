@@ -28,7 +28,7 @@ export default function Joystick() {
   const [isEnabled, setIsEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const [showJoystick, setShowJoystick] = useState(false);
-  console.log(isEnabled);
+
   useEffect(() => {
     // disable joystick if camera has no pan/tilt controls
     // pantilt = "n/N"

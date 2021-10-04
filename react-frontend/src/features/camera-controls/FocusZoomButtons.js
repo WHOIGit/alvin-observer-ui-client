@@ -1,8 +1,10 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Button, Typography } from "@material-ui/core";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import useLongPress from "../../hooks/useLongPress";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
@@ -15,6 +17,8 @@ const useStyles = makeStyles((theme) => ({
 export default function FocusZoomButtons() {
   const classes = useStyles();
   const timerRef = useRef(false);
+  const camSettings = useSelector(selectCamHeartbeatData);
+  const [isEnabled, setIsEnabled] = useState(true);
 
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
@@ -103,6 +107,17 @@ export default function FocusZoomButtons() {
     sendMessage(payload);
   };
 
+  useEffect(() => {
+    // set enabled status from camSettings.focus_mode
+    // if AUTO focus, disable
+    console.log(camSettings.focus_mode);
+    if (camSettings && camSettings.focus_mode === "AF") {
+      setIsEnabled(false);
+    } else {
+      setIsEnabled(true);
+    }
+  }, [camSettings]);
+
   return (
     <Grid container spacing={1} className={classes.root}>
       <Grid item xs={6}>
@@ -110,6 +125,7 @@ export default function FocusZoomButtons() {
           variant="contained"
           color="secondary"
           size="small"
+          disabled={!isEnabled}
           {...focusNearBtnProps}
         >
           Near
@@ -140,6 +156,7 @@ export default function FocusZoomButtons() {
           variant="contained"
           color="secondary"
           size="small"
+          disabled={!isEnabled}
           {...focusFarBtnProps}
         >
           Far
