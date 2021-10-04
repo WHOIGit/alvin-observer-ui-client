@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Paper, Box, Typography } from "@material-ui/core";
+import { Grid, Paper, Box } from "@material-ui/core";
 // local
 import ObserverDisplayChip from "./ObserverDisplayChip";
 import UpperRightButtons from "./UpperRightButtons";
@@ -8,7 +8,6 @@ import NavDataDisplay from "./NavDataDisplay";
 import MiniVideos from "./MiniVideos";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
-import SensorDataDisplay from "./SensorDataDisplay";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -43,10 +42,10 @@ export default function TopControlPanel({
             <Grid item xs>
               <Grid container spacing={0}>
                 <Grid item>
-                  <SelectVideoSource />
+                  <SelectVideoSource showLabel="horizontal" />
                 </Grid>
                 <Grid item className={classes.exposureGrid}>
-                  <SelectExposureMode />
+                  <SelectExposureMode showLabel="horizontal" />
                 </Grid>
               </Grid>
             </Grid>
@@ -55,9 +54,6 @@ export default function TopControlPanel({
         <Grid item xs={3}>
           <Box>
             <NavDataDisplay />
-          </Box>
-          <Box mt={1}>
-            <SensorDataDisplay />
           </Box>
         </Grid>
         <Grid item xs={3}>

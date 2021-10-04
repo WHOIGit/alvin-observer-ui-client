@@ -24,7 +24,7 @@ export default function App() {
       <Box className={classes.noSelect}>
         <ObserverUIContainer />
       </Box>
-      <Box>
+      <Box className={classes.noSelect}>
         <iframe
           src={SEALOG_URL}
           className={classes.sealogFrame}

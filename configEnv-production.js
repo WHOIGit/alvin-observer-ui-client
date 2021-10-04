@@ -12,9 +12,9 @@ window.SEALOG_URL = "https://sealog.whoi.edu/sealog-alvin/";
 // Video stream server configs
 //window.VIDEO_STREAM_SERVER = "https://128.128.184.62/video";
 window.VIDEO_STREAM_SERVER = "https://199.92.162.205/video";
-window.PORT_OBSERVER_VIDEO = "demo1";
+window.PORT_OBSERVER_VIDEO = "demo2";
 window.STBD_OBSERVER_VIDEO = "demo2";
-window.PORT_RECORDER_VIDEO = "demo2";
+window.PORT_RECORDER_VIDEO = "demo1";
 window.STBD_RECORDER_VIDEO = "demo1";
 window.PILOT_VIDEO = "demo1";
 

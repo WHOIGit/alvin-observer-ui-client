@@ -15,6 +15,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     zIndex: 500,
     transition: "all 0.4s",
+    userSelect: "none",
   },
   rootCollapse: {
     top: "-524px",
