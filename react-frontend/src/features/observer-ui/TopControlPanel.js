@@ -56,9 +56,6 @@ export default function TopControlPanel({
           <Box>
             <NavDataDisplay />
           </Box>
-          <Box mt={1}>
-            <SensorDataDisplay />
-          </Box>
         </Grid>
         <Grid item xs={3}>
           <Box mb={1}>

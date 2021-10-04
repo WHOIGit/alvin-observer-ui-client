@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import SensorDataDisplay from "./SensorDataDisplay";
 import { NAV_HEARTBEAT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
@@ -87,7 +88,9 @@ export default function NavDataDisplay() {
               </TableCell>
             </TableRow>
             <TableRow key="temp">
-              <TableCell component="th" scope="row"></TableCell>
+              <TableCell component="th" scope="row" colSpan={2}>
+                <SensorDataDisplay />
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
