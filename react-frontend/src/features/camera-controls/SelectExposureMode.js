@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@material-ui/core";
 // local imports
-import { selectCurrentCamData } from "./cameraControlsSlice";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SelectExposureMode({ showLabel }) {
   const classes = useStyles();
-  const camData = useSelector(selectCurrentCamData);
+  const camSettings = useSelector(selectCamHeartbeatData);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const labelText = "EXP:";
 
@@ -47,7 +47,7 @@ export default function SelectExposureMode({ showLabel }) {
     displayEmpty = false;
   }
 
-  if (camData === null) {
+  if (camSettings === null) {
     return null;
   }
 
@@ -63,7 +63,7 @@ export default function SelectExposureMode({ showLabel }) {
         <FormControl className={classes.formControl}>
           <Select
             id="exposure-select"
-            value={camData.currentSettings.exposure_mode}
+            value={camSettings.exposure}
             label={labelText}
             onChange={handleSendMessage}
             displayEmpty={displayEmpty}

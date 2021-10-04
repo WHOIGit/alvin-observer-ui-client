@@ -4,7 +4,10 @@ import { makeStyles } from "@material-ui/core/styles";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
-import { selectCurrentCamData } from "./cameraControlsSlice";
+import {
+  selectCurrentCamData,
+  selectCamHeartbeatData,
+} from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
@@ -23,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
 export default function SelectIsoMode() {
   const classes = useStyles();
   const camData = useSelector(selectCurrentCamData);
+  const camSettings = useSelector(selectCamHeartbeatData);
   const [isEnabled, setIsEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
@@ -46,17 +50,14 @@ export default function SelectIsoMode() {
     ];
     // set enabled status from camData.currentSettings.exposure_mode
     // if AUTO exposure, disable
-    if (
-      camData &&
-      disabledExposureModes.includes(camData.currentSettings.exposure_mode)
-    ) {
+    if (camSettings && disabledExposureModes.includes(camSettings.exposure)) {
       setIsEnabled(false);
     } else {
       setIsEnabled(true);
     }
-  }, [camData]);
+  }, [camSettings]);
 
-  if (camData === null) {
+  if (camSettings === null || camData === null) {
     return null;
   }
 
@@ -66,12 +67,14 @@ export default function SelectIsoMode() {
         <Select
           labelId="iso-select-label"
           id="iso-select"
-          value={camData.currentSettings.ISO}
+          value={camSettings.iso}
           onChange={handleSendMessage}
           disabled={!isEnabled}
         >
           {camData.ISO.map((item) => (
-            <MenuItem value={item}>ISO: {item}</MenuItem>
+            <MenuItem value={item} key={item}>
+              ISO: {item}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import ReactNipple from "react-nipple";
 import { makeStyles } from "@material-ui/core/styles";
@@ -8,6 +8,7 @@ import {
   setJoystickQueue,
   selectJoystickQueue,
   clearJoystickQueue,
+  selectCamHeartbeatData,
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
@@ -23,10 +24,20 @@ export default function Joystick() {
   const classes = useStyles();
   const dispatch = useDispatch();
   const joystickQueue = useSelector(selectJoystickQueue);
-  const joystickElem = useRef(null);
-
+  const camSettings = useSelector(selectCamHeartbeatData);
+  const [isEnabled, setIsEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const [showJoystick, setShowJoystick] = useState(false);
+  console.log(isEnabled);
+  useEffect(() => {
+    // disable joystick if camera has no pan/tilt controls
+    // pantilt = "n/N"
+    if (camSettings.pantilt.trim().toUpperCase() === "N") {
+      setIsEnabled(false);
+    } else {
+      setIsEnabled(true);
+    }
+  }, [camSettings]);
 
   useEffect(() => {
     // delay loading of the virtual joystick until CSS transtion ends (.4s)
@@ -88,7 +99,7 @@ export default function Joystick() {
     sendMessage(payload);
   };
 
-  if (!showJoystick) {
+  if (!showJoystick || !isEnabled) {
     return null;
   }
 
