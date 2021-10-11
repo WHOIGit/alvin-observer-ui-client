@@ -1,29 +1,35 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
+import {
+  MenuItem,
+  Grid,
+  FormControl,
+  Select,
+  Typography,
+} from "@material-ui/core";
 // local imports
-import { selectCurrentCamData } from "./cameraControlsSlice";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    position: "relative",
-  },
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
   },
+  horizLabel: {
+    paddingTop: theme.spacing(2),
+    paddingRight: theme.spacing(1),
+  },
 }));
 
-export default function SelectExposureMode({ showTopControls }) {
+export default function SelectExposureMode({ showLabel }) {
   const classes = useStyles();
-  const camData = useSelector(selectCurrentCamData);
+  const camSettings = useSelector(selectCamHeartbeatData);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  const labelText = "EXP:";
 
   const handleSendMessage = (event) => {
     const payload = {
@@ -35,34 +41,48 @@ export default function SelectExposureMode({ showTopControls }) {
     sendMessage(payload);
   };
 
-  if (camData === null) {
+  // set up label options
+  let displayEmpty = true;
+  if (showLabel === "vertical") {
+    displayEmpty = false;
+  }
+
+  if (camSettings === null) {
     return null;
   }
 
   return (
-    <div className={classes.root}>
-      <FormControl className={classes.formControl}>
-        <Select
-          id="exposure-select"
-          value={camData.currentSettings.exposure_mode}
-          label="Exposure Mode"
-          onChange={handleSendMessage}
-          displayEmpty
-        >
-          <MenuItem value={COMMAND_STRINGS.exposureModeOptions[0]}>
-            Exposure Mode: Auto
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.exposureModeOptions[1]}>
-            Exposure Mode: Manual
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.exposureModeOptions[2]}>
-            Exposure Mode: Shutter Priority
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.exposureModeOptions[3]}>
-            Exposure Mode: Iris Priority
-          </MenuItem>
-        </Select>
-      </FormControl>
-    </div>
+    <Grid container spacing={0}>
+      {showLabel && (
+        <Grid item xs className={classes.horizLabel}>
+          <Typography variant="body1">{labelText}</Typography>
+        </Grid>
+      )}
+
+      <Grid item xs>
+        <FormControl className={classes.formControl}>
+          <Select
+            id="exposure-select"
+            value={camSettings.exposure}
+            label={labelText}
+            onChange={handleSendMessage}
+            displayEmpty={displayEmpty}
+          >
+            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[0]}>
+              Auto
+            </MenuItem>
+            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[1]}>
+              Manual
+            </MenuItem>
+            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[2]}>
+              Shutter Priority
+            </MenuItem>
+            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[3]}>
+              Iris Priority
+            </MenuItem>
+          </Select>
+        </FormControl>
+      </Grid>
+    </Grid>
   );
 }

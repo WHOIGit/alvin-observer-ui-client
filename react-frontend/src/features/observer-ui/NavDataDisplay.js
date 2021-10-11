@@ -11,12 +11,10 @@ import {
 } from "@material-ui/core";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import SensorDataDisplay from "./SensorDataDisplay";
 import { NAV_HEARTBEAT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    backgroundColor: "#f5f5f5",
-  },
   table: {
     width: "100%",
   },
@@ -30,7 +28,7 @@ export default function NavDataDisplay() {
     return null;
   }
   return (
-    <div className={classes.root}>
+    <div>
       <TableContainer component={Paper}>
         <Table className={classes.table} size="small" aria-label="Nav Data">
           <TableBody>
@@ -84,6 +82,11 @@ export default function NavDataDisplay() {
                     {messages.y}
                   </Grid>
                 </Grid>
+              </TableCell>
+            </TableRow>
+            <TableRow key="temp">
+              <TableCell component="th" scope="row" colSpan={2}>
+                <SensorDataDisplay />
               </TableCell>
             </TableRow>
           </TableBody>

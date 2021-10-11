@@ -43,7 +43,7 @@ export default function MiniVideos({ showFullCameraControls }) {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCamera);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
-
+  console.log(messages);
   const videoElemRecord = useRef(null);
   const videoElemObserver = useRef(null);
   const observerVideoSrc = useSelector(
@@ -68,6 +68,10 @@ export default function MiniVideos({ showFullCameraControls }) {
     }
   }, [showFullCameraControls, observerVideoSrc, recordVideoSrc]);
 
+  if (!messages) {
+    return null;
+  }
+
   return (
     <div className={classes.root}>
       <Grid container spacing={2}>
@@ -76,7 +80,7 @@ export default function MiniVideos({ showFullCameraControls }) {
             <CardHeader
               title={messages && `REC: ${messages.camera}`}
               classes={{
-                root: classes.headerRecorderRoot,
+                root: messages.recording && classes.headerRecorderRoot,
                 title: classes.title,
               }}
             />

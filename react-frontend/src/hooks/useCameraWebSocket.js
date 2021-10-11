@@ -10,7 +10,6 @@ import {
   selectObserverSide,
   selectActiveCamera,
   selectWebSocketNamespace,
-  selectRecorderHeartbeatData,
 } from "../features/camera-controls/cameraControlsSlice";
 import {
   WS_SERVER,
@@ -25,7 +24,6 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
   const observerSideCmd = COMMAND_PREFIX + useSelector(selectObserverSide);
   const socketNamespace = useSelector(selectWebSocketNamespace);
   const activeCamera = useSelector(selectActiveCamera);
-  const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
   const [messages, setMessages] = useState(null);
   const socketRef = useRef();
   const dispatch = useDispatch();
@@ -39,6 +37,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       socketEvent === RECORDER_HEARTBEAT
     ) {
       socketNs = socketNs + socketNamespace;
+      //socketNs = "/port";
     }
   }
 
@@ -49,6 +48,10 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       query: { client: socketNamespace },
     });
     console.log(socketRef);
+
+    socketRef.current.on("connect", (incomingMessage) => {
+      console.log("ON CONNECT", incomingMessage);
+    });
 
     // Listens for incoming messages
     socketRef.current.on(socketEvent, (incomingMessage) => {
@@ -80,9 +83,16 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
     // Destroys the socket reference
     // when the connection is closed
     return () => {
+      // Here we emit our custom event
+      socketRef.current.on("disconnect", () => {
+        socketRef.current.emit("disconnectEvent", {
+          client: socketNamespace,
+        });
+        console.log("Socket disconnected: ");
+      });
       socketRef.current.disconnect();
     };
-  }, [socketEvent, dispatch, socketNs]);
+  }, [socketEvent, dispatch, socketNs, socketNamespace]);
 
   // Sends a message to the server
   const sendMessage = (messageBody) => {
