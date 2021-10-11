@@ -27,6 +27,12 @@ const initialState = {
   joystickQueue: [],
 };
 
+const getCameraConfig = (cameraId) => {
+  const cameraConfig = CAMERAS.find((item) => item.camera === cameraId);
+  console.log(cameraConfig);
+  return cameraConfig;
+};
+
 export const cameraControlsSlice = createSlice({
   name: "cameraControls",
   initialState: initialState,
@@ -56,7 +62,8 @@ export const cameraControlsSlice = createSlice({
       */
     },
     changeActiveCamera: (state, action) => {
-      state.activeCamera = action.payload.camera;
+      const activeCamera = getCameraConfig(action.payload.camera);
+      state.activeCamera = activeCamera;
     },
     setLastCommand: (state, action) => {
       state.lastCommand = action.payload;
@@ -74,7 +81,10 @@ export const cameraControlsSlice = createSlice({
           switch (state.lastCommand.action.name) {
             // change observer camera
             case COMMAND_STRINGS.cameraChangeCommand:
-              state.activeCamera = state.lastCommand.action.value;
+              const activeCamera = getCameraConfig(
+                state.lastCommand.action.value
+              );
+              state.activeCamera = activeCamera;
               break;
             // change focus mode
             case COMMAND_STRINGS.focusModeCommand:
@@ -162,8 +172,18 @@ export const {
 export default cameraControlsSlice.reducer;
 
 // Selector functions
-// return only the Active camera currently selected
-export const selectActiveCamera = (state) => state.cameraControls.activeCamera;
+// return only the Active camera id currently selected
+export const selectActiveCamera = (state) => {
+  if (state.cameraControls.activeCamera) {
+    return state.cameraControls.activeCamera.camera;
+  } else {
+    return null;
+  }
+};
+
+// return all the Active camera config values
+export const selectActiveCameraConfig = (state) =>
+  state.cameraControls.activeCamera;
 
 // return the current Observer Side
 export const selectObserverSide = (state) => state.cameraControls.observerSide;

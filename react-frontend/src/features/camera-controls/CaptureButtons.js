@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Button } from "@material-ui/core";
+import { Grid, Button, CircularProgress, Box } from "@material-ui/core";
+import { green } from "@material-ui/core/colors";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { selectActiveCamera } from "./cameraControlsSlice";
+import {
+  selectActiveCamera,
+  selectActiveCameraConfig,
+} from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
   NEW_CAMERA_COMMAND_EVENT,
@@ -15,13 +19,29 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     fontSize: ".7em",
   },
+  buttonWrapper: {
+    position: "relative",
+  },
+  buttonProgress: {
+    color: green[500],
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
+  },
 }));
 
 export default function CaptureButtons() {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCamera);
+  const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
+  //console.log(messages);
+  const [loading, setLoading] = useState(false);
+  //const [success, setSuccess] = useState(false);
+  const [requestedSrc, setRequestedSrc] = useState(false);
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
@@ -38,6 +58,18 @@ export default function CaptureButtons() {
     sendMessage(payload);
   };
 
+  const handleRecordAction = () => {
+    setLoading(true);
+    handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera);
+    setRequestedSrc(activeCameraConfig.cam_name);
+  };
+
+  useEffect(() => {
+    if (messages && messages.camera === requestedSrc) {
+      setLoading(false);
+    }
+  }, [messages, requestedSrc]);
+
   return (
     <>
       <Grid item xs={6}>
@@ -47,10 +79,7 @@ export default function CaptureButtons() {
           size="small"
           className={classes.ctrlButton}
           onClick={() =>
-            handleSendMessage(
-              COMMAND_STRINGS.stillImageCaptureCommand,
-              activeCamera
-            )
+            handleSendMessage(COMMAND_STRINGS.stillImageCaptureCommand, 0)
           }
         >
           Still Img Capture
@@ -81,17 +110,21 @@ export default function CaptureButtons() {
         </Button>
       </Grid>
       <Grid item xs={6}>
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          className={classes.ctrlButton}
-          onClick={() =>
-            handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera)
-          }
-        >
-          Record Source
-        </Button>
+        <div className={classes.buttonWrapper}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            disabled={loading}
+            className={classes.ctrlButton}
+            onClick={() => handleRecordAction()}
+          >
+            Record Source
+          </Button>
+          {loading && (
+            <CircularProgress size={24} className={classes.buttonProgress} />
+          )}
+        </div>
       </Grid>
     </>
   );
