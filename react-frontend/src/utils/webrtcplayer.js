@@ -24,23 +24,23 @@ export default class WebRtcPlayer {
     this.webrtc = new RTCPeerConnection({
       iceServers: [
         {
-          urls: ["stun:stun.l.google.com:19302"]
-        }
-      ]
+          urls: ["stun:stun.l.google.com:19302"],
+        },
+      ],
     });
     this.webrtc.onnegotiationneeded = this.handleNegotiationNeeded.bind(this);
     this.webrtc.ontrack = this.onTrack.bind(this);
     fetch(this.codecLink)
-      .then(response => {
-        response.json().then(data => {
+      .then((response) => {
+        response.json().then((data) => {
           data.forEach((item, i) => {
             this.webrtc.addTransceiver(item.Type, {
-              direction: "sendrecv"
+              direction: "sendrecv",
             });
           });
         });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   }
@@ -53,25 +53,27 @@ export default class WebRtcPlayer {
     formData.append("data", btoa(this.webrtc.localDescription.sdp));
     fetch(this.rsdpLink, {
       method: "POST",
-      body: formData
+      body: formData,
     })
-      .then(response => {
-        response.text().then(data => {
+      .then((response) => {
+        response.text().then((data) => {
           this.webrtc.setRemoteDescription(
             new RTCSessionDescription({
               type: "answer",
-              sdp: atob(data)
+              sdp: atob(data),
             })
           );
         });
       })
-      .catch(err => {});
+      .catch((err) => {});
   }
 
   onTrack(event) {
     this.stream.addTrack(event.track);
-    this.video.srcObject = this.stream;
-    this.video.play();
+    if (this.video) {
+      this.video.srcObject = this.stream;
+      this.video.play();
+    }
   }
 
   load(uuid) {

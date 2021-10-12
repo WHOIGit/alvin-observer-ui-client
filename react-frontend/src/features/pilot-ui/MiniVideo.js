@@ -11,7 +11,7 @@ import {
   CardContent,
   Typography,
   Button,
-  Chip
+  Chip,
 } from "@material-ui/core";
 // local import
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
@@ -21,31 +21,31 @@ import { VIDEO_STREAM_CONFIG } from "../../config.js";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   headerRoot: { padding: "4px" },
   title: {
-    fontSize: ".9em"
+    fontSize: ".9em",
   },
   inactiveVideo: {
-    border: "white solid 2px"
+    border: "white solid 2px",
   },
   activeVideo: {
-    border: "red solid 2px"
+    border: "red solid 2px",
   },
   videoAction: {
     justifyContent: "center",
     textTransform: "uppercase",
-    padding: "4px"
+    padding: "4px",
   },
   activeVideoAction: {
-    backgroundColor: "red"
+    backgroundColor: "red",
   },
   cardContent: {
-    padding: 0
-  }
+    padding: 0,
+  },
 }));
 
 export default function MiniVideo({ videoSrc, recording }) {
@@ -57,7 +57,7 @@ export default function MiniVideo({ videoSrc, recording }) {
   useEffect(() => {
     const video = videoElem.current;
     if (videoSrc) {
-      const playerVideo = new WebRtcPlayer(video.id, videoSrc);
+      new WebRtcPlayer(video.id, videoSrc);
     }
   }, [videoSrc]);
 
@@ -77,7 +77,7 @@ export default function MiniVideo({ videoSrc, recording }) {
         title={title}
         classes={{
           root: classes.headerRoot,
-          title: classes.title
+          title: classes.title,
         }}
       />
       <CardContent className={classes.cardContent}>
@@ -92,8 +92,9 @@ export default function MiniVideo({ videoSrc, recording }) {
       </CardContent>
 
       <CardActions
-        className={`${classes.videoAction} ${recording &&
-          classes.activeVideoAction}`}
+        className={`${classes.videoAction} ${
+          recording && classes.activeVideoAction
+        }`}
       >
         <Typography variant="body2" color="textSecondary" component="span">
           {footer}

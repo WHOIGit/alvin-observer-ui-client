@@ -32,7 +32,7 @@ export default function Joystick() {
   useEffect(() => {
     // disable joystick if camera has no pan/tilt controls
     // pantilt = "n/N"
-    if (camSettings.pantilt.trim().toUpperCase() === "N") {
+    if (camSettings && camSettings.pantilt.trim().toUpperCase() === "N") {
       setIsEnabled(false);
     } else {
       setIsEnabled(true);

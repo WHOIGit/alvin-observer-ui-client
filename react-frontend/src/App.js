@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Box } from "@material-ui/core";
+import { Container } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import PilotUIContainer from "./features/pilot-ui/PilotUIContainer";
 
@@ -17,12 +17,12 @@ const useStyles = makeStyles((theme) => ({
 export default function App() {
   const classes = useStyles();
 
-  // send message to set active camera
-  const { messages } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
-  console.log(messages);
-
   return (
-    <Container maxWidth={false} disableGutters={true}>
+    <Container
+      maxWidth={false}
+      disableGutters={true}
+      className={classes.noSelect}
+    >
       <PilotUIContainer />
     </Container>
   );
