@@ -6,7 +6,10 @@ import { Grid, Card, CardHeader, CardContent } from "@material-ui/core";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import TopCameraCommandsList from "./TopCameraCommandsList";
 import WebRtcPlayer from "../../utils/webrtcplayer";
-import { selectActiveCamera } from "../camera-controls/cameraControlsSlice";
+import {
+  selectActiveCamera,
+  selectActiveCameraConfig,
+} from "../camera-controls/cameraControlsSlice";
 import { VIDEO_STREAM_CONFIG, RECORDER_HEARTBEAT } from "../../config.js";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
@@ -42,8 +45,8 @@ const useStyles = makeStyles((theme) => ({
 export default function MiniVideos({ showFullCameraControls }) {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCamera);
+  const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
-  console.log(messages);
   const videoElemRecord = useRef(null);
   const videoElemObserver = useRef(null);
   const observerVideoSrc = useSelector(
@@ -56,15 +59,12 @@ export default function MiniVideos({ showFullCameraControls }) {
   useEffect(() => {
     const videoObserver = videoElemObserver.current;
     if (videoObserver) {
-      const playerObserver = new WebRtcPlayer(
-        videoObserver.id,
-        observerVideoSrc
-      );
+      new WebRtcPlayer(videoObserver.id, observerVideoSrc);
     }
 
     const videoRecord = videoElemRecord.current;
     if (videoRecord) {
-      const playerRecord = new WebRtcPlayer(videoRecord.id, recordVideoSrc);
+      new WebRtcPlayer(videoRecord.id, recordVideoSrc);
     }
   }, [showFullCameraControls, observerVideoSrc, recordVideoSrc]);
 
@@ -104,7 +104,7 @@ export default function MiniVideos({ showFullCameraControls }) {
             <>
               <Card className={classes.root}>
                 <CardHeader
-                  title={`OBS: ${activeCamera}`}
+                  title={`OBS: ${activeCameraConfig.cam_name}`}
                   classes={{
                     root: classes.headerRoot,
                     title: classes.title,
