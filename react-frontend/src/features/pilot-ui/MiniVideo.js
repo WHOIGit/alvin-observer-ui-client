@@ -1,5 +1,4 @@
-import React, { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useRef, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Card,
@@ -12,8 +11,11 @@ import { v4 as uuidv4 } from "uuid";
 // local import
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import WebRtcPlayer from "../../utils/webrtcplayer";
-import { selectActiveCamera } from "../camera-controls/cameraControlsSlice";
-import { VIDEO_STREAM_CONFIG } from "../../config.js";
+import {
+  VIDEO_STREAM_CONFIG,
+  RECORDER_HEARTBEAT,
+  CAM_HEARTBEAT,
+} from "../../config.js";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
@@ -44,30 +46,53 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MiniVideo({ videoSrc, recording }) {
+export default function MiniVideo({ videoSrc, observerSide, videoType }) {
+  // set websocket event based on videoType
+  let wsEvent;
+  if (videoType === "OBS") {
+    wsEvent = CAM_HEARTBEAT;
+  } else if (videoType === "REC") {
+    wsEvent = RECORDER_HEARTBEAT;
+  }
   const classes = useStyles();
   const videoElem = useRef(null);
-
-  console.log(videoSrc);
+  const [cameraName, setCameraName] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const { messages } = useCameraWebSocket(wsEvent);
+  console.log(wsEvent, messages);
 
   useEffect(() => {
     const video = videoElem.current;
     console.log(video);
     if (videoSrc) {
-      const videoPlayer = new WebRtcPlayer(video.id, videoSrc);
-      console.log(videoPlayer);
+      try {
+        new WebRtcPlayer(video.id, videoSrc);
+      } catch (error) {
+        console.error(error);
+      }
     }
   }, [videoSrc]);
 
-  let title;
+  useEffect(() => {
+    if (videoType !== "REC" || !messages) {
+      return null;
+    }
+
+    if (observerSide === "port") {
+      setCameraName(messages.port_camera);
+      setIsRecording(messages.port_recording === "true");
+    } else if (observerSide === "stbd") {
+      setCameraName(messages.stbd_camera);
+      setIsRecording(messages.stbd_recording === "true");
+    }
+  }, [messages, observerSide, videoType]);
+
+  useEffect(() => {
+    console.log("set video title");
+  }, [videoType]);
+
+  let title = videoType + cameraName;
   let footer;
-  if (recording) {
-    title = "REC:";
-    footer = "RECORDING";
-  } else {
-    title = "OBS:";
-    footer = "SOURCE";
-  }
 
   return (
     <Card className={`${classes.root}`}>
@@ -92,7 +117,7 @@ export default function MiniVideo({ videoSrc, recording }) {
 
       <CardActions
         className={`${classes.videoAction} ${
-          recording && classes.activeVideoAction
+          isRecording && classes.activeVideoAction
         }`}
       >
         <Typography variant="body2" color="textSecondary" component="span">

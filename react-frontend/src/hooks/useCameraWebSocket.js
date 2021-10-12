@@ -29,7 +29,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
   const dispatch = useDispatch();
   // need to set the web socket namespace depending on the event channel we need
   let socketNs = "/";
-
+  console.log(socketNamespace);
   if (useNamespace) {
     if (
       socketEvent === NEW_CAMERA_COMMAND_EVENT ||

@@ -8,18 +8,18 @@ import MiniVideo from "./MiniVideo";
 import {
   VIDEO_STREAM_CONFIG,
   COMMAND_STRINGS,
-  NEW_CAMERA_COMMAND_EVENT
+  NEW_CAMERA_COMMAND_EVENT,
 } from "../../config.js";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   paper: {
     padding: theme.spacing(2),
     textAlign: "center",
-    color: theme.palette.text.secondary
+    color: theme.palette.text.secondary,
   },
   rightAlign: {
-    textAlign: "right"
-  }
+    textAlign: "right",
+  },
 }));
 
 export default function RouterControlContainer() {
@@ -31,8 +31,8 @@ export default function RouterControlContainer() {
     const payload = {
       action: {
         name: commandName,
-        value: commandValue
-      }
+        value: commandValue,
+      },
     };
     sendMessage(payload);
   };
@@ -43,33 +43,38 @@ export default function RouterControlContainer() {
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.portObserverVideo}
-            recording={false}
+            observerSide="port"
+            videoType="OBS"
           />
         </Grid>
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.portRecordVideo}
-            recording={true}
+            observerSide="port"
+            videoType="REC"
           />
         </Grid>
 
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.pilotVideo}
-            recording={false}
+            observerSide="pilot"
+            videoType="OBS"
           />
         </Grid>
 
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.stbdObserverVideo}
-            recording={false}
+            observerSide="stbd"
+            videoType="OBS"
           />
         </Grid>
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.stbdRecordVideo}
-            recording={true}
+            observerSide="stbd"
+            videoType="REC"
           />
         </Grid>
       </Grid>
