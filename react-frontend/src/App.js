@@ -4,6 +4,8 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import ObserverUIContainer from "./features/observer-ui/ObserverUIContainer";
 import { SEALOG_URL } from "./config";
+import useCameraWebSocket from "./hooks/useCameraWebSocket";
+import { NEW_CAMERA_COMMAND_EVENT } from "./config";
 
 const useStyles = makeStyles((theme) => ({
   sealogFrame: {
@@ -18,6 +20,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 export default function App() {
   const classes = useStyles();
+
+  // send message to set active camera
+  const { messages } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  console.log(messages);
 
   return (
     <Container maxWidth={false} disableGutters={true}>

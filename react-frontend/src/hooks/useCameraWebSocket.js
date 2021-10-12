@@ -37,6 +37,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       socketEvent === RECORDER_HEARTBEAT
     ) {
       socketNs = socketNs + socketNamespace;
+      //socketNs = "/port";
     }
   }
 
@@ -47,6 +48,10 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       query: { client: socketNamespace },
     });
     console.log(socketRef);
+
+    socketRef.current.on("connect", (incomingMessage) => {
+      console.log("ON CONNECT", incomingMessage);
+    });
 
     // Listens for incoming messages
     socketRef.current.on(socketEvent, (incomingMessage) => {
@@ -87,7 +92,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       });
       socketRef.current.disconnect();
     };
-  }, [socketEvent, dispatch, socketNs]);
+  }, [socketEvent, dispatch, socketNs, socketNamespace]);
 
   // Sends a message to the server
   const sendMessage = (messageBody) => {

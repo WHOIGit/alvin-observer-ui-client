@@ -66,7 +66,7 @@ export default function SelectShutterMode() {
         <Select
           labelId="shutter-select-label"
           id="shutter-select"
-          value={camSettings.shutter}
+          value={isEnabled ? camSettings.shutter : ""}
           onChange={handleSendMessage}
           disabled={!isEnabled}
         >
