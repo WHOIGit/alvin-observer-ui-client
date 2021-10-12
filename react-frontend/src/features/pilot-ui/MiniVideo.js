@@ -1,18 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import adapter from "webrtc-adapter";
 import { makeStyles } from "@material-ui/core/styles";
 import {
-  Grid,
   Card,
   CardHeader,
-  CardMedia,
   CardActions,
   CardContent,
   Typography,
-  Button,
-  Chip,
 } from "@material-ui/core";
+import { v4 as uuidv4 } from "uuid";
 // local import
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import WebRtcPlayer from "../../utils/webrtcplayer";
@@ -56,8 +52,10 @@ export default function MiniVideo({ videoSrc, recording }) {
 
   useEffect(() => {
     const video = videoElem.current;
+    console.log(video);
     if (videoSrc) {
-      new WebRtcPlayer(video.id, videoSrc);
+      const videoPlayer = new WebRtcPlayer(video.id, videoSrc);
+      console.log(videoPlayer);
     }
   }, [videoSrc]);
 
@@ -85,6 +83,7 @@ export default function MiniVideo({ videoSrc, recording }) {
           <video
             style={{ width: "100%" }}
             ref={videoElem}
+            id={uuidv4()}
             autoPlay
             muted
           ></video>
