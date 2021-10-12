@@ -59,12 +59,12 @@ export default function MiniVideos({ showFullCameraControls }) {
   useEffect(() => {
     const videoObserver = videoElemObserver.current;
     if (videoObserver) {
-      new WebRtcPlayer(videoObserver.id, observerVideoSrc);
+      const obsVideo = new WebRtcPlayer(videoObserver.id, observerVideoSrc);
     }
 
     const videoRecord = videoElemRecord.current;
     if (videoRecord) {
-      new WebRtcPlayer(videoRecord.id, recordVideoSrc);
+      const recVideo = new WebRtcPlayer(videoRecord.id, recordVideoSrc);
     }
   }, [showFullCameraControls, observerVideoSrc, recordVideoSrc]);
 
