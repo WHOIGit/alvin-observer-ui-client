@@ -6,7 +6,12 @@ import { blue, green, deepOrange } from "@material-ui/core/colors";
 import CameraAltIcon from "@material-ui/icons/CameraAlt";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import {
+  COMMAND_STRINGS,
+  NEW_CAMERA_COMMAND_EVENT,
+  ROUTER_INPUTS,
+  ROUTER_OUTPUTS,
+} from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -35,14 +40,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function RouterControls({
-  showFullCameraControls,
-  setShowFullCameraControls,
-}) {
+export default function RouterControls() {
   const classes = useStyles();
-  const ioValues = Array(16)
-    .fill()
-    .map((_, i) => i + 1);
+
   const [inputValue, setInputValue] = useState(null);
   const [outputValue, setOutputValue] = useState(null);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
@@ -67,8 +67,8 @@ export default function RouterControls({
     setOutputValue(null);
   };
 
-  const renderInputBtns = (value) => {
-    const activeBtn = value === inputValue;
+  const renderInputBtns = (item) => {
+    const activeBtn = item.value === inputValue;
     console.log(activeBtn);
     const btnStyle = clsx({
       [classes.ctrlButton]: true, //always applies
@@ -82,16 +82,16 @@ export default function RouterControls({
           color="primary"
           size="small"
           className={btnStyle}
-          onClick={() => setInputValue(value)}
+          onClick={() => setInputValue(item.value)}
         >
-          Input {value}
+          {item.label}
         </Button>
       </Grid>
     );
   };
 
-  const renderOutputBtns = (value) => {
-    const activeBtn = value === outputValue;
+  const renderOutputBtns = (item) => {
+    const activeBtn = item.value === outputValue;
     const btnStyle = clsx({
       [classes.ctrlButton]: true, //always applies
       [classes.outputButton]: true, //always applies
@@ -105,9 +105,9 @@ export default function RouterControls({
           color="primary"
           size="small"
           className={btnStyle}
-          onClick={() => setOutputValue(value)}
+          onClick={() => setOutputValue(item.value)}
         >
-          Output {value}
+          {item.label}
         </Button>
       </Grid>
     );
@@ -118,7 +118,7 @@ export default function RouterControls({
       <Grid container spacing={2} alignItems="center" justifyContent="center">
         <Grid item xs={6}>
           <Grid container spacing={1}>
-            {ioValues.map((value) => renderInputBtns(value))}
+            {ROUTER_INPUTS.map((item) => renderInputBtns(item))}
           </Grid>
 
           <Box className={classes.box} mt={2}>
@@ -133,7 +133,7 @@ export default function RouterControls({
         </Grid>
         <Grid item xs={6}>
           <Grid container spacing={1}>
-            {ioValues.map((value) => renderOutputBtns(value))}
+            {ROUTER_OUTPUTS.map((item) => renderOutputBtns(item))}
           </Grid>
 
           <Box className={classes.box} mt={2}>

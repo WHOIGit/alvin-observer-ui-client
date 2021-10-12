@@ -74,24 +74,28 @@ export default function MiniVideo({ videoSrc, observerSide, videoType }) {
   }, [videoSrc]);
 
   useEffect(() => {
-    if (videoType !== "REC" || !messages) {
+    if (!messages) {
       return null;
     }
 
-    if (observerSide === "port") {
-      setCameraName(messages.port_camera);
-      setIsRecording(messages.port_recording === "true");
-    } else if (observerSide === "stbd") {
-      setCameraName(messages.stbd_camera);
-      setIsRecording(messages.stbd_recording === "true");
+    if (videoType === "REC") {
+      if (observerSide === "port") {
+        setCameraName(messages.port_camera);
+        setIsRecording(messages.port_recording === "true");
+      } else if (observerSide === "stbd") {
+        setCameraName(messages.stbd_camera);
+        setIsRecording(messages.stbd_recording === "true");
+      }
+    } else if (videoType === "OBS") {
+      if (observerSide === "port") {
+        setCameraName(messages.port_camera);
+      } else if (observerSide === "stbd") {
+        setCameraName(messages.stbd_camera);
+      }
     }
   }, [messages, observerSide, videoType]);
 
-  useEffect(() => {
-    console.log("set video title");
-  }, [videoType]);
-
-  let title = videoType + cameraName;
+  let title = videoType + ": " + cameraName;
   let footer;
 
   return (

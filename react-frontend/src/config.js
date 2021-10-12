@@ -61,3 +61,7 @@ export const VIDEO_STREAM_CONFIG = {
   stbdRecordVideo: envSettings.STBD_RECORDER_VIDEO,
   pilotVideo: envSettings.PILOT_VIDEO,
 };
+
+// Router controls inputs/outputs
+export const ROUTER_INPUTS = envSettings.ROUTER_INPUTS;
+export const ROUTER_OUTPUTS = envSettings.ROUTER_OUTPUTS;
