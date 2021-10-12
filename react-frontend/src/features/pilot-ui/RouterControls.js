@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Button, Box } from "@material-ui/core";
 import { blue, green, deepOrange } from "@material-ui/core/colors";
-import CameraAltIcon from "@material-ui/icons/CameraAlt";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import {

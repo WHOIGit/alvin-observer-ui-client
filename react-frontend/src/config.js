@@ -50,7 +50,19 @@ export const COMMAND_STRINGS = {
   whiteBalanceCommand: "WB",
   whiteBalanceOptions: ["AUTO", "MAN", "SP", "IP"],
   captureIntervalCommand: "CI",
-  captureIntervalOptions: ["1", "2", "3", "4"],
+  captureIntervalOptions: [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+  ],
 };
 
 export const VIDEO_STREAM_CONFIG = {

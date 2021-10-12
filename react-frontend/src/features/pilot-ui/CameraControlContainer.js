@@ -69,7 +69,7 @@ export default function CameraControlContainer() {
         setInitialCamera();
       }
     }
-  }, [activeCamera, initialCamHeartbeat]);
+  }, [activeCamera, dispatch, initialCamHeartbeat, sendMessage]);
 
   return (
     <>

@@ -11,29 +11,27 @@ import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    position: "relative"
+    position: "relative",
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120
-  }
+    minWidth: 120,
+  },
 }));
 
 export default function SelectWhiteBalance() {
   const classes = useStyles();
   const camData = useSelector(selectCurrentCamData);
-  const { messages, sendMessage } = useCameraWebSocket(
-    NEW_CAMERA_COMMAND_EVENT
-  );
+  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
-  const handleSendMessage = event => {
+  const handleSendMessage = (event) => {
     const payload = {
       action: {
         name: COMMAND_STRINGS.whiteBalanceCommand,
-        value: event.target.value
-      }
+        value: event.target.value,
+      },
     };
     sendMessage(payload);
   };
