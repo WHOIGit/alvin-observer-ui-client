@@ -58,19 +58,24 @@ export default function MiniVideos({ showFullCameraControls }) {
 
   useEffect(() => {
     const videoObserver = videoElemObserver.current;
+    console.log(videoObserver, observerVideoSrc);
     if (videoObserver) {
+      // eslint-disable-next-line no-unused-vars
       const obsVideo = new WebRtcPlayer(videoObserver.id, observerVideoSrc);
     }
 
     const videoRecord = videoElemRecord.current;
     if (videoRecord) {
+      // eslint-disable-next-line no-unused-vars
       const recVideo = new WebRtcPlayer(videoRecord.id, recordVideoSrc);
     }
-  }, [showFullCameraControls, observerVideoSrc, recordVideoSrc]);
-
-  if (!messages) {
-    return null;
-  }
+  }, [
+    showFullCameraControls,
+    observerVideoSrc,
+    recordVideoSrc,
+    videoElemObserver,
+    videoElemRecord,
+  ]);
 
   return (
     <div className={classes.root}>
@@ -80,7 +85,8 @@ export default function MiniVideos({ showFullCameraControls }) {
             <CardHeader
               title={messages && `REC: ${messages.camera}`}
               classes={{
-                root: messages.recording && classes.headerRecorderRoot,
+                root:
+                  messages && messages.recording && classes.headerRecorderRoot,
                 title: classes.title,
               }}
             />
@@ -104,7 +110,9 @@ export default function MiniVideos({ showFullCameraControls }) {
             <>
               <Card className={classes.root}>
                 <CardHeader
-                  title={`OBS: ${activeCameraConfig.cam_name}`}
+                  title={
+                    activeCameraConfig && `OBS: ${activeCameraConfig.cam_name}`
+                  }
                   classes={{
                     root: classes.headerRoot,
                     title: classes.title,
