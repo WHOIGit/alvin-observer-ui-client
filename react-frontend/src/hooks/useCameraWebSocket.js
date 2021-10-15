@@ -17,11 +17,10 @@ import {
   NEW_CAMERA_COMMAND_EVENT,
   CAM_HEARTBEAT,
   RECORDER_HEARTBEAT,
-  COMMAND_PREFIX,
 } from "../config";
 
 const useCameraWebSocket = (socketEvent, useNamespace = true) => {
-  const observerSideCmd = COMMAND_PREFIX + useSelector(selectObserverSide);
+  const observerSide = useSelector(selectObserverSide);
   const socketNamespace = useSelector(selectWebSocketNamespace);
   const activeCamera = useSelector(selectActiveCamera);
   const [messages, setMessages] = useState(null);
@@ -39,6 +38,17 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       socketNs = socketNs + socketNamespace;
       //socketNs = "/port";
     }
+  }
+
+  let observerSideCmd;
+  if (observerSide === "P") {
+    observerSideCmd = "COVP";
+  }
+  if (observerSide === "S") {
+    observerSideCmd = "COVS";
+  }
+  if (observerSide === "PL") {
+    observerSideCmd = "COPL";
   }
 
   useEffect(() => {
