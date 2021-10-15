@@ -17,7 +17,6 @@ import {
   NEW_CAMERA_COMMAND_EVENT,
   CAM_HEARTBEAT,
   RECORDER_HEARTBEAT,
-  COMMAND_PREFIX,
 } from "../config";
 
 const useCameraWebSocket = (socketEvent, useNamespace = true) => {
