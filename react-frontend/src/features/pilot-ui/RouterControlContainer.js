@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Paper, Icon, Button, Box } from "@material-ui/core";
+import { Grid, Button, Box } from "@material-ui/core";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import RouterControls from "./RouterControls";
@@ -45,6 +45,7 @@ export default function RouterControlContainer() {
             videoSrc={VIDEO_STREAM_CONFIG.portObserverVideo}
             observerSide="port"
             videoType="OBS"
+            key="video0"
           />
         </Grid>
         <Grid item xs>
@@ -52,6 +53,7 @@ export default function RouterControlContainer() {
             videoSrc={VIDEO_STREAM_CONFIG.portRecordVideo}
             observerSide="port"
             videoType="REC"
+            key="video1"
           />
         </Grid>
 
@@ -60,6 +62,7 @@ export default function RouterControlContainer() {
             videoSrc={VIDEO_STREAM_CONFIG.pilotVideo}
             observerSide="pilot"
             videoType="OBS"
+            key="video2"
           />
         </Grid>
 
@@ -68,6 +71,7 @@ export default function RouterControlContainer() {
             videoSrc={VIDEO_STREAM_CONFIG.stbdObserverVideo}
             observerSide="stbd"
             videoType="OBS"
+            key="video3"
           />
         </Grid>
         <Grid item xs>
@@ -75,6 +79,7 @@ export default function RouterControlContainer() {
             videoSrc={VIDEO_STREAM_CONFIG.stbdRecordVideo}
             observerSide="stbd"
             videoType="REC"
+            key="video4"
           />
         </Grid>
       </Grid>

@@ -81,6 +81,7 @@ export default function RouterControls() {
           color="primary"
           size="small"
           className={btnStyle}
+          key={item.value}
           onClick={() => setInputValue(item.value)}
         >
           {item.label}
@@ -104,6 +105,7 @@ export default function RouterControls() {
           color="primary"
           size="small"
           className={btnStyle}
+          key={item.value}
           onClick={() => setOutputValue(item.value)}
         >
           {item.label}

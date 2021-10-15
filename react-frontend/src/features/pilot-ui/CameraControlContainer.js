@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Paper, Icon, List, ListItem } from "@material-ui/core";
+//import { makeStyles } from "@material-ui/core/styles";
+import { Grid, List, ListItem } from "@material-ui/core";
 // local
 import LargeVideo from "../camera-controls/LargeVideo";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
@@ -26,16 +26,8 @@ import {
   COMMAND_STRINGS,
 } from "../../config";
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: "center",
-    color: theme.palette.text.secondary,
-  },
-}));
-
 export default function CameraControlContainer() {
-  const classes = useStyles();
+  //const classes = useStyles();
   const dispatch = useDispatch();
   // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
   const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
@@ -85,7 +77,7 @@ export default function CameraControlContainer() {
 
       <Grid container spacing={2}>
         <Grid item xs={9}>
-          <LargeVideo />
+          {/*<LargeVideo />*/}
         </Grid>
         <Grid item xs={3}>
           <List>

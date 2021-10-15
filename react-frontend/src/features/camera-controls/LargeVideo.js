@@ -7,26 +7,27 @@ import { VIDEO_STREAM_CONFIG } from "../../config.js";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    overflowY: "hidden"
+    overflowY: "hidden",
   },
   filmImage: {
     marginTop: "20px",
-    maxWidth: "100%"
-  }
+    maxWidth: "100%",
+  },
 }));
 
 export default function LargeVideo() {
   const classes = useStyles();
   const videoElem = useRef(null);
   const observerVideoSrc = useSelector(
-    state => state.cameraControls.observerVideoSrc
+    (state) => state.cameraControls.observerVideoSrc
   );
 
   useEffect(() => {
     const videoObserver = videoElem.current;
     if (videoObserver) {
+      // eslint-disable-next-line no-unused-vars
       const playerObserver = new WebRtcPlayer(
         videoObserver.id,
         observerVideoSrc

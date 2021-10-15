@@ -59,7 +59,7 @@ export default function MiniVideo({ videoSrc, observerSide, videoType }) {
   const [cameraName, setCameraName] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const { messages } = useCameraWebSocket(wsEvent);
-  console.log(wsEvent, messages);
+  //console.log(wsEvent, messages);
 
   useEffect(() => {
     const video = videoElem.current;
