@@ -7,7 +7,7 @@ import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import TopCameraCommandsList from "./TopCameraCommandsList";
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import {
-  selectActiveCamera,
+  //selectActiveCamera,
   selectActiveCameraConfig,
 } from "../camera-controls/cameraControlsSlice";
 import { VIDEO_STREAM_CONFIG, RECORDER_HEARTBEAT } from "../../config.js";
@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MiniVideos({ showFullCameraControls }) {
   const classes = useStyles();
-  const activeCamera = useSelector(selectActiveCamera);
+  //const activeCamera = useSelector(selectActiveCamera);
   const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   const videoElemRecord = useRef(null);

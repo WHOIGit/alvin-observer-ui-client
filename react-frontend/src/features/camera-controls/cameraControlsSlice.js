@@ -14,7 +14,7 @@ const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
 
 const initialState = {
   observerSide: null, // P = Port/ S = Starboard
-  webSocketNamespace: null,
+  webSocketNamespace: WS_SERVER_NAMESPACE_PORT,
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
   initialCamHeartbeat: null,

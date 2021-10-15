@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Button, CircularProgress, Box } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
 import {
   selectActiveCamera,
   selectActiveCameraConfig,
@@ -38,10 +39,12 @@ export default function CaptureButtons() {
   const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
-  //console.log(messages);
+  console.log(messages);
+  //const recordingCamID = useSelector((state) => getProductNameById(state, productId));
   const [loading, setLoading] = useState(false);
   //const [success, setSuccess] = useState(false);
   const [requestedSrc, setRequestedSrc] = useState(false);
+  const timer = useRef();
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
@@ -52,7 +55,9 @@ export default function CaptureButtons() {
     };
     // If a RECORD SOURCE action, need to send the previous Recording camera name
     if (commandName === COMMAND_STRINGS.recordSourceCommand) {
-      payload.oldCamera = messages.camera;
+      // get the camera ID of the currently recording camera
+      const oldCamera = getCameraConfigFromName(messages.camera);
+      payload.oldCamera = oldCamera.camera;
     }
 
     sendMessage(payload);
@@ -66,9 +71,17 @@ export default function CaptureButtons() {
 
   useEffect(() => {
     if (messages && messages.camera === requestedSrc) {
-      setLoading(false);
+      timer.current = window.setTimeout(() => {
+        setLoading(false);
+      }, 2000);
     }
   }, [messages, requestedSrc]);
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timer.current);
+    };
+  }, []);
 
   return (
     <>
