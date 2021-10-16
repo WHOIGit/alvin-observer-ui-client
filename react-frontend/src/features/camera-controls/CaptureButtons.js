@@ -72,7 +72,8 @@ export default function CaptureButtons() {
     // if not changing recording cameras, add a "fake" delay to UI to match the
     // time it takes imaging server to start new recording,
     // we don't get this status change from the imaging server
-    if (activeCamera === requestedSrc) {
+    console.log(activeCamera, currentRecordingSrc);
+    if (activeCamera === currentRecordingSrc) {
       setTimeout(() => {
         setLoading(false);
         setRequestedSrc(activeCamera);
