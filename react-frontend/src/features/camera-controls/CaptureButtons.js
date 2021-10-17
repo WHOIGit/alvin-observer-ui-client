@@ -4,10 +4,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Button, CircularProgress, Box } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import {
-  selectActiveCamera,
-  selectActiveCameraConfig,
-} from "./cameraControlsSlice";
+import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
+import { selectActiveCamera } from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
   NEW_CAMERA_COMMAND_EVENT,
@@ -35,13 +33,20 @@ const useStyles = makeStyles((theme) => ({
 export default function CaptureButtons() {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCamera);
-  const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   //console.log(messages);
   const [loading, setLoading] = useState(false);
-  //const [success, setSuccess] = useState(false);
-  const [requestedSrc, setRequestedSrc] = useState(false);
+  const [currentRecordingSrc, setCurrentRecordingSrc] = useState(null);
+  const [requestedSrc, setRequestedSrc] = useState(null);
+
+  useEffect(() => {
+    // set current Recording camera ID from RECORDER_HEARTBEAT socket
+    if (messages) {
+      const recCamera = getCameraConfigFromName(messages.camera);
+      setCurrentRecordingSrc(recCamera.camera);
+    }
+  }, [messages]);
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
@@ -52,7 +57,9 @@ export default function CaptureButtons() {
     };
     // If a RECORD SOURCE action, need to send the previous Recording camera name
     if (commandName === COMMAND_STRINGS.recordSourceCommand) {
-      payload.oldCamera = messages.camera;
+      // get the camera ID of the currently recording camera
+      const oldCamera = getCameraConfigFromName(messages.camera);
+      payload.oldCamera = oldCamera.camera;
     }
 
     sendMessage(payload);
@@ -61,14 +68,26 @@ export default function CaptureButtons() {
   const handleRecordAction = () => {
     setLoading(true);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera);
-    setRequestedSrc(activeCameraConfig.cam_name);
+
+    // if not changing recording cameras, add a "fake" delay to UI to match the
+    // time it takes imaging server to start new recording,
+    // we don't get this status change from the imaging server
+    console.log(activeCamera, currentRecordingSrc);
+    if (activeCamera === currentRecordingSrc) {
+      setTimeout(() => {
+        setLoading(false);
+        setRequestedSrc(activeCamera);
+      }, 2000);
+    } else {
+      setRequestedSrc(activeCamera);
+    }
   };
 
   useEffect(() => {
-    if (messages && messages.camera === requestedSrc) {
+    if (currentRecordingSrc === requestedSrc) {
       setLoading(false);
     }
-  }, [messages, requestedSrc]);
+  }, [currentRecordingSrc, requestedSrc]);
 
   return (
     <>

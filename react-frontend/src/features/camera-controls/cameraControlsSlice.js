@@ -13,7 +13,7 @@ const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
 
 const initialState = {
-  observerSide: "PL", // P = Port, S = Starboard, PLT = Pilot
+  observerSide: "PL", // P = Port, S = Starboard, PL = Pilot
   webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
@@ -29,7 +29,7 @@ const initialState = {
 
 const getCameraConfig = (cameraId) => {
   const cameraConfig = CAMERAS.find((item) => item.camera === cameraId);
-  console.log(cameraConfig);
+  //console.log(cameraConfig);
   return cameraConfig;
 };
 
