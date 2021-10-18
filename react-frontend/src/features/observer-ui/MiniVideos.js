@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Card, CardHeader, CardContent } from "@material-ui/core";
 // local import
@@ -21,18 +22,11 @@ const useStyles = makeStyles((theme) => ({
   headerRoot: {
     padding: "4px",
   },
-  headerRecorderRoot: {
-    padding: "4px",
+  headerRecording: {
     backgroundColor: "red",
   },
   title: {
     fontSize: ".9em",
-  },
-  inactiveVideo: {
-    border: "white solid 2px",
-  },
-  activeVideo: {
-    border: "red solid 2px",
   },
   cardContent: {
     padding: 0,
@@ -55,6 +49,11 @@ export default function MiniVideos({ showFullCameraControls }) {
   const recordVideoSrc = useSelector(
     (state) => state.cameraControls.recordVideoSrc
   );
+
+  const cardHeaderStyle = clsx({
+    [classes.headerRoot]: true, //always applies
+    [classes.headerRecording]: messages, //only when open === true
+  });
 
   useEffect(() => {
     const videoObserver = videoElemObserver.current;
