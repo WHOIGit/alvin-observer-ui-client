@@ -52,7 +52,6 @@ export default function MiniVideos({ showFullCameraControls }) {
   const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   console.log(messages);
-  let testVar = "true";
   const videoElemRecord = useRef(null);
   const videoElemObserver = useRef(null);
   const observerVideoSrc = useSelector(
@@ -64,7 +63,7 @@ export default function MiniVideos({ showFullCameraControls }) {
 
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
-    [classes.headerRecording]: messages && testVar === "true", //only when condition === true
+    [classes.headerRecording]: messages && messages.recording === "true", //only when condition === true
   });
 
   useEffect(() => {
