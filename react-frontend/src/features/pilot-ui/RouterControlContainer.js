@@ -1,6 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Button, Box } from "@material-ui/core";
+import Red from "@material-ui/core/colors/red";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import RouterControls from "./RouterControls";
@@ -19,6 +20,9 @@ const useStyles = makeStyles((theme) => ({
   },
   rightAlign: {
     textAlign: "right",
+  },
+  recStopButton: {
+    backgroundColor: Red[600],
   },
 }));
 
@@ -100,7 +104,18 @@ export default function RouterControlContainer() {
             </Button>
           </Grid>
 
-          <Grid>BIG RED BUTTON. name: REC, value: ST</Grid>
+          <Grid>
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.recStopButton}
+              onClick={() =>
+                handleSendMessage(COMMAND_STRINGS.recordSourceCommand, "ST")
+              }
+            >
+              Stop All Recordings
+            </Button>
+          </Grid>
 
           <Grid item xs className={classes.rightAlign}>
             <Button
