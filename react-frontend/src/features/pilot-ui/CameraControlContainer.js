@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-//import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import { Grid, List, ListItem } from "@material-ui/core";
 // local
 import LargeVideo from "../camera-controls/LargeVideo";
@@ -14,6 +14,7 @@ import FocusZoomButtons from "../camera-controls/FocusZoomButtons";
 import Joystick from "../camera-controls/Joystick";
 import SetCaptureInterval from "../camera-controls/SetCaptureInterval";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import RecordingStatusChip from "./RecordingStatusChip";
 import {
   selectInitialCamHeartbeatData,
   selectActiveCamera,
@@ -26,8 +27,14 @@ import {
   COMMAND_STRINGS,
 } from "../../config";
 
+const useStyles = makeStyles((theme) => ({
+  joystickBox: {
+    marginTop: "-50px",
+  },
+}));
+
 export default function CameraControlContainer() {
-  //const classes = useStyles();
+  const classes = useStyles();
   const dispatch = useDispatch();
   // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
   const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
@@ -71,16 +78,19 @@ export default function CameraControlContainer() {
         </Grid>
 
         <Grid item xs={6}>
-          Recording Status
+          <RecordingStatusChip />
         </Grid>
       </Grid>
 
       <Grid container spacing={2}>
         <Grid item xs={9}>
-          {/*<LargeVideo />*/}
+          <LargeVideo />
         </Grid>
         <Grid item xs={3}>
           <List>
+            <ListItem>
+              <SelectExposureMode showLabel={"vertical"} />
+            </ListItem>
             <ListItem>
               <SelectShutterMode />
             </ListItem>
@@ -89,9 +99,6 @@ export default function CameraControlContainer() {
             </ListItem>
             <ListItem>
               <SelectIsoMode />
-            </ListItem>
-            <ListItem>
-              <SelectExposureMode />
             </ListItem>
           </List>
         </Grid>
@@ -108,7 +115,9 @@ export default function CameraControlContainer() {
           <FocusZoomButtons />
         </Grid>
         <Grid item xs>
-          <Joystick />
+          <div className={classes.joystickBox}>
+            <Joystick />
+          </div>
         </Grid>
       </Grid>
     </>

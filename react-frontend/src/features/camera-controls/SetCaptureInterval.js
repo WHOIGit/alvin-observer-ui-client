@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import { MenuItem, Button, FormControl, Select, Grid } from "@material-ui/core";
-// local imports
 import {
-  selectCurrentCamData,
-  selectCamHeartbeatData,
-} from "./cameraControlsSlice";
+  MenuItem,
+  Button,
+  FormControl,
+  Select,
+  Grid,
+  Typography,
+} from "@material-ui/core";
+// local imports
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
@@ -22,14 +26,17 @@ const useStyles = makeStyles((theme) => ({
   horizBtn: {
     paddingTop: theme.spacing(1),
   },
+  captureLabel: {
+    paddingLeft: theme.spacing(1),
+  },
 }));
 
 export default function SelectWhiteBalance() {
   const classes = useStyles();
   //const camData = useSelector(selectCurrentCamData);
-  //const camSettings = useSelector(selectCamHeartbeatData);
-  //const [value, setValue] = useState(camSettings.capture_interval);
-  const [value, setValue] = useState(0);
+  const camSettings = useSelector(selectCamHeartbeatData);
+  console.log(camSettings);
+  const [value, setValue] = useState(null);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
   const handleValueChange = (event) => {
@@ -46,6 +53,14 @@ export default function SelectWhiteBalance() {
     sendMessage(payload);
   };
 
+  useEffect(() => {
+    // only set value from camSettings if null so we can update the select field without
+    // changing the current value, needs to wait for button push
+    if (value === null) {
+      camSettings && setValue(camSettings.capture_interval);
+    }
+  }, [camSettings, value]);
+
   return (
     <div className={classes.root}>
       <Grid container spacing={2}>
@@ -53,9 +68,8 @@ export default function SelectWhiteBalance() {
           <FormControl className={classes.formControl}>
             <Select
               id="capture-interval-select"
-              //value={camSettings.capture_interval}
-              value={value}
               onChange={handleValueChange}
+              value={value}
             >
               {COMMAND_STRINGS.captureIntervalOptions.map((item) => (
                 <MenuItem value={item} key={item}>
@@ -76,6 +90,11 @@ export default function SelectWhiteBalance() {
               Start
             </Button>
           </div>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="overline" className={classes.captureLabel}>
+            CAPTURE INTERVAL
+          </Typography>
         </Grid>
       </Grid>
     </div>
