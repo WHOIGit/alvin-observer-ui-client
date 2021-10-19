@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Card, CardHeader, CardContent } from "@material-ui/core";
+import VideocamIcon from "@material-ui/icons/Videocam";
+import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 // local import
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import TopCameraCommandsList from "./TopCameraCommandsList";
@@ -20,13 +22,21 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   headerRoot: {
-    padding: "4px",
+    padding: "0 2px",
   },
   headerRecording: {
     backgroundColor: "red",
   },
   title: {
     fontSize: ".9em",
+  },
+  cardAction: {
+    marginTop: "0",
+    marginRight: 0,
+    height: "30px",
+  },
+  actionIcon: {
+    position: "absolute",
   },
   cardContent: {
     padding: 0,
@@ -41,6 +51,7 @@ export default function MiniVideos({ showFullCameraControls }) {
   //const activeCamera = useSelector(selectActiveCamera);
   const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
+  console.log(messages);
   const videoElemRecord = useRef(null);
   const videoElemObserver = useRef(null);
   const observerVideoSrc = useSelector(
@@ -52,7 +63,7 @@ export default function MiniVideos({ showFullCameraControls }) {
 
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
-    [classes.headerRecording]: messages, //only when open === true
+    [classes.headerRecording]: messages && messages.recording === "true", //only when condition === true
   });
 
   useEffect(() => {
@@ -83,10 +94,11 @@ export default function MiniVideos({ showFullCameraControls }) {
           <Card className={`${classes.root}`}>
             <CardHeader
               title={messages && `REC: ${messages.camera}`}
+              action={<div>{messages && <VideocamIcon />}</div>}
               classes={{
-                root:
-                  messages && messages.recording && classes.headerRecorderRoot,
+                root: cardHeaderStyle,
                 title: classes.title,
+                action: classes.cardAction,
               }}
             />
             <CardContent className={classes.cardContent}>
@@ -112,9 +124,11 @@ export default function MiniVideos({ showFullCameraControls }) {
                   title={
                     activeCameraConfig && `OBS: ${activeCameraConfig.cam_name}`
                   }
+                  action={<div></div>}
                   classes={{
                     root: classes.headerRoot,
                     title: classes.title,
+                    action: classes.cardAction,
                   }}
                 />
                 <CardContent className={classes.cardContent}>
