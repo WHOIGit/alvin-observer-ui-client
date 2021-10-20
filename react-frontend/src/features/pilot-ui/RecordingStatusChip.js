@@ -48,6 +48,8 @@ export default function RecordingStatusChip() {
       console.log(messages);
       if (recordingCams.includes(activeCameraConfig.cam_name)) {
         setIsRecording(true);
+      } else {
+        setIsRecording(false);
       }
     }
   }, [messages, activeCameraConfig]);

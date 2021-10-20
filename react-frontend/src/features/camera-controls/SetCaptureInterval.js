@@ -35,7 +35,6 @@ export default function SelectWhiteBalance() {
   const classes = useStyles();
   //const camData = useSelector(selectCurrentCamData);
   const camSettings = useSelector(selectCamHeartbeatData);
-  console.log(camSettings);
   const [value, setValue] = useState(null);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 

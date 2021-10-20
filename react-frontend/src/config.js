@@ -49,7 +49,7 @@ export const COMMAND_STRINGS = {
   routerIOCommand: "RTR",
   whiteBalanceCommand: "WB",
   whiteBalanceOptions: ["AUTO", "MAN", "SP", "IP"],
-  captureIntervalCommand: "CI",
+  captureIntervalCommand: "SIC",
   captureIntervalOptions: [
     "0",
     "1",
