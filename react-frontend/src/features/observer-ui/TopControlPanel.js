@@ -1,11 +1,13 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Paper, Box } from "@material-ui/core";
+import { useSelector } from "react-redux";
 // local
 import ObserverDisplayChip from "./ObserverDisplayChip";
 import UpperRightButtons from "./UpperRightButtons";
 import NavDataDisplay from "./NavDataDisplay";
-import MiniVideos from "./MiniVideos";
+import TopCameraCommandsList from "./TopCameraCommandsList";
+import MiniVideo from "./MiniVideo";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
 
@@ -32,12 +34,30 @@ export default function TopControlPanel({
   setShowFullCameraControls,
 }) {
   const classes = useStyles();
+  const observerVideoSrc = useSelector(
+    (state) => state.cameraControls.observerVideoSrc
+  );
+  const recordVideoSrc = useSelector(
+    (state) => state.cameraControls.recordVideoSrc
+  );
 
   return (
     <>
       <Grid container spacing={2}>
         <Grid item xs={6}>
-          <MiniVideos showFullCameraControls={showFullCameraControls} />
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <MiniVideo videoSrc={observerVideoSrc} videoType={"OBS"} />
+            </Grid>
+            <Grid item xs={6}>
+              {showFullCameraControls ? (
+                <TopCameraCommandsList />
+              ) : (
+                <MiniVideo videoSrc={recordVideoSrc} videoType={"REC"} />
+              )}
+            </Grid>
+          </Grid>
+
           <Grid container spacing={0} justify="flex-start" alignItems="center">
             <Grid item xs>
               <Grid container spacing={0}>

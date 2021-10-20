@@ -36,7 +36,6 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       socketEvent === RECORDER_HEARTBEAT
     ) {
       socketNs = socketNs + socketNamespace;
-      //socketNs = "/port";
     }
   }
 
@@ -57,8 +56,9 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       path: WS_PATH + "socket.io",
       query: { client: socketNamespace },
     });
-    console.log(socketRef);
-
+    if (socketEvent === RECORDER_HEARTBEAT) {
+      console.log(socketRef);
+    }
     socketRef.current.on("connect", (incomingMessage) => {
       console.log("ON CONNECT", incomingMessage);
     });
@@ -74,6 +74,7 @@ const useCameraWebSocket = (socketEvent, useNamespace = true) => {
       if (socketEvent !== CAM_HEARTBEAT) {
         setMessages(incomingMessage);
       }
+
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
         console.log(socketEvent, incomingMessage);
         // check if message is a Camera Change Package, else it's a Command Receipt
