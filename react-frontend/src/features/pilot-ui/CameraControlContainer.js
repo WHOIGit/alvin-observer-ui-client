@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
 export default function CameraControlContainer() {
   const classes = useStyles();
   const dispatch = useDispatch();
-  // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
+  // connect to pilot CAM_HEARTBEAT, store current cam parameters in Redux state
   const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
   console.log(messages);
   // connect to newCameraCommand

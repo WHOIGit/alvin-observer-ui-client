@@ -20,6 +20,8 @@ const initialState = {
   initialCamHeartbeat: null,
   activeCamera: null,
   camHeartbeatData: null,
+  camHeartbeatDataPort: null, // observer specific heartbeat data for Pilot UI
+  camHeartbeatDataStbd: null, // observer specific heartbeat data for Pilot UI
   recorderHeartbeatData: null,
   currentCamData: null,
   lastCommand: null,
@@ -129,6 +131,15 @@ export const cameraControlsSlice = createSlice({
         return state;
       }
       state.camHeartbeatData = action.payload;
+    },
+    changeCamHeartbeatPort: (state, action) => {
+      const camHeartbeatDataPort = action.payload;
+      delete camHeartbeatDataPort.eventId;
+      delete camHeartbeatDataPort.timestamp;
+      if (state.camHeartbeatDataPort === camHeartbeatDataPort) {
+        return state;
+      }
+      state.camHeartbeatDataPort = action.payload;
     },
     changeRecorderHeartbeat: (state, action) => {
       const data = action.payload;

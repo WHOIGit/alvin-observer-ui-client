@@ -10,6 +10,9 @@ import {
   VIDEO_STREAM_CONFIG,
   COMMAND_STRINGS,
   NEW_CAMERA_COMMAND_EVENT,
+  WS_SERVER_NAMESPACE_PORT,
+  WS_SERVER_NAMESPACE_STARBOARD,
+  WS_SERVER_NAMESPACE_PILOT,
 } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
@@ -28,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function RouterControlContainer() {
   const classes = useStyles();
-
+  console.log(WS_SERVER_NAMESPACE_PILOT);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
   const handleSendMessage = (commandName, commandValue) => {
@@ -46,26 +49,26 @@ export default function RouterControlContainer() {
       <Grid container spacing={2}>
         <Grid item xs>
           <MiniVideo
-            videoSrc={VIDEO_STREAM_CONFIG.portObserverVideo}
-            observerSide="port"
-            videoType="OBS"
-            key="video0"
+            videoSrc={VIDEO_STREAM_CONFIG.portRecordVideo}
+            observerSide={WS_SERVER_NAMESPACE_PORT}
+            videoType="REC"
+            key="video1"
           />
         </Grid>
         <Grid item xs>
           <MiniVideo
-            videoSrc={VIDEO_STREAM_CONFIG.portRecordVideo}
-            observerSide="port"
-            videoType="REC"
-            key="video1"
+            videoSrc={VIDEO_STREAM_CONFIG.portObserverVideo}
+            observerSide={WS_SERVER_NAMESPACE_PORT}
+            videoType="OBS"
+            key="video0"
           />
         </Grid>
 
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.pilotVideo}
-            observerSide="pilot"
-            videoType="OBS"
+            observerSide={WS_SERVER_NAMESPACE_PILOT}
+            videoType="PILOT"
             key="video2"
           />
         </Grid>
@@ -73,7 +76,7 @@ export default function RouterControlContainer() {
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.stbdObserverVideo}
-            observerSide="stbd"
+            observerSide={WS_SERVER_NAMESPACE_STARBOARD}
             videoType="OBS"
             key="video3"
           />
@@ -81,7 +84,7 @@ export default function RouterControlContainer() {
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.stbdRecordVideo}
-            observerSide="stbd"
+            observerSide={WS_SERVER_NAMESPACE_STARBOARD}
             videoType="REC"
             key="video4"
           />

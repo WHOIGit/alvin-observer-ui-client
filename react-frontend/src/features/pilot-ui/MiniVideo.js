@@ -15,6 +15,9 @@ import {
   VIDEO_STREAM_CONFIG,
   RECORDER_HEARTBEAT,
   CAM_HEARTBEAT,
+  WS_SERVER_NAMESPACE_PORT,
+  WS_SERVER_NAMESPACE_STARBOARD,
+  WS_SERVER_NAMESPACE_PILOT,
 } from "../../config.js";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
@@ -48,18 +51,17 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MiniVideo({ videoSrc, observerSide, videoType }) {
   // set websocket event based on videoType
-  let wsEvent;
-  if (videoType === "OBS") {
+  let wsEvent = RECORDER_HEARTBEAT;
+  if (videoType !== "REC") {
     wsEvent = CAM_HEARTBEAT;
-  } else if (videoType === "REC") {
-    wsEvent = RECORDER_HEARTBEAT;
   }
+
   const classes = useStyles();
   const videoElem = useRef(null);
   const [cameraName, setCameraName] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const { messages } = useCameraWebSocket(wsEvent);
-  //console.log(wsEvent, messages);
+  const { messages } = useCameraWebSocket(wsEvent, true, observerSide);
+  console.log(wsEvent, observerSide, messages);
 
   useEffect(() => {
     const video = videoElem.current;
@@ -79,19 +81,10 @@ export default function MiniVideo({ videoSrc, observerSide, videoType }) {
     }
 
     if (videoType === "REC") {
-      if (observerSide === "port") {
-        setCameraName(messages.port_camera);
-        setIsRecording(messages.port_recording === "true");
-      } else if (observerSide === "stbd") {
-        setCameraName(messages.stbd_camera);
-        setIsRecording(messages.stbd_recording === "true");
-      }
-    } else if (videoType === "OBS") {
-      if (observerSide === "port") {
-        setCameraName(messages.port_camera);
-      } else if (observerSide === "stbd") {
-        setCameraName(messages.stbd_camera);
-      }
+      setCameraName(messages.camera);
+      setIsRecording(messages.recording === "true");
+    } else if (videoType === "OBS" || videoType === "PILOT") {
+      setCameraName(messages.camera);
     }
   }, [messages, observerSide, videoType]);
 
