@@ -47,13 +47,13 @@ export default function TopControlPanel({
         <Grid item xs={6}>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <MiniVideo videoSrc={observerVideoSrc} videoType={"OBS"} />
+              <MiniVideo videoSrc={recordVideoSrc} videoType={"REC"} />
             </Grid>
             <Grid item xs={6}>
               {showFullCameraControls ? (
                 <TopCameraCommandsList />
               ) : (
-                <MiniVideo videoSrc={recordVideoSrc} videoType={"REC"} />
+                <MiniVideo videoSrc={observerVideoSrc} videoType={"OBS"} />
               )}
             </Grid>
           </Grid>
