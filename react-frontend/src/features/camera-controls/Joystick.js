@@ -67,7 +67,7 @@ export default function Joystick() {
         // assign interval to a variable to clear it.
         console.log(lastAction);
         handleSendMessage(lastAction);
-      }, 100);
+      }, 50);
 
       // if we get the "end" event, stop the function cycle, reset the state
       if (lastAction.actionType === "end") {
