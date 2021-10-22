@@ -32,7 +32,11 @@ export default function Joystick() {
   useEffect(() => {
     // disable joystick if camera has no pan/tilt controls
     // pantilt = "n/N"
-    if (camSettings.pantilt.trim().toUpperCase() === "N") {
+    if (
+      camSettings &&
+      camSettings.pantilt &&
+      camSettings.pantilt.trim().toUpperCase() === "N"
+    ) {
       setIsEnabled(false);
     } else {
       setIsEnabled(true);
@@ -65,7 +69,6 @@ export default function Joystick() {
         handleSendMessage(lastAction);
       }, 100);
 
-      console.log(lastAction.actionType);
       // if we get the "end" event, stop the function cycle, reset the state
       if (lastAction.actionType === "end") {
         clearInterval(intervalId);

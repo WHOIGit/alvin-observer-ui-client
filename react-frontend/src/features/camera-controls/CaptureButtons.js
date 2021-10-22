@@ -44,7 +44,8 @@ export default function CaptureButtons() {
     // set current Recording camera ID from RECORDER_HEARTBEAT socket
     if (messages) {
       const recCamera = getCameraConfigFromName(messages.camera);
-      setCurrentRecordingSrc(recCamera.camera);
+
+      recCamera && setCurrentRecordingSrc(recCamera.camera);
     }
   }, [messages]);
 
