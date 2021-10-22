@@ -1,20 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  Card,
-  CardHeader,
-  CardActions,
-  CardContent,
-  Typography,
-} from "@material-ui/core";
+import { Card, CardHeader, CardContent } from "@material-ui/core";
+import VideocamIcon from "@material-ui/icons/Videocam";
+import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import { v4 as uuidv4 } from "uuid";
 // local import
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import WebRtcPlayer from "../../utils/webrtcplayer";
+import { getCameraConfigFromId } from "../../utils/getCamConfigFromId";
+import {
+  selectCamHeartbeatData,
+  selectCamHeartbeatDataPort,
+  selectCamHeartbeatDataStbd,
+} from "../camera-controls/cameraControlsSlice";
 import {
   VIDEO_STREAM_CONFIG,
   RECORDER_HEARTBEAT,
-  CAM_HEARTBEAT,
   WS_SERVER_NAMESPACE_PORT,
   WS_SERVER_NAMESPACE_STARBOARD,
   WS_SERVER_NAMESPACE_PILOT,
@@ -26,46 +29,54 @@ const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
-  headerRoot: { padding: "4px" },
+  headerRoot: {
+    padding: "0 2px",
+  },
+  headerRecording: {
+    backgroundColor: "red",
+  },
   title: {
     fontSize: ".9em",
-  },
-  inactiveVideo: {
-    border: "white solid 2px",
-  },
-  activeVideo: {
-    border: "red solid 2px",
-  },
-  videoAction: {
-    justifyContent: "center",
-    textTransform: "uppercase",
-    padding: "4px",
-  },
-  activeVideoAction: {
-    backgroundColor: "red",
   },
   cardContent: {
     padding: 0,
   },
+  cardAction: {
+    marginTop: "0",
+    marginRight: 0,
+    height: "30px",
+  },
 }));
 
 export default function MiniVideo({ videoSrc, observerSide, videoType }) {
-  // set websocket event based on videoType
-  let wsEvent = RECORDER_HEARTBEAT;
-  if (videoType !== "REC") {
-    wsEvent = CAM_HEARTBEAT;
+  // only use Web Socket hook for recording sources
+  let hookEnabled = false;
+  if (videoType === "REC") {
+    hookEnabled = true;
   }
 
   const classes = useStyles();
   const videoElem = useRef(null);
   const [cameraName, setCameraName] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const { messages } = useCameraWebSocket(wsEvent, true, observerSide);
-  console.log(wsEvent, observerSide, messages);
+  const { messages } = useCameraWebSocket(
+    RECORDER_HEARTBEAT,
+    true,
+    observerSide,
+    hookEnabled
+  );
+
+  const activeCameraPilot = useSelector(selectCamHeartbeatData);
+  const activeCameraPort = useSelector(selectCamHeartbeatDataPort);
+  const activeCameraStbd = useSelector(selectCamHeartbeatDataStbd);
+
+  const cardHeaderStyle = clsx({
+    [classes.headerRoot]: true, //always applies
+    [classes.headerRecording]: messages && isRecording, //only when condition === true
+  });
 
   useEffect(() => {
     const video = videoElem.current;
-    console.log(video);
     if (videoSrc) {
       try {
         new WebRtcPlayer(video.id, videoSrc);
@@ -76,29 +87,49 @@ export default function MiniVideo({ videoSrc, observerSide, videoType }) {
   }, [videoSrc]);
 
   useEffect(() => {
-    if (!messages) {
-      return null;
-    }
-
-    if (videoType === "REC") {
+    if (videoType === "REC" && messages) {
       setCameraName(messages.camera);
       setIsRecording(messages.recording === "true");
-    } else if (videoType === "OBS" || videoType === "PILOT") {
-      setCameraName(messages.camera);
+    } else {
+      console.log(observerSide);
+      if (observerSide === "port" && activeCameraPort) {
+        const camera = getCameraConfigFromId(activeCameraPort.camera);
+        setCameraName(camera.cam_name);
+      } else if (observerSide === "stbd" && activeCameraStbd) {
+        const camera = getCameraConfigFromId(activeCameraStbd.camera);
+        setCameraName(camera.cam_name);
+      } else if (observerSide === "pilot" && activeCameraPilot) {
+        const camera = getCameraConfigFromId(activeCameraPilot.camera);
+        console.log(camera, activeCameraPilot);
+        camera && setCameraName(camera.cam_name);
+      }
     }
-  }, [messages, observerSide, videoType]);
+  }, [
+    messages,
+    observerSide,
+    videoType,
+    activeCameraPort,
+    activeCameraStbd,
+    activeCameraPilot,
+  ]);
 
   let title = videoType + ": " + cameraName;
-  let footer;
 
   return (
     <Card className={`${classes.root}`}>
       <CardHeader
         title={title}
         classes={{
-          root: classes.headerRoot,
+          root: cardHeaderStyle,
           title: classes.title,
+          action: classes.cardAction,
         }}
+        action={
+          <div>
+            {isRecording && videoType === "REC" && <VideocamIcon />}
+            {!isRecording && videoType === "REC" && <VideocamOffIcon />}
+          </div>
+        }
       />
       <CardContent className={classes.cardContent}>
         <div>
@@ -111,16 +142,6 @@ export default function MiniVideo({ videoSrc, observerSide, videoType }) {
           ></video>
         </div>
       </CardContent>
-
-      <CardActions
-        className={`${classes.videoAction} ${
-          isRecording && classes.activeVideoAction
-        }`}
-      >
-        <Typography variant="body2" color="textSecondary" component="span">
-          {footer}
-        </Typography>
-      </CardActions>
     </Card>
   );
 }

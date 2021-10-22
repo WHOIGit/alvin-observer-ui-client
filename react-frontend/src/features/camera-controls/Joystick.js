@@ -32,7 +32,12 @@ export default function Joystick() {
   useEffect(() => {
     // disable joystick if camera has no pan/tilt controls
     // pantilt = "n/N"
-    if (camSettings && camSettings.pantilt.trim().toUpperCase() === "N") {
+    console.log(camSettings);
+    if (
+      camSettings &&
+      camSettings.pantilt &&
+      camSettings.pantilt.trim().toUpperCase() === "N"
+    ) {
       setIsEnabled(false);
     } else {
       setIsEnabled(true);
@@ -47,6 +52,16 @@ export default function Joystick() {
   }, []);
 
   useEffect(() => {
+    const handleSendMessage = (commandValue) => {
+      const payload = {
+        action: {
+          name: COMMAND_STRINGS.panTiltCommand,
+          value: commandValue,
+        },
+      };
+      sendMessage(payload);
+    };
+
     let intervalId;
     if (joystickQueue.length) {
       const lastAction = joystickQueue.slice(-1)[0];
@@ -75,7 +90,7 @@ export default function Joystick() {
     return () => {
       clearInterval(intervalId);
     };
-  }, [joystickQueue]);
+  }, [dispatch, joystickQueue, sendMessage]);
 
   const handleJoystickEvents = (evt, data) => {
     //console.log(evt, data);
@@ -87,16 +102,6 @@ export default function Joystick() {
       direction: data.direction,
     };
     dispatch(setJoystickQueue(payload));
-  };
-
-  const handleSendMessage = (commandValue) => {
-    const payload = {
-      action: {
-        name: COMMAND_STRINGS.panTiltCommand,
-        value: commandValue,
-      },
-    };
-    sendMessage(payload);
   };
 
   if (!showJoystick || !isEnabled) {

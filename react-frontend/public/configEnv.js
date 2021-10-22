@@ -2,7 +2,7 @@
 // Use in place of the REACT_APP style env variables.
 
 // Web socket server root URL
-window.WS_SERVER = "https://128.128.184.62";
+window.WS_SERVER = "http://128.128.184.62";
 //window.WS_SERVER = "https://128.128.184.62";
 // Web socket server path, ex: "/websocket-server-path/"
 window.WS_PATH = "/websocket-server/";

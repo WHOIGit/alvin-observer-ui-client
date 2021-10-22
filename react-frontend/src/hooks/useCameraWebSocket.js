@@ -7,6 +7,8 @@ import {
   changeCameraSettings,
   changeCurrentCamData,
   changeCamHeartbeat,
+  changeCamHeartbeatPort,
+  changeCamHeartbeatStbd,
   selectObserverSide,
   selectActiveCamera,
   selectWebSocketNamespace,
@@ -17,12 +19,15 @@ import {
   NEW_CAMERA_COMMAND_EVENT,
   CAM_HEARTBEAT,
   RECORDER_HEARTBEAT,
+  WS_SERVER_NAMESPACE_PORT,
+  WS_SERVER_NAMESPACE_STARBOARD,
 } from "../config";
 
 const useCameraWebSocket = (
   socketEvent,
   useNamespace = true,
-  nameSpaceOverride = null // set socket connection to different nameSpace than the current Pilot/Observer
+  nameSpaceOverride = null, // set socket connection to different nameSpace than the current Pilot/Observer
+  isEnabled = true
 ) => {
   const observerSide = useSelector(selectObserverSide);
   const activeCamera = useSelector(selectActiveCamera);
@@ -30,6 +35,7 @@ const useCameraWebSocket = (
   const [messages, setMessages] = useState(null);
   const socketRef = useRef();
   const dispatch = useDispatch();
+
   // check if the current namespace needs to be changed to a different one
   let activeSocketNamespace;
   if (nameSpaceOverride) {
@@ -62,14 +68,15 @@ const useCameraWebSocket = (
   }
 
   useEffect(() => {
+    if (!isEnabled) {
+      return null;
+    }
     // Creates a WebSocket connection
     socketRef.current = socketIOClient(WS_SERVER + socketNs, {
       path: WS_PATH + "socket.io",
       query: { client: activeSocketNamespace },
     });
-    if (socketEvent === RECORDER_HEARTBEAT) {
-      console.log(socketRef);
-    }
+
     socketRef.current.on("connect", (incomingMessage) => {
       console.log("ON CONNECT", incomingMessage);
     });
@@ -81,12 +88,11 @@ const useCameraWebSocket = (
         ...message,
         ownedByCurrentUser: message.senderId === socketRef.current.id
       };
-      
+       */
+
       if (socketEvent !== CAM_HEARTBEAT) {
         setMessages(incomingMessage);
       }
-      */
-      setMessages(incomingMessage);
 
       // handle NEW_CAMERA_COMMAND_EVENT events here
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
@@ -103,7 +109,11 @@ const useCameraWebSocket = (
       // handle CAM_HEARTBEAT events here
       if (socketEvent === CAM_HEARTBEAT && nameSpaceOverride) {
         // set Observer specific heartbeats here for Pilot UI
-        dispatch(changeCamHeartbeat(incomingMessage));
+        if (nameSpaceOverride === WS_SERVER_NAMESPACE_PORT) {
+          dispatch(changeCamHeartbeatPort(incomingMessage));
+        } else if (nameSpaceOverride === WS_SERVER_NAMESPACE_STARBOARD) {
+          dispatch(changeCamHeartbeatStbd(incomingMessage));
+        }
       } else {
         dispatch(changeCamHeartbeat(incomingMessage));
       }
@@ -127,6 +137,7 @@ const useCameraWebSocket = (
     socketNs,
     activeSocketNamespace,
     nameSpaceOverride,
+    isEnabled,
   ]);
 
   // Sends a message to the server

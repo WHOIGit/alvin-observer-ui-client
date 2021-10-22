@@ -43,7 +43,7 @@ export default function SelectExposureMode({ showLabel }) {
 
   // set up label options
   let displayEmpty = true;
-  if (showLabel === "vertical") {
+  if (showLabel) {
     displayEmpty = false;
   }
 

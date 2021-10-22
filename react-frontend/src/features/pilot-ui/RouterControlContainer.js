@@ -10,10 +10,12 @@ import {
   VIDEO_STREAM_CONFIG,
   COMMAND_STRINGS,
   NEW_CAMERA_COMMAND_EVENT,
+  CAM_HEARTBEAT,
   WS_SERVER_NAMESPACE_PORT,
   WS_SERVER_NAMESPACE_STARBOARD,
   WS_SERVER_NAMESPACE_PILOT,
 } from "../../config.js";
+import PilotRecordButton from "../camera-controls/PilotRecordButton";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -31,8 +33,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default function RouterControlContainer() {
   const classes = useStyles();
-  console.log(WS_SERVER_NAMESPACE_PILOT);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  // establish web socket connections for all CAM_HEARTBEAT namespaces
+  useCameraWebSocket(CAM_HEARTBEAT);
+  useCameraWebSocket(CAM_HEARTBEAT, true, WS_SERVER_NAMESPACE_PORT);
+  useCameraWebSocket(CAM_HEARTBEAT, true, WS_SERVER_NAMESPACE_STARBOARD);
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
@@ -94,17 +99,7 @@ export default function RouterControlContainer() {
       <Box mt={1.5}>
         <Grid container justifyContent="center" spacing={2}>
           <Grid item xs>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              className={classes.ctrlButton}
-              onClick={() =>
-                handleSendMessage(COMMAND_STRINGS.recordSourceCommand, "PORT")
-              }
-            >
-              Record Port Source
-            </Button>
+            <PilotRecordButton observerSide={WS_SERVER_NAMESPACE_PORT} />
           </Grid>
 
           <Grid>
@@ -113,7 +108,10 @@ export default function RouterControlContainer() {
               color="primary"
               className={classes.recStopButton}
               onClick={() =>
-                handleSendMessage(COMMAND_STRINGS.recordSourceCommand, "ST")
+                handleSendMessage(
+                  COMMAND_STRINGS.recordSourceCommand,
+                  COMMAND_STRINGS.recordStopCommand
+                )
               }
             >
               Stop All Recordings
@@ -121,17 +119,7 @@ export default function RouterControlContainer() {
           </Grid>
 
           <Grid item xs className={classes.rightAlign}>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              className={classes.ctrlButton}
-              onClick={() =>
-                handleSendMessage(COMMAND_STRINGS.recordSourceCommand, "STBD")
-              }
-            >
-              Record STBD Source
-            </Button>
+            <PilotRecordButton observerSide={WS_SERVER_NAMESPACE_STARBOARD} />
           </Grid>
         </Grid>
       </Box>

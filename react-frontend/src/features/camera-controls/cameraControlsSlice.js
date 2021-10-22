@@ -141,6 +141,15 @@ export const cameraControlsSlice = createSlice({
       }
       state.camHeartbeatDataPort = action.payload;
     },
+    changeCamHeartbeatStbd: (state, action) => {
+      const camHeartbeatDataStbd = action.payload;
+      delete camHeartbeatDataStbd.eventId;
+      delete camHeartbeatDataStbd.timestamp;
+      if (state.camHeartbeatDataStbd === camHeartbeatDataStbd) {
+        return state;
+      }
+      state.camHeartbeatDataStbd = action.payload;
+    },
     changeRecorderHeartbeat: (state, action) => {
       const data = action.payload;
       delete data.eventId;
@@ -172,6 +181,8 @@ export const {
   changeActiveCamera,
   changeCameraSettings,
   changeCamHeartbeat,
+  changeCamHeartbeatPort,
+  changeCamHeartbeatStbd,
   changeRecorderHeartbeat,
   changeCurrentCamData,
   setLastCommand,
@@ -206,6 +217,14 @@ export const selectWebSocketNamespace = (state) =>
 // return the current CamHeartbeat data
 export const selectCamHeartbeatData = (state) =>
   state.cameraControls.camHeartbeatData;
+
+// return the Port CamHeartbeat data
+export const selectCamHeartbeatDataPort = (state) =>
+  state.cameraControls.camHeartbeatDataPort;
+
+// return the Starboard CamHeartbeat data
+export const selectCamHeartbeatDataStbd = (state) =>
+  state.cameraControls.camHeartbeatDataStbd;
 
 // return the initial cached CamHeartbeat data
 export const selectInitialCamHeartbeatData = (state) =>

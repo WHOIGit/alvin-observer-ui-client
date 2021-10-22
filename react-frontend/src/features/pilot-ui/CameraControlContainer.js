@@ -9,6 +9,7 @@ import SelectShutterMode from "../camera-controls/SelectShutterMode";
 import SelectIrisMode from "../camera-controls/SelectIrisMode";
 import SelectIsoMode from "../camera-controls/SelectIsoMode";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
+import SelectWhiteBalance from "../camera-controls/SelectWhiteBalance";
 import FocusModeButton from "../camera-controls/FocusModeButton";
 import FocusZoomButtons from "../camera-controls/FocusZoomButtons";
 import Joystick from "../camera-controls/Joystick";
@@ -89,7 +90,7 @@ export default function CameraControlContainer() {
         <Grid item xs={3}>
           <List>
             <ListItem>
-              <SelectExposureMode showLabel={"vertical"} />
+              <SelectExposureMode showLabel={true} />
             </ListItem>
             <ListItem>
               <SelectShutterMode />
@@ -99,6 +100,9 @@ export default function CameraControlContainer() {
             </ListItem>
             <ListItem>
               <SelectIsoMode />
+            </ListItem>
+            <ListItem>
+              <SelectWhiteBalance showLabel={true} />
             </ListItem>
           </List>
         </Grid>

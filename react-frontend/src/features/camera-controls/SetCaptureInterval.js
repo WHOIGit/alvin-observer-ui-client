@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SelectWhiteBalance() {
+export default function SelectCaptureInterval() {
   const classes = useStyles();
   //const camData = useSelector(selectCurrentCamData);
   const camSettings = useSelector(selectCamHeartbeatData);

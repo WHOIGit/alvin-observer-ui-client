@@ -1,30 +1,39 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
+import {
+  MenuItem,
+  Grid,
+  FormControl,
+  Select,
+  Typography,
+  Button,
+} from "@material-ui/core";
 // local imports
-import { selectCurrentCamData } from "./cameraControlsSlice";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    position: "relative",
-  },
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
   },
+  horizLabel: {
+    paddingTop: theme.spacing(2),
+    paddingRight: theme.spacing(1),
+  },
+  onePushBtn: {
+    textAlign: "center",
+  },
 }));
 
-export default function SelectWhiteBalance() {
+export default function SelectWhiteBalance({ showLabel }) {
   const classes = useStyles();
-  const camData = useSelector(selectCurrentCamData);
+  const camSettings = useSelector(selectCamHeartbeatData);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  const labelText = "WHITE BALANCE:";
 
   const handleSendMessage = (event) => {
     const payload = {
@@ -36,34 +45,64 @@ export default function SelectWhiteBalance() {
     sendMessage(payload);
   };
 
-  if (camData === null) {
+  const handleOnePushMessage = () => {
+    const payload = {
+      action: {
+        name: COMMAND_STRINGS.whiteBalanceOnePushCommand,
+        value: null,
+      },
+    };
+    sendMessage(payload);
+  };
+
+  // set up label options
+  let displayEmpty = true;
+  if (showLabel) {
+    displayEmpty = false;
+  }
+
+  if (camSettings === null) {
     return null;
   }
 
   return (
-    <div className={classes.root}>
-      <FormControl className={classes.formControl}>
-        <InputLabel id="white-balance-label">White Balance</InputLabel>
-        <Select
-          labelId="white-balance-label"
-          id="white-balance-select"
-          value={camData.currentSettings.exposure_mode}
-          onChange={handleSendMessage}
-        >
-          <MenuItem value={COMMAND_STRINGS.whiteBalanceOptions[0]}>
-            Auto
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.whiteBalanceOptions[1]}>
-            Manual
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.whiteBalanceOptions[2]}>
-            Shutter Priority
-          </MenuItem>
-          <MenuItem value={COMMAND_STRINGS.whiteBalanceOptions[3]}>
-            Iris Priority
-          </MenuItem>
-        </Select>
-      </FormControl>
-    </div>
+    <Grid container spacing={0}>
+      {showLabel && (
+        <Grid item xs={12} className={classes.horizLabel}>
+          <Typography variant="body1">{labelText}</Typography>
+        </Grid>
+      )}
+
+      <Grid item xs={12}>
+        <FormControl className={classes.formControl}>
+          <Select
+            id="exposure-select"
+            value={camSettings.white_balance}
+            label={labelText}
+            onChange={handleSendMessage}
+            displayEmpty={displayEmpty}
+          >
+            {COMMAND_STRINGS.whiteBalanceOptions.map((item) => (
+              <MenuItem value={item} key={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={12}>
+        <div className={classes.onePushBtn}>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
+            onClick={() => handleOnePushMessage()}
+          >
+            WB One Push
+          </Button>
+        </div>
+      </Grid>
+    </Grid>
   );
 }

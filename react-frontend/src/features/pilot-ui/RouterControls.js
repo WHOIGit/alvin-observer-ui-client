@@ -47,7 +47,6 @@ export default function RouterControls() {
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   // disable Take button until both values have been selected
   const disabled = !inputValue || !outputValue;
-  console.log(inputValue);
   const handleSendMessage = () => {
     const payload = {
       action: {
@@ -68,7 +67,6 @@ export default function RouterControls() {
 
   const renderInputBtns = (item) => {
     const activeBtn = item.value === inputValue;
-    console.log(activeBtn);
     const btnStyle = clsx({
       [classes.ctrlButton]: true, //always applies
       [classes.activeButton]: activeBtn, //only when open === true
