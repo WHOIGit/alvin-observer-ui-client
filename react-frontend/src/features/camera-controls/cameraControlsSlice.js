@@ -13,13 +13,15 @@ const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
 
 const initialState = {
-  observerSide: null, // P = Port/ S = Starboard
-  webSocketNamespace: WS_SERVER_NAMESPACE_PORT,
+  observerSide: "PL", // P = Port, S = Starboard, PL = Pilot
+  webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
   initialCamHeartbeat: null,
   activeCamera: null,
   camHeartbeatData: null,
+  camHeartbeatDataPort: null, // observer specific heartbeat data for Pilot UI
+  camHeartbeatDataStbd: null, // observer specific heartbeat data for Pilot UI
   recorderHeartbeatData: null,
   currentCamData: null,
   lastCommand: null,
@@ -29,7 +31,7 @@ const initialState = {
 
 const getCameraConfig = (cameraId) => {
   const cameraConfig = CAMERAS.find((item) => item.camera === cameraId);
-  console.log(cameraConfig);
+  //console.log(cameraConfig);
   return cameraConfig;
 };
 
@@ -130,6 +132,24 @@ export const cameraControlsSlice = createSlice({
       }
       state.camHeartbeatData = action.payload;
     },
+    changeCamHeartbeatPort: (state, action) => {
+      const camHeartbeatDataPort = action.payload;
+      delete camHeartbeatDataPort.eventId;
+      delete camHeartbeatDataPort.timestamp;
+      if (state.camHeartbeatDataPort === camHeartbeatDataPort) {
+        return state;
+      }
+      state.camHeartbeatDataPort = action.payload;
+    },
+    changeCamHeartbeatStbd: (state, action) => {
+      const camHeartbeatDataStbd = action.payload;
+      delete camHeartbeatDataStbd.eventId;
+      delete camHeartbeatDataStbd.timestamp;
+      if (state.camHeartbeatDataStbd === camHeartbeatDataStbd) {
+        return state;
+      }
+      state.camHeartbeatDataStbd = action.payload;
+    },
     changeRecorderHeartbeat: (state, action) => {
       const data = action.payload;
       delete data.eventId;
@@ -161,6 +181,8 @@ export const {
   changeActiveCamera,
   changeCameraSettings,
   changeCamHeartbeat,
+  changeCamHeartbeatPort,
+  changeCamHeartbeatStbd,
   changeRecorderHeartbeat,
   changeCurrentCamData,
   setLastCommand,
@@ -195,6 +217,14 @@ export const selectWebSocketNamespace = (state) =>
 // return the current CamHeartbeat data
 export const selectCamHeartbeatData = (state) =>
   state.cameraControls.camHeartbeatData;
+
+// return the Port CamHeartbeat data
+export const selectCamHeartbeatDataPort = (state) =>
+  state.cameraControls.camHeartbeatDataPort;
+
+// return the Starboard CamHeartbeat data
+export const selectCamHeartbeatDataStbd = (state) =>
+  state.cameraControls.camHeartbeatDataStbd;
 
 // return the initial cached CamHeartbeat data
 export const selectInitialCamHeartbeatData = (state) =>
