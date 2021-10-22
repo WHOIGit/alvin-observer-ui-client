@@ -90,7 +90,7 @@ export default function MiniVideo({ videoSrc, observerSide, videoType }) {
     if (videoType === "REC" && messages) {
       setCameraName(messages.camera);
       setIsRecording(messages.recording === "true");
-    } else {
+    } else if (videoType === "OBS" || videoType === "PILOT") {
       if (observerSide === "port" && activeCameraPort) {
         const camera = getCameraConfigFromId(activeCameraPort.camera);
         setCameraName(camera.cam_name);
