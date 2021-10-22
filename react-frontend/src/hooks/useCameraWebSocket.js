@@ -114,7 +114,7 @@ const useCameraWebSocket = (
         } else if (nameSpaceOverride === WS_SERVER_NAMESPACE_STARBOARD) {
           dispatch(changeCamHeartbeatStbd(incomingMessage));
         }
-      } else {
+      } else if (socketEvent === CAM_HEARTBEAT) {
         dispatch(changeCamHeartbeat(incomingMessage));
       }
     });
