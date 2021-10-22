@@ -29,6 +29,7 @@ export default function PilotRecordButton({ observerSide }) {
         name: COMMAND_STRINGS.recordSourceCommand,
         value: activeCamera.camera,
       },
+      observerSideOverride: observerSide,
     };
     sendMessage(payload);
   };

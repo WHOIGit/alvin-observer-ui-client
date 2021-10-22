@@ -91,7 +91,6 @@ export default function MiniVideo({ videoSrc, observerSide, videoType }) {
       setCameraName(messages.camera);
       setIsRecording(messages.recording === "true");
     } else {
-      console.log(observerSide);
       if (observerSide === "port" && activeCameraPort) {
         const camera = getCameraConfigFromId(activeCameraPort.camera);
         setCameraName(camera.cam_name);
@@ -100,7 +99,6 @@ export default function MiniVideo({ videoSrc, observerSide, videoType }) {
         setCameraName(camera.cam_name);
       } else if (observerSide === "pilot" && activeCameraPilot) {
         const camera = getCameraConfigFromId(activeCameraPilot.camera);
-        console.log(camera, activeCameraPilot);
         camera && setCameraName(camera.cam_name);
       }
     }

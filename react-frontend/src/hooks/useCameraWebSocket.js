@@ -150,6 +150,16 @@ const useCameraWebSocket = (
         camera = messageBody.oldCamera;
       }
 
+      // override the Observer side command if Pilot is sending a Record message
+      if (messageBody.hasOwnProperty("observerSideOverride")) {
+        let newObserverSide = messageBody.observerSideOverride;
+        if (newObserverSide === WS_SERVER_NAMESPACE_PORT) {
+          observerSideCmd = "COVP";
+        } else if (newObserverSide === WS_SERVER_NAMESPACE_STARBOARD) {
+          observerSideCmd = "COVS";
+        }
+      }
+
       const payload = {
         eventId: uuidv4(),
         command: observerSideCmd,

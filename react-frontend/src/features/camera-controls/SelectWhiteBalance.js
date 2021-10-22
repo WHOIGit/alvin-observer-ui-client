@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
     paddingRight: theme.spacing(1),
   },
   onePushBtn: {
+    paddingTop: theme.spacing(2),
     textAlign: "center",
   },
 }));
