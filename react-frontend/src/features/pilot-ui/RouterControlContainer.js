@@ -62,7 +62,7 @@ export default function RouterControlContainer() {
         </Grid>
         <Grid item xs>
           <MiniVideo
-            videoSrc={VIDEO_STREAM_CONFIG.portObserverVideo}
+            videoSrc={VIDEO_STREAM_CONFIG.portObserverSmallVideo}
             observerSide={WS_SERVER_NAMESPACE_PORT}
             videoType="OBS"
             key="video0"
@@ -71,7 +71,7 @@ export default function RouterControlContainer() {
 
         <Grid item xs>
           <MiniVideo
-            videoSrc={VIDEO_STREAM_CONFIG.pilotVideo}
+            videoSrc={VIDEO_STREAM_CONFIG.pilotSmallVideo}
             observerSide={WS_SERVER_NAMESPACE_PILOT}
             videoType="PILOT"
             key="video2"
@@ -80,7 +80,7 @@ export default function RouterControlContainer() {
 
         <Grid item xs>
           <MiniVideo
-            videoSrc={VIDEO_STREAM_CONFIG.stbdObserverVideo}
+            videoSrc={VIDEO_STREAM_CONFIG.stbdObserverSmallVideo}
             observerSide={WS_SERVER_NAMESPACE_STARBOARD}
             videoType="OBS"
             key="video3"
