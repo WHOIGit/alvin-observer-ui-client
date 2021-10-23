@@ -7,7 +7,7 @@ After=docker.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-WorkingDirectory=/home/alvin/alvin-pilot-ui-client
+WorkingDirectory=/opt/pilot-ui
 ExecStart=/usr/bin/docker-compose build
 ExecStart=/usr/bin/docker-compose up -d -V
 ExecStop=/usr/bin/docker-compose down
