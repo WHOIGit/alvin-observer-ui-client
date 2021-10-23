@@ -77,10 +77,13 @@ export const COMMAND_STRINGS = {
 export const VIDEO_STREAM_CONFIG = {
   server: envSettings.VIDEO_STREAM_SERVER,
   portObserverVideo: envSettings.PORT_OBSERVER_VIDEO,
+  portObserverSmallVideo: envSettings.PORT_OBSERVER_SMALL_VIDEO,
   stbdObserverVideo: envSettings.STBD_OBSERVER_VIDEO,
+  stbdObserverSmallVideo: envSettings.STBD_OBSERVER_SMALL_VIDEO,
   portRecordVideo: envSettings.PORT_RECORDER_VIDEO,
   stbdRecordVideo: envSettings.STBD_RECORDER_VIDEO,
   pilotVideo: envSettings.PILOT_VIDEO,
+  pilotSmallVideo: envSettings.PILOT_SMALL_VIDEO,
 };
 
 // Router controls inputs/outputs

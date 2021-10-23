@@ -34,8 +34,8 @@ export default function TopControlPanel({
   setShowFullCameraControls,
 }) {
   const classes = useStyles();
-  const observerVideoSrc = useSelector(
-    (state) => state.cameraControls.observerVideoSrc
+  const observerVideoSmallSrc = useSelector(
+    (state) => state.cameraControls.observerVideoSmallSrc
   );
   const recordVideoSrc = useSelector(
     (state) => state.cameraControls.recordVideoSrc
@@ -53,7 +53,7 @@ export default function TopControlPanel({
               {showFullCameraControls ? (
                 <TopCameraCommandsList />
               ) : (
-                <MiniVideo videoSrc={observerVideoSrc} videoType={"OBS"} />
+                <MiniVideo videoSrc={observerVideoSmallSrc} videoType={"OBS"} />
               )}
             </Grid>
           </Grid>

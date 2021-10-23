@@ -1,18 +1,17 @@
 // Web socket server root URL
-window.WS_SERVER = (typeof window !== 'undefined') &&
-  `https://${window.location.hostname}`;
+window.WS_SERVER =
+  typeof window !== "undefined" && `https://${window.location.hostname}`;
 
 // Web socket server path, ex: "/websocket-server-path/"
 window.WS_PATH = "/websocket-server/";
 
 // sealog url for iframe
-window.SEALOG_URL = (typeof window !== 'undefined') &&
-  `https://${window.location.hostname}/sealog`;
+window.SEALOG_URL =
+  typeof window !== "undefined" && `https://${window.location.hostname}/sealog`;
 
 // Video stream server configs
-//window.VIDEO_STREAM_SERVER = "https://128.128.184.62/video";
-window.VIDEO_STREAM_SERVER = (typeof window !== 'undefined') &&
-  `https://${window.location.hostname}/video`;
+window.VIDEO_STREAM_SERVER =
+  typeof window !== "undefined" && `https://${window.location.hostname}/video`;
 
 window.PORT_OBSERVER_VIDEO = "port_obs";
 window.PORT_OBSERVER_SMALL_VIDEO = "port_obs_small";

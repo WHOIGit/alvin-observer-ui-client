@@ -1,4 +1,4 @@
-import { createSlice, current } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import {
   COMMAND_STRINGS,
   CAMERAS,
@@ -10,12 +10,14 @@ import {
 
 // set default settings
 const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
+const defaultObserverVideoSmallSrc = VIDEO_STREAM_CONFIG.portObserverSmallVideo;
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
 
 const initialState = {
   observerSide: "PL", // P = Port, S = Starboard, PL = Pilot
   webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
   observerVideoSrc: defaultObserverVideoSrc,
+  observerVideoSmallSrc: defaultObserverVideoSmallSrc,
   recordVideoSrc: defaultRecordVideoSrc,
   initialCamHeartbeat: null,
   activeCamera: null,
@@ -43,9 +45,15 @@ export const cameraControlsSlice = createSlice({
       state.observerSide = action.payload;
       if (action.payload === "P") {
         state.webSocketNamespace = WS_SERVER_NAMESPACE_PORT;
+        state.observerVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
+        state.observerVideoSmallSrc =
+          VIDEO_STREAM_CONFIG.portObserverSmallVideo;
       }
       if (action.payload === "S") {
         state.webSocketNamespace = WS_SERVER_NAMESPACE_STARBOARD;
+        state.observerVideoSrc = VIDEO_STREAM_CONFIG.stbdObserverVideo;
+        state.observerVideoSmallSrc =
+          VIDEO_STREAM_CONFIG.stbdObserverSmallVideo;
       }
       // set available cameras
       /*
