@@ -93,16 +93,18 @@ export default function SelectWhiteBalance({ showLabel }) {
       </Grid>
 
       <Grid item xs={12}>
-        <div className={classes.onePushBtn}>
-          <Button
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={() => handleOnePushMessage()}
-          >
-            WB One Push
-          </Button>
-        </div>
+        {camSettings.white_balance.includes("ONE_PUSH") && (
+          <div className={classes.onePushBtn}>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={() => handleOnePushMessage()}
+            >
+              WB One Push
+            </Button>
+          </div>
+        )}
       </Grid>
     </Grid>
   );
