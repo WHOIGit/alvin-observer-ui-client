@@ -38,7 +38,7 @@ export default function FocusZoomButtons() {
       clearTimeout(timerRef.current);
     }
     // delay Stop message sending to avoid collisions with last button actions
-    setTimeout(handleSendMessage, 1000, commandName, COMMAND_STRINGS.focusStop);
+    setTimeout(handleSendMessage, 100, commandName, COMMAND_STRINGS.focusStop);
   };
 
   const focusNearBtnProps = useLongPress({
