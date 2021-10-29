@@ -4,6 +4,7 @@ import ReactNipple from "react-nipple";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography } from "@material-ui/core";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import useThrottledFunction from "../../hooks/useThrottledFunction";
 import {
   setJoystickQueue,
   selectJoystickQueue,
@@ -50,8 +51,15 @@ export default function Joystick() {
     }, 500);
   }, []);
 
+  // create a throttled function that limits the rate at which we send joystick
+  // events to the server.
+  const sendMoveMessageThrottled = useThrottledFunction(100, (action) => {
+    if (action && action.actionType === "move") {
+      handleSendMessage(action);
+    }
+  });
+
   useEffect(() => {
-    let intervalId;
     if (joystickQueue.length) {
       const lastAction = joystickQueue.slice(-1)[0];
       // force send message on start/end events
@@ -62,22 +70,10 @@ export default function Joystick() {
         handleSendMessage(lastAction);
       }
 
-      // set interval for function to throttle events send to imaging server
-      intervalId = setInterval(() => {
-        // assign interval to a variable to clear it.
-        console.log(lastAction);
-        handleSendMessage(lastAction);
-      }, 50);
-
-      // if we get the "end" event, stop the function cycle, reset the state
-      if (lastAction.actionType === "end") {
-        clearInterval(intervalId);
-        dispatch(clearJoystickQueue());
-      }
+      // always call this for all action types to prevent messages getting
+      // out of order due to throttling. only move messages actually get sent.
+      sendMoveMessageThrottled(lastAction);
     }
-    return () => {
-      clearInterval(intervalId);
-    };
   }, [joystickQueue]);
 
   const handleJoystickEvents = (evt, data) => {
