@@ -7,10 +7,15 @@ ENV NPM_CONFIG_LOGLEVEL=error
 
 WORKDIR /app
 
-COPY ./react-frontend /app
-
 # Install all node packages
-RUN npm install && npm run build
+COPY ./react-frontend/package*.json /app/
+# Uncomment to populate from a local node_modules directory
+# COPY ./node_modules /app/node_modules
+RUN npm install --no-audit
+
+# Copy sources and build
+COPY ./react-frontend /app
+RUN npm run build
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
 FROM nginx:alpine
