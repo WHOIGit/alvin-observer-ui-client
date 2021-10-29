@@ -100,6 +100,9 @@ function throttledFunction(delay, fn) {
         fn.apply(this, arguments);
       }
     },
+    (newFn) => {
+      fn = newFn
+    },
     () => {
       isDisposed = true;
     }
@@ -113,9 +116,10 @@ function throttledFunction(delay, fn) {
 //
 // Thanks to Adam Comella.
 export default function useThrottledFunction(delay, fn) {
-  const [[throttledFn, disposeThrottledFn], _] = useState(() => {
+  const [[throttledFn, setFn, disposeThrottledFn], _] = useState(() => {
     return throttledFunction(delay, fn);
   });
+  setFn(fn);
 
   useEffect(() => {
     return () => {

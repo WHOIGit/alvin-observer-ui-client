@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import ReactNipple from "react-nipple";
 import { makeStyles } from "@material-ui/core/styles";
@@ -50,11 +50,21 @@ export default function Joystick() {
     }, 500);
   }, []);
 
+  const sendPanTiltCommand = (commandValue) => {
+    const payload = {
+      action: {
+        name: COMMAND_STRINGS.panTiltCommand,
+        value: commandValue,
+      },
+    };
+    sendMessage(payload);
+  };
+
   // create a throttled function that limits the rate at which we send joystick
   // events to the server.
-  const sendMoveMessageThrottled = useThrottledFunction(100, (action) => {
+  const sendMoveCommandThrottled = useThrottledFunction(100, (action) => {
     if (action && action.actionType === "move") {
-      handleSendMessage(action);
+      sendPanTiltCommand(action);
     }
   });
 
@@ -66,12 +76,12 @@ export default function Joystick() {
         lastAction.actionType === "start" ||
         lastAction.actionType === "end"
       ) {
-        handleSendMessage(lastAction);
+        sendPanTiltCommand(lastAction);
       }
 
-      // always call this for all action types to prevent messages getting
-      // out of order due to throttling. only move messages actually get sent.
-      sendMoveMessageThrottled(lastAction);
+      // always call this for all action types to prevent commands getting
+      // out of order due to throttling. only move commands actually get sent.
+      sendMoveCommandThrottled(lastAction);
     }
   }, [joystickQueue]);
 
@@ -85,16 +95,6 @@ export default function Joystick() {
       direction: data.direction,
     };
     dispatch(setJoystickQueue(payload));
-  };
-
-  const handleSendMessage = (commandValue) => {
-    const payload = {
-      action: {
-        name: COMMAND_STRINGS.panTiltCommand,
-        value: commandValue,
-      },
-    };
-    sendMessage(payload);
   };
 
   if (!showJoystick || !isEnabled) {
