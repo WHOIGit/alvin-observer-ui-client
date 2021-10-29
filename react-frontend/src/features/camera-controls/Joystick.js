@@ -8,7 +8,6 @@ import useThrottledFunction from "../../hooks/useThrottledFunction";
 import {
   setJoystickQueue,
   selectJoystickQueue,
-  clearJoystickQueue,
   selectCamHeartbeatData,
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
