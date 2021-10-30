@@ -106,30 +106,6 @@ export default function CaptureButtons() {
         </Button>
       </Grid>
       <Grid item xs={6}>
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          className={classes.ctrlButton}
-        >
-          Event <br />
-          Trigger
-        </Button>
-      </Grid>
-      <Grid item xs={6}>
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          className={classes.ctrlButton}
-          onClick={() =>
-            handleSendMessage(COMMAND_STRINGS.quickClickCommand, activeCamera)
-          }
-        >
-          Quick <br /> Clip
-        </Button>
-      </Grid>
-      <Grid item xs={6}>
         <div className={classes.buttonWrapper}>
           <Button
             variant="contained"
