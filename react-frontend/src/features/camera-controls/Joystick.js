@@ -1,13 +1,12 @@
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import ReactNipple from "react-nipple";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography } from "@material-ui/core";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import useThrottledFunction from "../../hooks/useThrottledFunction";
 import {
-  setJoystickQueue,
-  selectJoystickQueue,
+  setJoystickStatus,
+  selectJoystickStatus,
   selectCamHeartbeatData,
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
@@ -23,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Joystick() {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const joystickQueue = useSelector(selectJoystickQueue);
+  const joystickStatus = useSelector(selectJoystickStatus);
   const camSettings = useSelector(selectCamHeartbeatData);
   const [isEnabled, setIsEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
@@ -60,33 +59,55 @@ export default function Joystick() {
     sendMessage(payload);
   };
 
-  // create a throttled function that limits the rate at which we send joystick
-  // events to the server.
-  const sendMoveCommandThrottled = useThrottledFunction(100, (action) => {
-    if (action && action.actionType === "move") {
-      sendPanTiltCommand(action);
-    }
+  // the joystickSpitter is a ref object that tracks the state of the timer
+  // created during a Joystick interaction
+  const joystickSpitter = useRef({
+    intervalId: null,
+    lastMove: null,
   });
 
-  useEffect(() => {
-    if (joystickQueue.length) {
-      const lastAction = joystickQueue.slice(-1)[0];
-      // force send message on start/end events
-      if (
-        lastAction.actionType === "start" ||
-        lastAction.actionType === "end"
-      ) {
-        sendPanTiltCommand(lastAction);
-      }
+  const startSpitter = () => {
+    joystickSpitter.current.intervalId = setInterval(() => {
+        // continuously spit out the last move message
+        if (joystickSpitter.current.lastMove) {
+          sendPanTiltCommand(joystickSpitter.current.lastMove);
+        }
+      }, 100);
+  };
 
-      // always call this for all action types to prevent commands getting
-      // out of order due to throttling. only move commands actually get sent.
-      sendMoveCommandThrottled(lastAction);
+  const stopSpitter = () => {
+    clearInterval(joystickSpitter.current.intervalId);
+    joystickSpitter.current.intervalId = null;
+  };
+
+  // top the spitter when we unmount this component
+  useEffect(() => {
+    return () => {
+      stopSpitter();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!joystickStatus) {
+      // no op
+    } else if (joystickStatus.actionType === "start") {
+      sendPanTiltCommand(joystickStatus);
+      startSpitter();
+      // enqueue a fake "move" event for the spitter
+      // note: angle and direction will be undefined
+      joystickSpitter.current.lastMove = {
+        ...joystickStatus, distance: 0, actionType: "move"
+      };
+    } else if (joystickStatus.actionType === "move") {
+      // enqueue this move for the spitter timer
+      joystickSpitter.current.lastMove = joystickStatus;
+    } else if (joystickStatus.actionType === "end") {
+      stopSpitter();
+      sendPanTiltCommand(joystickStatus);
     }
-  }, [joystickQueue]);
+  }, [joystickStatus]);
 
   const handleJoystickEvents = (evt, data) => {
-    //console.log(evt, data);
     const payload = {
       actionType: evt.type,
       position: data.position,
@@ -94,7 +115,7 @@ export default function Joystick() {
       angle: data.angle,
       direction: data.direction,
     };
-    dispatch(setJoystickQueue(payload));
+    dispatch(setJoystickStatus(payload));
   };
 
   if (!showJoystick || !isEnabled) {

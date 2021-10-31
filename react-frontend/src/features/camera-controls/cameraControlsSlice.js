@@ -28,7 +28,7 @@ const initialState = {
   currentCamData: null,
   lastCommand: null,
   availableCameras: CAMERAS,
-  joystickQueue: [],
+  joystickStatus: null,
 };
 
 const getCameraConfig = (cameraId) => {
@@ -175,11 +175,8 @@ export const cameraControlsSlice = createSlice({
       state.currentCamData.SHU = action.payload.SHU;
       state.currentCamData.currentSettings = action.payload.current_settings;
     },
-    setJoystickQueue: (state, action) => {
-      state.joystickQueue.push(action.payload);
-    },
-    clearJoystickQueue: (state, action) => {
-      state.joystickQueue = [];
+    setJoystickStatus: (state, action) => {
+      state.joystickStatus = action.payload;
     },
   },
 });
@@ -195,8 +192,7 @@ export const {
   changeCurrentCamData,
   setLastCommand,
   setObserverSide,
-  setJoystickQueue,
-  clearJoystickQueue,
+  setJoystickStatus
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -246,6 +242,6 @@ export const selectRecorderHeartbeatData = (state) =>
 export const selectCurrentCamData = (state) =>
   state.cameraControls.currentCamData;
 
-// return the array of queued Joystick commands
-export const selectJoystickQueue = (state) =>
-  state.cameraControls.joystickQueue;
+// return the curreent joystick status
+export const selectJoystickStatus = (state) =>
+  state.cameraControls.joystickStatus;
