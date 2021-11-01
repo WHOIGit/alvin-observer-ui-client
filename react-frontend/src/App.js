@@ -3,6 +3,9 @@ import { Container } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import PilotUIContainer from "./features/pilot-ui/PilotUIContainer";
 
+import "@fontsource/roboto";
+import "@fontsource/roboto/700.css";
+
 const useStyles = makeStyles((theme) => ({
   sealogFrame: {
     width: "100%",
@@ -14,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
     userSelect: "none",
   },
 }));
+
 export default function App() {
   const classes = useStyles();
 

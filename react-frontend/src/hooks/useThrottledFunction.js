@@ -116,7 +116,12 @@ function throttledFunction(delay, fn) {
 //
 // Thanks to Adam Comella.
 export default function useThrottledFunction(delay, fn) {
-  const [[throttledFn, setFn, disposeThrottledFn], _] = useState(() => {
+  const [prevDelay, _] = useState(delay);
+  if (delay !== prevDelay) {
+    throw new Error('useThrottledFunction: Changing the `delay` parameter between invocations is currently not supported.');
+  }
+
+  const [[throttledFn, setFn, disposeThrottledFn], __] = useState(() => {
     return throttledFunction(delay, fn);
   });
   setFn(fn);
