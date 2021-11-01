@@ -7,6 +7,9 @@ import { SEALOG_URL } from "./config";
 import useCameraWebSocket from "./hooks/useCameraWebSocket";
 import { NEW_CAMERA_COMMAND_EVENT } from "./config";
 
+import "@fontsource/roboto";
+import "@fontsource/roboto/700.css";
+
 const useStyles = makeStyles((theme) => ({
   sealogFrame: {
     width: "100%",
@@ -18,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
     userSelect: "none",
   },
 }));
+
 export default function App() {
   const classes = useStyles();
 
