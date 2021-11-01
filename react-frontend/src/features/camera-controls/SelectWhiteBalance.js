@@ -49,8 +49,8 @@ export default function SelectWhiteBalance({ showLabel }) {
   const handleOnePushMessage = () => {
     const payload = {
       action: {
-        name: COMMAND_STRINGS.whiteBalanceOnePushCommand,
-        value: null,
+        name: COMMAND_STRINGS.whiteBalanceCommand,
+        value: COMMAND_STRINGS.whiteBalanceOnePushCommandValue
       },
     };
     sendMessage(payload);

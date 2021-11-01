@@ -54,10 +54,8 @@ export const COMMAND_STRINGS = {
     "INDOOR",
     "OUTDOOR",
     "ONE_PUSH_WB",
-    "MAN",
-    "ONE_PUSH_TRIGGER",
   ],
-  whiteBalanceOnePushCommand: "WBP",
+  whiteBalanceOnePushCommandValue: "ONE_PUSH_TRIGGER",
   captureIntervalCommand: "SIC",
   captureIntervalOptions: [
     "0",
