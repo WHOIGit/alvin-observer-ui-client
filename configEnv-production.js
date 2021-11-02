@@ -3,7 +3,7 @@ window.WS_SERVER = (typeof window !== 'undefined') &&
   `https://${window.location.hostname}`;
 
 // Web socket server path, ex: "/websocket-server-path/"
-window.WS_PATH = "/websocket-server/";
+window.WS_PATH = "/imaging-control/";
 
 // sealog url for iframe
 //window.SEALOG_URL = "https://sealog.whoi.edu/sealog-alvin/";
