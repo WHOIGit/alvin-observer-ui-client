@@ -143,7 +143,6 @@ const useCameraWebSocket = (
 
   // Sends a message to the server
   const sendMessage = (messageBody) => {
-    console.log(messageBody.action);
     if (socketRef.current !== undefined) {
       // check if this a "Record Source" action, change "camera" prop to be current Recorder camera
       let camera = activeCamera;
@@ -155,9 +154,8 @@ const useCameraWebSocket = (
         eventId: uuidv4(),
         command: observerSideCmd,
         camera: camera,
-        action: messageBody.action,
+        ...messageBody,
       };
-      console.log(payload);
       try {
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));

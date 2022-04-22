@@ -46,14 +46,14 @@ export const cameraControlsSlice = createSlice({
       if (action.payload === "P") {
         state.webSocketNamespace = WS_SERVER_NAMESPACE_PORT;
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
-        state.observerVideoSmallSrc =
-          VIDEO_STREAM_CONFIG.portObserverSmallVideo;
+        state.observerVideoSmallSrc = VIDEO_STREAM_CONFIG.portObserverSmallVideo;
+        state.recordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo; //mjs-added-19apr2022
       }
       if (action.payload === "S") {
         state.webSocketNamespace = WS_SERVER_NAMESPACE_STARBOARD;
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.stbdObserverVideo;
-        state.observerVideoSmallSrc =
-          VIDEO_STREAM_CONFIG.stbdObserverSmallVideo;
+        state.observerVideoSmallSrc = VIDEO_STREAM_CONFIG.stbdObserverSmallVideo;
+        state.recordVideoSrc = VIDEO_STREAM_CONFIG.stbdRecordVideo; //mjs-added-19apr2022
       }
       // set available cameras
       /*

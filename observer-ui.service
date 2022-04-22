@@ -2,7 +2,8 @@
 
 [Unit]
 Description=Observer UI React frontend
-After=docker.service
+Requires=network-online.target
+After=docker.service network.target
 
 [Service]
 Type=oneshot

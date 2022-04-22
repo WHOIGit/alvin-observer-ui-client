@@ -32,4 +32,5 @@ window.CAMERAS = [
   { camera: "camera6", cam_name: "down_cam", owner: "none" },
   { camera: "camera7", cam_name: "brow_wide", owner: "pilot" },
   { camera: "camera8", cam_name: "sci_cam", owner: "port" },
+  { camera: "camera9", cam_name: "pilot_cam", owner: "pilot" },
 ];

@@ -10,10 +10,10 @@ WORKDIR /app
 # Uncomment this section to install our CA certificate to the container, and use
 #   --build-arg http_proxy=http://199.92.162.241:3128 \
 #   --build-arg https_proxy=http://199.92.162.241:3128
-#RUN wget -O /usr/local/share/ca-certificates/squid-ca-cert.crt \
-#        http://199.92.162.241/squid-ca-cert.crt \
-# && update-ca-certificates
-#ARG npm_config_cafile=/etc/ssl/certs/ca-certificates.crt 
+RUN wget -O /usr/local/share/ca-certificates/squid-ca-cert.crt \
+        http://199.92.162.241/squid-ca-cert.crt \
+ && update-ca-certificates
+ARG npm_config_cafile=/etc/ssl/certs/ca-certificates.crt 
 
 # Install all node packages
 COPY ./react-frontend/package*.json /app/
