@@ -8,6 +8,7 @@ import {
   TableContainer,
   TableRow,
   Paper,
+  Grid,
 } from "@material-ui/core";
 // local
 import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
@@ -31,16 +32,22 @@ export default function NavDataDisplay() {
         <Table className={classes.table} size="small" aria-label="Nav Data">
           <TableBody>
             <TableRow key="version">
-              <TableCell component="th" scope="row">
+              <TableCell scope="row">
                 Observer Imaging UI for Alvin {camSettings.version}
               </TableCell>
             </TableRow>
 
-            <TableRow key="x-y">
-              <TableCell component="th" scope="row">
-                Cruise: {camSettings.cruise}
+            <TableRow key="cruise">
+              <TableCell scope="row">
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    Cruise: {camSettings.cruise}
+                  </Grid>
+                  <Grid item xs={6}>
+                    Dive: {camSettings.dive}
+                  </Grid>
+                </Grid>
               </TableCell>
-              <TableCell>Dive: {camSettings.dive}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
