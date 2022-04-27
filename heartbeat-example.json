@@ -1,0 +1,16 @@
+{
+  "command": "SOVP",
+  "camera": "camera1",
+  "iso": "100",
+  "shutter": "1/30",
+  "iris": "2.8",
+  "exposure": "AUTO",
+  "action": "???",
+  "focus_mode": "MF",
+  "pantilt": "y",
+  "camctrl": "y",
+  "owner": "port",
+  "dive": "AL5082",
+  "cruise": "AT42-18",
+  "version": "1.0"
+}
