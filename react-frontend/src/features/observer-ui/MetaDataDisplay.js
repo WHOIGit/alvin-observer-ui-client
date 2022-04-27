@@ -10,7 +10,7 @@ import {
   Paper,
 } from "@material-ui/core";
 // local
-import { selectCamHeartbeatData } from "./cameraControlsSlice";
+import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   table: {
