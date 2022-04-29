@@ -11,6 +11,7 @@ import {
 // local imports
 import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import useIsOwner from "../../hooks/useIsOwner";
 import { COMMAND_STRINGS } from "../../config.js";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
@@ -29,6 +30,7 @@ export default function SelectExposureMode({ showLabel }) {
   const classes = useStyles();
   const camSettings = useSelector(selectCamHeartbeatData);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  const { isOwner } = useIsOwner();
   const labelText = "EXP:";
 
   const handleSendMessage = (event) => {
@@ -47,7 +49,8 @@ export default function SelectExposureMode({ showLabel }) {
     displayEmpty = false;
   }
 
-  if (camSettings === null) {
+  // check to make sure camera has controls and current Observer matches Cam Owner
+  if (camSettings === null || camSettings.camctrl === "n" || !isOwner) {
     return null;
   }
 
