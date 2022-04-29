@@ -31,6 +31,7 @@ export default function SelectExposureMode({ showLabel }) {
   const camSettings = useSelector(selectCamHeartbeatData);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { isOwner } = useIsOwner();
+  console.log(isOwner);
   const labelText = "EXP:";
 
   const handleSendMessage = (event) => {
@@ -50,7 +51,7 @@ export default function SelectExposureMode({ showLabel }) {
   }
 
   // check to make sure camera has controls and current Observer matches Cam Owner
-  if (camSettings === null || camSettings?.camctrl === "n" || !isOwner) {
+  if (camSettings === null || camSettings?.camctrl === "y" || !isOwner) {
     return null;
   }
 
