@@ -13,11 +13,11 @@ export default function useIsOwner() {
   console.log(currentObserver);
 
   let isOwner = false;
-  if (camSettings.owner === "port" && currentObserver === "P") {
+  if (camSettings?.owner === "port" && currentObserver === "P") {
     isOwner = true;
   }
 
-  if (camSettings.owner === "stbd" && currentObserver === "S") {
+  if (camSettings?.owner === "stbd" && currentObserver === "S") {
     isOwner = true;
   }
   return { isOwner };

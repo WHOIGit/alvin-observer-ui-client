@@ -50,7 +50,7 @@ export default function SelectExposureMode({ showLabel }) {
   }
 
   // check to make sure camera has controls and current Observer matches Cam Owner
-  if (camSettings === null || camSettings.camctrl === "n" || !isOwner) {
+  if (camSettings === null || camSettings?.camctrl === "n" || !isOwner) {
     return null;
   }
 
