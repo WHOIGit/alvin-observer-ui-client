@@ -50,10 +50,13 @@ export default function Joystick() {
   }, []);
 
   const sendPanTiltCommand = (commandValue) => {
+    // add timestamp to command sent to imaging server for debug
+    const timestamp = new Date().toISOString();
     const payload = {
       action: {
         name: COMMAND_STRINGS.panTiltCommand,
         value: commandValue,
+        timestamp: timestamp,
       },
     };
     sendMessage(payload);
@@ -68,11 +71,11 @@ export default function Joystick() {
 
   const startSpitter = () => {
     joystickSpitter.current.intervalId = setInterval(() => {
-        // continuously spit out the last move message
-        if (joystickSpitter.current.lastMove) {
-          sendPanTiltCommand(joystickSpitter.current.lastMove);
-        }
-      }, 100);
+      // continuously spit out the last move message
+      if (joystickSpitter.current.lastMove) {
+        sendPanTiltCommand(joystickSpitter.current.lastMove);
+      }
+    }, 100);
   };
 
   const stopSpitter = () => {
@@ -96,7 +99,9 @@ export default function Joystick() {
       // enqueue a fake "move" event for the spitter
       // note: angle and direction will be undefined
       joystickSpitter.current.lastMove = {
-        ...joystickStatus, distance: 0, actionType: "move"
+        ...joystickStatus,
+        distance: 0,
+        actionType: "move",
       };
     } else if (joystickStatus.actionType === "move") {
       // enqueue this move for the spitter timer

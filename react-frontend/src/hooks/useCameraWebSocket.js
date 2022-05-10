@@ -75,6 +75,7 @@ const useCameraWebSocket = (
     socketRef.current = socketIOClient(WS_SERVER + socketNs, {
       path: WS_PATH + "socket.io",
       query: { client: activeSocketNamespace },
+      transports: ["websocket"],
     });
 
     socketRef.current.on("connect", (incomingMessage) => {
@@ -157,6 +158,7 @@ const useCameraWebSocket = (
         camera: camera,
         ...messageBody,
       };
+      console.log(payload);
       try {
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));
