@@ -75,7 +75,7 @@ const useCameraWebSocket = (
     socketRef.current = socketIOClient(WS_SERVER + socketNs, {
       path: WS_PATH + "socket.io",
       query: { client: activeSocketNamespace },
-      transports: ["websocket"],
+      //transports: ["websocket"],
     });
 
     socketRef.current.on("connect", (incomingMessage) => {
@@ -117,7 +117,7 @@ const useCameraWebSocket = (
           dispatch(changeCamHeartbeatStbd(incomingMessage));
         }
       } else if (socketEvent === CAM_HEARTBEAT) {
-        //console.log(socketEvent, incomingMessage);
+        console.log(socketEvent, incomingMessage);
         dispatch(changeCamHeartbeat(incomingMessage));
       }
     });
