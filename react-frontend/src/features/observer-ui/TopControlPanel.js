@@ -8,6 +8,7 @@ import UpperRightButtons from "./UpperRightButtons";
 import NavDataDisplay from "./NavDataDisplay";
 import TopCameraCommandsList from "./TopCameraCommandsList";
 import MiniVideo from "./MiniVideo";
+import MetaDataDisplay from "./MetaDataDisplay";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
 
@@ -77,6 +78,9 @@ export default function TopControlPanel({
           </Box>
         </Grid>
         <Grid item xs={3}>
+          <Box mb={1}>
+            <MetaDataDisplay />
+          </Box>
           <Box mb={1}>
             <ObserverDisplayChip />
           </Box>

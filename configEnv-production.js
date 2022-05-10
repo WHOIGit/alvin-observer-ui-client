@@ -3,7 +3,7 @@ window.WS_SERVER =
   typeof window !== "undefined" && `https://${window.location.hostname}`;
 
 // Web socket server path, ex: "/websocket-server-path/"
-window.WS_PATH = "/websocket-server/";
+window.WS_PATH = "/imaging-control/";
 
 // sealog url for iframe
 window.SEALOG_URL =
@@ -29,8 +29,9 @@ window.CAMERAS = [
   { camera: "camera4", cam_name: "stbd_patz", owner: "stbd" },
   { camera: "camera5", cam_name: "aft_cam", owner: "none" },
   { camera: "camera6", cam_name: "down_cam", owner: "none" },
-  { camera: "camera7", cam_name: "brow_wide", owner: "pilot" },
-  { camera: "camera8", cam_name: "sci_cam", owner: "port" },
+  { camera: "camera7", cam_name: "brow_wide", owner: "none" },
+  { camera: "camera8", cam_name: "sci_cam", owner: "pilot" },
+  { camera: "camera9", cam_name: "pilot_cam", owner: "pilot" },
 ];
 
 window.ROUTER_INPUTS = [

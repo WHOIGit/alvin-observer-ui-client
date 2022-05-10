@@ -75,6 +75,7 @@ const useCameraWebSocket = (
     socketRef.current = socketIOClient(WS_SERVER + socketNs, {
       path: WS_PATH + "socket.io",
       query: { client: activeSocketNamespace },
+      transports: ["websocket"],
     });
 
     socketRef.current.on("connect", (incomingMessage) => {
@@ -97,7 +98,7 @@ const useCameraWebSocket = (
 
       // handle NEW_CAMERA_COMMAND_EVENT events here
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
-        console.log(socketEvent, incomingMessage);
+        //console.log(socketEvent, incomingMessage);
         // check if message is a Camera Change Package, else it's a Command Receipt
         if (incomingMessage.hasOwnProperty("current_settings")) {
           console.log("CAM CHANGE HERE");
@@ -116,6 +117,7 @@ const useCameraWebSocket = (
           dispatch(changeCamHeartbeatStbd(incomingMessage));
         }
       } else if (socketEvent === CAM_HEARTBEAT) {
+        //console.log(socketEvent, incomingMessage);
         dispatch(changeCamHeartbeat(incomingMessage));
       }
     });
@@ -143,7 +145,6 @@ const useCameraWebSocket = (
 
   // Sends a message to the server
   const sendMessage = (messageBody) => {
-    console.log(messageBody.action);
     if (socketRef.current !== undefined) {
       // check if this a "Record Source" action, change "camera" prop to be current Recorder camera
       let camera = activeCamera;
@@ -165,7 +166,7 @@ const useCameraWebSocket = (
         eventId: uuidv4(),
         command: observerSideCmd,
         camera: camera,
-        action: messageBody.action,
+        ...messageBody,
       };
       console.log(payload);
       try {

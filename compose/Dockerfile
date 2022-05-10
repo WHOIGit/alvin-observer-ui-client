@@ -13,7 +13,7 @@ WORKDIR /app
 #RUN wget -O /usr/local/share/ca-certificates/squid-ca-cert.crt \
 #        http://199.92.162.241/squid-ca-cert.crt \
 # && update-ca-certificates
-#ARG npm_config_cafile=/etc/ssl/certs/ca-certificates.crt 
+ARG npm_config_cafile=/etc/ssl/certs/ca-certificates.crt 
 
 # Install all node packages
 COPY ./react-frontend/package*.json /app/

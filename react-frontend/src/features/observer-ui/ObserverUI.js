@@ -46,13 +46,13 @@ export default function ObserverUI({
 }) {
   const classes = useStyles();
   const dispatch = useDispatch();
-  console.log("RENDERING");
+
   // connect to observer side newCameraCommand to get global camera data on first connect,
   // send message to set active camera
   const { messages, sendMessage } = useCameraWebSocket(
     NEW_CAMERA_COMMAND_EVENT
   );
-  console.log(messages);
+
   // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
   useCameraWebSocket(CAM_HEARTBEAT);
   const activeCamera = useSelector(selectActiveCamera);
