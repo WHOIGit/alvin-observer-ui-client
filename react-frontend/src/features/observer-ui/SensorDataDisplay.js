@@ -6,6 +6,7 @@ import { SENSOR_HEARTBEAT } from "../../config.js";
 
 export default function SensorDataDisplay() {
   const { messages } = useCameraWebSocket(SENSOR_HEARTBEAT);
+  console.log(messages);
   if (messages === null) {
     return null;
   }
