@@ -20,7 +20,7 @@ export default function useIsOwner() {
     isOwner = true;
   }
 
-  if (camSettings?.owner === "pilot") {
+  if (currentObserver === "PL") {
     isOwner = true;
   }
 
