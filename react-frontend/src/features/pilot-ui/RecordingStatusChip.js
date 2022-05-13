@@ -40,12 +40,11 @@ export default function RecordingStatusChip() {
       if (messages.port_recording === "true") {
         recordingCams.push(messages.port_camera);
       }
+
       if (messages.stbd_recording === "true") {
         recordingCams.push(messages.stbd_camera);
       }
-      console.log(recordingCams);
-      console.log(activeCameraConfig);
-      console.log(messages);
+
       if (recordingCams.includes(activeCameraConfig.cam_name)) {
         setIsRecording(true);
       } else {
