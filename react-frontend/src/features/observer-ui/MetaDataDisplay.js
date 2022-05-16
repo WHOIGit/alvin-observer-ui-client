@@ -44,7 +44,7 @@ export default function NavDataDisplay() {
                     Exp: {camSettings.cruise}
                   </Grid>
                   <Grid item xs={6}>
-                    Dive: {camSettings.dive}
+                    Dive #: {camSettings.dive}
                   </Grid>
                 </Grid>
               </TableCell>
