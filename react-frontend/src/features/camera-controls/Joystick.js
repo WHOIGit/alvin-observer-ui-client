@@ -46,7 +46,7 @@ export default function Joystick() {
     // delay loading of the virtual joystick until CSS transtion ends (.4s)
     setTimeout(() => {
       setShowJoystick(true);
-    }, 500);
+    }, 800);
   }, []);
 
   const sendPanTiltCommand = (commandValue) => {

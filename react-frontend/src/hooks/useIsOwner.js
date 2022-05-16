@@ -19,5 +19,11 @@ export default function useIsOwner() {
   if (camSettings?.owner === "stbd" && currentObserver === "S") {
     isOwner = true;
   }
+
+  // Pilot observer "PL" is always owner
+  if (currentObserver === "PL") {
+    isOwner = true;
+  }
+
   return { isOwner };
 }
