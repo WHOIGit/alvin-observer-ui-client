@@ -10,7 +10,8 @@ import {
 export default function useIsOwner() {
   const camSettings = useSelector(selectCamHeartbeatData);
   const currentObserver = useSelector(selectObserverSide);
-
+  console.log(currentObserver);
+  console.log(camSettings);
   let isOwner = false;
   if (camSettings?.owner === "port" && currentObserver === "P") {
     isOwner = true;
