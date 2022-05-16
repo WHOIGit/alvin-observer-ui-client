@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
 export default function NavDataDisplay() {
   const classes = useStyles();
   const camSettings = useSelector(selectCamHeartbeatData);
-  console.log(camSettings);
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={6}>

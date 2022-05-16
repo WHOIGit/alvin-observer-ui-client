@@ -40,7 +40,7 @@ export default function CameraControlContainer() {
   const dispatch = useDispatch();
   // connect to pilot CAM_HEARTBEAT, store current cam parameters in Redux state
   const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
-  console.log(messages);
+
   // connect to newCameraCommand
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const activeCamera = useSelector(selectActiveCamera);
