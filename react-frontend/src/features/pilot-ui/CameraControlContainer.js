@@ -20,6 +20,7 @@ import {
   selectInitialCamHeartbeatData,
   selectActiveCamera,
   changeActiveCamera,
+  selectCamHeartbeatData,
 } from "../camera-controls/cameraControlsSlice";
 
 import {
@@ -39,11 +40,12 @@ export default function CameraControlContainer() {
   const dispatch = useDispatch();
   // connect to pilot CAM_HEARTBEAT, store current cam parameters in Redux state
   const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
-  console.log(messages);
   // connect to newCameraCommand
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
+  const camSettings = useSelector(selectCamHeartbeatData);
+  console.log(camSettings);
 
   // use CAM_HEARTBEAT parameters only on initial app load to set activeCamera
   // keep camera params in local state otherwise
@@ -88,7 +90,7 @@ export default function CameraControlContainer() {
           <LargeVideo />
         </Grid>
         <Grid item xs={3}>
-          {messages?.camctrl === "y" && (
+          {camSettings?.camctrl === "y" && (
             <List>
               <ListItem>
                 <SelectExposureMode showLabel={true} />
@@ -117,15 +119,15 @@ export default function CameraControlContainer() {
 
         <>
           <Grid item xs>
-            {messages?.camctrl === "y" && <FocusModeButton />}
+            {camSettings?.camctrl === "y" && <FocusModeButton />}
           </Grid>
           <Grid item xs>
-            {messages?.camctrl === "y" && <FocusZoomButtons />}
+            {camSettings?.camctrl === "y" && <FocusZoomButtons />}
           </Grid>
         </>
 
         <Grid item xs>
-          {messages?.pantitlt === "y" && (
+          {camSettings?.pantitlt === "y" && (
             <div className={classes.joystickBox}>
               <Joystick />
             </div>
