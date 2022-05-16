@@ -23,11 +23,7 @@ import {
   selectCamHeartbeatData,
 } from "../camera-controls/cameraControlsSlice";
 
-import {
-  CAM_HEARTBEAT,
-  NEW_CAMERA_COMMAND_EVENT,
-  COMMAND_STRINGS,
-} from "../../config";
+import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config";
 
 const useStyles = makeStyles((theme) => ({
   joystickBox: {
@@ -38,8 +34,6 @@ const useStyles = makeStyles((theme) => ({
 export default function CameraControlContainer() {
   const classes = useStyles();
   const dispatch = useDispatch();
-  // connect to pilot CAM_HEARTBEAT, store current cam parameters in Redux state
-  const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
   // connect to newCameraCommand
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const activeCamera = useSelector(selectActiveCamera);
