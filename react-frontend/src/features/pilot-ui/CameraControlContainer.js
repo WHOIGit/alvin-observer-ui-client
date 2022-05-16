@@ -127,7 +127,7 @@ export default function CameraControlContainer() {
         </>
 
         <Grid item xs>
-          {camSettings?.pantitlt === "y" && (
+          {camSettings?.pantilt === "y" && (
             <div className={classes.joystickBox}>
               <Joystick />
             </div>
