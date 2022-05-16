@@ -87,7 +87,7 @@ export default function CameraControlContainer() {
           <LargeVideo />
         </Grid>
         <Grid item xs={3}>
-          {messages.camctrl === "y" && (
+          {messages?.camctrl === "y" && (
             <List>
               <ListItem>
                 <SelectExposureMode showLabel={true} />
@@ -116,15 +116,15 @@ export default function CameraControlContainer() {
 
         <>
           <Grid item xs>
-            {messages.camctrl === "y" && <FocusModeButton />}
+            {messages?.camctrl === "y" && <FocusModeButton />}
           </Grid>
           <Grid item xs>
-            {messages.camctrl === "y" && <FocusZoomButtons />}
+            {messages?.camctrl === "y" && <FocusZoomButtons />}
           </Grid>
         </>
 
         <Grid item xs>
-          {messages.pantitlt === "y" && (
+          {messages?.pantitlt === "y" && (
             <div className={classes.joystickBox}>
               <Joystick />
             </div>
