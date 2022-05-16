@@ -18,7 +18,7 @@ export default function NavDataDisplay() {
   return (
     <Grid container spacing={2}>
       <Grid item xs={6}>
-        Observer Imaging UI for Alvin {camSettings?.version}
+        Pilot Imaging UI for Alvin {camSettings?.version}
       </Grid>
       <Grid item xs={3}>
         Cruise: {camSettings?.cruise}
