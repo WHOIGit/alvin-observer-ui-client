@@ -33,15 +33,15 @@ export default function NavDataDisplay() {
           <TableBody>
             <TableRow key="version">
               <TableCell scope="row">
-                Observer Imaging UI for Alvin {camSettings.version}
+                Alvin Obs Imaging UI {camSettings.version}
               </TableCell>
             </TableRow>
 
             <TableRow key="cruise">
               <TableCell scope="row">
-                <Grid container spacing={2}>
+                <Grid container spacing={1}>
                   <Grid item xs={6}>
-                    Cruise: {camSettings.cruise}
+                    Exp: {camSettings.cruise}
                   </Grid>
                   <Grid item xs={6}>
                     Dive: {camSettings.dive}
