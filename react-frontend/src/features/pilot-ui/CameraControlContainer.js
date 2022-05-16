@@ -46,7 +46,6 @@ export default function CameraControlContainer() {
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
   const camSettings = useSelector(selectCamHeartbeatData);
-  console.log(camSettings);
 
   // use CAM_HEARTBEAT parameters only on initial app load to set activeCamera
   // keep camera params in local state otherwise
