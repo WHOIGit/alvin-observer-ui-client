@@ -39,7 +39,6 @@ export default function CameraControlContainer() {
   const dispatch = useDispatch();
   // connect to pilot CAM_HEARTBEAT, store current cam parameters in Redux state
   const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
-  console.log(messages);
   // connect to newCameraCommand
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const activeCamera = useSelector(selectActiveCamera);
@@ -114,16 +113,22 @@ export default function CameraControlContainer() {
         <Grid item xs>
           <SetCaptureInterval />
         </Grid>
+
+        <>
+          <Grid item xs>
+            {messages.camctrl === "y" && <FocusModeButton />}
+          </Grid>
+          <Grid item xs>
+            {messages.camctrl === "y" && <FocusZoomButtons />}
+          </Grid>
+        </>
+
         <Grid item xs>
-          <FocusModeButton />
-        </Grid>
-        <Grid item xs>
-          <FocusZoomButtons />
-        </Grid>
-        <Grid item xs>
-          <div className={classes.joystickBox}>
-            <Joystick />
-          </div>
+          {messages.pantitlt === "y" && (
+            <div className={classes.joystickBox}>
+              <Joystick />
+            </div>
+          )}
         </Grid>
       </Grid>
     </>
