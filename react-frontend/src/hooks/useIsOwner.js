@@ -20,6 +20,7 @@ export default function useIsOwner() {
     isOwner = true;
   }
 
+  // Pilot observer "PL" is always owner
   if (currentObserver === "PL") {
     isOwner = true;
   }
