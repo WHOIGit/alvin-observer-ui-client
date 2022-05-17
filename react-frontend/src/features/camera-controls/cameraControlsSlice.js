@@ -9,8 +9,8 @@ import {
 } from "../../config.js";
 
 // set default settings
-const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
-const defaultObserverVideoSmallSrc = VIDEO_STREAM_CONFIG.portObserverSmallVideo;
+const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.pilotVideo;  //portObserverVideo; //mjs-changed-19apr2022 - needed for pilot
+const defaultObserverVideoSmallSrc = VIDEO_STREAM_CONFIG.pilotSmallVideo;  //portObserverSmallVideo; //mjs-changed-19apr2022 - needed for pilot
 const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
 
 const initialState = {
