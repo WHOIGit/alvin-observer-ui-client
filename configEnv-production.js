@@ -30,44 +30,84 @@ window.CAMERAS = [
   { camera: "camera5", cam_name: "aft_cam", owner: "none" },
   { camera: "camera6", cam_name: "down_cam", owner: "none" },
   { camera: "camera7", cam_name: "brow_wide", owner: "none" },
-  { camera: "camera8", cam_name: "sci_cam", owner: "pilot" },
+  { camera: "camera8", cam_name: "sci_cam", owner: "port" },
   { camera: "camera9", cam_name: "pilot_cam", owner: "pilot" },
 ];
 
+
+
 window.ROUTER_INPUTS = [
-  { label: "INPUT 1", value: "INPUT 1" },
-  { label: "INPUT 2", value: "INPUT 2" },
-  { label: "INPUT 3", value: "INPUT 3" },
-  { label: "INPUT 4", value: "INPUT 4" },
-  { label: "INPUT 5", value: "INPUT 5" },
-  { label: "INPUT 6", value: "INPUT 6" },
-  { label: "INPUT 7", value: "INPUT 7" },
-  { label: "INPUT 8", value: "INPUT 8" },
-  { label: "INPUT 9", value: "INPUT 9" },
-  { label: "INPUT 10", value: "INPUT 10" },
-  { label: "INPUT 11", value: "INPUT 11" },
-  { label: "INPUT 12", value: "INPUT 12" },
-  { label: "INPUT 13", value: "INPUT 13" },
-  { label: "INPUT 14", value: "INPUT 14" },
-  { label: "INPUT 15", value: "INPUT 15" },
-  { label: "INPUT 16", value: "INPUT 16" },
+  { label: "port_brow_4k", value: "input1" },
+  { label: "port_patz", value: "input2" },
+  { label: "port_video3", value: "input3" },
+  { label: "INPUT 4", value: "input4" },
+  { label: "brow_cam", value: "input5" },
+  { label: "port_flexlink2", value: "input6" },
+  { label: "aft_cam", value: "input7" },
+  { label: "img_server_vga", value: "input8" },
+  { label: "INPUT 9", value: "input9" },
+  { label: "down_cam", value: "input10" },
+  { label: "stbd_brow_4k", value: "input11" },
+  { label: "stbd_patz", value: "input12" },
+  { label: "stbd_video3", value: "input13" },
+  { label: "sci_cam", value: "input14" },
+  { label: "pilot_cam", value: "input15" },
+  { label: "stbd_flexlink2", value: "input16" },
 ];
 
+/*                   
+aja_input_table = {'port_brow_4k'   : 'input1',   
+                   'port_patz'      : 'input2', 
+                   'port_video3'    : 'input3', 
+                   'input4'         : 'input4', 
+                   'brow_cam'       : 'input5',  #port_flexlink1
+                   'port_flexlink2' : 'input6', 
+                   'aft_cam'        : 'input7',  #port-IP-video1 
+                   'img_server_vga' : 'input8', 
+                   'input9'         : 'input9', 
+                   'down_cam'       : 'input10', #stbs-IP-video 
+                   'stbd_brow_4k'   : 'input11',
+                   'stbd_patz'      : 'input12',
+                   'stbd_video3'    : 'input13',
+                   'sci_cam'        : 'input14', 
+                   'pilot_cam'      : 'input15', #stbd_flexlink1        
+                   'stbd_flexlink2' : 'input16'} 
+*/                      
+
 window.ROUTER_OUTPUTS = [
-  { label: "OUTPUT 1", value: "OUTPUT 1" },
-  { label: "OUTPUT 2", value: "OUTPUT 2" },
-  { label: "OUTPUT 3", value: "OUTPUT 3" },
-  { label: "OUTPUT 4", value: "OUTPUT 4" },
-  { label: "OUTPUT 5", value: "OUTPUT 5" },
-  { label: "OUTPUT 6", value: "OUTPUT 6" },
-  { label: "OUTPUT 7", value: "OUTPUT 7" },
-  { label: "OUTPUT 8", value: "OUTPUT 8" },
-  { label: "OUTPUT 9", value: "OUTPUT 9" },
-  { label: "OUTPUT 10", value: "OUTPUT 10" },
-  { label: "OUTPUT 11", value: "OUTPUT 11" },
-  { label: "OUTPUT 12", value: "OUTPUT 12" },
-  { label: "OUTPUT 13", value: "OUTPUT 13" },
-  { label: "OUTPUT 14", value: "OUTPUT 14" },
-  { label: "OUTPUT 15", value: "OUTPUT 15" },
-  { label: "OUTPUT 16", value: "OUTPUT 16" },
-];
+  { label: "port_raw_rec", value: "output1" },
+  { label: "port_prox_rec", value: "output2" },
+  { label: "port_obs_mon", value: "output3" },
+  { label: "browcam_fg", value: "output4" },
+  { label: "OUTPUT 5", value: "output5" },
+  { label: "OUTPUT 6", value: "output6" },
+  { label: "pilot_mon", value: "output7" },
+  { label: "OUTPUT 8", value: "output8" },
+  { label: "OUTPUT 9", value: "output9" },
+  { label: "OUTPUT 10", value: "output10" },
+  { label: "stbd_raw_rec", value: "output11" },
+  { label: "stbd_prox_rec", value: "output12" },
+  { label: "stbd_obs_mon", value: "output13" },
+  { label: "OUTPUT 14", value: "output14" },
+  { label: "browcam_video", value: "output15" },
+  { label: "scicam_video", value: "output16" },
+];  
+  
+/*
+aja_output_table = {'port_prores_rec'  : 'output1', #port_video1  
+                    'port_proxy_rec'   : 'output2', #port_video2
+                    'port_obs_mon'     : 'output3', #port_video3
+                    'browcam_fg_video' : 'output4', 
+                    'output5'          : 'output5', 
+                    'output6'          : 'output6', 
+                    'pilot_mon'        : 'output7', 
+                    'output8'          : 'output8', 
+                    'output9'          : 'output9', 
+                    'output10'         : 'output10', 
+                    'stbd_prores_rec'  : 'output11', #Stbd_video1
+                    'stbd_proxy_rec'   : 'output12', #Stbd_video2 
+                    'stbd_obs_mon'     : 'output13', #Stbd_video3
+                    'output14'         : 'output14', 
+                    'browcam_video'    : 'output15', #Browcam Av.IO          
+                    'scicam_video'     : 'output16'} #Scicam Av.IO  
+*/
