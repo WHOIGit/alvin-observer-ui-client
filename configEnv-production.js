@@ -30,12 +30,32 @@ window.CAMERAS = [
   { camera: "camera5", cam_name: "aft_cam", owner: "none" },
   { camera: "camera6", cam_name: "down_cam", owner: "none" },
   { camera: "camera7", cam_name: "brow_wide", owner: "none" },
-  { camera: "camera8", cam_name: "sci_cam", owner: "port" },
+  { camera: "camera8", cam_name: "sci_cam", owner: "pilot" },
   { camera: "camera9", cam_name: "pilot_cam", owner: "pilot" },
 ];
 
 
 
+window.ROUTER_INPUTS = [
+  { label: "pilot_cam", value: "input1" },
+  { label: "port_flexlink2", value: "input2" },
+  { label: "port_patz", value: "input3" },
+  { label: "port_brow_4k", value: "input4" },
+  { label: "INPUT 5", value: "input5" },
+  { label: "INPUT 6", value: "input6" },
+  { label: "aft_cam", value: "input7" },
+  { label: "img_server_vga", value: "input8" },
+  { label: "INPUT 9", value: "input9" },
+  { label: "down_cam", value: "input10" },
+  { label: "sci_cam", value: "input11" },
+  { label: "INPUT 12", value: "input12" },
+  { label: "stbd_patz", value: "input13" },
+  { label: "stbd_brow_4k", value: "input14" },
+  { label: "brow_cam", value: "input15" },
+  { label: "stbd_flexlink2", value: "input16" },
+];
+
+/*
 window.ROUTER_INPUTS = [
   { label: "port_brow_4k", value: "input1" },
   { label: "port_patz", value: "input2" },
@@ -54,6 +74,8 @@ window.ROUTER_INPUTS = [
   { label: "pilot_cam", value: "input15" },
   { label: "stbd_flexlink2", value: "input16" },
 ];
+*/
+
 
 /*                   
 aja_input_table = {'port_brow_4k'   : 'input1',   
