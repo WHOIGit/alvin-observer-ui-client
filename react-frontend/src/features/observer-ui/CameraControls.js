@@ -9,7 +9,6 @@ const useStyles = makeStyles((theme) => ({
     //backgroundColor: "#f5f5f5",
     backgroundColor: "#282c34",
     position: "absolute",
-    top: 250,
     left: 0,
     width: "100%",
     padding: theme.spacing(2),
