@@ -25,11 +25,11 @@ export default function LargeVideo() {
   );
 
   useEffect(() => {
-    const videoObserver = videoElem.current;
-    if (videoObserver) {
-      const playerObserver = new WebRtcPlayer(
-        videoObserver.id,
-        observerVideoSrc
+    if (videoElem.current) {
+      const player = new WebRtcPlayer(
+        videoElem.current.id,
+        observerVideoSrc /* stream */,
+        "0" /* channel */
       );
     }
   }, [observerVideoSrc]);
