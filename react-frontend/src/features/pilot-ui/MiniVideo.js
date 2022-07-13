@@ -76,13 +76,12 @@ export default function MiniVideo({ videoSrc, observerSide, videoType }) {
   });
 
   useEffect(() => {
-    const video = videoElem.current;
-    if (videoSrc) {
-      try {
-        new WebRtcPlayer(video.id, videoSrc);
-      } catch (error) {
-        console.error(error);
-      }
+    if (videoElem.current) {
+      const player = new WebRtcPlayer(
+        videoElem.current.id,
+        videoSrc /* stream */,
+        "0" /* channel */
+      );
     }
   }, [videoSrc]);
 
