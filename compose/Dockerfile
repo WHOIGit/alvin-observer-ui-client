@@ -17,7 +17,7 @@ ARG npm_config_cafile=/etc/ssl/certs/ca-certificates.crt
 
 # Install all node packages
 COPY ./react-frontend/package*.json /app/
-RUN npm install --no-audit
+RUN npm install --no-audit --legacy-peer-deps
 
 # Copy sources and build
 COPY ./react-frontend /app
