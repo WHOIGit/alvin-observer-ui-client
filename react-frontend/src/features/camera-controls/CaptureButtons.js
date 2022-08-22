@@ -37,6 +37,7 @@ export default function CaptureButtons() {
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   //console.log(messages);
   const [loading, setLoading] = useState(false);
+  const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const [currentRecordingSrc, setCurrentRecordingSrc] = useState(null);
   const [requestedSrc, setRequestedSrc] = useState(null);
 
@@ -84,6 +85,16 @@ export default function CaptureButtons() {
     }
   };
 
+  const handleImgCapture = () => {
+    setLoadingImgCapture(true);
+    handleSendMessage(COMMAND_STRINGS.stillImageCaptureCommand, 0);
+
+    // add a "fake" delay to UI to show users that image capture is processing
+    setTimeout(() => {
+      setLoadingImgCapture(false);
+    }, 2000);
+  };
+
   useEffect(() => {
     if (currentRecordingSrc === requestedSrc) {
       setLoading(false);
@@ -93,17 +104,20 @@ export default function CaptureButtons() {
   return (
     <>
       <Grid item xs={6}>
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          className={classes.ctrlButton}
-          onClick={() =>
-            handleSendMessage(COMMAND_STRINGS.stillImageCaptureCommand, 0)
-          }
-        >
-          Still Img Capture
-        </Button>
+        <div className={classes.buttonWrapper}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            className={classes.ctrlButton}
+            onClick={() => handleImgCapture()}
+          >
+            Still Img Capture
+          </Button>
+          {loadingImgCapture && (
+            <CircularProgress size={24} className={classes.buttonProgress} />
+          )}
+        </div>
       </Grid>
       <Grid item xs={6}>
         <div className={classes.buttonWrapper}>

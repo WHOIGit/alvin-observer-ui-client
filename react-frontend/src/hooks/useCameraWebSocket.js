@@ -78,10 +78,6 @@ const useCameraWebSocket = (
       //transports: ["websocket"],
     });
 
-    socketRef.current.on("connect", (incomingMessage) => {
-      console.log("ON CONNECT", incomingMessage);
-    });
-
     // Listens for incoming messages
     socketRef.current.on(socketEvent, (incomingMessage) => {
       /*
