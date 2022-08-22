@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { Fab } from "@material-ui/core";
 import CameraAltIcon from "@material-ui/icons/CameraAlt";
+import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import CameraControls from "./CameraControls";
 import ObserverSideSelect from "./ObserverSideSelect";
 import ObserverUI from "./ObserverUI";
@@ -81,7 +83,7 @@ export default function ObserverUIContainer() {
           onClick={() => handleControlToggle()}
         >
           <CameraAltIcon className={classes.extendedIcon} />
-          {showTopControls ? "Hide" : "Show"} Camera
+          {showTopControls ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
         </Fab>
       </div>
       <CameraControls showFullCameraControls={showFullCameraControls} />
