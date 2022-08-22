@@ -35,7 +35,7 @@ export default function CaptureButtons() {
   const activeCamera = useSelector(selectActiveCamera);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
-  //console.log(messages);
+  console.log(messages);
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const [currentRecordingSrc, setCurrentRecordingSrc] = useState(null);
