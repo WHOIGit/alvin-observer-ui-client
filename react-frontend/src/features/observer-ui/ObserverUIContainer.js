@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
   toggleButton: {
     position: "absolute",
-    bottom: -Math.abs(theme.spacing(8)),
+    bottom: -Math.abs(theme.spacing(6)),
     right: theme.spacing(2),
     zIndex: 2000,
     transition: "all 0.4s",
@@ -77,6 +77,7 @@ export default function ObserverUIContainer() {
         <Fab
           variant="extended"
           color="primary"
+          size="medium"
           className={`${classes.toggleButton} ${
             showFullCameraControls ? classes.toggleButtonOff : "camera-off"
           }`}

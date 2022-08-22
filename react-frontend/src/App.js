@@ -13,7 +13,7 @@ import "@fontsource/roboto/700.css";
 const useStyles = makeStyles((theme) => ({
   sealogBox: {
     backgroundColor: "black",
-    paddingTop: "30px",
+    paddingTop: "40px",
   },
   sealogFrame: {
     width: "100%",
