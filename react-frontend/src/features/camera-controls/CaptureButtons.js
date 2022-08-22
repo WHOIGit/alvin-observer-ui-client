@@ -109,6 +109,7 @@ export default function CaptureButtons() {
             variant="contained"
             color="primary"
             size="small"
+            disabled={loadingImgCapture}
             className={classes.ctrlButton}
             onClick={() => handleImgCapture()}
           >
