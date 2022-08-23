@@ -31,7 +31,7 @@ export default function SelectExposureMode({ showLabel }) {
   const camSettings = useSelector(selectCamHeartbeatData);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { isOwner } = useIsOwner();
-  const labelText = "EXP:";
+  const labelText = "EXP MODE:";
 
   const handleSendMessage = (event) => {
     const payload = {

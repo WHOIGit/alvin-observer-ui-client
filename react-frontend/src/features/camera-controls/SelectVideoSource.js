@@ -28,7 +28,7 @@ export default function SelectVideoSource({ showLabel }) {
   const activeCamera = useSelector(selectActiveCamera);
   const cameras = useSelector((state) => state.cameraControls.availableCameras);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
-  const labelText = "SRC:";
+  const labelText = "SOURCE:";
 
   const handleSendMessage = (event) => {
     const payload = {

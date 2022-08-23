@@ -47,7 +47,7 @@ export default function MiniVideoHeader({ videoType }) {
   const classes = useStyles();
   const [cameraName, setCameraName] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
   const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const recorderResponseError = useSelector(selectRecorderResponseError);
   const { messages } = useCameraWebSocket(wsEvent);
@@ -62,7 +62,11 @@ export default function MiniVideoHeader({ videoType }) {
     if (videoType === "REC" && messages) {
       setCameraName(messages.camera);
       setIsRecording(messages.recording === "true");
-      recorderResponseError && setErrorMessage("Connection Error!");
+      if (recorderResponseError) {
+        setErrorMessage("Connection Error!");
+      } else {
+        setErrorMessage("");
+      }
     } else if (videoType === "OBS" && activeCameraConfig) {
       setCameraName(activeCameraConfig.cam_name);
       setIsRecording(false);
