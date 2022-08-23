@@ -35,7 +35,6 @@ export default function CaptureButtons() {
   const activeCamera = useSelector(selectActiveCamera);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
-  console.log(messages);
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const [currentRecordingSrc, setCurrentRecordingSrc] = useState(null);
@@ -70,11 +69,28 @@ export default function CaptureButtons() {
   const handleRecordAction = () => {
     setLoading(true);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera);
-
+    setRequestedSrc(activeCamera);
     // if not changing recording cameras, add a "fake" delay to UI to match the
     // time it takes imaging server to start new recording,
     // we don't get this status change from the imaging server
     console.log(activeCamera, currentRecordingSrc);
+    // need to check if messages.recording is true and src cameras match
+    const checkRecorderStatus = () => {
+      if (
+        messages.recording !== "true" ||
+        activeCamera === currentRecordingSrc
+      ) {
+        console.log("Recorder status false");
+        window.setTimeout(
+          checkRecorderStatus,
+          100
+        ); /* this checks the flag every 100 milliseconds*/
+      } else {
+        setLoading(false);
+      }
+    };
+    checkRecorderStatus();
+    /*
     if (activeCamera === currentRecordingSrc) {
       setTimeout(() => {
         setLoading(false);
@@ -83,6 +99,7 @@ export default function CaptureButtons() {
     } else {
       setRequestedSrc(activeCamera);
     }
+    */
   };
 
   const handleImgCapture = () => {
