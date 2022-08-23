@@ -5,7 +5,7 @@ import { Grid, Button, CircularProgress, Box } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
-import { selectActiveCamera } from "./cameraControlsSlice";
+import { selectActiveCameraConfig } from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
   NEW_CAMERA_COMMAND_EVENT,
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CaptureButtons() {
   const classes = useStyles();
-  const activeCamera = useSelector(selectActiveCamera);
+  const activeCamera = useSelector(selectActiveCameraConfig);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   const [recordTimer, setRecordTimer] = useState(null);
