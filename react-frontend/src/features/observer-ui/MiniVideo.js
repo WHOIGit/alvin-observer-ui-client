@@ -82,6 +82,7 @@ export default function MiniVideo({ videoSrc, videoType }) {
   }, [videoSrc]);
 
   useEffect(() => {
+    console.log("EFFECT FIRING");
     if (videoType === "REC" && messages) {
       setCameraName(messages.camera);
       setIsRecording(messages.recording === "true");
