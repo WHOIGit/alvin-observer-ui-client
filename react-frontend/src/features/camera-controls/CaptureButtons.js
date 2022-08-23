@@ -50,6 +50,18 @@ export default function CaptureButtons() {
     }
   }, [messages]);
 
+  useEffect(() => {
+    // set current Recording camera ID from RECORDER_HEARTBEAT socket
+    if (messages && recordTimer) {
+      const recCamera = getCameraConfigFromName(messages.camera);
+
+      if (messages.recording === "true" && activeCamera === recCamera) {
+        clearInterval(recordTimer);
+        setLoading(false);
+      }
+    }
+  }, [messages, recordTimer, activeCamera]);
+
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
       action: {
@@ -92,13 +104,18 @@ export default function CaptureButtons() {
     console.log(activeCamera, currentRecordingSrc);
     console.log(messages.recording);
 
-    /*
+    // This is the maximum time the spinner will display
+    // Cancel this timer if we get a OK response in useEffect above
     const timer = setTimeout(() => {
+      console.log("CANCEL TIMER. ERROR");
       setLoading(false);
     }, 10000);
     setRecordTimer(timer);
-    */
-    await waitOnRecorder(() => messages.recording === "true");
+    /*
+    await waitOnRecorder(
+      () =>
+        messages.recording === "true" && activeCamera === currentRecordingSrc
+    ); */
     console.log("Waiting done");
     setLoading(false);
 
