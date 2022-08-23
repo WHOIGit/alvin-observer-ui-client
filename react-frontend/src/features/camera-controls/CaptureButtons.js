@@ -75,21 +75,25 @@ export default function CaptureButtons() {
     // we don't get this status change from the imaging server
     console.log(activeCamera, currentRecordingSrc);
     // need to check if messages.recording is true and src cameras match
-    const checkRecorderStatus = () => {
-      if (
-        messages.recording !== "true" ||
-        activeCamera === currentRecordingSrc
-      ) {
-        console.log("Recorder status false");
-        window.setTimeout(
-          checkRecorderStatus,
-          100
-        ); /* this checks the flag every 100 milliseconds*/
-      } else {
-        setLoading(false);
-      }
+    const waitOnRecorder = (condition) => {
+      return new Promise((resolve) => {
+        let interval = setInterval(() => {
+          if (!condition()) {
+            return;
+          }
+
+          clearInterval(interval);
+          resolve();
+        }, 100);
+      });
     };
-    checkRecorderStatus();
+
+    await waitOnRecorder(
+      () =>
+        messages.recording === "true" && activeCamera === currentRecordingSrc
+    );
+    setLoading(false);
+
     /*
     if (activeCamera === currentRecordingSrc) {
       setTimeout(() => {
