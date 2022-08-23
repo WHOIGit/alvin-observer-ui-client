@@ -41,18 +41,7 @@ export default function CaptureButtons() {
   const [recordTimer, setRecordTimer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
-  const [currentRecordingSrc, setCurrentRecordingSrc] = useState(null);
-  const [requestedSrc, setRequestedSrc] = useState(null);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    // set current Recording camera ID from RECORDER_HEARTBEAT socket
-    if (messages) {
-      const recCamera = getCameraConfigFromName(messages.camera);
-
-      recCamera && setCurrentRecordingSrc(recCamera.camera);
-    }
-  }, [messages]);
 
   useEffect(() => {
     // set current Recording camera ID from RECORDER_HEARTBEAT socket
@@ -90,12 +79,9 @@ export default function CaptureButtons() {
   const handleRecordAction = async () => {
     setLoading(true);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera);
-    setRequestedSrc(activeCamera);
-    // if not changing recording cameras, add a "fake" delay to UI to match the
-    // time it takes imaging server to start new recording,
-    // we don't get this status change from the imaging server
-    console.log(activeCamera, currentRecordingSrc);
-    console.log(messages.recording);
+    // reset error status in Redux
+    const payload = false;
+    dispatch(setRecorderError(payload));
 
     // This is the maximum time the spinner will display
     // Cancel this timer if we get a OK response from socket message in useEffect above
