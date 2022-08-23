@@ -47,7 +47,7 @@ export default function CaptureButtons() {
     // set current Recording camera ID from RECORDER_HEARTBEAT socket
 
     if (messages && recordTimer) {
-      console.log(activeCamera, messages.camera, recordTimer, messages);
+      //console.log(activeCamera, messages.camera, recordTimer, messages);
       if (
         messages.recording === "true" &&
         activeCamera.cam_name === messages.camera
