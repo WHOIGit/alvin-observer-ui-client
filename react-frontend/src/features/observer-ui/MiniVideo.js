@@ -1,43 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import clsx from "clsx";
+import React, { useEffect, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Card, CardHeader, CardContent } from "@material-ui/core";
-import VideocamIcon from "@material-ui/icons/Videocam";
-import VideocamOffIcon from "@material-ui/icons/VideocamOff";
+import { Card, CardContent } from "@material-ui/core";
 import { v4 as uuidv4 } from "uuid";
 // local import
-import { selectActiveCameraConfig } from "../camera-controls/cameraControlsSlice";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import WebRtcPlayer from "../../utils/webrtcplayer";
-import {
-  VIDEO_STREAM_CONFIG,
-  RECORDER_HEARTBEAT,
-  CAM_HEARTBEAT,
-} from "../../config.js";
+import MiniVideoHeader from "./MiniVideoHeader";
+import { VIDEO_STREAM_CONFIG } from "../../config.js";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
-  },
-  headerRoot: {
-    padding: "0 2px",
-  },
-  headerRecording: {
-    backgroundColor: "red",
-  },
-  title: {
-    fontSize: ".9em",
-  },
-  cardAction: {
-    marginTop: "0",
-    marginRight: 0,
-    height: "30px",
-  },
-  actionIcon: {
-    position: "absolute",
   },
   cardContent: {
     padding: 0,
@@ -48,24 +22,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function MiniVideo({ videoSrc, videoType }) {
-  // set websocket event based on videoType
-  let wsEvent;
-  if (videoType === "OBS") {
-    wsEvent = CAM_HEARTBEAT;
-  } else if (videoType === "REC") {
-    wsEvent = RECORDER_HEARTBEAT;
-  }
   const classes = useStyles();
   const videoElem = useRef(null);
-  const [cameraName, setCameraName] = useState(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const activeCameraConfig = useSelector(selectActiveCameraConfig);
-  const { messages } = useCameraWebSocket(wsEvent);
-  console.log(messages);
-  const cardHeaderStyle = clsx({
-    [classes.headerRoot]: true, //always applies
-    [classes.headerRecording]: messages && isRecording, //only when condition === true
-  });
 
   useEffect(() => {
     if (videoElem.current) {
@@ -77,34 +35,9 @@ export default function MiniVideo({ videoSrc, videoType }) {
     }
   }, [videoSrc]);
 
-  useEffect(() => {
-    if (videoType === "REC" && messages) {
-      setCameraName(messages.camera);
-      setIsRecording(messages.recording === "true");
-    } else if (videoType === "OBS" && activeCameraConfig) {
-      setCameraName(activeCameraConfig.cam_name);
-      setIsRecording(false);
-    }
-  }, [messages, videoType, activeCameraConfig]);
-
-  let title = videoType + ": " + cameraName;
-
   return (
     <Card className={`${classes.root}`}>
-      <CardHeader
-        title={title}
-        action={
-          <div>
-            {isRecording && videoType === "REC" && <VideocamIcon />}
-            {!isRecording && videoType === "REC" && <VideocamOffIcon />}
-          </div>
-        }
-        classes={{
-          root: cardHeaderStyle,
-          title: classes.title,
-          action: classes.cardAction,
-        }}
-      />
+      <MiniVideoHeader videoType={videoType} />
       <CardContent className={classes.cardContent}>
         <div>
           <video

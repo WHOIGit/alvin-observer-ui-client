@@ -9,8 +9,8 @@ import {
 } from "../../config.js";
 
 // set default settings
-const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.pilotVideo;  //portObserverVideo; //mjs-changed-19apr2022 - needed for pilot
-const defaultObserverVideoSmallSrc = VIDEO_STREAM_CONFIG.pilotSmallVideo;  //portObserverSmallVideo; //mjs-changed-19apr2022 - needed for pilot
+const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.pilotVideo; //portObserverVideo; //mjs-changed-19apr2022 - needed for pilot
+const defaultObserverVideoSmallSrc = VIDEO_STREAM_CONFIG.pilotSmallVideo; //portObserverSmallVideo; //mjs-changed-19apr2022 - needed for pilot
 //const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo; //mjs-removed-19apr2022
 
 const initialState = {
@@ -29,6 +29,7 @@ const initialState = {
   lastCommand: null,
   availableCameras: CAMERAS,
   joystickStatus: null,
+  recorderResponseError: false,
 };
 
 const getCameraConfig = (cameraId) => {
@@ -46,13 +47,15 @@ export const cameraControlsSlice = createSlice({
       if (action.payload === "P") {
         state.webSocketNamespace = WS_SERVER_NAMESPACE_PORT;
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
-        state.observerVideoSmallSrc = VIDEO_STREAM_CONFIG.portObserverSmallVideo;
+        state.observerVideoSmallSrc =
+          VIDEO_STREAM_CONFIG.portObserverSmallVideo;
         //state.recordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo; //mjs-added-19apr2022
       }
       if (action.payload === "S") {
         state.webSocketNamespace = WS_SERVER_NAMESPACE_STARBOARD;
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.stbdObserverVideo;
-        state.observerVideoSmallSrc = VIDEO_STREAM_CONFIG.stbdObserverSmallVideo;
+        state.observerVideoSmallSrc =
+          VIDEO_STREAM_CONFIG.stbdObserverSmallVideo;
         //state.recordVideoSrc = VIDEO_STREAM_CONFIG.stbdRecordVideo; //mjs-added-19apr2022
       }
       // set available cameras
@@ -178,6 +181,9 @@ export const cameraControlsSlice = createSlice({
     setJoystickStatus: (state, action) => {
       state.joystickStatus = action.payload;
     },
+    setRecorderError: (state, action) => {
+      state.recorderResponseError = action.payload;
+    },
   },
 });
 
@@ -192,7 +198,8 @@ export const {
   changeCurrentCamData,
   setLastCommand,
   setObserverSide,
-  setJoystickStatus
+  setJoystickStatus,
+  setRecorderError,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -242,6 +249,10 @@ export const selectRecorderHeartbeatData = (state) =>
 export const selectCurrentCamData = (state) =>
   state.cameraControls.currentCamData;
 
-// return the curreent joystick status
+// return the current joystick status
 export const selectJoystickStatus = (state) =>
   state.cameraControls.joystickStatus;
+
+// return the error status of last Recorder response
+export const selectRecorderResponseError = (state) =>
+  state.cameraControls.recorderResponseError;
