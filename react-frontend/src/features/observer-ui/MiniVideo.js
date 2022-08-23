@@ -65,7 +65,7 @@ export default function MiniVideo({ videoSrc, videoType }) {
   const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const recorderResponseError = useSelector(selectRecorderResponseError);
   const { messages } = useCameraWebSocket(wsEvent);
-  console.log(wsEvent);
+  console.log(wsEvent, messages);
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
     [classes.headerRecording]: messages && isRecording, //only when condition === true
@@ -82,7 +82,6 @@ export default function MiniVideo({ videoSrc, videoType }) {
   }, [videoSrc]);
 
   useEffect(() => {
-    console.log("EFFECT FIRING");
     if (videoType === "REC" && messages) {
       setCameraName(messages.camera);
       setIsRecording(messages.recording === "true");
