@@ -55,7 +55,7 @@ export default function MiniVideoHeader({ videoType }) {
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
     [classes.headerRecording]: messages && isRecording, //only when condition === true
-    [classes.headerError]: recorderResponseError, //only when condition === true
+    [classes.headerError]: videoType === "REC" && recorderResponseError, //only when condition === true
   });
 
   useEffect(() => {
