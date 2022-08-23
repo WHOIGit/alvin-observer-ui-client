@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Button, CircularProgress, Box } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
-import { selectActiveCameraConfig } from "./cameraControlsSlice";
+import {
+  selectActiveCameraConfig,
+  setRecorderError,
+} from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
   NEW_CAMERA_COMMAND_EVENT,
@@ -40,6 +43,7 @@ export default function CaptureButtons() {
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const [currentRecordingSrc, setCurrentRecordingSrc] = useState(null);
   const [requestedSrc, setRequestedSrc] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // set current Recording camera ID from RECORDER_HEARTBEAT socket
@@ -99,6 +103,9 @@ export default function CaptureButtons() {
     const timer = setTimeout(() => {
       console.log("CANCEL TIMER. ERROR");
       setLoading(false);
+      // save error status in Redux
+      const payload = true;
+      dispatch(setRecorderError(payload));
     }, 12000);
     setRecordTimer(timer);
   };
