@@ -66,6 +66,21 @@ export default function CaptureButtons() {
     sendMessage(payload);
   };
 
+  // need to check if messages.recording is true and src cameras match
+  const waitOnRecorder = (condition) => {
+    console.log("Waiting start");
+    return new Promise((resolve) => {
+      let interval = setInterval(() => {
+        if (!condition()) {
+          return;
+        }
+
+        clearInterval(interval);
+        resolve();
+      }, 100);
+    });
+  };
+
   const handleRecordAction = async () => {
     setLoading(true);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera);
@@ -74,24 +89,13 @@ export default function CaptureButtons() {
     // time it takes imaging server to start new recording,
     // we don't get this status change from the imaging server
     console.log(activeCamera, currentRecordingSrc);
-    // need to check if messages.recording is true and src cameras match
-    const waitOnRecorder = (condition) => {
-      return new Promise((resolve) => {
-        let interval = setInterval(() => {
-          if (!condition()) {
-            return;
-          }
-
-          clearInterval(interval);
-          resolve();
-        }, 100);
-      });
-    };
+    console.log(messages.recording);
 
     await waitOnRecorder(
       () =>
         messages.recording === "true" && activeCamera === currentRecordingSrc
     );
+    console.log("Waiting done");
     setLoading(false);
 
     /*
