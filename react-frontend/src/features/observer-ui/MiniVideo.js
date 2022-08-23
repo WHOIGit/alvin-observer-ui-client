@@ -13,23 +13,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
-  headerRoot: {
-    padding: "0 2px",
-  },
-  headerRecording: {
-    backgroundColor: "red",
-  },
-  title: {
-    fontSize: ".9em",
-  },
-  cardAction: {
-    marginTop: "0",
-    marginRight: 0,
-    height: "30px",
-  },
-  actionIcon: {
-    position: "absolute",
-  },
   cardContent: {
     padding: 0,
     "&:last-child": {

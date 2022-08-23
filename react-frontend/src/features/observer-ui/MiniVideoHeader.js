@@ -20,6 +20,9 @@ const useStyles = makeStyles((theme) => ({
   headerRecording: {
     backgroundColor: "red",
   },
+  headerError: {
+    backgroundColor: "#ffc107",
+  },
   title: {
     fontSize: ".9em",
   },
@@ -44,26 +47,29 @@ export default function MiniVideoHeader({ videoType }) {
   const classes = useStyles();
   const [cameraName, setCameraName] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const recorderResponseError = useSelector(selectRecorderResponseError);
   const { messages } = useCameraWebSocket(wsEvent);
-  console.log(wsEvent, messages);
+
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
     [classes.headerRecording]: messages && isRecording, //only when condition === true
+    [classes.headerError]: recorderResponseError, //only when condition === true
   });
 
   useEffect(() => {
     if (videoType === "REC" && messages) {
       setCameraName(messages.camera);
       setIsRecording(messages.recording === "true");
+      recorderResponseError && setErrorMessage("Connection Error!");
     } else if (videoType === "OBS" && activeCameraConfig) {
       setCameraName(activeCameraConfig.cam_name);
       setIsRecording(false);
     }
-  }, [messages, videoType, activeCameraConfig]);
+  }, [messages, videoType, activeCameraConfig, recorderResponseError]);
 
-  let title = videoType + ": " + cameraName;
+  let title = videoType + ": " + cameraName + " " + errorMessage;
 
   return (
     <CardHeader
