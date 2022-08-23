@@ -7,7 +7,10 @@ import VideocamIcon from "@material-ui/icons/Videocam";
 import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import { v4 as uuidv4 } from "uuid";
 // local import
-import { selectActiveCameraConfig } from "../camera-controls/cameraControlsSlice";
+import {
+  selectActiveCameraConfig,
+  selectRecorderResponseError,
+} from "../camera-controls/cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import {
@@ -60,8 +63,9 @@ export default function MiniVideo({ videoSrc, videoType }) {
   const [cameraName, setCameraName] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const activeCameraConfig = useSelector(selectActiveCameraConfig);
+  const recorderResponseError = useSelector(selectRecorderResponseError);
   const { messages } = useCameraWebSocket(wsEvent);
-  //console.log(messages);
+  console.log(recorderResponseError);
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
     [classes.headerRecording]: messages && isRecording, //only when condition === true

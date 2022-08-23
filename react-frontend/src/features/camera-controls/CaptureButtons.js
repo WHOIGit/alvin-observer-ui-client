@@ -60,7 +60,7 @@ export default function CaptureButtons() {
     if (messages && recordTimer) {
       console.log(activeCamera, messages.camera, recordTimer, messages);
       if (
-        messages.recording === "true" &&
+        messages.recording === "false" &&
         activeCamera.cam_name === messages.camera
       ) {
         clearInterval(recordTimer);
