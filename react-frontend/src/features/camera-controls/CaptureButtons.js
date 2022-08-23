@@ -35,6 +35,7 @@ export default function CaptureButtons() {
   const activeCamera = useSelector(selectActiveCamera);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
+  const [recordTimer, setRecordTimer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const [currentRecordingSrc, setCurrentRecordingSrc] = useState(null);
@@ -91,6 +92,12 @@ export default function CaptureButtons() {
     console.log(activeCamera, currentRecordingSrc);
     console.log(messages.recording);
 
+    /*
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 10000);
+    setRecordTimer(timer);
+    */
     await waitOnRecorder(
       () =>
         messages.recording === "true" && activeCamera === currentRecordingSrc
@@ -119,12 +126,6 @@ export default function CaptureButtons() {
       setLoadingImgCapture(false);
     }, 2000);
   };
-
-  useEffect(() => {
-    if (currentRecordingSrc === requestedSrc) {
-      setLoading(false);
-    }
-  }, [currentRecordingSrc, requestedSrc]);
 
   return (
     <>
