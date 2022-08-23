@@ -41,7 +41,7 @@ export default function TopControlPanel({
   const recordVideoSrc = useSelector(
     (state) => state.cameraControls.recordVideoSrc
   );
-
+  console.log(recordVideoSrc, observerVideoSmallSrc);
   return (
     <>
       <Grid container spacing={2}>
