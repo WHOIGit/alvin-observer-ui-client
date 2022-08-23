@@ -41,6 +41,7 @@ export default function TopControlPanel({
   const recordVideoSrc = useSelector(
     (state) => state.cameraControls.recordVideoSrc
   );
+  console.log(observerVideoSmallSrc, recordVideoSrc);
 
   return (
     <>
