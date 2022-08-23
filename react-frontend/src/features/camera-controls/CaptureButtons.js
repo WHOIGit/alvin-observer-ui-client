@@ -98,10 +98,7 @@ export default function CaptureButtons() {
     }, 10000);
     setRecordTimer(timer);
     */
-    await waitOnRecorder(
-      () =>
-        messages.recording === "true" && activeCamera === currentRecordingSrc
-    );
+    await waitOnRecorder(() => messages.recording === "true");
     console.log("Waiting done");
     setLoading(false);
 
