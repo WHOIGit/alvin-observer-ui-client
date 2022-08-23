@@ -116,8 +116,6 @@ export default function CaptureButtons() {
       () =>
         messages.recording === "true" && activeCamera === currentRecordingSrc
     ); */
-    console.log("Waiting done");
-    setLoading(false);
 
     /*
     if (activeCamera === currentRecordingSrc) {

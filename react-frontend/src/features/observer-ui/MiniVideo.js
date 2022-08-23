@@ -61,7 +61,7 @@ export default function MiniVideo({ videoSrc, videoType }) {
   const [isRecording, setIsRecording] = useState(false);
   const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const { messages } = useCameraWebSocket(wsEvent);
-  console.log(messages);
+  //console.log(messages);
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
     [classes.headerRecording]: messages && isRecording, //only when condition === true
