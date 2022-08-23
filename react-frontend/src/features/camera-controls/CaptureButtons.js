@@ -54,9 +54,8 @@ export default function CaptureButtons() {
     // set current Recording camera ID from RECORDER_HEARTBEAT socket
 
     if (messages && recordTimer) {
-      const recCamera = getCameraConfigFromName(messages.camera);
-      console.log(activeCamera, recCamera, recordTimer, messages);
-      if (messages.recording === "true" && activeCamera === recCamera) {
+      console.log(activeCamera, messages.camera, recordTimer, messages);
+      if (messages.recording === "true" && activeCamera === messages.camera) {
         clearInterval(recordTimer);
         setLoading(false);
       }
@@ -80,21 +79,6 @@ export default function CaptureButtons() {
     sendMessage(payload);
   };
 
-  // need to check if messages.recording is true and src cameras match
-  const waitOnRecorder = (condition) => {
-    console.log("Waiting start");
-    return new Promise((resolve) => {
-      let interval = setInterval(() => {
-        if (!condition()) {
-          return;
-        }
-
-        clearInterval(interval);
-        resolve();
-      }, 100);
-    });
-  };
-
   const handleRecordAction = async () => {
     setLoading(true);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera);
@@ -106,28 +90,13 @@ export default function CaptureButtons() {
     console.log(messages.recording);
 
     // This is the maximum time the spinner will display
-    // Cancel this timer if we get a OK response in useEffect above
+    // Cancel this timer if we get a OK response from socket message in useEffect above
+    // OK response can take up to 10 seconds
     const timer = setTimeout(() => {
       console.log("CANCEL TIMER. ERROR");
       setLoading(false);
-    }, 10000);
+    }, 12000);
     setRecordTimer(timer);
-    /*
-    await waitOnRecorder(
-      () =>
-        messages.recording === "true" && activeCamera === currentRecordingSrc
-    ); */
-
-    /*
-    if (activeCamera === currentRecordingSrc) {
-      setTimeout(() => {
-        setLoading(false);
-        setRequestedSrc(activeCamera);
-      }, 2000);
-    } else {
-      setRequestedSrc(activeCamera);
-    }
-    */
   };
 
   const handleImgCapture = () => {
