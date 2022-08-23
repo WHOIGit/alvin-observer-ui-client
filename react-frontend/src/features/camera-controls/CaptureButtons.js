@@ -52,10 +52,10 @@ export default function CaptureButtons() {
 
   useEffect(() => {
     // set current Recording camera ID from RECORDER_HEARTBEAT socket
-    console.log(activeCamera, recordTimer, messages);
+
     if (messages && recordTimer) {
       const recCamera = getCameraConfigFromName(messages.camera);
-
+      console.log(activeCamera, recCamera, recordTimer, messages);
       if (messages.recording === "true" && activeCamera === recCamera) {
         clearInterval(recordTimer);
         setLoading(false);
