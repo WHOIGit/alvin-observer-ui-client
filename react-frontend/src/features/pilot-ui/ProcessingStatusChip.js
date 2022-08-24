@@ -11,9 +11,10 @@ import { RECORDER_HEARTBEAT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    position: "relative",
-    textAlign: "center",
+    position: "absolute",
     marginTop: "-50px",
+    left: "50%",
+    transform: "translate(-50%, 0)",
   },
   formControl: {
     margin: theme.spacing(1),
