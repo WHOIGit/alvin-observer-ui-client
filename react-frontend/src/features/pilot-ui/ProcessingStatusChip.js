@@ -4,15 +4,16 @@ import { green, red } from "@material-ui/core/colors";
 import { makeStyles } from "@material-ui/core/styles";
 import Chip from "@material-ui/core/Chip";
 import DoneIcon from "@material-ui/icons/Done";
-import CachedIcon from "@material-ui/icons/Cached";
+import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
 // local imports
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { RECORDER_HEARTBEAT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    position: "absolute",
+    position: "relative",
     textAlign: "center",
+    marginTop: "-50px",
   },
   formControl: {
     margin: theme.spacing(1),
@@ -46,8 +47,8 @@ export default function ProcessingStatusChip() {
   return (
     <div className={classes.root}>
       <Chip
-        icon={isProcessingComplete ? <DoneIcon /> : <CachedIcon />}
-        label={isProcessingComplete ? "Processing Complete" : "Processing"}
+        icon={isProcessingComplete ? <DoneIcon /> : <HourglassEmptyIcon />}
+        label={isProcessingComplete ? "Processing Complete" : "Processing..."}
         color="default"
         className={chipStyle}
       />
