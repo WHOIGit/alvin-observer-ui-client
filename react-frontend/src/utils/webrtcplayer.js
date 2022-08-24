@@ -16,8 +16,13 @@ export default class WebRtcPlayer {
   }
 
   createLinks() {
-    this.codecLink = this.server + "/stream/codec/" + this.uuid;
-    this.rsdpLink = this.server + "/stream/receiver/" + this.uuid;
+    //RTSPtoWebRTC
+    //this.codecLink = this.server + "/stream/codec/" + this.uuid;
+    //this.rsdpLink = this.server + "/stream/receiver/" + this.uuid;
+
+    //RTSPtoWeb
+    this.codecLink = this.server + "/stream/" + this.uuid + "/channel/0/codec";
+    this.rsdpLink = this.server + "/stream/" + this.uuid + "/channel/0/webrtc";
   }
 
   play() {

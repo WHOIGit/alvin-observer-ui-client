@@ -3,6 +3,7 @@ version: "3.7"
 
 services:
   react_frontend:
+    image: ghcr.io/whoigit/alvin-observer-ui:stable
     build:
       context: .
       dockerfile: ./compose/Dockerfile
