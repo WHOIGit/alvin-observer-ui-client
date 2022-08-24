@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Button, Box } from "@material-ui/core";
-import Red from "@material-ui/core/colors/red";
+import { Grid, Button, Box, CircularProgress } from "@material-ui/core";
+import { green, red } from "@material-ui/core/colors";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import RouterControls from "./RouterControls";
@@ -27,7 +27,18 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "right",
   },
   recStopButton: {
-    backgroundColor: Red[600],
+    backgroundColor: red[600],
+  },
+  buttonWrapper: {
+    position: "relative",
+  },
+  buttonProgress: {
+    color: green[500],
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
   },
 }));
 
@@ -38,6 +49,7 @@ export default function RouterControlContainer() {
   useCameraWebSocket(CAM_HEARTBEAT);
   useCameraWebSocket(CAM_HEARTBEAT, true, WS_SERVER_NAMESPACE_PORT);
   useCameraWebSocket(CAM_HEARTBEAT, true, WS_SERVER_NAMESPACE_STARBOARD);
+  const [loading, setLoading] = useState(false);
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
@@ -47,6 +59,19 @@ export default function RouterControlContainer() {
       },
     };
     sendMessage(payload);
+  };
+
+  const handleStopRecord = () => {
+    setLoading(true);
+    handleSendMessage(
+      COMMAND_STRINGS.recordSourceCommand,
+      COMMAND_STRINGS.recordStopCommand
+    );
+
+    // add a "fake" delay to UI to show users that image capture is processing
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   };
 
   return (
@@ -107,15 +132,13 @@ export default function RouterControlContainer() {
               variant="contained"
               color="primary"
               className={classes.recStopButton}
-              onClick={() =>
-                handleSendMessage(
-                  COMMAND_STRINGS.recordSourceCommand,
-                  COMMAND_STRINGS.recordStopCommand
-                )
-              }
+              onClick={() => handleStopRecord()}
             >
               Stop All Recordings
             </Button>
+            {loading && (
+              <CircularProgress size={24} className={classes.buttonProgress} />
+            )}
           </Grid>
 
           <Grid item xs className={classes.rightAlign}>
