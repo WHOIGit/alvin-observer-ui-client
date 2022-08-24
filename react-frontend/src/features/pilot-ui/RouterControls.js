@@ -117,7 +117,7 @@ export default function RouterControls() {
   return (
     <>
       <Grid container spacing={2} alignItems="center" justifyContent="center">
-        <Grid item xs={4}>
+        <Grid item xs={6}>
           <Grid container spacing={1}>
             {ROUTER_INPUTS.map((item) => renderInputBtns(item))}
           </Grid>
@@ -132,10 +132,8 @@ export default function RouterControls() {
             </Button>
           </Box>
         </Grid>
-        <Grid item xs={4}>
-          <ProcessingStatusChip />
-        </Grid>
-        <Grid item xs={4}>
+
+        <Grid item xs={6}>
           <Grid container spacing={1}>
             {ROUTER_OUTPUTS.map((item) => renderOutputBtns(item))}
           </Grid>
@@ -151,6 +149,10 @@ export default function RouterControls() {
               TAKE
             </Button>
           </Box>
+        </Grid>
+
+        <Grid item xs={12}>
+          <ProcessingStatusChip />
         </Grid>
       </Grid>
     </>
