@@ -128,17 +128,23 @@ export default function RouterControlContainer() {
           </Grid>
 
           <Grid>
-            <Button
-              variant="contained"
-              color="primary"
-              className={classes.recStopButton}
-              onClick={() => handleStopRecord()}
-            >
-              Stop All Recordings
-            </Button>
-            {loading && (
-              <CircularProgress size={24} className={classes.buttonProgress} />
-            )}
+            <div className={classes.buttonWrapper}>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={loading}
+                className={classes.recStopButton}
+                onClick={() => handleStopRecord()}
+              >
+                Stop All Recordings
+              </Button>
+              {loading && (
+                <CircularProgress
+                  size={24}
+                  className={classes.buttonProgress}
+                />
+              )}
+            </div>
           </Grid>
 
           <Grid item xs className={classes.rightAlign}>
