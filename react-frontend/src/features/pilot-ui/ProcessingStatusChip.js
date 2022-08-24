@@ -11,7 +11,8 @@ import { RECORDER_HEARTBEAT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    position: "relative",
+    position: "absolute",
+    textAlign: "center",
   },
   formControl: {
     margin: theme.spacing(1),
@@ -43,7 +44,7 @@ export default function ProcessingStatusChip() {
     }
   }, [messages]);
   return (
-    <div>
+    <div className={classes.root}>
       <Chip
         icon={isProcessingComplete ? <DoneIcon /> : <CachedIcon />}
         label={isProcessingComplete ? "Processing Complete" : "Processing"}
