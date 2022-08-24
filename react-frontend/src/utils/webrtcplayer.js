@@ -1,20 +1,32 @@
 export default class WebRtcPlayer {
   static server = "http://127.0.0.1:8083";
-  webrtc = null;
-  video = null;
+
   server = null;
-  codecLink = null;
-  rsdpLink = null;
-  stream = new MediaStream();
-  uuid = null;
-  constructor(id, uuid) {
+  stream = null;
+  channel = null;
+
+  webrtc = null;
+  mediastream = null;
+  video = null;
+
+  constructor(id, stream, channel) {
     this.server = WebRtcPlayer.server;
     this.video = document.getElementById(id);
-    this.uuid = uuid;
-    this.createLinks();
+    this.stream = stream;
+    this.channel = channel;
+
+    this.video.addEventListener("loadeddata", () => {
+      this.video.play();
+    });
+
+    this.video.addEventListener("error", () => {
+      console.error("video error");
+    });
+
     this.play();
   }
 
+<<<<<<< HEAD
   createLinks() {
     //RTSPtoWebRTC
     //this.codecLink = this.server + "/stream/codec/" + this.uuid;
@@ -23,86 +35,84 @@ export default class WebRtcPlayer {
     //RTSPtoWeb
     this.codecLink = this.server + "/stream/" + this.uuid + "/channel/0/codec";
     this.rsdpLink = this.server + "/stream/" + this.uuid + "/channel/0/webrtc";
+=======
+  getStreamUrl() {
+    // RTSPtoWeb only, not RTSPtoWebRTC
+    return `${this.server}/stream/${this.stream}/channel/${this.channel}/webrtc`;
+>>>>>>> 14863343f76659b7f3dcc6f7c22ec589f07add5a
   }
 
-  play() {
+  async play() {
+    console.log("webrtc play");
+    this.mediastream = new MediaStream();
+    this.video.srcObject = this.mediastream;
+
     this.webrtc = new RTCPeerConnection({
-      iceServers: [
-        {
-          urls: ["stun:stun.l.google.com:19302"]
-        }
-      ]
+      iceServers: [{
+        urls: ["stun:stun.l.google.com:19302"],
+      }],
+      sdpSemantics: "unified-plan"
     });
+
     this.webrtc.onnegotiationneeded = this.handleNegotiationNeeded.bind(this);
-    this.webrtc.ontrack = this.onTrack.bind(this);
-    fetch(this.codecLink)
-      .then(response => {
-        response.json().then(data => {
-          data.forEach((item, i) => {
-            this.webrtc.addTransceiver(item.Type, {
-              direction: "sendrecv"
-            });
-          });
-        });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    this.webrtc.onsignalingstatechange = this.handleSignalingStateChange.bind(this);
+    this.webrtc.ontrack = this.handleTrack.bind(this);
+
+    this.webrtc.addTransceiver("video", {
+      "direction": "sendrecv",
+    });
   }
 
-  async handleNegotiationNeeded() {
-    let offer = await this.webrtc.createOffer();
+  async handleNegotiationNeeded() {    
+    console.log("handleNegotiationNeeded");
+    let offer = await this.webrtc.createOffer({
+      offerToReceiveAudio: false,
+      offerToReceiveVideo: true
+    });
     await this.webrtc.setLocalDescription(offer);
-    let formData = new FormData();
-    formData.append("suuid", this.uuid);
-    formData.append("data", btoa(this.webrtc.localDescription.sdp));
-    fetch(this.rsdpLink, {
-      method: "POST",
-      body: formData
-    })
-      .then(response => {
-        response.text().then(data => {
-          this.webrtc.setRemoteDescription(
-            new RTCSessionDescription({
-              type: "answer",
-              sdp: atob(data)
-            })
-          );
+  }
+
+  async handleSignalingStateChange() {
+    console.log(`handleSignalingStateChange ${this.webrtc.signalingState}`);
+    switch (this.webrtc.signalingState) {
+      case "have-local-offer":
+        let formData = new FormData();
+        formData.append("data", btoa(this.webrtc.localDescription.sdp));
+        const response = await fetch(this.getStreamUrl(), {
+          method: "POST",
+          body: formData,
         });
-      })
-      .catch(err => {});
+
+        this.webrtc.setRemoteDescription(new RTCSessionDescription({
+          type: "answer",
+          sdp: atob(await response.text()),
+        }));
+
+        break;
+
+      case "stable":
+        /*
+        * There is no ongoing exchange of offer and answer underway.
+        * This may mean that the RTCPeerConnection object is new, in which case both the localDescription and remoteDescription are null;
+        * it may also mean that negotiation is complete and a connection has been established.
+        */
+        break;
+
+      case "closed":
+        /*
+        * The RTCPeerConnection has been closed.
+        */
+        break;
+
+      default:
+        console.log(`unhandled signalingState is ${this.webrtc.signalingState}`);
+        break;
+    }
   }
 
-  onTrack(event) {
-    this.stream.addTrack(event.track);
-    this.video.srcObject = this.stream;
-    this.video.play();
-  }
-
-  load(uuid) {
-    this.destroy();
-    this.uuid = uuid;
-    this.createLinks();
-    this.play();
-  }
-
-  destroy() {
-    this.webrtc.close();
-    this.webrtc = null;
-    this.video.srcObject = null;
-    this.stream = new MediaStream();
-  }
-
-  getImageUrl() {
-    let canvas = document.createElement("canvas");
-    canvas.width = this.video.videoWidth;
-    canvas.height = this.video.videoHeight;
-    canvas
-      .getContext("2d")
-      .drawImage(this.video, 0, 0, canvas.width, canvas.height);
-    let dataURL = canvas.toDataURL();
-    canvas.remove();
-    return dataURL;
+  handleTrack(event) {
+    console.log("handle track");
+    this.mediastream.addTrack(event.track);
   }
 
   static setServer(serv) {

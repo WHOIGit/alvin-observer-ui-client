@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Button, CircularProgress, Box } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
-import { selectActiveCamera } from "./cameraControlsSlice";
+import {
+  selectActiveCameraConfig,
+  setRecorderError,
+} from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
   NEW_CAMERA_COMMAND_EVENT,
@@ -32,22 +35,29 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CaptureButtons() {
   const classes = useStyles();
-  const activeCamera = useSelector(selectActiveCamera);
+  const activeCamera = useSelector(selectActiveCameraConfig);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
-  //console.log(messages);
+  const [recordTimer, setRecordTimer] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [currentRecordingSrc, setCurrentRecordingSrc] = useState(null);
-  const [requestedSrc, setRequestedSrc] = useState(null);
+  const [loadingImgCapture, setLoadingImgCapture] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // set current Recording camera ID from RECORDER_HEARTBEAT socket
-    if (messages) {
-      const recCamera = getCameraConfigFromName(messages.camera);
 
-      recCamera && setCurrentRecordingSrc(recCamera.camera);
+    if (messages && recordTimer) {
+      //console.log(activeCamera, messages.camera, recordTimer, messages);
+      if (
+        messages.recording === "true" &&
+        activeCamera.cam_name === messages.camera
+      ) {
+        clearInterval(recordTimer);
+        setRecordTimer(null);
+        setLoading(false);
+      }
     }
-  }, [messages]);
+  }, [messages, recordTimer, activeCamera]);
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
@@ -66,44 +76,54 @@ export default function CaptureButtons() {
     sendMessage(payload);
   };
 
-  const handleRecordAction = () => {
+  const handleRecordAction = async () => {
     setLoading(true);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera);
+    // reset error status in Redux
+    const payload = false;
+    dispatch(setRecorderError(payload));
 
-    // if not changing recording cameras, add a "fake" delay to UI to match the
-    // time it takes imaging server to start new recording,
-    // we don't get this status change from the imaging server
-    console.log(activeCamera, currentRecordingSrc);
-    if (activeCamera === currentRecordingSrc) {
-      setTimeout(() => {
-        setLoading(false);
-        setRequestedSrc(activeCamera);
-      }, 2000);
-    } else {
-      setRequestedSrc(activeCamera);
-    }
+    // This is the maximum time the spinner will display
+    // Cancel this timer if we get a OK response from socket message in useEffect above
+    // OK response can take up to 10 seconds
+    const timer = setTimeout(() => {
+      console.log("CANCEL TIMER. ERROR");
+      setLoading(false);
+      // save error status in Redux
+      const payload = true;
+      dispatch(setRecorderError(payload));
+    }, 12000);
+    setRecordTimer(timer);
   };
 
-  useEffect(() => {
-    if (currentRecordingSrc === requestedSrc) {
-      setLoading(false);
-    }
-  }, [currentRecordingSrc, requestedSrc]);
+  const handleImgCapture = () => {
+    setLoadingImgCapture(true);
+    handleSendMessage(COMMAND_STRINGS.stillImageCaptureCommand, 0);
+
+    // add a "fake" delay to UI to show users that image capture is processing
+    setTimeout(() => {
+      setLoadingImgCapture(false);
+    }, 2000);
+  };
 
   return (
     <>
       <Grid item xs={6}>
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          className={classes.ctrlButton}
-          onClick={() =>
-            handleSendMessage(COMMAND_STRINGS.stillImageCaptureCommand, 0)
-          }
-        >
-          Still Img Capture
-        </Button>
+        <div className={classes.buttonWrapper}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            disabled={loadingImgCapture}
+            className={classes.ctrlButton}
+            onClick={() => handleImgCapture()}
+          >
+            Still Img Capture
+          </Button>
+          {loadingImgCapture && (
+            <CircularProgress size={24} className={classes.buttonProgress} />
+          )}
+        </div>
       </Grid>
       <Grid item xs={6}>
         <div className={classes.buttonWrapper}>
