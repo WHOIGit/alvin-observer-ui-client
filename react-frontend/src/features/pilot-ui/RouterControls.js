@@ -10,6 +10,7 @@ import {
   NEW_CAMERA_COMMAND_EVENT,
   ROUTER_INPUTS,
   ROUTER_OUTPUTS,
+  RECORDER_HEARTBEAT,
 } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
@@ -44,7 +45,9 @@ export default function RouterControls() {
 
   const [inputValue, setInputValue] = useState(null);
   const [outputValue, setOutputValue] = useState(null);
+  const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  console.log(messages);
   // disable Take button until both values have been selected
   const disabled = !inputValue || !outputValue;
   const handleSendMessage = () => {

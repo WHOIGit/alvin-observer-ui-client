@@ -46,8 +46,7 @@ export default function RouterControlContainer() {
   const classes = useStyles();
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   // establish web socket connections for all CAM_HEARTBEAT namespaces
-  const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
-  console.log(messages);
+  useCameraWebSocket(CAM_HEARTBEAT);
   useCameraWebSocket(CAM_HEARTBEAT, true, WS_SERVER_NAMESPACE_PORT);
   useCameraWebSocket(CAM_HEARTBEAT, true, WS_SERVER_NAMESPACE_STARBOARD);
   const [loading, setLoading] = useState(false);
