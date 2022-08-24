@@ -18,6 +18,7 @@ import {
 const useStyles = makeStyles((theme) => ({
   buttonWrapper: {
     position: "relative",
+    display: "inline-block",
   },
   buttonProgress: {
     color: green[500],
@@ -68,6 +69,7 @@ export default function PilotRecordButton({ observerSide }) {
         variant="contained"
         color="primary"
         size="small"
+        disabled={loading}
         onClick={() => handleRecordAction()}
       >
         Record {observerSide} Source
