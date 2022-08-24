@@ -92,26 +92,28 @@ export default function CameraControlContainer() {
         <Grid item xs={9}>
           <LargeVideo />
         </Grid>
-        <Grid item xs={3} className={classes.controlsBox}>
-          {camSettings?.camctrl === "y" && (
-            <List>
-              <ListItem>
-                <SelectExposureMode showLabel={true} />
-              </ListItem>
-              <ListItem>
-                <SelectShutterMode />
-              </ListItem>
-              <ListItem>
-                <SelectIrisMode />
-              </ListItem>
-              <ListItem>
-                <SelectIsoMode />
-              </ListItem>
-              <ListItem>
-                <SelectWhiteBalance showLabel={true} />
-              </ListItem>
-            </List>
-          )}
+        <Grid item xs={3}>
+          <div className={classes.controlsBox}>
+            {camSettings?.camctrl === "y" && (
+              <List>
+                <ListItem>
+                  <SelectExposureMode showLabel={true} />
+                </ListItem>
+                <ListItem>
+                  <SelectShutterMode />
+                </ListItem>
+                <ListItem>
+                  <SelectIrisMode />
+                </ListItem>
+                <ListItem>
+                  <SelectIsoMode />
+                </ListItem>
+                <ListItem>
+                  <SelectWhiteBalance showLabel={true} />
+                </ListItem>
+              </List>
+            )}
+          </div>
         </Grid>
       </Grid>
 
