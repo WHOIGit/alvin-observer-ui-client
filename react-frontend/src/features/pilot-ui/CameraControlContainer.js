@@ -31,10 +31,10 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   joystickBox: {
-    minHeight: "387px",
+    marginTop: "-50px",
   },
   controlsBox: {
-    marginTop: "-50px",
+    minHeight: "387px",
   },
 }));
 
