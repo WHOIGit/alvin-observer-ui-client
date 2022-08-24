@@ -31,6 +31,9 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   joystickBox: {
+    minHeight: "387px",
+  },
+  controlsBox: {
     marginTop: "-50px",
   },
 }));
@@ -89,7 +92,7 @@ export default function CameraControlContainer() {
         <Grid item xs={9}>
           <LargeVideo />
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={3} className={classes.controlsBox}>
           {camSettings?.camctrl === "y" && (
             <List>
               <ListItem>
