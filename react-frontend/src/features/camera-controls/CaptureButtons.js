@@ -72,13 +72,14 @@ export default function CaptureButtons() {
       const oldCamera = getCameraConfigFromName(messages.camera);
       payload.oldCamera = oldCamera.camera;
     }
+    console.log(payload);
 
     sendMessage(payload);
   };
 
   const handleRecordAction = async () => {
     setLoading(true);
-    handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera);
+    handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
     // reset error status in Redux
     const payload = false;
     dispatch(setRecorderError(payload));
