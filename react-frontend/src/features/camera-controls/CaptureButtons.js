@@ -43,6 +43,7 @@ export default function CaptureButtons() {
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const dispatch = useDispatch();
 
+  console.log(activeCamera);
   useEffect(() => {
     // set current Recording camera ID from RECORDER_HEARTBEAT socket
 
