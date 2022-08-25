@@ -26,20 +26,9 @@ export default class WebRtcPlayer {
     this.play();
   }
 
-<<<<<<< HEAD
-  createLinks() {
-    //RTSPtoWebRTC
-    //this.codecLink = this.server + "/stream/codec/" + this.uuid;
-    //this.rsdpLink = this.server + "/stream/receiver/" + this.uuid;
-
-    //RTSPtoWeb
-    this.codecLink = this.server + "/stream/" + this.uuid + "/channel/0/codec";
-    this.rsdpLink = this.server + "/stream/" + this.uuid + "/channel/0/webrtc";
-=======
   getStreamUrl() {
     // RTSPtoWeb only, not RTSPtoWebRTC
     return `${this.server}/stream/${this.stream}/channel/${this.channel}/webrtc`;
->>>>>>> 14863343f76659b7f3dcc6f7c22ec589f07add5a
   }
 
   async play() {
