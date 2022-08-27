@@ -34,7 +34,6 @@ const initialState = {
 
 const getCameraConfig = (cameraId) => {
   const cameraConfig = CAMERAS.find((item) => item.camera === cameraId);
-  //console.log(cameraConfig);
   return cameraConfig;
 };
 
@@ -171,7 +170,6 @@ export const cameraControlsSlice = createSlice({
       state.recorderHeartbeatData = data;
     },
     changeCurrentCamData: (state, action) => {
-      console.log(action.payload);
       state.currentCamData = {};
       state.currentCamData.IRS = action.payload.IRS;
       state.currentCamData.ISO = action.payload.ISO;

@@ -47,7 +47,6 @@ export default function CaptureButtons() {
     // set current Recording camera ID from RECORDER_HEARTBEAT socket
 
     if (messages && recordTimer) {
-      //console.log(activeCamera, messages.camera, recordTimer, messages);
       if (
         messages.recording === "true" &&
         activeCamera.cam_name === messages.camera
@@ -72,7 +71,6 @@ export default function CaptureButtons() {
       const oldCamera = getCameraConfigFromName(messages.camera);
       payload.oldCamera = oldCamera.camera;
     }
-    console.log(payload);
 
     sendMessage(payload);
   };
@@ -88,7 +86,6 @@ export default function CaptureButtons() {
     // Cancel this timer if we get a OK response from socket message in useEffect above
     // OK response can take up to 10 seconds
     const timer = setTimeout(() => {
-      console.log("CANCEL TIMER. ERROR");
       setLoading(false);
       // save error status in Redux
       const payload = true;
