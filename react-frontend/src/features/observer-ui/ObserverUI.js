@@ -77,7 +77,6 @@ export default function ObserverUI({
 
     // set initial camera state only if activeCamera is undefined
     if (activeCamera === null) {
-      console.log(initialCamHeartbeat);
       if (initialCamHeartbeat !== null) {
         setInitialCamera();
       }
