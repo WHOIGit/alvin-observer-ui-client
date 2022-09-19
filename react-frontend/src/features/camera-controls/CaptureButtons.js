@@ -8,6 +8,7 @@ import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
 import {
   selectActiveCameraConfig,
   setRecorderError,
+  setVideoSourceEnabled,
 } from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
@@ -54,9 +55,12 @@ export default function CaptureButtons() {
         clearInterval(recordTimer);
         setRecordTimer(null);
         setLoading(false);
+        // reenable Video Source menu
+        const payloadVideoSrc = true;
+        dispatch(setRecorderError(payloadVideoSrc));
       }
     }
-  }, [messages, recordTimer, activeCamera]);
+  }, [messages, recordTimer, activeCamera, dispatch]);
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
@@ -78,6 +82,9 @@ export default function CaptureButtons() {
   const handleRecordAction = async () => {
     setLoading(true);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
+    // set Video Source menu to be disabled
+    const payloadVideoSrc = false;
+    dispatch(setRecorderError(payloadVideoSrc));
     // reset error status in Redux
     const payload = false;
     dispatch(setRecorderError(payload));
@@ -88,8 +95,11 @@ export default function CaptureButtons() {
     const timer = setTimeout(() => {
       setLoading(false);
       // save error status in Redux
-      const payload = true;
-      dispatch(setRecorderError(payload));
+      const payloadRecError = true;
+      dispatch(setRecorderError(payloadRecError));
+      // reenable Video Source menu
+      const payloadVideoSrc = true;
+      dispatch(setRecorderError(payloadVideoSrc));
     }, 12000);
     setRecordTimer(timer);
   };
