@@ -11,7 +11,7 @@ import SelectIsoMode from "../camera-controls/SelectIsoMode";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
 import SelectWhiteBalance from "../camera-controls/SelectWhiteBalance";
 import FocusModeButton from "../camera-controls/FocusModeButton";
-import FocusZoomButtons from "../camera-controls/FocusZoomButtons";
+import FocusZoomButtonsGrid from "../camera-controls/FocusZoomButtonsGrid";
 import Joystick from "../camera-controls/Joystick";
 import SetCaptureInterval from "../camera-controls/SetCaptureInterval";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
@@ -127,7 +127,7 @@ export default function CameraControlContainer() {
             {camSettings?.camctrl === "y" && <FocusModeButton />}
           </Grid>
           <Grid item xs>
-            {camSettings?.camctrl === "y" && <FocusZoomButtons />}
+            {camSettings?.camctrl === "y" && <FocusZoomButtonsGrid />}
           </Grid>
         </>
 
