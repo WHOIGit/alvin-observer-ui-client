@@ -66,6 +66,7 @@ const FocusModeButton = () => {
         color="secondary"
         size="small"
         startIcon={<CenterFocusStrongIcon />}
+        disabled={loading}
         onClick={() => handleSendMessage(COMMAND_STRINGS.focusModeCommand)}
       >
         Focus {currentFocusMode}

@@ -43,7 +43,7 @@ export default function CaptureButtons() {
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const dispatch = useDispatch();
-
+  console.log(loading);
   useEffect(() => {
     // set current Recording camera ID from RECORDER_HEARTBEAT socket
 
@@ -100,7 +100,7 @@ export default function CaptureButtons() {
       // reenable Video Source menu
       const payloadVideoSrc = true;
       dispatch(setVideoSourceEnabled(payloadVideoSrc));
-    }, 12000);
+    }, 5000);
     setRecordTimer(timer);
   };
 
