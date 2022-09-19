@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Box, Divider } from "@material-ui/core";
 
 import FocusModeButton from "../camera-controls/FocusModeButton";
-import FocusZoomButtons from "../camera-controls/FocusZoomButtons";
+import FocusZoomButtonsGrid from "../camera-controls/FocusZoomButtonsGrid";
 import Joystick from "../camera-controls/Joystick";
 import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
 import useIsOwner from "../../hooks/useIsOwner";
@@ -34,7 +34,7 @@ export default function CameraControlButtons() {
           </Box>
 
           <Box my={3}>
-            <FocusZoomButtons />
+            <FocusZoomButtonsGrid />
           </Box>
         </>
       )}
