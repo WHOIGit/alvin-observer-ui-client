@@ -57,7 +57,7 @@ export default function CaptureButtons() {
         setLoading(false);
         // reenable Video Source menu
         const payloadVideoSrc = true;
-        dispatch(setRecorderError(payloadVideoSrc));
+        dispatch(setVideoSourceEnabled(payloadVideoSrc));
       }
     }
   }, [messages, recordTimer, activeCamera, dispatch]);
@@ -84,7 +84,7 @@ export default function CaptureButtons() {
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
     // set Video Source menu to be disabled
     const payloadVideoSrc = false;
-    dispatch(setRecorderError(payloadVideoSrc));
+    dispatch(setVideoSourceEnabled(payloadVideoSrc));
     // reset error status in Redux
     const payload = false;
     dispatch(setRecorderError(payload));
@@ -99,7 +99,7 @@ export default function CaptureButtons() {
       dispatch(setRecorderError(payloadRecError));
       // reenable Video Source menu
       const payloadVideoSrc = true;
-      dispatch(setRecorderError(payloadVideoSrc));
+      dispatch(setVideoSourceEnabled(payloadVideoSrc));
     }, 12000);
     setRecordTimer(timer);
   };
