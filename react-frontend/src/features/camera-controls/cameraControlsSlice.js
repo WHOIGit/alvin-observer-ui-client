@@ -9,16 +9,16 @@ import {
 } from "../../config.js";
 
 // set default settings
-const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
-const defaultObserverVideoSmallSrc = VIDEO_STREAM_CONFIG.portObserverSmallVideo;
-const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
+const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.pilotVideo; //portObserverVideo; //mjs-changed-19apr2022 - needed for pilot
+const defaultObserverVideoSmallSrc = VIDEO_STREAM_CONFIG.pilotSmallVideo; //portObserverSmallVideo; //mjs-changed-19apr2022 - needed for pilot
+//const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo; //mjs-removed-19apr2022
 
 const initialState = {
-  observerSide: null, // P = Port, S = Starboard, PL = Pilot
+  observerSide: "PL", // P = Port, S = Starboard, PL = Pilot
   webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
   observerVideoSrc: defaultObserverVideoSrc,
   observerVideoSmallSrc: defaultObserverVideoSmallSrc,
-  recordVideoSrc: defaultRecordVideoSrc,
+  //recordVideoSrc: defaultRecordVideoSrc, //mjs-removed-19apr2022
   initialCamHeartbeat: null,
   activeCamera: null,
   camHeartbeatData: null,
@@ -30,6 +30,7 @@ const initialState = {
   availableCameras: CAMERAS,
   joystickStatus: null,
   recorderResponseError: false,
+  videoSourceEnabled: true,
 };
 
 const getCameraConfig = (cameraId) => {
@@ -48,14 +49,14 @@ export const cameraControlsSlice = createSlice({
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
         state.observerVideoSmallSrc =
           VIDEO_STREAM_CONFIG.portObserverSmallVideo;
-        state.recordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo; //mjs-added-19apr2022
+        //state.recordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo; //mjs-added-19apr2022
       }
       if (action.payload === "S") {
         state.webSocketNamespace = WS_SERVER_NAMESPACE_STARBOARD;
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.stbdObserverVideo;
         state.observerVideoSmallSrc =
           VIDEO_STREAM_CONFIG.stbdObserverSmallVideo;
-        state.recordVideoSrc = VIDEO_STREAM_CONFIG.stbdRecordVideo; //mjs-added-19apr2022
+        //state.recordVideoSrc = VIDEO_STREAM_CONFIG.stbdRecordVideo; //mjs-added-19apr2022
       }
       // set available cameras
       /*
@@ -182,6 +183,9 @@ export const cameraControlsSlice = createSlice({
     setRecorderError: (state, action) => {
       state.recorderResponseError = action.payload;
     },
+    setVideoSourceEnabled: (state, action) => {
+      state.videoSourceEnabled = action.payload;
+    },
   },
 });
 
@@ -198,6 +202,7 @@ export const {
   setObserverSide,
   setJoystickStatus,
   setRecorderError,
+  setVideoSourceEnabled,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -254,3 +259,7 @@ export const selectJoystickStatus = (state) =>
 // return the error status of last Recorder response
 export const selectRecorderResponseError = (state) =>
   state.cameraControls.recorderResponseError;
+
+// return if Video Source select should be enabled/disabled
+export const selectVideoSourceEnabled = (state) =>
+  state.cameraControls.videoSourceEnabled;
