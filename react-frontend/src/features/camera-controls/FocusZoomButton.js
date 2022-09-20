@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function FocusZoomButton({
+  buttonFunction,
   label,
   commandStringControl,
   commandStringOneStop,
@@ -83,12 +84,16 @@ export default function FocusZoomButton({
   useEffect(() => {
     // set enabled status from camSettings.focus_mode
     // if AUTO focus, disable
-    if (camSettings && camSettings.focus_mode === "AF") {
+    if (
+      camSettings &&
+      camSettings.focus_mode === "AF" &&
+      buttonFunction === "focus"
+    ) {
       setIsEnabled(false);
     } else {
       setIsEnabled(true);
     }
-  }, [camSettings]);
+  }, [buttonFunction, camSettings]);
 
   return (
     <div className={classes.buttonWrapper}>
