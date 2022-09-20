@@ -30,11 +30,11 @@ const initialState = {
   availableCameras: CAMERAS,
   joystickStatus: null,
   recorderResponseError: false,
+  videoSourceEnabled: true,
 };
 
 const getCameraConfig = (cameraId) => {
   const cameraConfig = CAMERAS.find((item) => item.camera === cameraId);
-  //console.log(cameraConfig);
   return cameraConfig;
 };
 
@@ -171,7 +171,6 @@ export const cameraControlsSlice = createSlice({
       state.recorderHeartbeatData = data;
     },
     changeCurrentCamData: (state, action) => {
-      console.log(action.payload);
       state.currentCamData = {};
       state.currentCamData.IRS = action.payload.IRS;
       state.currentCamData.ISO = action.payload.ISO;
@@ -183,6 +182,9 @@ export const cameraControlsSlice = createSlice({
     },
     setRecorderError: (state, action) => {
       state.recorderResponseError = action.payload;
+    },
+    setVideoSourceEnabled: (state, action) => {
+      state.videoSourceEnabled = action.payload;
     },
   },
 });
@@ -200,6 +202,7 @@ export const {
   setObserverSide,
   setJoystickStatus,
   setRecorderError,
+  setVideoSourceEnabled,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -256,3 +259,7 @@ export const selectJoystickStatus = (state) =>
 // return the error status of last Recorder response
 export const selectRecorderResponseError = (state) =>
   state.cameraControls.recorderResponseError;
+
+// return if Video Source select should be enabled/disabled
+export const selectVideoSourceEnabled = (state) =>
+  state.cameraControls.videoSourceEnabled;

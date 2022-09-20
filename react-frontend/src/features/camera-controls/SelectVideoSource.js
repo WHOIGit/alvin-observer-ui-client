@@ -8,7 +8,10 @@ import {
   Grid,
   Typography,
 } from "@material-ui/core";
-import { selectActiveCamera } from "./cameraControlsSlice";
+import {
+  selectActiveCamera,
+  selectVideoSourceEnabled,
+} from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
@@ -26,9 +29,11 @@ const useStyles = makeStyles((theme) => ({
 export default function SelectVideoSource({ showLabel }) {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCamera);
+  const videoSourceEnabled = useSelector(selectVideoSourceEnabled);
   const cameras = useSelector((state) => state.cameraControls.availableCameras);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const labelText = "SOURCE:";
+  console.log(videoSourceEnabled, "VIDEO ENABLED");
 
   const handleSendMessage = (event) => {
     const payload = {
@@ -55,7 +60,8 @@ export default function SelectVideoSource({ showLabel }) {
             value={activeCamera}
             onChange={handleSendMessage}
             displayEmpty
-            inputProps={{ "aria-label": "Without label" }}
+            disabled={!videoSourceEnabled}
+            inputProps={{ "aria-label": "Video Source" }}
           >
             {cameras.map((item) => (
               <MenuItem value={item.camera} key={item.camera}>

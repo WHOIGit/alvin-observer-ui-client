@@ -31,7 +31,6 @@ export default function App() {
 
   // send message to set active camera
   const { messages } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
-  console.log(messages);
 
   return (
     <Container maxWidth={false} disableGutters={true}>

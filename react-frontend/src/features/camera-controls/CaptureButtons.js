@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Button, CircularProgress, Box } from "@material-ui/core";
+import { Grid, Button, CircularProgress } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
 import {
   selectActiveCameraConfig,
   setRecorderError,
+  setVideoSourceEnabled,
 } from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
@@ -47,7 +48,6 @@ export default function CaptureButtons() {
     // set current Recording camera ID from RECORDER_HEARTBEAT socket
 
     if (messages && recordTimer) {
-      //console.log(activeCamera, messages.camera, recordTimer, messages);
       if (
         messages.recording === "true" &&
         activeCamera.cam_name === messages.camera
@@ -55,9 +55,12 @@ export default function CaptureButtons() {
         clearInterval(recordTimer);
         setRecordTimer(null);
         setLoading(false);
+        // reenable Video Source menu
+        const payloadVideoSrc = true;
+        dispatch(setVideoSourceEnabled(payloadVideoSrc));
       }
     }
-  }, [messages, recordTimer, activeCamera]);
+  }, [messages, recordTimer, activeCamera, dispatch]);
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
@@ -72,7 +75,6 @@ export default function CaptureButtons() {
       const oldCamera = getCameraConfigFromName(messages.camera);
       payload.oldCamera = oldCamera.camera;
     }
-    console.log(payload);
 
     sendMessage(payload);
   };
@@ -80,6 +82,9 @@ export default function CaptureButtons() {
   const handleRecordAction = async () => {
     setLoading(true);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
+    // set Video Source menu to be disabled
+    const payloadVideoSrc = false;
+    dispatch(setVideoSourceEnabled(payloadVideoSrc));
     // reset error status in Redux
     const payload = false;
     dispatch(setRecorderError(payload));
@@ -88,11 +93,13 @@ export default function CaptureButtons() {
     // Cancel this timer if we get a OK response from socket message in useEffect above
     // OK response can take up to 10 seconds
     const timer = setTimeout(() => {
-      console.log("CANCEL TIMER. ERROR");
       setLoading(false);
       // save error status in Redux
-      const payload = true;
-      dispatch(setRecorderError(payload));
+      const payloadRecError = true;
+      dispatch(setRecorderError(payloadRecError));
+      // reenable Video Source menu
+      const payloadVideoSrc = true;
+      dispatch(setVideoSourceEnabled(payloadVideoSrc));
     }, 12000);
     setRecordTimer(timer);
   };
