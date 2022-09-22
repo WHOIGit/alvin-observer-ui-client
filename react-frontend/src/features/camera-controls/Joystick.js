@@ -108,9 +108,11 @@ export default function Joystick() {
     } else if (joystickStatus.actionType === "move") {
       // enqueue this move for the spitter timer
       joystickSpitter.current.lastMove = joystickStatus;
+      console.log("MOVING JOYSTICK");
     } else if (joystickStatus.actionType === "end") {
       stopSpitter();
       sendPanTiltCommand(joystickStatus);
+      console.log("STOPPING SPITTER");
     }
   }, [joystickStatus]);
 
