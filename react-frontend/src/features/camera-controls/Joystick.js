@@ -70,6 +70,7 @@ export default function Joystick() {
   });
 
   const startSpitter = () => {
+    console.log("START SPITTER FUNC");
     joystickSpitter.current.intervalId = setInterval(() => {
       // continuously spit out the last move message
       if (joystickSpitter.current.lastMove) {
@@ -83,10 +84,14 @@ export default function Joystick() {
     joystickSpitter.current.intervalId = null;
   };
 
-  // top the spitter when we unmount this component
+  // Unnmount this component here
   useEffect(() => {
     return () => {
+      // stop the spitter when we unmount this component
       stopSpitter();
+      // clear out Redux joystickStatus queue as well
+      const payload = null;
+      dispatch(setJoystickStatus(payload));
     };
   }, []);
 
