@@ -85,10 +85,14 @@ export default function Joystick() {
     joystickSpitter.current.intervalId = null;
   };
 
-  // top the spitter when we unmount this component
+  // stop the spitter when we unmount this component
+  // clear out Redux joystickStatus as well
   useEffect(() => {
     return () => {
       stopSpitter();
+
+      const payload = null;
+      dispatch(setJoystickStatus(payload));
     };
   }, []);
 
