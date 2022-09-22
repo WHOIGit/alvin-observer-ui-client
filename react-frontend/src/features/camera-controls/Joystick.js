@@ -50,6 +50,7 @@ export default function Joystick() {
   }, []);
 
   const sendPanTiltCommand = (commandValue) => {
+    console.log("JOYSTICK MESSAGE SENT");
     // add timestamp to command sent to imaging server for debug
     const timestamp = new Date().toISOString();
     const payload = {
@@ -94,6 +95,7 @@ export default function Joystick() {
     if (!joystickStatus) {
       // no op
     } else if (joystickStatus.actionType === "start") {
+      console.log("STARTING SPITTER");
       sendPanTiltCommand(joystickStatus);
       startSpitter();
       // enqueue a fake "move" event for the spitter
