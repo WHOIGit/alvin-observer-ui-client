@@ -94,7 +94,6 @@ export const cameraControlsSlice = createSlice({
           switch (state.lastCommand.action.name) {
             // change observer camera
             case COMMAND_STRINGS.cameraChangeCommand:
-              console.log("CAMERA CHANGE IN REDUX");
               const activeCamera = getCameraConfig(
                 state.lastCommand.action.value
               );

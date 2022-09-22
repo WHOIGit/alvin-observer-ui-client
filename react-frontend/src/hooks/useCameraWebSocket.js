@@ -94,7 +94,7 @@ const useCameraWebSocket = (
 
       // handle NEW_CAMERA_COMMAND_EVENT events here
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
-        console.log(socketEvent, incomingMessage);
+        // console.log(socketEvent, incomingMessage);
         // check if message is a Camera Change Package, else it's a Command Receipt
         if (incomingMessage.hasOwnProperty("current_settings")) {
           console.log("CAM CHANGE HERE");

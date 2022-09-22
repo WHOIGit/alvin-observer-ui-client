@@ -30,7 +30,7 @@ export default function App() {
   const classes = useStyles();
 
   // send message to set active camera
-  const { messages } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  // const { messages } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
   return (
     <Container maxWidth={false} disableGutters={true}>

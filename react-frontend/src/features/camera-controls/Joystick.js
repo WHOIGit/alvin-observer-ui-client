@@ -50,7 +50,6 @@ export default function Joystick() {
   }, []);
 
   const sendPanTiltCommand = (commandValue) => {
-    console.log("JOYSTICK MESSAGE SENT");
     // add timestamp to command sent to imaging server for debug
     const timestamp = new Date().toISOString();
     const payload = {
@@ -85,12 +84,12 @@ export default function Joystick() {
     joystickSpitter.current.intervalId = null;
   };
 
-  // stop the spitter when we unmount this component
-  // clear out Redux joystickStatus as well
+  // Unnmount this component here
   useEffect(() => {
     return () => {
+      // stop the spitter when we unmount this component
       stopSpitter();
-
+      // clear out Redux joystickStatus queue as well
       const payload = null;
       dispatch(setJoystickStatus(payload));
     };
@@ -100,7 +99,6 @@ export default function Joystick() {
     if (!joystickStatus) {
       // no op
     } else if (joystickStatus.actionType === "start") {
-      console.log("STARTING SPITTER");
       sendPanTiltCommand(joystickStatus);
       startSpitter();
       // enqueue a fake "move" event for the spitter
@@ -113,11 +111,9 @@ export default function Joystick() {
     } else if (joystickStatus.actionType === "move") {
       // enqueue this move for the spitter timer
       joystickSpitter.current.lastMove = joystickStatus;
-      console.log("MOVING JOYSTICK");
     } else if (joystickStatus.actionType === "end") {
       stopSpitter();
       sendPanTiltCommand(joystickStatus);
-      console.log("STOPPING SPITTER");
     }
   }, [joystickStatus]);
 
