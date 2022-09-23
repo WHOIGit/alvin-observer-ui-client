@@ -9,10 +9,7 @@ import {
   Typography,
 } from "@material-ui/core";
 // local imports
-import {
-  selectActiveCameraConfig,
-  selectCamHeartbeatData,
-} from "./cameraControlsSlice";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import useIsOwner from "../../hooks/useIsOwner";
 import { COMMAND_STRINGS } from "../../config.js";
@@ -32,12 +29,9 @@ const useStyles = makeStyles((theme) => ({
 export default function SelectExposureMode({ showLabel }) {
   const classes = useStyles();
   const camSettings = useSelector(selectCamHeartbeatData);
-  const activeCam = useSelector(selectActiveCameraConfig);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { isOwner } = useIsOwner();
   const labelText = "EXP MODE:";
-  console.log(camSettings);
-  console.log(activeCam);
 
   const handleSendMessage = (event) => {
     const payload = {
