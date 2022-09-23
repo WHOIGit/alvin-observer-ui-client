@@ -15,6 +15,7 @@ import FocusZoomButtonsGrid from "../camera-controls/FocusZoomButtonsGrid";
 import Joystick from "../camera-controls/Joystick";
 import SetCaptureInterval from "../camera-controls/SetCaptureInterval";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import useIsOwner from "../../hooks/useIsOwner";
 import RecordingStatusChip from "./RecordingStatusChip";
 import {
   selectInitialCamHeartbeatData,
@@ -43,6 +44,7 @@ export default function CameraControlContainer() {
   const dispatch = useDispatch();
   // connect to pilot CAM_HEARTBEAT, store current cam parameters in Redux state
   const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
+  const { isOwner } = useIsOwner();
 
   // connect to newCameraCommand
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
@@ -94,7 +96,7 @@ export default function CameraControlContainer() {
         </Grid>
         <Grid item xs={3}>
           <div className={classes.controlsBox}>
-            {camSettings?.camctrl === "y" && (
+            {camSettings?.camctrl === "y" && isOwner && (
               <List>
                 <ListItem>
                   <SelectExposureMode showLabel={true} />
@@ -124,15 +126,17 @@ export default function CameraControlContainer() {
 
         <>
           <Grid item xs>
-            {camSettings?.camctrl === "y" && <FocusModeButton />}
+            {camSettings?.camctrl === "y" && isOwner && <FocusModeButton />}
           </Grid>
           <Grid item xs>
-            {camSettings?.camctrl === "y" && <FocusZoomButtonsGrid />}
+            {camSettings?.camctrl === "y" && isOwner && (
+              <FocusZoomButtonsGrid />
+            )}
           </Grid>
         </>
 
         <Grid item xs>
-          {camSettings?.pantilt === "y" && (
+          {camSettings?.pantilt === "y" && isOwner && (
             <div className={classes.joystickBox}>
               <Joystick />
             </div>
