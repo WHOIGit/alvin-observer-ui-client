@@ -121,7 +121,7 @@ export default function CameraControlContainer() {
 
       <Grid container spacing={2}>
         <Grid item xs>
-          <SetCaptureInterval />
+          {isOwner && <SetCaptureInterval />}
         </Grid>
 
         <>
