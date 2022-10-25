@@ -31,6 +31,8 @@ const initialState = {
   joystickStatus: null,
   recorderResponseError: false,
   videoSourceEnabled: true,
+  // array of commands
+  commandsQueue: [],
 };
 
 const getCameraConfig = (cameraId) => {
@@ -84,52 +86,57 @@ export const cameraControlsSlice = createSlice({
       state.lastCommand.action.value = action.payload.action.value;
       state.lastCommand.status = "PENDING";
     },
+    addCommandQueue: (state, action) => {
+      let lastCommand = action.payload;
+      console.log(lastCommand);
+      state.commandsQueue = state.commandsQueue.concat(lastCommand);
+    },
     changeCameraSettings: (state, action) => {
       // need to check confirmation of successful command from WebSocket
-      if (state.lastCommand.eventId === action.payload.eventId) {
-        // If websocket receipt returns OK, update the live settings
-        if (action.payload.receipt.status === "OK") {
-          state.lastCommand.status = "OK";
-          // change the camera settings
-          switch (state.lastCommand.action.name) {
-            // change observer camera
-            case COMMAND_STRINGS.cameraChangeCommand:
-              const activeCamera = getCameraConfig(
-                state.lastCommand.action.value
-              );
-              state.activeCamera = activeCamera;
-              break;
-            // change focus mode
-            case COMMAND_STRINGS.focusModeCommand:
-              state.currentCamData.currentSettings.focus_mode =
-                state.lastCommand.action.value;
-              break;
-            // change shutter mode
-            case COMMAND_STRINGS.shutterModeCommand:
-              state.currentCamData.currentSettings.SHU =
-                state.lastCommand.action.value;
-              break;
-            // change iris mode
-            case COMMAND_STRINGS.irisModeCommand:
-              state.currentCamData.currentSettings.IRS =
-                state.lastCommand.action.value;
-              break;
-            // change iso mode
-            case COMMAND_STRINGS.isoModeCommand:
-              state.currentCamData.currentSettings.ISO =
-                state.lastCommand.action.value;
-              break;
-            // change exposure mode
-            case COMMAND_STRINGS.exposureModeCommand:
-              state.currentCamData.currentSettings.exposure_mode =
-                state.lastCommand.action.value;
-              break;
-            default:
+      state.commandsQueue.forEach((element) => {
+        if (action.payload.eventId === element.eventId) {
+          // If websocket receipt returns OK, update the live settings
+          if (action.payload.receipt.status === "OK") {
+            // change the camera settings
+            switch (element.action.name) {
+              // change observer camera
+              case COMMAND_STRINGS.cameraChangeCommand:
+                const activeCamera = getCameraConfig(element.action.value);
+                state.activeCamera = activeCamera;
+                break;
+              // change focus mode
+              case COMMAND_STRINGS.focusModeCommand:
+                state.currentCamData.currentSettings.focus_mode =
+                  element.action.value;
+                break;
+              // change shutter mode
+              case COMMAND_STRINGS.shutterModeCommand:
+                state.currentCamData.currentSettings.SHU = element.action.value;
+                break;
+              // change iris mode
+              case COMMAND_STRINGS.irisModeCommand:
+                state.currentCamData.currentSettings.IRS = element.action.value;
+                break;
+              // change iso mode
+              case COMMAND_STRINGS.isoModeCommand:
+                state.currentCamData.currentSettings.ISO = element.action.value;
+                break;
+              // change exposure mode
+              case COMMAND_STRINGS.exposureModeCommand:
+                state.currentCamData.currentSettings.exposure_mode =
+                  element.action.value;
+                break;
+              default:
+            }
+          } else {
+            console.log("ERROR Received from AIS");
           }
-        } else {
-          state.lastCommand.status = "ERR";
         }
-      }
+        // remove command from queue
+        state.commandsQueue = state.commandsQueue.filter(
+          (item) => item.eventId !== action.payload.eventId
+        );
+      });
     },
     changeCamHeartbeat: (state, action) => {
       if (state.initialCamHeartbeat === null) {
@@ -203,6 +210,7 @@ export const {
   setJoystickStatus,
   setRecorderError,
   setVideoSourceEnabled,
+  addCommandQueue,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;

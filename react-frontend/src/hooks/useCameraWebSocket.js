@@ -12,6 +12,7 @@ import {
   selectObserverSide,
   selectActiveCamera,
   selectWebSocketNamespace,
+  addCommandQueue,
 } from "../features/camera-controls/cameraControlsSlice";
 import {
   WS_SERVER,
@@ -94,7 +95,8 @@ const useCameraWebSocket = (
 
       // handle NEW_CAMERA_COMMAND_EVENT events here
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
-        // console.log(socketEvent, incomingMessage);
+        console.log("Incoming message");
+        console.log(socketEvent, incomingMessage);
         // check if message is a Camera Change Package, else it's a Command Receipt
         if (incomingMessage.hasOwnProperty("current_settings")) {
           console.log("CAM CHANGE HERE");
@@ -155,8 +157,10 @@ const useCameraWebSocket = (
       };
 
       try {
+        console.log("Dispatched payload", payload);
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));
+        dispatch(addCommandQueue(payload));
       } catch (err) {
         console.log(err);
       }
