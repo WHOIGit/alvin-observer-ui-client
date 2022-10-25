@@ -87,9 +87,8 @@ export const cameraControlsSlice = createSlice({
       state.lastCommand.status = "PENDING";
     },
     addCommandQueue: (state, action) => {
-      let lastCommand = action.payload;
-      console.log(lastCommand);
-      state.commandsQueue = state.commandsQueue.concat(lastCommand);
+      state.commandsQueue = state.commandsQueue.concat(action.payload);
+      console.log(state.commandsQueue);
     },
     changeCameraSettings: (state, action) => {
       // need to check confirmation of successful command from WebSocket
