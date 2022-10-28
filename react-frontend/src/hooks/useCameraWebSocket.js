@@ -116,7 +116,7 @@ const useCameraWebSocket = (
           dispatch(changeCamHeartbeatStbd(incomingMessage));
         }
       } else if (socketEvent === CAM_HEARTBEAT) {
-        //console.log(socketEvent, incomingMessage);
+        console.log("INCOMING HEARTBEAT", incomingMessage);
         dispatch(changeCamHeartbeat(incomingMessage));
       }
     });
