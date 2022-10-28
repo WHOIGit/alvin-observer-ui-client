@@ -57,6 +57,7 @@ export default function CaptureButtons() {
         setLoading(false);
         // reenable Video Source menu
         const payloadVideoSrc = true;
+        console.log("enabling video source");
         dispatch(setVideoSourceEnabled(payloadVideoSrc));
       }
     }
@@ -83,10 +84,13 @@ export default function CaptureButtons() {
     setLoading(true);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
     // set Video Source menu to be disabled
+    console.log("disabling video source");
     const payloadVideoSrc = false;
     dispatch(setVideoSourceEnabled(payloadVideoSrc));
     // reset error status in Redux
+    console.log("reset recording error");
     const payload = false;
+    console.log("disabling video source");
     dispatch(setRecorderError(payload));
 
     // This is the maximum time the spinner will display
@@ -95,9 +99,11 @@ export default function CaptureButtons() {
     const timer = setTimeout(() => {
       setLoading(false);
       // save error status in Redux
+      console.log("save recording error");
       const payloadRecError = true;
       dispatch(setRecorderError(payloadRecError));
       // reenable Video Source menu
+      console.log("enabling video source");
       const payloadVideoSrc = true;
       dispatch(setVideoSourceEnabled(payloadVideoSrc));
     }, 12000);
