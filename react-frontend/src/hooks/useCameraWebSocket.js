@@ -158,7 +158,7 @@ const useCameraWebSocket = (
       };
 
       try {
-        console.log("Dispatched payload", payload);
+        //console.log("Dispatched payload", payload);
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));
         dispatch(addCommandQueue(payload));
