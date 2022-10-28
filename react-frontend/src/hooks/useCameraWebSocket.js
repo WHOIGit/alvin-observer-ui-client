@@ -95,12 +95,12 @@ const useCameraWebSocket = (
 
       // handle NEW_CAMERA_COMMAND_EVENT events here
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
-        console.log("Incoming message");
-        console.log(socketEvent, incomingMessage);
+        //console.log("Incoming message");
+        //console.log(socketEvent, incomingMessage);
         // check if message is a Camera Change Package, else it's a Command Receipt
         if (incomingMessage.hasOwnProperty("current_settings")) {
-          console.log("CAM CHANGE HERE");
-          console.log(socketEvent, incomingMessage);
+          //console.log("CAM CHANGE HERE");
+          //console.log(socketEvent, incomingMessage);
           dispatch(changeCurrentCamData(incomingMessage));
         } else {
           dispatch(changeCameraSettings(incomingMessage));
@@ -116,6 +116,7 @@ const useCameraWebSocket = (
           dispatch(changeCamHeartbeatStbd(incomingMessage));
         }
       } else if (socketEvent === CAM_HEARTBEAT) {
+        //console.log(socketEvent, incomingMessage);
         dispatch(changeCamHeartbeat(incomingMessage));
       }
     });
