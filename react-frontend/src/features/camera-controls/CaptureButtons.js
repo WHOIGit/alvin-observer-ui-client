@@ -84,6 +84,7 @@ export default function CaptureButtons() {
 
   const handleRecordAction = async () => {
     setLoading(true);
+    // save the current RECORDER_HEARTBEAT filename so we can check if it changes on new actions
     setCurrentRecordFile(messages.filename);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
     // set Video Source menu to be disabled
