@@ -48,7 +48,6 @@ export default function CaptureButtons() {
   useEffect(() => {
     // get current Recording camera ID from RECORDER_HEARTBEAT socket
     // also check if RECORDER_HEARTBEAT filename has changed, indicates new recording for same camera
-    console.log(messages);
     if (messages && recordTimer) {
       if (
         messages.recording === "true" &&
