@@ -57,7 +57,7 @@ export default function CaptureButtons() {
         setLoading(false);
         // reenable Video Source menu
         const payloadVideoSrc = true;
-        console.log("enabling video source");
+        console.log("enabling video source", messages);
         dispatch(setVideoSourceEnabled(payloadVideoSrc));
       }
     }
