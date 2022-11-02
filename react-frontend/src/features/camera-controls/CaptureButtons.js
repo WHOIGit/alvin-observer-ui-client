@@ -40,17 +40,20 @@ export default function CaptureButtons() {
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   const [recordTimer, setRecordTimer] = useState(null);
+  const [currentRecordFile, setCurrentRecordFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // set current Recording camera ID from RECORDER_HEARTBEAT socket
+    // get current Recording camera ID from RECORDER_HEARTBEAT socket
+    // also check if RECORDER_HEARTBEAT filename has changed, indicates new recording for same camera
     console.log(messages);
     if (messages && recordTimer) {
       if (
         messages.recording === "true" &&
-        activeCamera.cam_name === messages.camera
+        activeCamera.cam_name === messages.camera &&
+        messages.filename !== currentRecordFile
       ) {
         clearInterval(recordTimer);
         setRecordTimer(null);
@@ -61,7 +64,7 @@ export default function CaptureButtons() {
         dispatch(setVideoSourceEnabled(payloadVideoSrc));
       }
     }
-  }, [messages, recordTimer, activeCamera, dispatch]);
+  }, [messages, recordTimer, activeCamera, dispatch, currentRecordFile]);
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
@@ -82,6 +85,7 @@ export default function CaptureButtons() {
 
   const handleRecordAction = async () => {
     setLoading(true);
+    setCurrentRecordFile(messages.filename);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
     // set Video Source menu to be disabled
     console.log("disabling video source");
