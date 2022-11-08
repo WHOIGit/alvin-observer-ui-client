@@ -103,7 +103,6 @@ export default function CaptureButtons() {
     const timer = setTimeout(() => {
       setLoading(false);
       // save error status in Redux
-      console.log("save recording error");
       const payloadRecError = true;
       dispatch(setRecorderError(payloadRecError));
       // reenable Video Source menu
