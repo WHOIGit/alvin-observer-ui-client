@@ -32,6 +32,7 @@ export default function SelectExposureMode({ showLabel }) {
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { isOwner } = useIsOwner();
   const labelText = "EXP MODE:";
+  //console.log(camSettings);
 
   const handleSendMessage = (event) => {
     const payload = {

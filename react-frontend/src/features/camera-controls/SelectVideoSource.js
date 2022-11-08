@@ -34,6 +34,7 @@ export default function SelectVideoSource({ showLabel }) {
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const labelText = "SOURCE:";
 
+  console.log("Video source status", videoSourceEnabled);
   const handleSendMessage = (event) => {
     const payload = {
       action: {
