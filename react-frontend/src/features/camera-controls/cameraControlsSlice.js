@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { createSelector } from "reselect";
 import {
   COMMAND_STRINGS,
   CAMERAS,
@@ -240,9 +241,12 @@ export const selectObserverSide = (state) => state.cameraControls.observerSide;
 export const selectWebSocketNamespace = (state) =>
   state.cameraControls.webSocketNamespace;
 
+// use createSelector to create memoized selector
 // return the current CamHeartbeat data
-export const selectCamHeartbeatData = (state) =>
-  state.cameraControls.camHeartbeatData;
+export const selectCamHeartbeatData = createSelector(
+  (state) => state.cameraControls.camHeartbeatData,
+  (item) => item
+);
 
 // return the Port CamHeartbeat data
 export const selectCamHeartbeatDataPort = (state) =>
