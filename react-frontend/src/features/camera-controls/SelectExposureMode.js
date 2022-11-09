@@ -41,7 +41,6 @@ export default function SelectExposureMode({ showLabel }) {
         value: event.target.value,
       },
     };
-    console.log("TARGET VALUE:", event.target.value);
     sendMessage(payload);
   };
 

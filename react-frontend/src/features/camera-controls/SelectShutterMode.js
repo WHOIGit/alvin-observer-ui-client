@@ -30,7 +30,6 @@ export default function SelectShutterMode() {
   const [isEnabled, setIsEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
-  console.log(camSettings);
   const handleSendMessage = (event) => {
     const payload = {
       action: {
