@@ -7,6 +7,7 @@ import Select from "@material-ui/core/Select";
 import {
   selectCurrentCamData,
   selectCamHeartbeatData,
+  selectExposureControlsEnabled,
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
@@ -27,9 +28,11 @@ export default function SelectShutterMode() {
   const classes = useStyles();
   const camData = useSelector(selectCurrentCamData);
   const camSettings = useSelector(selectCamHeartbeatData);
+  const controlEnabled = useSelector(selectExposureControlsEnabled);
   const [isEnabled, setIsEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
+  console.log(camSettings);
   const handleSendMessage = (event) => {
     const payload = {
       action: {
@@ -39,6 +42,17 @@ export default function SelectShutterMode() {
     };
     sendMessage(payload);
   };
+
+  useEffect(() => {
+    // disable if an Exposure mode changes is currently processing
+    if (!controlEnabled) {
+      console.log("disable shutter");
+      setIsEnabled(false);
+    } else {
+      console.log("enable shutter");
+      setIsEnabled(true);
+    }
+  }, [controlEnabled]);
 
   useEffect(() => {
     // list of exposure modes that disable this function

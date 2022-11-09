@@ -31,6 +31,7 @@ const initialState = {
   joystickStatus: null,
   recorderResponseError: false,
   videoSourceEnabled: true,
+  exposureControlsEnabled: true,
   // array of commands
   commandsQueue: [],
 };
@@ -192,6 +193,9 @@ export const cameraControlsSlice = createSlice({
     setVideoSourceEnabled: (state, action) => {
       state.videoSourceEnabled = action.payload;
     },
+    setExposureControlsEnabled: (state, action) => {
+      state.exposureControlsEnabled = action.payload;
+    },
   },
 });
 
@@ -210,6 +214,7 @@ export const {
   setRecorderError,
   setVideoSourceEnabled,
   addCommandQueue,
+  setExposureControlsEnabled,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -270,3 +275,7 @@ export const selectRecorderResponseError = (state) =>
 // return if Video Source select should be enabled/disabled
 export const selectVideoSourceEnabled = (state) =>
   state.cameraControls.videoSourceEnabled;
+
+// return if Video Source select should be enabled/disabled
+export const selectExposureControlsEnabled = (state) =>
+  state.cameraControls.exposureControlsEnabled;
