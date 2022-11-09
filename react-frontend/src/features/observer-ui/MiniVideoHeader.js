@@ -62,10 +62,13 @@ export default function MiniVideoHeader({ videoType }) {
     if (videoType === "REC" && messages) {
       setCameraName(messages.camera);
       setIsRecording(messages.recording === "true");
-      if (recorderResponseError) {
-        setErrorMessage("Connection Error!");
-      } else {
-        setErrorMessage("");
+      // only check Recorder error status if RECORDER_HEARTBEAT recording status is false
+      if (messages.recording !== "true") {
+        if (recorderResponseError) {
+          setErrorMessage("Connection Error!");
+        } else {
+          setErrorMessage("");
+        }
       }
     } else if (videoType === "OBS" && activeCameraConfig) {
       setCameraName(activeCameraConfig.cam_name);

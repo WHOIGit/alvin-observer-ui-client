@@ -40,27 +40,30 @@ export default function CaptureButtons() {
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   const [recordTimer, setRecordTimer] = useState(null);
+  const [currentRecordFile, setCurrentRecordFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // set current Recording camera ID from RECORDER_HEARTBEAT socket
-
+    // get current Recording camera ID from RECORDER_HEARTBEAT socket
+    // also check if RECORDER_HEARTBEAT filename has changed, indicates new recording for same camera
     if (messages && recordTimer) {
       if (
         messages.recording === "true" &&
-        activeCamera.cam_name === messages.camera
+        activeCamera.cam_name === messages.camera &&
+        messages.filename !== currentRecordFile
       ) {
         clearInterval(recordTimer);
         setRecordTimer(null);
         setLoading(false);
         // reenable Video Source menu
         const payloadVideoSrc = true;
+        console.log("enabling video source", messages);
         dispatch(setVideoSourceEnabled(payloadVideoSrc));
       }
     }
-  }, [messages, recordTimer, activeCamera, dispatch]);
+  }, [messages, recordTimer, activeCamera, dispatch, currentRecordFile]);
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
@@ -81,12 +84,17 @@ export default function CaptureButtons() {
 
   const handleRecordAction = async () => {
     setLoading(true);
+    // save the current RECORDER_HEARTBEAT filename so we can check if it changes on new actions
+    setCurrentRecordFile(messages.filename);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
     // set Video Source menu to be disabled
+    console.log("disabling video source");
     const payloadVideoSrc = false;
     dispatch(setVideoSourceEnabled(payloadVideoSrc));
     // reset error status in Redux
+    console.log("reset recording error");
     const payload = false;
+    console.log("disabling video source");
     dispatch(setRecorderError(payload));
 
     // This is the maximum time the spinner will display
@@ -98,6 +106,7 @@ export default function CaptureButtons() {
       const payloadRecError = true;
       dispatch(setRecorderError(payloadRecError));
       // reenable Video Source menu
+      console.log("enabling video source");
       const payloadVideoSrc = true;
       dispatch(setVideoSourceEnabled(payloadVideoSrc));
     }, 12000);
