@@ -7,6 +7,7 @@ import Select from "@material-ui/core/Select";
 import {
   selectCurrentCamData,
   selectCamHeartbeatData,
+  selectExposureControlsEnabled,
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
@@ -27,6 +28,7 @@ export default function SelectIsoMode() {
   const classes = useStyles();
   const camData = useSelector(selectCurrentCamData);
   const camSettings = useSelector(selectCamHeartbeatData);
+  const controlEnabled = useSelector(selectExposureControlsEnabled);
   const [isEnabled, setIsEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
@@ -48,14 +50,20 @@ export default function SelectIsoMode() {
       COMMAND_STRINGS.exposureModeOptions[2],
       COMMAND_STRINGS.exposureModeOptions[3],
     ];
-    // set enabled status from camData.currentSettings.exposure_mode
-    // if AUTO exposure, disable
-    if (camSettings && disabledExposureModes.includes(camSettings.exposure)) {
+
+    // disable if an Exposure mode changes is currently processing
+    if (!controlEnabled) {
       setIsEnabled(false);
     } else {
-      setIsEnabled(true);
+      // set enabled status from camData.currentSettings.exposure_mode
+      // if AUTO exposure, disable
+      if (camSettings && disabledExposureModes.includes(camSettings.exposure)) {
+        setIsEnabled(false);
+      } else {
+        setIsEnabled(true);
+      }
     }
-  }, [camSettings]);
+  }, [camSettings, controlEnabled]);
 
   if (camSettings === null || camData === null) {
     return null;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
@@ -7,6 +7,7 @@ import Select from "@material-ui/core/Select";
 import {
   selectCurrentCamData,
   selectCamHeartbeatData,
+  selectExposureControlsEnabled,
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
@@ -25,8 +26,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SelectShutterMode() {
   const classes = useStyles();
-  const camData = useSelector(selectCurrentCamData);
-  const camSettings = useSelector(selectCamHeartbeatData);
+  const camData = useSelector(selectCurrentCamData, shallowEqual);
+  const camSettings = useSelector(selectCamHeartbeatData, shallowEqual);
+  const controlEnabled = useSelector(
+    selectExposureControlsEnabled,
+    shallowEqual
+  );
   const [isEnabled, setIsEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
@@ -47,14 +52,19 @@ export default function SelectShutterMode() {
       COMMAND_STRINGS.exposureModeOptions[0],
       COMMAND_STRINGS.exposureModeOptions[3],
     ];
-    // set enabled status from camData.currentSettings.exposure_mode
-    // if AUTO exposure, disable
-    if (camSettings && disabledExposureModes.includes(camSettings.exposure)) {
+    // disable if an Exposure mode changes is currently processing
+    if (!controlEnabled) {
       setIsEnabled(false);
     } else {
-      setIsEnabled(true);
+      // set enabled status from camData.currentSettings.exposure_mode
+      // if AUTO exposure, disable
+      if (camSettings && disabledExposureModes.includes(camSettings.exposure)) {
+        setIsEnabled(false);
+      } else {
+        setIsEnabled(true);
+      }
     }
-  }, [camSettings]);
+  }, [camSettings, controlEnabled]);
 
   if (camSettings === null || camData === null) {
     return null;

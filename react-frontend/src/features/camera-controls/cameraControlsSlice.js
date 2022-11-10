@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { createSelector } from "reselect";
 import {
   COMMAND_STRINGS,
   CAMERAS,
@@ -31,6 +32,7 @@ const initialState = {
   joystickStatus: null,
   recorderResponseError: false,
   videoSourceEnabled: true,
+  exposureControlsEnabled: true,
   // array of commands
   commandsQueue: [],
 };
@@ -145,6 +147,7 @@ export const cameraControlsSlice = createSlice({
       delete camHeartbeatData.eventId;
       delete camHeartbeatData.timestamp;
       if (state.camHeartbeatData === camHeartbeatData) {
+        console.log("No change in hearbeat data");
         return state;
       }
       state.camHeartbeatData = action.payload;
@@ -192,6 +195,9 @@ export const cameraControlsSlice = createSlice({
     setVideoSourceEnabled: (state, action) => {
       state.videoSourceEnabled = action.payload;
     },
+    setExposureControlsEnabled: (state, action) => {
+      state.exposureControlsEnabled = action.payload;
+    },
   },
 });
 
@@ -210,6 +216,7 @@ export const {
   setRecorderError,
   setVideoSourceEnabled,
   addCommandQueue,
+  setExposureControlsEnabled,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -235,7 +242,12 @@ export const selectObserverSide = (state) => state.cameraControls.observerSide;
 export const selectWebSocketNamespace = (state) =>
   state.cameraControls.webSocketNamespace;
 
+// use createSelector to create memoized selector
 // return the current CamHeartbeat data
+//export const selectCamHeartbeatData = createSelector(
+//  (state) => state.cameraControls.camHeartbeatData,
+//  (item) => item
+//);
 export const selectCamHeartbeatData = (state) =>
   state.cameraControls.camHeartbeatData;
 
@@ -270,3 +282,7 @@ export const selectRecorderResponseError = (state) =>
 // return if Video Source select should be enabled/disabled
 export const selectVideoSourceEnabled = (state) =>
   state.cameraControls.videoSourceEnabled;
+
+// return if Video Source select should be enabled/disabled
+export const selectExposureControlsEnabled = (state) =>
+  state.cameraControls.exposureControlsEnabled;
