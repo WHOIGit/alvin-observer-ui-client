@@ -40,6 +40,8 @@ export default function SelectIrisMode() {
     sendMessage(payload);
   };
 
+  console.log("render IRIS mode");
+
   useEffect(() => {
     // list of exposure modes that disable this function
     // AUTO, SP
