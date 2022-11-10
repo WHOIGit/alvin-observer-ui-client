@@ -59,7 +59,7 @@ export default function SelectExposureMode({ showLabel }) {
     // check if requested Exposure mode change has completed
     // save result in Redux
     if (camSettings && camSettings.exposure !== expModeRequested) {
-      console.log("exposure mismatch");
+      console.log("exposure mismatch", expModeRequested, camSettings.exposure);
       dispatch(setExposureControlsEnabled(false));
     } else {
       console.log("exposure matches");
