@@ -52,6 +52,8 @@ export default function SelectShutterMode() {
     ];
     // disable if an Exposure mode changes is currently processing
     if (!controlEnabled) {
+      setIsEnabled(false);
+    } else {
       // set enabled status from camData.currentSettings.exposure_mode
       // if AUTO exposure, disable
       if (camSettings && disabledExposureModes.includes(camSettings.exposure)) {
