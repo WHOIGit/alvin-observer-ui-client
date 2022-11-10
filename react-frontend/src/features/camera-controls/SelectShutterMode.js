@@ -26,9 +26,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SelectShutterMode() {
   const classes = useStyles();
-  const camData = useSelector(selectCurrentCamData);
+  const camData = useSelector(selectCurrentCamData, shallowEqual);
   const camSettings = useSelector(selectCamHeartbeatData, shallowEqual);
-  const controlEnabled = useSelector(selectExposureControlsEnabled);
+  const controlEnabled = useSelector(
+    selectExposureControlsEnabled,
+    shallowEqual
+  );
   const [isEnabled, setIsEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
