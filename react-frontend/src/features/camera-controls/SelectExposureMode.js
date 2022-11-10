@@ -35,9 +35,7 @@ export default function SelectExposureMode({ showLabel }) {
   const camSettings = useSelector(selectCamHeartbeatData);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { isOwner } = useIsOwner();
-  const [expModeRequested, setExpModeRequested] = useState(
-    camSettings.exposure
-  );
+  const [expModeRequested, setExpModeRequested] = useState(null);
   const labelText = "EXP MODE:";
   //console.log(camSettings);
 
@@ -52,6 +50,10 @@ export default function SelectExposureMode({ showLabel }) {
     sendMessage(payload);
     setExpModeRequested(event.target.value);
   };
+
+  useEffect(() => {
+    if (camSettings) setExpModeRequested(camSettings.exposure);
+  }, []);
 
   useEffect(() => {
     // check if requested Exposure mode change has completed
