@@ -150,9 +150,6 @@ export const cameraControlsSlice = createSlice({
         console.log("No change in hearbeat data");
         return state;
       }
-      console.log("CHANGES in hearbeat data");
-      console.log("STATE", state.camHeartbeatData);
-      console.log("PAYLOAD", camHeartbeatData);
       state.camHeartbeatData = action.payload;
     },
     changeCamHeartbeatPort: (state, action) => {
