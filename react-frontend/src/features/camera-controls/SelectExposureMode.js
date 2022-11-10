@@ -1,5 +1,5 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   MenuItem,
@@ -9,7 +9,10 @@ import {
   Typography,
 } from "@material-ui/core";
 // local imports
-import { selectCamHeartbeatData } from "./cameraControlsSlice";
+import {
+  selectCamHeartbeatData,
+  setExposureControlsEnabled,
+} from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import useIsOwner from "../../hooks/useIsOwner";
 import { COMMAND_STRINGS } from "../../config.js";
@@ -28,9 +31,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SelectExposureMode({ showLabel }) {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const camSettings = useSelector(selectCamHeartbeatData);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { isOwner } = useIsOwner();
+  const [expModeRequested, setExpModeRequested] = useState(null);
   const labelText = "EXP MODE:";
   //console.log(camSettings);
 
@@ -41,8 +46,31 @@ export default function SelectExposureMode({ showLabel }) {
         value: event.target.value,
       },
     };
+    console.log("TARGET VALUE:", event.target.value);
     sendMessage(payload);
+    setExpModeRequested(event.target.value);
   };
+
+  useEffect(() => {
+    // set initial
+    console.log("SET INITIAL EXP MODE", camSettings?.exposure);
+    if (camSettings) setExpModeRequested(camSettings.exposure);
+  }, []);
+
+  useEffect(() => {
+    // check if requested Exposure mode change has completed
+    // save result in Redux
+    if (
+      camSettings?.exposure !== expModeRequested &&
+      expModeRequested !== null
+    ) {
+      console.log("exposure mismatch", expModeRequested, camSettings.exposure);
+      dispatch(setExposureControlsEnabled(false));
+    } else {
+      console.log("exposure matches");
+      dispatch(setExposureControlsEnabled(true));
+    }
+  }, [camSettings, dispatch, expModeRequested]);
 
   // set up label options
   let displayEmpty = true;
