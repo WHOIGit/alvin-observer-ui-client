@@ -52,7 +52,7 @@ export default function SelectExposureMode({ showLabel }) {
   };
 
   useEffect(() => {
-    console.log("SET INITIAL EXP MODE", camSettings.exposure);
+    console.log("SET INITIAL EXP MODE", camSettings?.exposure);
     if (camSettings) setExpModeRequested(camSettings.exposure);
   }, []);
 
