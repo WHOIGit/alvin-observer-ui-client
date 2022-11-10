@@ -44,31 +44,23 @@ export default function SelectShutterMode() {
   };
 
   useEffect(() => {
-    // disable if an Exposure mode changes is currently processing
-    if (!controlEnabled) {
-      console.log("disable shutter");
-      setIsEnabled(false);
-    } else {
-      console.log("enable shutter");
-      setIsEnabled(true);
-    }
-  }, [controlEnabled]);
-
-  useEffect(() => {
     // list of exposure modes that disable this function
     // AUTO, IP
     const disabledExposureModes = [
       COMMAND_STRINGS.exposureModeOptions[0],
       COMMAND_STRINGS.exposureModeOptions[3],
     ];
-    // set enabled status from camData.currentSettings.exposure_mode
-    // if AUTO exposure, disable
-    if (camSettings && disabledExposureModes.includes(camSettings.exposure)) {
-      setIsEnabled(false);
-    } else {
-      setIsEnabled(true);
+    // disable if an Exposure mode changes is currently processing
+    if (!controlEnabled) {
+      // set enabled status from camData.currentSettings.exposure_mode
+      // if AUTO exposure, disable
+      if (camSettings && disabledExposureModes.includes(camSettings.exposure)) {
+        setIsEnabled(false);
+      } else {
+        setIsEnabled(true);
+      }
     }
-  }, [camSettings]);
+  }, [camSettings, controlEnabled]);
 
   if (camSettings === null || camData === null) {
     return null;
