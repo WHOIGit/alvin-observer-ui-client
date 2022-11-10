@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 export default function SelectShutterMode() {
   const classes = useStyles();
   const camData = useSelector(selectCurrentCamData);
-  const camSettings = useSelector(selectCamHeartbeatData);
+  const camSettings = useSelector(selectCamHeartbeatData, shallowEqual);
   const controlEnabled = useSelector(selectExposureControlsEnabled);
   const [isEnabled, setIsEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
