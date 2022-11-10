@@ -147,8 +147,10 @@ export const cameraControlsSlice = createSlice({
       delete camHeartbeatData.eventId;
       delete camHeartbeatData.timestamp;
       if (state.camHeartbeatData === camHeartbeatData) {
+        console.log("No change in hearbeat data");
         return state;
       }
+      console.log("CHANGES in hearbeat data");
       state.camHeartbeatData = action.payload;
     },
     changeCamHeartbeatPort: (state, action) => {
