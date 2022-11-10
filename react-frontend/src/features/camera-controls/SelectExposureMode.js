@@ -52,6 +52,7 @@ export default function SelectExposureMode({ showLabel }) {
   };
 
   useEffect(() => {
+    // set initial
     console.log("SET INITIAL EXP MODE", camSettings?.exposure);
     if (camSettings) setExpModeRequested(camSettings.exposure);
   }, []);
@@ -59,7 +60,10 @@ export default function SelectExposureMode({ showLabel }) {
   useEffect(() => {
     // check if requested Exposure mode change has completed
     // save result in Redux
-    if (camSettings && camSettings.exposure !== expModeRequested) {
+    if (
+      camSettings?.exposure !== expModeRequested &&
+      expModeRequested !== null
+    ) {
       console.log("exposure mismatch", expModeRequested, camSettings.exposure);
       dispatch(setExposureControlsEnabled(false));
     } else {

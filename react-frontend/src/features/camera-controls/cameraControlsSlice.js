@@ -151,6 +151,8 @@ export const cameraControlsSlice = createSlice({
         return state;
       }
       console.log("CHANGES in hearbeat data");
+      console.log("STATE", state.camHeartbeatData);
+      console.log("PAYLOAD", camHeartbeatData);
       state.camHeartbeatData = action.payload;
     },
     changeCamHeartbeatPort: (state, action) => {
