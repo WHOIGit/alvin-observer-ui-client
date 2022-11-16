@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { isEqual } from "lodash";
 import { createSelector } from "reselect";
 import {
   COMMAND_STRINGS,
