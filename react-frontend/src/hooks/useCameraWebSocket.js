@@ -76,7 +76,7 @@ const useCameraWebSocket = (
     socketRef.current = socketIOClient(WS_SERVER + socketNs, {
       path: WS_PATH + "socket.io",
       query: { client: activeSocketNamespace },
-      //transports: ["websocket"],
+      transports: ["websocket"],
     });
 
     // Listens for incoming messages
