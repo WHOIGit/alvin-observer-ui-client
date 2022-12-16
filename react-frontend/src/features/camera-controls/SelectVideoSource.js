@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -31,10 +31,15 @@ export default function SelectVideoSource({ showLabel }) {
   const activeCamera = useSelector(selectActiveCamera);
   const videoSourceEnabled = useSelector(selectVideoSourceEnabled);
   const cameras = useSelector((state) => state.cameraControls.availableCameras);
+  const [requestedSource, setRequestedSource] = useState(null);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const labelText = "SOURCE:";
 
-  console.log("Video source status", videoSourceEnabled);
+  useEffect(() => {
+    console.log("REQ SRC: ", requestedSource);
+    console.log("Active Camera: ", activeCamera);
+  }, [requestedSource, activeCamera]);
+
   const handleSendMessage = (event) => {
     const payload = {
       action: {
@@ -43,6 +48,7 @@ export default function SelectVideoSource({ showLabel }) {
       },
     };
     sendMessage(payload);
+    setRequestedSource(event.target.value);
   };
 
   return (
