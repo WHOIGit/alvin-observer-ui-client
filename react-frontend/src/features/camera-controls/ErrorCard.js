@@ -1,6 +1,8 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Card, CardContent, Chip } from "@material-ui/core";
+import { red } from "@material-ui/core/colors";
+import { Card, CardContent, Chip, Box } from "@material-ui/core";
+import NoPhotographyIcon from "@mui/icons-material/NoPhotography";
 // local import
 
 const useStyles = makeStyles((theme) => ({
@@ -10,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     width: "100%",
     color: "white",
-    //backgroundColor: theme.palette.success.main
+    backgroundColor: theme.palette.error.main,
   },
 }));
 
@@ -21,11 +23,14 @@ export default function ErrorCard({ errorType }) {
     <Card className={`${classes.root}`}>
       <CardContent>
         <Chip
-          label="CAM CHANGE ERROR. CAMERA UNAVAILABLE"
+          label="CAMERA CHANGE ERROR"
           className={classes.chip}
           color="warning"
         />
       </CardContent>
+      <Box m={1}>
+        <NoPhotographyIcon style={{ color: red[400] }} />
+      </Box>
     </Card>
   );
 }
