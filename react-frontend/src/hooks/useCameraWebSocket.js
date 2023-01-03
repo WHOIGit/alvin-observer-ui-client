@@ -102,11 +102,11 @@ const useCameraWebSocket = (
           console.log("CAM CHANGE HERE");
           console.log(socketEvent, incomingMessage);
           dispatch(changeCurrentCamData(incomingMessage));
-          dispatch(setErrorCameraChange(false));
+          //dispatch(setErrorCameraChange(false));
         } else {
           dispatch(changeCameraSettings(incomingMessage));
           // set Error to true is current_settings is missing. No new cam package was received
-          dispatch(setErrorCameraChange(true));
+          //dispatch(setErrorCameraChange(true));
         }
       }
 
