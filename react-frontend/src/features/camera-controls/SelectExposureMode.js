@@ -64,10 +64,8 @@ export default function SelectExposureMode({ showLabel }) {
       camSettings?.exposure !== expModeRequested &&
       expModeRequested !== null
     ) {
-      console.log("exposure mismatch", expModeRequested, camSettings.exposure);
       dispatch(setExposureControlsEnabled(false));
     } else {
-      console.log("exposure matches");
       dispatch(setExposureControlsEnabled(true));
     }
   }, [camSettings, dispatch, expModeRequested]);

@@ -47,8 +47,6 @@ export default function CaptureButtons() {
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const dispatch = useDispatch();
 
-  console.log("REC ENABLED STATUS", recordControlsEnabled);
-
   useEffect(() => {
     // get current Recording camera ID from RECORDER_HEARTBEAT socket
     // also check if RECORDER_HEARTBEAT filename has changed, indicates new recording for same camera
