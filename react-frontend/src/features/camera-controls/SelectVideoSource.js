@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   MenuItem,
@@ -11,6 +11,7 @@ import {
 import {
   selectActiveCamera,
   selectVideoSourceEnabled,
+  setRecordControlsEnabled,
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
@@ -28,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SelectVideoSource({ showLabel }) {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const activeCamera = useSelector(selectActiveCamera);
   const videoSourceEnabled = useSelector(selectVideoSourceEnabled);
   const cameras = useSelector((state) => state.cameraControls.availableCameras);
@@ -38,7 +40,14 @@ export default function SelectVideoSource({ showLabel }) {
   useEffect(() => {
     console.log("REQ SRC: ", requestedSource);
     console.log("Active Camera: ", activeCamera);
-  }, [requestedSource, activeCamera]);
+    if (requestedSource === activeCamera) {
+      console.log("ENABLE REC Controls");
+      dispatch(setRecordControlsEnabled(true));
+    } else {
+      console.log("DISABLE REC Controls");
+      dispatch(setRecordControlsEnabled(false));
+    }
+  }, [requestedSource, activeCamera, dispatch]);
 
   const handleSendMessage = (event) => {
     const payload = {

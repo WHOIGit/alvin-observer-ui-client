@@ -9,6 +9,7 @@ import {
   selectActiveCameraConfig,
   setRecorderError,
   setVideoSourceEnabled,
+  selectRecordControlsEnabled,
 } from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
@@ -37,6 +38,7 @@ const useStyles = makeStyles((theme) => ({
 export default function CaptureButtons() {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCameraConfig);
+  const recordControlsEnabled = useSelector(selectRecordControlsEnabled);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   const [recordTimer, setRecordTimer] = useState(null);
@@ -148,7 +150,7 @@ export default function CaptureButtons() {
             variant="contained"
             color="primary"
             size="small"
-            disabled={loading}
+            disabled={loading && recordControlsEnabled}
             className={classes.ctrlButton}
             onClick={() => handleRecordAction()}
           >

@@ -33,6 +33,7 @@ const initialState = {
   recorderResponseError: false,
   videoSourceEnabled: true,
   exposureControlsEnabled: true,
+  recordControlsEnabled: true,
   // array of commands
   commandsQueue: [],
 };
@@ -90,7 +91,6 @@ export const cameraControlsSlice = createSlice({
     },
     addCommandQueue: (state, action) => {
       state.commandsQueue = state.commandsQueue.concat(action.payload);
-      console.log(state.commandsQueue);
     },
     changeCameraSettings: (state, action) => {
       // need to check confirmation of successful command from WebSocket
@@ -198,6 +198,9 @@ export const cameraControlsSlice = createSlice({
     setExposureControlsEnabled: (state, action) => {
       state.exposureControlsEnabled = action.payload;
     },
+    setRecordControlsEnabled: (state, action) => {
+      state.recordControlsEnabled = action.payload;
+    },
   },
 });
 
@@ -217,6 +220,7 @@ export const {
   setVideoSourceEnabled,
   addCommandQueue,
   setExposureControlsEnabled,
+  setRecordControlsEnabled,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -283,6 +287,10 @@ export const selectRecorderResponseError = (state) =>
 export const selectVideoSourceEnabled = (state) =>
   state.cameraControls.videoSourceEnabled;
 
-// return if Video Source select should be enabled/disabled
+// return if Exposure controls should be enabled/disabled
 export const selectExposureControlsEnabled = (state) =>
   state.cameraControls.exposureControlsEnabled;
+
+// return if Record Button should be enabled/disabled
+export const selectRecordControlsEnabled = (state) =>
+  state.cameraControls.recordControlsEnabled;
