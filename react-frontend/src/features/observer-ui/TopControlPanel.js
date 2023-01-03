@@ -46,6 +46,7 @@ export default function TopControlPanel({
   const errorCameraChange = useSelector(selectErrorCameraChange);
 
   const renderDynamicGridBox = () => {
+    console.log("CAM ERROR", errorCameraChange);
     if (errorCameraChange) return <ErrorCard />;
     if (showFullCameraControls) {
       return <TopCameraCommandsList />;

@@ -14,6 +14,13 @@ const useStyles = makeStyles((theme) => ({
     color: "white",
     backgroundColor: theme.palette.error.main,
   },
+  iconBox: {
+    textAlign: "center",
+  },
+  icon: {
+    color: "white",
+    backgroundColor: theme.palette.error.main,
+  },
 }));
 
 export default function ErrorCard({ errorType }) {
@@ -24,8 +31,8 @@ export default function ErrorCard({ errorType }) {
       <CardContent>
         <Chip label="CAMERA CHANGE ERROR" className={classes.chip} />
       </CardContent>
-      <Box m={1}>
-        <ErrorIcon style={{ color: red[400] }} />
+      <Box m={1} className={classes.iconBox}>
+        <ErrorIcon className={classes.icon} />
       </Box>
     </Card>
   );
