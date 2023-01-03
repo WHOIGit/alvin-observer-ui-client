@@ -34,6 +34,7 @@ const initialState = {
   videoSourceEnabled: true,
   exposureControlsEnabled: true,
   recordControlsEnabled: true,
+  errorCameraChange: false,
   // array of commands
   commandsQueue: [],
 };
@@ -201,6 +202,9 @@ export const cameraControlsSlice = createSlice({
     setRecordControlsEnabled: (state, action) => {
       state.recordControlsEnabled = action.payload;
     },
+    setErrorCameraChange: (state, action) => {
+      state.errorCameraChange = action.payload;
+    },
   },
 });
 
@@ -294,3 +298,7 @@ export const selectExposureControlsEnabled = (state) =>
 // return if Record Button should be enabled/disabled
 export const selectRecordControlsEnabled = (state) =>
   state.cameraControls.recordControlsEnabled;
+
+// return error disalb
+export const selectErrorCameraChange = (state) =>
+  state.cameraControls.errorCameraChange;

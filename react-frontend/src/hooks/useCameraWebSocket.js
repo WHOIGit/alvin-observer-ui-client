@@ -6,13 +6,13 @@ import {
   setLastCommand,
   changeCameraSettings,
   changeCurrentCamData,
-  changeCamHeartbeat,
   changeCamHeartbeatPort,
   changeCamHeartbeatStbd,
   selectObserverSide,
   selectActiveCamera,
   selectWebSocketNamespace,
   addCommandQueue,
+  setErrorCameraChange,
 } from "../features/camera-controls/cameraControlsSlice";
 import {
   WS_SERVER,
@@ -102,8 +102,11 @@ const useCameraWebSocket = (
           console.log("CAM CHANGE HERE");
           console.log(socketEvent, incomingMessage);
           dispatch(changeCurrentCamData(incomingMessage));
+          dispatch(setErrorCameraChange(false));
         } else {
           dispatch(changeCameraSettings(incomingMessage));
+          // set Error to true is current_settings is missing. No new cam package was received
+          dispatch(setErrorCameraChange(true));
         }
       }
 
