@@ -98,7 +98,7 @@ export const cameraControlsSlice = createSlice({
       state.commandsQueue.forEach((element) => {
         if (action.payload.eventId === element.eventId) {
           // If websocket receipt returns OK, update the live settings
-          if (action.payload.receipt.status === "OK") {
+          if (action.payload.receipt.status !== "OK") {
             state.errorCameraChange = false;
             // change the camera settings
             switch (element.action.name) {
