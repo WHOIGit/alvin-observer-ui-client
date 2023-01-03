@@ -12,7 +12,7 @@ import MetaDataDisplay from "./MetaDataDisplay";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
 import ErrorCard from "../camera-controls/ErrorCard";
-import { selectErrorCameraChange } from "./camera-controls/cameraControlsSlice";
+import { selectErrorCameraChange } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
