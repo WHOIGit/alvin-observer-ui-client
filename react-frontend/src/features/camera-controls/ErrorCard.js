@@ -28,7 +28,7 @@ export default function ErrorCard({ errorType }) {
   return (
     <Card className={`${classes.root}`}>
       <CardContent>
-        <Chip label="CAMERA CHANGE ERROR" className={classes.chip} />
+        <Chip label="ERROR RECEIVED FROM AIS" className={classes.chip} />
       </CardContent>
       <Box m={1} className={classes.iconBox}>
         <ErrorIcon className={classes.icon} fontSize="large" />

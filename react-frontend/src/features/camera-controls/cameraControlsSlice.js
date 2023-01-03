@@ -99,6 +99,7 @@ export const cameraControlsSlice = createSlice({
         if (action.payload.eventId === element.eventId) {
           // If websocket receipt returns OK, update the live settings
           if (action.payload.receipt.status === "OK") {
+            state.errorCameraChange = false;
             // change the camera settings
             switch (element.action.name) {
               // change observer camera
@@ -132,6 +133,7 @@ export const cameraControlsSlice = createSlice({
             }
           } else {
             console.log("ERROR Received from AIS");
+            state.errorCameraChange = true;
           }
         }
         // remove command from queue
