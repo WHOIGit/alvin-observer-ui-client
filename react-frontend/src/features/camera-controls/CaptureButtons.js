@@ -47,6 +47,20 @@ export default function CaptureButtons() {
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const dispatch = useDispatch();
 
+  console.log("REC ENABLED STATUS", recordControlsEnabled);
+
+  useEffect(() => {
+    // get current Recording camera ID from RECORDER_HEARTBEAT socket
+    // also check if RECORDER_HEARTBEAT filename has changed, indicates new recording for same camera
+    if (recordControlsEnabled) {
+      setLoading(false);
+      setLoadingImgCapture(false);
+    } else {
+      setLoading(true);
+      setLoadingImgCapture(true);
+    }
+  }, [recordControlsEnabled]);
+
   useEffect(() => {
     // get current Recording camera ID from RECORDER_HEARTBEAT socket
     // also check if RECORDER_HEARTBEAT filename has changed, indicates new recording for same camera
@@ -150,7 +164,7 @@ export default function CaptureButtons() {
             variant="contained"
             color="primary"
             size="small"
-            disabled={loading && recordControlsEnabled}
+            disabled={loading}
             className={classes.ctrlButton}
             onClick={() => handleRecordAction()}
           >
