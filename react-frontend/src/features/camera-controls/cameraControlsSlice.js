@@ -225,6 +225,7 @@ export const {
   addCommandQueue,
   setExposureControlsEnabled,
   setRecordControlsEnabled,
+  setErrorCameraChange,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
