@@ -165,6 +165,7 @@ export const cameraControlsSlice = createSlice({
       const camHeartbeatDataPort = action.payload;
       delete camHeartbeatDataPort.eventId;
       delete camHeartbeatDataPort.timestamp;
+
       if (isEqual(currentState.camHeartbeatDataPort, camHeartbeatDataPort)) {
         return state;
       }
@@ -176,6 +177,7 @@ export const cameraControlsSlice = createSlice({
       const camHeartbeatDataStbd = action.payload;
       delete camHeartbeatDataStbd.eventId;
       delete camHeartbeatDataStbd.timestamp;
+
       if (isEqual(currentState.camHeartbeatDataStbd, camHeartbeatDataStbd)) {
         return state;
       }
@@ -184,11 +186,10 @@ export const cameraControlsSlice = createSlice({
     changeRecorderHeartbeat: (state, action) => {
       // get the original state to check Heartbeat data
       const currentState = original(state);
-      console.log("Orig:", currentState);
       const data = action.payload;
       delete data.eventId;
       delete data.timestamp;
-      console.log("New:", data);
+
       if (isEqual(currentState.recorderHeartbeatData, data)) {
         return state;
       }
