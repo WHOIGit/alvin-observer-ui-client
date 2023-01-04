@@ -9,9 +9,8 @@ import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import {
   selectActiveCameraConfig,
   selectRecorderResponseError,
+  selectRecorderHeartbeatData,
 } from "../camera-controls/cameraControlsSlice";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { RECORDER_HEARTBEAT, CAM_HEARTBEAT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   headerRoot: {
@@ -37,34 +36,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function MiniVideoHeader({ videoType }) {
-  // set websocket event based on videoType
-  let wsEvent;
-  if (videoType === "OBS") {
-    wsEvent = CAM_HEARTBEAT;
-  } else if (videoType === "REC") {
-    wsEvent = RECORDER_HEARTBEAT;
-  }
   const classes = useStyles();
   const [cameraName, setCameraName] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const recorderResponseError = useSelector(selectRecorderResponseError);
-  const { messages } = useCameraWebSocket(wsEvent);
+  const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
 
-  console.log(messages);
+  console.log(recorderHeartbeatData);
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
-    [classes.headerRecording]: messages && isRecording, //only when condition === true
+    [classes.headerRecording]: recorderHeartbeatData && isRecording, //only when condition === true
     [classes.headerError]: videoType === "REC" && recorderResponseError, //only when condition === true
   });
 
   useEffect(() => {
-    if (videoType === "REC" && messages) {
-      setCameraName(messages.camera);
-      setIsRecording(messages.recording === "true");
+    if (videoType === "REC" && recorderHeartbeatData) {
+      setCameraName(recorderHeartbeatData.camera);
+      setIsRecording(recorderHeartbeatData.recording === "true");
       // only check Recorder error status if RECORDER_HEARTBEAT recording status is false
-      if (messages.recording !== "true") {
+      if (recorderHeartbeatData.recording !== "true") {
         if (recorderResponseError) {
           setErrorMessage("Connection Error!");
         } else {
@@ -75,7 +67,12 @@ export default function MiniVideoHeader({ videoType }) {
       setCameraName(activeCameraConfig.cam_name);
       setIsRecording(false);
     }
-  }, [messages, videoType, activeCameraConfig, recorderResponseError]);
+  }, [
+    recorderHeartbeatData,
+    videoType,
+    activeCameraConfig,
+    recorderResponseError,
+  ]);
 
   let title = videoType + ": " + cameraName + " " + errorMessage;
 
