@@ -10,6 +10,7 @@ import {
 } from "../camera-controls/cameraControlsSlice";
 import {
   CAM_HEARTBEAT,
+  RECORDER_HEARTBEAT,
   NEW_CAMERA_COMMAND_EVENT,
   COMMAND_STRINGS,
 } from "../../config";
@@ -53,8 +54,9 @@ export default function ObserverUI({
     NEW_CAMERA_COMMAND_EVENT
   );
 
-  // connect to CAM_HEARTBEAT, store current cam parameters in Redux state
+  // connect to CAM_HEARTBEAT and RECORDER_HEARTBEAT, store current cam parameters in Redux state
   useCameraWebSocket(CAM_HEARTBEAT);
+  useCameraWebSocket(RECORDER_HEARTBEAT);
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
 

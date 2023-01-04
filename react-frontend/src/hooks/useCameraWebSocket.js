@@ -9,6 +9,7 @@ import {
   changeCamHeartbeat,
   changeCamHeartbeatPort,
   changeCamHeartbeatStbd,
+  changeRecorderHeartbeat,
   selectObserverSide,
   selectActiveCamera,
   selectWebSocketNamespace,
@@ -88,7 +89,7 @@ const useCameraWebSocket = (
       };
        */
 
-      if (socketEvent !== CAM_HEARTBEAT) {
+      if (socketEvent !== CAM_HEARTBEAT && socketEvent !== RECORDER_HEARTBEAT) {
         //console.log(socketEvent, incomingMessage);
         setMessages(incomingMessage);
       }
@@ -118,6 +119,11 @@ const useCameraWebSocket = (
       } else if (socketEvent === CAM_HEARTBEAT) {
         //console.log("INCOMING HEARTBEAT", incomingMessage);
         dispatch(changeCamHeartbeat(incomingMessage));
+      }
+
+      // handle RECORDER_HEARTBEAT events here
+      if (socketEvent === RECORDER_HEARTBEAT) {
+        dispatch(changeRecorderHeartbeat(incomingMessage));
       }
     });
 
