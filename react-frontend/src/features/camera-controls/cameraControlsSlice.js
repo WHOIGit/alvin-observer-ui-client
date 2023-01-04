@@ -149,11 +149,9 @@ export const cameraControlsSlice = createSlice({
       }
       // get the original state to check Heartbeat data
       const currentState = original(state);
-      //console.log("Original Heartbeat:", currentState.camHeartbeatData);
       const camHeartbeatData = action.payload;
       delete camHeartbeatData.eventId;
       delete camHeartbeatData.timestamp;
-      //console.log("New Heartbeat:", camHeartbeatData);
 
       if (isEqual(currentState.camHeartbeatData, camHeartbeatData)) {
         console.log("No change in hearbeat data");
@@ -162,28 +160,34 @@ export const cameraControlsSlice = createSlice({
       state.camHeartbeatData = action.payload;
     },
     changeCamHeartbeatPort: (state, action) => {
+      // get the original state to check Heartbeat data
+      const currentState = original(state);
       const camHeartbeatDataPort = action.payload;
       delete camHeartbeatDataPort.eventId;
       delete camHeartbeatDataPort.timestamp;
-      if (state.camHeartbeatDataPort === camHeartbeatDataPort) {
+      if (isEqual(currentState.camHeartbeatDataPort, camHeartbeatDataPort)) {
         return state;
       }
       state.camHeartbeatDataPort = action.payload;
     },
     changeCamHeartbeatStbd: (state, action) => {
+      // get the original state to check Heartbeat data
+      const currentState = original(state);
       const camHeartbeatDataStbd = action.payload;
       delete camHeartbeatDataStbd.eventId;
       delete camHeartbeatDataStbd.timestamp;
-      if (state.camHeartbeatDataStbd === camHeartbeatDataStbd) {
+      if (isEqual(currentState.camHeartbeatDataStbd, camHeartbeatDataStbd)) {
         return state;
       }
       state.camHeartbeatDataStbd = action.payload;
     },
     changeRecorderHeartbeat: (state, action) => {
+      // get the original state to check Heartbeat data
+      const currentState = original(state);
       const data = action.payload;
       delete data.eventId;
       delete data.timestamp;
-      if (state.recorderHeartbeatData === data) {
+      if (isEqual(currentState.recorderHeartbeatData, data)) {
         return state;
       }
       state.recorderHeartbeatData = data;
