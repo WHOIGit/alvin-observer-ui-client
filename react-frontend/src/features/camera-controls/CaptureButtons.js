@@ -9,6 +9,7 @@ import {
   selectActiveCameraConfig,
   setRecorderError,
   setVideoSourceEnabled,
+  selectRecordControlsEnabled,
 } from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
@@ -37,6 +38,7 @@ const useStyles = makeStyles((theme) => ({
 export default function CaptureButtons() {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCameraConfig);
+  const recordControlsEnabled = useSelector(selectRecordControlsEnabled);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   const [recordTimer, setRecordTimer] = useState(null);
@@ -44,6 +46,18 @@ export default function CaptureButtons() {
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    // get current Recording camera ID from RECORDER_HEARTBEAT socket
+    // also check if RECORDER_HEARTBEAT filename has changed, indicates new recording for same camera
+    if (recordControlsEnabled) {
+      setLoading(false);
+      setLoadingImgCapture(false);
+    } else {
+      setLoading(true);
+      setLoadingImgCapture(true);
+    }
+  }, [recordControlsEnabled]);
 
   useEffect(() => {
     // get current Recording camera ID from RECORDER_HEARTBEAT socket
