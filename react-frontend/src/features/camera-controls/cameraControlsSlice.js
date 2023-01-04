@@ -147,14 +147,15 @@ export const cameraControlsSlice = createSlice({
       if (state.initialCamHeartbeat === null) {
         state.initialCamHeartbeat = action.payload;
       }
-      // get the current Heartbeat data
+      // get the original state to check Heartbeat data
       const currentState = original(state);
-      console.log("Original Heartbeat:", currentState.camHeartbeatData);
+      //console.log("Original Heartbeat:", currentState.camHeartbeatData);
       const camHeartbeatData = action.payload;
       delete camHeartbeatData.eventId;
       delete camHeartbeatData.timestamp;
-      console.log("New Heartbeat:", camHeartbeatData);
-      if (state.camHeartbeatData === camHeartbeatData) {
+      //console.log("New Heartbeat:", camHeartbeatData);
+
+      if (isEqual(currentState.camHeartbeatData, camHeartbeatData)) {
         console.log("No change in hearbeat data");
         return state;
       }
