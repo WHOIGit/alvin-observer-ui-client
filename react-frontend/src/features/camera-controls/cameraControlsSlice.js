@@ -148,8 +148,8 @@ export const cameraControlsSlice = createSlice({
         state.initialCamHeartbeat = action.payload;
       }
       // get the current Heartbeat data
-      const currentData = original(state);
-      console.log("Original Heartbeat:", currentData);
+      const currentState = original(state);
+      console.log("Original Heartbeat:", currentState.camHeartbeatData);
       const camHeartbeatData = action.payload;
       delete camHeartbeatData.eventId;
       delete camHeartbeatData.timestamp;
