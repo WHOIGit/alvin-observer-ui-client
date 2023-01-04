@@ -184,9 +184,11 @@ export const cameraControlsSlice = createSlice({
     changeRecorderHeartbeat: (state, action) => {
       // get the original state to check Heartbeat data
       const currentState = original(state);
+      console.log("Orig:", currentState);
       const data = action.payload;
       delete data.eventId;
       delete data.timestamp;
+      console.log("New:", data);
       if (isEqual(currentState.recorderHeartbeatData, data)) {
         return state;
       }
