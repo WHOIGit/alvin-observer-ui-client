@@ -10,6 +10,7 @@ import {
   setRecorderError,
   setVideoSourceEnabled,
   selectRecordControlsEnabled,
+  selectCamHeartbeatData,
 } from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
@@ -39,6 +40,7 @@ export default function CaptureButtons() {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCameraConfig);
   const recordControlsEnabled = useSelector(selectRecordControlsEnabled);
+  const camSettings = useSelector(selectCamHeartbeatData);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   const [recordTimer, setRecordTimer] = useState(null);
@@ -136,6 +138,11 @@ export default function CaptureButtons() {
       setLoadingImgCapture(false);
     }, 2000);
   };
+
+  // check to make sure camera has controls, current Observer matches Cam Owner, camera is available
+  if (camSettings === null || camSettings?.focus_mode === "ERR") {
+    return null;
+  }
 
   return (
     <>
