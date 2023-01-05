@@ -38,6 +38,7 @@ export default function SelectExposureMode({ showLabel }) {
   const [expModeRequested, setExpModeRequested] = useState(null);
   const labelText = "EXP MODE:";
   //console.log(camSettings);
+  console.log("render Exposure select");
 
   const handleSendMessage = (event) => {
     const payload = {

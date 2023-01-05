@@ -10,13 +10,10 @@ import {
   setRecorderError,
   setVideoSourceEnabled,
   selectRecordControlsEnabled,
+  selectRecorderHeartbeatData,
   selectCamHeartbeatData,
 } from "./cameraControlsSlice";
-import {
-  COMMAND_STRINGS,
-  NEW_CAMERA_COMMAND_EVENT,
-  RECORDER_HEARTBEAT,
-} from "../../config.js";
+import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   ctrlButton: {
@@ -40,9 +37,9 @@ export default function CaptureButtons() {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCameraConfig);
   const recordControlsEnabled = useSelector(selectRecordControlsEnabled);
+  const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
   const camSettings = useSelector(selectCamHeartbeatData);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
-  const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
   const [recordTimer, setRecordTimer] = useState(null);
   const [currentRecordFile, setCurrentRecordFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -50,8 +47,6 @@ export default function CaptureButtons() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // get current Recording camera ID from RECORDER_HEARTBEAT socket
-    // also check if RECORDER_HEARTBEAT filename has changed, indicates new recording for same camera
     if (recordControlsEnabled) {
       setLoading(false);
       setLoadingImgCapture(false);
@@ -62,24 +57,29 @@ export default function CaptureButtons() {
   }, [recordControlsEnabled]);
 
   useEffect(() => {
-    // get current Recording camera ID from RECORDER_HEARTBEAT socket
+    // get current Recording camera ID from RECORDER_HEARTBEAT
     // also check if RECORDER_HEARTBEAT filename has changed, indicates new recording for same camera
-    if (messages && recordTimer) {
+    if (recorderHeartbeatData && recordTimer) {
       if (
-        messages.recording === "true" &&
-        activeCamera.cam_name === messages.camera &&
-        messages.filename !== currentRecordFile
+        recorderHeartbeatData.recording === "true" &&
+        activeCamera.cam_name === recorderHeartbeatData.camera &&
+        recorderHeartbeatData.filename !== currentRecordFile
       ) {
         clearInterval(recordTimer);
         setRecordTimer(null);
         setLoading(false);
         // reenable Video Source menu
         const payloadVideoSrc = true;
-        console.log("enabling video source", messages);
         dispatch(setVideoSourceEnabled(payloadVideoSrc));
       }
     }
-  }, [messages, recordTimer, activeCamera, dispatch, currentRecordFile]);
+  }, [
+    recorderHeartbeatData,
+    recordTimer,
+    activeCamera,
+    dispatch,
+    currentRecordFile,
+  ]);
 
   const handleSendMessage = (commandName, commandValue) => {
     const payload = {
@@ -91,7 +91,7 @@ export default function CaptureButtons() {
     // If a RECORD SOURCE action, need to send the previous Recording camera name
     if (commandName === COMMAND_STRINGS.recordSourceCommand) {
       // get the camera ID of the currently recording camera
-      const oldCamera = getCameraConfigFromName(messages.camera);
+      const oldCamera = getCameraConfigFromName(recorderHeartbeatData.camera);
       payload.oldCamera = oldCamera.camera;
     }
 
@@ -101,7 +101,7 @@ export default function CaptureButtons() {
   const handleRecordAction = async () => {
     setLoading(true);
     // save the current RECORDER_HEARTBEAT filename so we can check if it changes on new actions
-    setCurrentRecordFile(messages.filename);
+    setCurrentRecordFile(recorderHeartbeatData.filename);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
     // set Video Source menu to be disabled
     console.log("disabling video source");
