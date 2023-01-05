@@ -40,7 +40,7 @@ export default function SelectVideoSource({ showLabel }) {
   useEffect(() => {
     console.log("REQ SRC: ", requestedSource);
     console.log("Active Camera: ", activeCamera);
-    if (requestedSource === activeCamera || requestedSource === null) {
+    if (requestedSource === null) {
       console.log("ENABLE REC Controls");
       dispatch(setRecordControlsEnabled(true));
     } else {
