@@ -76,8 +76,13 @@ export default function SelectExposureMode({ showLabel }) {
     displayEmpty = false;
   }
 
-  // check to make sure camera has controls and current Observer matches Cam Owner
-  if (camSettings === null || camSettings?.camctrl === "n" || !isOwner) {
+  // check to make sure camera has controls, current Observer matches Cam Owner, camera is available
+  if (
+    camSettings === null ||
+    camSettings?.camctrl === "n" ||
+    !isOwner ||
+    camSettings?.exposure === "ERR"
+  ) {
     return null;
   }
 
