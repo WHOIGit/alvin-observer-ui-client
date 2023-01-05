@@ -64,10 +64,8 @@ export default function SelectExposureMode({ showLabel }) {
       camSettings?.exposure !== expModeRequested &&
       expModeRequested !== null
     ) {
-      console.log("exposure mismatch", expModeRequested, camSettings.exposure);
       dispatch(setExposureControlsEnabled(false));
     } else {
-      console.log("exposure matches");
       dispatch(setExposureControlsEnabled(true));
     }
   }, [camSettings, dispatch, expModeRequested]);
@@ -78,8 +76,13 @@ export default function SelectExposureMode({ showLabel }) {
     displayEmpty = false;
   }
 
-  // check to make sure camera has controls and current Observer matches Cam Owner
-  if (camSettings === null || camSettings?.camctrl === "n" || !isOwner) {
+  // check to make sure camera has controls, current Observer matches Cam Owner, camera is available
+  if (
+    camSettings === null ||
+    camSettings?.camctrl === "n" ||
+    !isOwner ||
+    camSettings?.exposure === "ERR"
+  ) {
     return null;
   }
 

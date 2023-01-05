@@ -33,6 +33,8 @@ const initialState = {
   recorderResponseError: false,
   videoSourceEnabled: true,
   exposureControlsEnabled: true,
+  recordControlsEnabled: true,
+  errorCameraChange: false,
   // array of commands
   commandsQueue: [],
 };
@@ -90,7 +92,6 @@ export const cameraControlsSlice = createSlice({
     },
     addCommandQueue: (state, action) => {
       state.commandsQueue = state.commandsQueue.concat(action.payload);
-      console.log(state.commandsQueue);
     },
     changeCameraSettings: (state, action) => {
       // need to check confirmation of successful command from WebSocket
@@ -98,6 +99,7 @@ export const cameraControlsSlice = createSlice({
         if (action.payload.eventId === element.eventId) {
           // If websocket receipt returns OK, update the live settings
           if (action.payload.receipt.status === "OK") {
+            state.errorCameraChange = false;
             // change the camera settings
             switch (element.action.name) {
               // change observer camera
@@ -131,6 +133,7 @@ export const cameraControlsSlice = createSlice({
             }
           } else {
             console.log("ERROR Received from AIS");
+            state.errorCameraChange = true;
           }
         }
         // remove command from queue
@@ -198,6 +201,12 @@ export const cameraControlsSlice = createSlice({
     setExposureControlsEnabled: (state, action) => {
       state.exposureControlsEnabled = action.payload;
     },
+    setRecordControlsEnabled: (state, action) => {
+      state.recordControlsEnabled = action.payload;
+    },
+    setErrorCameraChange: (state, action) => {
+      state.errorCameraChange = action.payload;
+    },
   },
 });
 
@@ -217,6 +226,8 @@ export const {
   setVideoSourceEnabled,
   addCommandQueue,
   setExposureControlsEnabled,
+  setRecordControlsEnabled,
+  setErrorCameraChange,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -283,6 +294,14 @@ export const selectRecorderResponseError = (state) =>
 export const selectVideoSourceEnabled = (state) =>
   state.cameraControls.videoSourceEnabled;
 
-// return if Video Source select should be enabled/disabled
+// return if Exposure controls should be enabled/disabled
 export const selectExposureControlsEnabled = (state) =>
   state.cameraControls.exposureControlsEnabled;
+
+// return if Record Button should be enabled/disabled
+export const selectRecordControlsEnabled = (state) =>
+  state.cameraControls.recordControlsEnabled;
+
+// return error disalb
+export const selectErrorCameraChange = (state) =>
+  state.cameraControls.errorCameraChange;

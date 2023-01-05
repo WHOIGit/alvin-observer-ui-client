@@ -1,5 +1,5 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   MenuItem,
@@ -11,8 +11,11 @@ import {
 import {
   selectActiveCamera,
   selectVideoSourceEnabled,
+  setRecordControlsEnabled,
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import useIsOwner from "../../hooks/useIsOwner";
+
 import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
@@ -28,13 +31,36 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SelectVideoSource({ showLabel }) {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const activeCamera = useSelector(selectActiveCamera);
   const videoSourceEnabled = useSelector(selectVideoSourceEnabled);
   const cameras = useSelector((state) => state.cameraControls.availableCameras);
+  const [requestedSource, setRequestedSource] = useState(null);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  const { isOwner } = useIsOwner();
   const labelText = "SOURCE:";
 
-  console.log("Video source status", videoSourceEnabled);
+  useEffect(() => {
+    console.log("REQ SRC: ", requestedSource);
+    console.log("Active Camera: ", activeCamera);
+    if (requestedSource === activeCamera || requestedSource === null) {
+      if (!isOwner) {
+        // non-owned camera changes confirm change too fast,
+        // add a "fake" delay to UI to show users that camera change is happening
+        setTimeout(() => {
+          console.log("ENABLE REC Controls");
+          dispatch(setRecordControlsEnabled(true));
+        }, 2000);
+      } else {
+        console.log("ENABLE REC Controls");
+        dispatch(setRecordControlsEnabled(true));
+      }
+    } else {
+      console.log("DISABLE REC Controls");
+      dispatch(setRecordControlsEnabled(false));
+    }
+  }, [requestedSource, activeCamera, dispatch, isOwner]);
+
   const handleSendMessage = (event) => {
     const payload = {
       action: {
@@ -43,6 +69,7 @@ export default function SelectVideoSource({ showLabel }) {
       },
     };
     sendMessage(payload);
+    setRequestedSource(event.target.value);
   };
 
   return (

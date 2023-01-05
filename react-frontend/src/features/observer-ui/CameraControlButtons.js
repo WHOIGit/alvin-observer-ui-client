@@ -21,7 +21,7 @@ export default function CameraControlButtons() {
   const { isOwner } = useIsOwner();
 
   // check to make sure camera has controls and current Observer matches Cam Owner
-  if (camSettings === null || !isOwner) {
+  if (camSettings === null || !isOwner || camSettings?.exposure === "ERR") {
     return null;
   }
 
