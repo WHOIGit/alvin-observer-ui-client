@@ -46,7 +46,7 @@ export default function TopControlPanel({
   const camHeartbeat = useSelector(selectCamHeartbeatData);
 
   const renderDynamicGridBox = () => {
-    if (camHeartbeat.focus_mode === "ERR") return <ErrorCard />;
+    if (camHeartbeat?.focus_mode === "ERR") return <ErrorCard />;
     if (showFullCameraControls) {
       return <TopCameraCommandsList />;
     } else {
