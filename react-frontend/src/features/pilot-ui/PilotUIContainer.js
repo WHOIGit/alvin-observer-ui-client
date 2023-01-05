@@ -12,6 +12,12 @@ import { deepOrange } from "@material-ui/core/colors";
 import RouterControlContainer from "./RouterControlContainer";
 import CameraControlContainer from "./CameraControlContainer";
 import MetaDataDisplay from "./MetaDataDisplay";
+import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import {
+  CAM_HEARTBEAT,
+  WS_SERVER_NAMESPACE_PORT,
+  WS_SERVER_NAMESPACE_STARBOARD,
+} from "../../config.js";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -66,6 +72,10 @@ const useStyles = makeStyles((theme) => ({
 export default function SimpleTabs() {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
+  // establish web socket connections for all CAM_HEARTBEAT namespaces
+  useCameraWebSocket(CAM_HEARTBEAT);
+  useCameraWebSocket(CAM_HEARTBEAT, true, WS_SERVER_NAMESPACE_PORT);
+  useCameraWebSocket(CAM_HEARTBEAT, true, WS_SERVER_NAMESPACE_STARBOARD);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
