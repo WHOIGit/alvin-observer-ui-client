@@ -89,7 +89,7 @@ const useCameraWebSocket = (
       };
        */
 
-      if (socketEvent !== CAM_HEARTBEAT && socketEvent !== RECORDER_HEARTBEAT) {
+      if (socketEvent !== CAM_HEARTBEAT) {
         //console.log(socketEvent, incomingMessage);
         setMessages(incomingMessage);
       }
