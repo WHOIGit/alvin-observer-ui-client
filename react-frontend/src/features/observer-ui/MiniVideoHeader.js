@@ -44,7 +44,6 @@ export default function MiniVideoHeader({ videoType }) {
   const recorderResponseError = useSelector(selectRecorderResponseError);
   const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
 
-  console.log(recorderHeartbeatData);
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
     [classes.headerRecording]: recorderHeartbeatData && isRecording, //only when condition === true

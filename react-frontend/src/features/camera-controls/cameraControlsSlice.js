@@ -188,9 +188,7 @@ export const cameraControlsSlice = createSlice({
       const data = action.payload;
       delete data.eventId;
       delete data.timestamp;
-      console.log(data, currentState.recorderHeartbeatData);
       if (isEqual(currentState.recorderHeartbeatData, data)) {
-        console.log("No change");
         return state;
       }
       state.recorderHeartbeatData = data;
