@@ -293,7 +293,7 @@ export const selectInitialCamHeartbeatData = (state) =>
 
 // use createSelector to create memoized selector
 // return the current RecorderHeartbeat data
-export const RecorderHeartbeat = createSelector(
+export const selectRecorderHeartbeatData = createSelector(
   (state) => state.cameraControls.recorderHeartbeatData,
   (item) => item
 );
