@@ -288,8 +288,15 @@ export const selectInitialCamHeartbeatData = (state) =>
   state.cameraControls.initialCamHeartbeat;
 
 // return the current RecorderHeartbeat data
-export const selectRecorderHeartbeatData = (state) =>
-  state.cameraControls.recorderHeartbeatData;
+//export const selectRecorderHeartbeatData = (state) =>
+//  state.cameraControls.recorderHeartbeatData;
+
+// use createSelector to create memoized selector
+// return the current RecorderHeartbeat data
+export const RecorderHeartbeat = createSelector(
+  (state) => state.cameraControls.recorderHeartbeatData,
+  (item) => item
+);
 
 // return the current Camera data the socket returns on a camera change
 export const selectCurrentCamData = (state) =>
