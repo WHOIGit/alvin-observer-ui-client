@@ -17,6 +17,7 @@ import SetCaptureInterval from "../camera-controls/SetCaptureInterval";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import useIsOwner from "../../hooks/useIsOwner";
 import RecordingStatusChip from "./RecordingStatusChip";
+import ErrorCard from "../camera-controls/ErrorCard";
 import {
   selectInitialCamHeartbeatData,
   selectActiveCamera,
@@ -76,6 +77,31 @@ export default function CameraControlContainer() {
     }
   }, [activeCamera, dispatch, initialCamHeartbeat, sendMessage]);
 
+  const renderDynamicGridBox = () => {
+    if (camSettings?.focus_mode === "ERR") return <ErrorCard />;
+    if (camSettings?.camctrl === "y" && isOwner) {
+      return (
+        <List>
+          <ListItem>
+            <SelectExposureMode showLabel={true} />
+          </ListItem>
+          <ListItem>
+            <SelectShutterMode />
+          </ListItem>
+          <ListItem>
+            <SelectIrisMode />
+          </ListItem>
+          <ListItem>
+            <SelectIsoMode />
+          </ListItem>
+          <ListItem>
+            <SelectWhiteBalance showLabel={true} />
+          </ListItem>
+        </List>
+      );
+    }
+  };
+
   return (
     <>
       <Grid container spacing={2} justify="flex-start" alignItems="center">
@@ -93,27 +119,7 @@ export default function CameraControlContainer() {
           <LargeVideo />
         </Grid>
         <Grid item xs={3}>
-          <div className={classes.controlsBox}>
-            {camSettings?.camctrl === "y" && isOwner && (
-              <List>
-                <ListItem>
-                  <SelectExposureMode showLabel={true} />
-                </ListItem>
-                <ListItem>
-                  <SelectShutterMode />
-                </ListItem>
-                <ListItem>
-                  <SelectIrisMode />
-                </ListItem>
-                <ListItem>
-                  <SelectIsoMode />
-                </ListItem>
-                <ListItem>
-                  <SelectWhiteBalance showLabel={true} />
-                </ListItem>
-              </List>
-            )}
-          </div>
+          <div className={classes.controlsBox}>{renderDynamicGridBox()}</div>
         </Grid>
       </Grid>
 
