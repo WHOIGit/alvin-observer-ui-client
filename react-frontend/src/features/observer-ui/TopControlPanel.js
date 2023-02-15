@@ -11,6 +11,8 @@ import MiniVideo from "./MiniVideo";
 import MetaDataDisplay from "./MetaDataDisplay";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
+import ErrorCard from "../camera-controls/ErrorCard";
+import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -41,6 +43,16 @@ export default function TopControlPanel({
   const recordVideoSrc = useSelector(
     (state) => state.cameraControls.recordVideoSrc
   );
+  const camHeartbeat = useSelector(selectCamHeartbeatData);
+
+  const renderDynamicGridBox = () => {
+    if (camHeartbeat?.focus_mode === "ERR") return <ErrorCard />;
+    if (showFullCameraControls) {
+      return <TopCameraCommandsList />;
+    } else {
+      return <MiniVideo videoSrc={observerVideoSmallSrc} videoType={"OBS"} />;
+    }
+  };
 
   return (
     <>
@@ -51,11 +63,7 @@ export default function TopControlPanel({
               <MiniVideo videoSrc={recordVideoSrc} videoType={"REC"} />
             </Grid>
             <Grid item xs={6}>
-              {showFullCameraControls ? (
-                <TopCameraCommandsList />
-              ) : (
-                <MiniVideo videoSrc={observerVideoSmallSrc} videoType={"OBS"} />
-              )}
+              {renderDynamicGridBox()}
             </Grid>
           </Grid>
 

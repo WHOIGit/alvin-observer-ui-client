@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, original } from "@reduxjs/toolkit";
+import { isEqual } from "lodash";
 import { createSelector } from "reselect";
 import {
   COMMAND_STRINGS,
@@ -33,6 +34,8 @@ const initialState = {
   recorderResponseError: false,
   videoSourceEnabled: true,
   exposureControlsEnabled: true,
+  recordControlsEnabled: true,
+  errorCameraChange: false,
   // array of commands
   commandsQueue: [],
 };
@@ -90,7 +93,6 @@ export const cameraControlsSlice = createSlice({
     },
     addCommandQueue: (state, action) => {
       state.commandsQueue = state.commandsQueue.concat(action.payload);
-      console.log(state.commandsQueue);
     },
     changeCameraSettings: (state, action) => {
       // need to check confirmation of successful command from WebSocket
@@ -98,6 +100,7 @@ export const cameraControlsSlice = createSlice({
         if (action.payload.eventId === element.eventId) {
           // If websocket receipt returns OK, update the live settings
           if (action.payload.receipt.status === "OK") {
+            state.errorCameraChange = false;
             // change the camera settings
             switch (element.action.name) {
               // change observer camera
@@ -131,6 +134,7 @@ export const cameraControlsSlice = createSlice({
             }
           } else {
             console.log("ERROR Received from AIS");
+            state.errorCameraChange = true;
           }
         }
         // remove command from queue
@@ -143,38 +147,48 @@ export const cameraControlsSlice = createSlice({
       if (state.initialCamHeartbeat === null) {
         state.initialCamHeartbeat = action.payload;
       }
+      // get the original state to check Heartbeat data
+      const currentState = original(state);
       const camHeartbeatData = action.payload;
       delete camHeartbeatData.eventId;
       delete camHeartbeatData.timestamp;
-      if (state.camHeartbeatData === camHeartbeatData) {
-        console.log("No change in hearbeat data");
+
+      if (isEqual(currentState.camHeartbeatData, camHeartbeatData)) {
         return state;
       }
       state.camHeartbeatData = action.payload;
     },
     changeCamHeartbeatPort: (state, action) => {
+      // get the original state to check Heartbeat data
+      const currentState = original(state);
       const camHeartbeatDataPort = action.payload;
       delete camHeartbeatDataPort.eventId;
       delete camHeartbeatDataPort.timestamp;
-      if (state.camHeartbeatDataPort === camHeartbeatDataPort) {
+
+      if (isEqual(currentState.camHeartbeatDataPort, camHeartbeatDataPort)) {
         return state;
       }
       state.camHeartbeatDataPort = action.payload;
     },
     changeCamHeartbeatStbd: (state, action) => {
+      // get the original state to check Heartbeat data
+      const currentState = original(state);
       const camHeartbeatDataStbd = action.payload;
       delete camHeartbeatDataStbd.eventId;
       delete camHeartbeatDataStbd.timestamp;
-      if (state.camHeartbeatDataStbd === camHeartbeatDataStbd) {
+
+      if (isEqual(currentState.camHeartbeatDataStbd, camHeartbeatDataStbd)) {
         return state;
       }
       state.camHeartbeatDataStbd = action.payload;
     },
     changeRecorderHeartbeat: (state, action) => {
+      // get the original state to check Heartbeat data
+      const currentState = original(state);
       const data = action.payload;
       delete data.eventId;
       delete data.timestamp;
-      if (state.recorderHeartbeatData === data) {
+      if (isEqual(currentState.recorderHeartbeatData, data)) {
         return state;
       }
       state.recorderHeartbeatData = data;
@@ -198,6 +212,12 @@ export const cameraControlsSlice = createSlice({
     setExposureControlsEnabled: (state, action) => {
       state.exposureControlsEnabled = action.payload;
     },
+    setRecordControlsEnabled: (state, action) => {
+      state.recordControlsEnabled = action.payload;
+    },
+    setErrorCameraChange: (state, action) => {
+      state.errorCameraChange = action.payload;
+    },
   },
 });
 
@@ -217,6 +237,8 @@ export const {
   setVideoSourceEnabled,
   addCommandQueue,
   setExposureControlsEnabled,
+  setRecordControlsEnabled,
+  setErrorCameraChange,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -264,8 +286,15 @@ export const selectInitialCamHeartbeatData = (state) =>
   state.cameraControls.initialCamHeartbeat;
 
 // return the current RecorderHeartbeat data
-export const selectRecorderHeartbeatData = (state) =>
-  state.cameraControls.recorderHeartbeatData;
+//export const selectRecorderHeartbeatData = (state) =>
+//  state.cameraControls.recorderHeartbeatData;
+
+// use createSelector to create memoized selector
+// return the current RecorderHeartbeat data
+export const selectRecorderHeartbeatData = createSelector(
+  (state) => state.cameraControls.recorderHeartbeatData,
+  (item) => item
+);
 
 // return the current Camera data the socket returns on a camera change
 export const selectCurrentCamData = (state) =>
@@ -283,6 +312,14 @@ export const selectRecorderResponseError = (state) =>
 export const selectVideoSourceEnabled = (state) =>
   state.cameraControls.videoSourceEnabled;
 
-// return if Video Source select should be enabled/disabled
+// return if Exposure controls should be enabled/disabled
 export const selectExposureControlsEnabled = (state) =>
   state.cameraControls.exposureControlsEnabled;
+
+// return if Record Button should be enabled/disabled
+export const selectRecordControlsEnabled = (state) =>
+  state.cameraControls.recordControlsEnabled;
+
+// return error disalb
+export const selectErrorCameraChange = (state) =>
+  state.cameraControls.errorCameraChange;
