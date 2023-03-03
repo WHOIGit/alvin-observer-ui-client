@@ -54,7 +54,7 @@ export default function FocusZoomButton({
       clearTimeout(timerRef.current);
     }
     // delay Stop message sending to avoid collisions with last button actions
-    setTimeout(handleSendMessage, 100, commandName, COMMAND_STRINGS.focusStop);
+    setTimeout(handleSendMessage, 50, commandName, COMMAND_STRINGS.focusStop);
 
     // add a "fake" delay to UI to show users that image capture is processing
     setLoading(true);
