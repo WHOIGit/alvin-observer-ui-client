@@ -60,7 +60,7 @@ export default function FocusZoomButton({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 500); 
+    }, 750); 
   };
 
   const btnProps = useLongPress({
