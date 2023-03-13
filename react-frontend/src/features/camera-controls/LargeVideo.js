@@ -7,23 +7,24 @@ import { VIDEO_STREAM_CONFIG } from "../../config.js";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    overflowY: "hidden"
+    overflowY: "hidden",
   },
   filmImage: {
     marginTop: "20px",
-    maxWidth: "100%"
-  }
+    maxWidth: "100%",
+  },
 }));
 
 export default function LargeVideo() {
+  console.log("Large Video load");
   const classes = useStyles();
   const videoElem = useRef(null);
   const observerVideoSrc = useSelector(
-    state => state.cameraControls.observerVideoSrc
+    (state) => state.cameraControls.observerVideoSrc
   );
-
+  console.log(observerVideoSrc);
   useEffect(() => {
     if (videoElem.current) {
       const player = new WebRtcPlayer(
