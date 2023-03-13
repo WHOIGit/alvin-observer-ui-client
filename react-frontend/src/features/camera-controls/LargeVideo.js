@@ -37,7 +37,6 @@ export default function LargeVideo() {
 
   return (
     <div className={classes.root}>
-      <p>VIDEO</p>
       <div id="videoBoxMain">
         <video
           style={{ width: "100%" }}
