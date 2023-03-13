@@ -44,6 +44,7 @@ export default function TopControlPanel({
     (state) => state.cameraControls.recordVideoSrc
   );
   const camHeartbeat = useSelector(selectCamHeartbeatData);
+  console.log(camHeartbeat);
 
   const renderDynamicGridBox = () => {
     if (camHeartbeat?.focus_mode === "ERR") return <ErrorCard />;
