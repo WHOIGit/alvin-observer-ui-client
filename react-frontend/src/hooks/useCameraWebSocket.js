@@ -90,7 +90,7 @@ const useCameraWebSocket = (
        */
 
       if (socketEvent !== CAM_HEARTBEAT) {
-        //console.log(socketEvent, incomingMessage);
+        console.log(socketEvent, incomingMessage);
         setMessages(incomingMessage);
       }
 
@@ -118,13 +118,13 @@ const useCameraWebSocket = (
           dispatch(changeCamHeartbeatStbd(incomingMessage));
         }
       } else if (socketEvent === CAM_HEARTBEAT) {
-        console.log("INCOMING CAM HEARTBEAT", incomingMessage);
+        //console.log("INCOMING CAM HEARTBEAT", incomingMessage);
         dispatch(changeCamHeartbeat(incomingMessage));
       }
 
       // handle RECORDER_HEARTBEAT events here
       if (socketEvent === RECORDER_HEARTBEAT) {
-        console.log("INCOMING REC HEARTBEAT", incomingMessage);
+        //console.log("INCOMING REC HEARTBEAT", incomingMessage);
         dispatch(changeRecorderHeartbeat(incomingMessage));
       }
     });
