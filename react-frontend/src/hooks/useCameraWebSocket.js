@@ -110,6 +110,7 @@ const useCameraWebSocket = (
 
       // handle CAM_HEARTBEAT events here
       if (socketEvent === CAM_HEARTBEAT && nameSpaceOverride) {
+        console.log("INCOMING CAM HEARTBEAT", incomingMessage);
         // set Observer specific heartbeats here for Pilot UI
         if (nameSpaceOverride === WS_SERVER_NAMESPACE_PORT) {
           dispatch(changeCamHeartbeatPort(incomingMessage));
@@ -117,12 +118,13 @@ const useCameraWebSocket = (
           dispatch(changeCamHeartbeatStbd(incomingMessage));
         }
       } else if (socketEvent === CAM_HEARTBEAT) {
-        //console.log("INCOMING HEARTBEAT", incomingMessage);
+        console.log("INCOMING CAM HEARTBEAT", incomingMessage);
         dispatch(changeCamHeartbeat(incomingMessage));
       }
 
       // handle RECORDER_HEARTBEAT events here
       if (socketEvent === RECORDER_HEARTBEAT) {
+        console.log("INCOMING REC HEARTBEAT", incomingMessage);
         dispatch(changeRecorderHeartbeat(incomingMessage));
       }
     });
