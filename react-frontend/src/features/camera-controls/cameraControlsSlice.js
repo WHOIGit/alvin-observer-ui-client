@@ -38,6 +38,7 @@ const initialState = {
   errorCameraChange: false,
   // array of commands
   commandsQueue: [],
+  cameras: [],
 };
 
 const getCameraConfig = (cameraId) => {
@@ -218,6 +219,9 @@ export const cameraControlsSlice = createSlice({
     setErrorCameraChange: (state, action) => {
       state.errorCameraChange = action.payload;
     },
+    setCamerasConfig: (state, action) => {
+      state.cameras = action.payload;
+    },
   },
 });
 
@@ -239,6 +243,7 @@ export const {
   setExposureControlsEnabled,
   setRecordControlsEnabled,
   setErrorCameraChange,
+  setCamerasConfig,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -320,6 +325,9 @@ export const selectExposureControlsEnabled = (state) =>
 export const selectRecordControlsEnabled = (state) =>
   state.cameraControls.recordControlsEnabled;
 
-// return error disalb
+// return error disable
 export const selectErrorCameraChange = (state) =>
   state.cameraControls.errorCameraChange;
+
+// return initial camera config values supplied by AIS
+export const selectCameras = (state) => state.cameraControls.cameras;
