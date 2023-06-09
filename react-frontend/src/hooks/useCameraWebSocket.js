@@ -103,6 +103,9 @@ const useCameraWebSocket = (
           console.log("CAM CHANGE HERE");
           console.log(socketEvent, incomingMessage);
           dispatch(changeCurrentCamData(incomingMessage));
+        } else if (incomingMessage.hasOwnProperty("camera_array")) {
+          console.log("GET INITIAL CAMERA CONFIG");
+          console.log(socketEvent, incomingMessage);
         } else {
           dispatch(changeCameraSettings(incomingMessage));
         }
