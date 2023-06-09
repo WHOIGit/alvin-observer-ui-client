@@ -3,7 +3,6 @@ import { isEqual } from "lodash";
 import { createSelector } from "reselect";
 import {
   COMMAND_STRINGS,
-  CAMERAS,
   VIDEO_STREAM_CONFIG,
   WS_SERVER_NAMESPACE_PORT,
   WS_SERVER_NAMESPACE_STARBOARD,
@@ -40,8 +39,8 @@ const initialState = {
   allCameras: [],
 };
 
-const getCameraConfig = (cameraId) => {
-  const cameraConfig = CAMERAS.find((item) => item.camera === cameraId);
+const getCameraConfig = (cameraId, cameras) => {
+  const cameraConfig = cameras.find((item) => item.camera === cameraId);
   return cameraConfig;
 };
 
@@ -67,7 +66,10 @@ export const cameraControlsSlice = createSlice({
       }
     },
     changeActiveCamera: (state, action) => {
-      const activeCamera = getCameraConfig(action.payload.camera);
+      const activeCamera = getCameraConfig(
+        action.payload.camera,
+        state.allCameras
+      );
       state.activeCamera = activeCamera;
     },
     setLastCommand: (state, action) => {
@@ -90,7 +92,10 @@ export const cameraControlsSlice = createSlice({
             switch (element.action.name) {
               // change observer camera
               case COMMAND_STRINGS.cameraChangeCommand:
-                const activeCamera = getCameraConfig(element.action.value);
+                const activeCamera = getCameraConfig(
+                  element.action.value,
+                  state.allCameras
+                );
                 state.activeCamera = activeCamera;
                 break;
               // change focus mode
