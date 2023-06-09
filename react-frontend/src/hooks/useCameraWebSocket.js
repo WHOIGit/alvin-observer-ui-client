@@ -10,6 +10,7 @@ import {
   changeCamHeartbeatPort,
   changeCamHeartbeatStbd,
   changeRecorderHeartbeat,
+  setCamerasConfig,
   selectObserverSide,
   selectActiveCamera,
   selectWebSocketNamespace,
@@ -98,13 +99,23 @@ const useCameraWebSocket = (
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
         console.log("Incoming message");
         console.log(socketEvent, incomingMessage);
-        // check if message is a Camera Change Package, else it's a Command Receipt
+
+        // check if message is a Camera Change Package
+        // or camera config packages.
+        // Else it's a Command Receipt
         if (incomingMessage.hasOwnProperty("current_settings")) {
           console.log("CAM CHANGE HERE");
           console.log(socketEvent, incomingMessage);
           dispatch(changeCurrentCamData(incomingMessage));
         } else if (incomingMessage.hasOwnProperty("camera_array")) {
           console.log("GET INITIAL CAMERA CONFIG");
+          console.log(socketEvent, incomingMessage);
+          dispatch(setCamerasConfig(incomingMessage.camera_array));
+        } else if (incomingMessage.hasOwnProperty("router_output_array")) {
+          console.log("GET INITIAL ROUTER OUTPUT CONFIG");
+          console.log(socketEvent, incomingMessage);
+        } else if (incomingMessage.hasOwnProperty("router_input_array")) {
+          console.log("GET INITIAL ROUTER INPUT CONFIG");
           console.log(socketEvent, incomingMessage);
         } else {
           dispatch(changeCameraSettings(incomingMessage));
