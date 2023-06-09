@@ -29,7 +29,7 @@ const initialState = {
   recorderHeartbeatData: null,
   currentCamData: null,
   lastCommand: null,
-  availableCameras: CAMERAS,
+  //availableCameras: CAMERAS,
   joystickStatus: null,
   recorderResponseError: false,
   videoSourceEnabled: true,
@@ -331,4 +331,9 @@ export const selectErrorCameraChange = (state) =>
   state.cameraControls.errorCameraChange;
 
 // return initial camera config values supplied by AIS
-export const selectAllCameras = (state) => state.cameraControls.allCameras;
+//export const selectAllCameras = (state) => state.cameraControls.allCameras;
+
+export const selectAllCameras = createSelector(
+  (state) => state.cameraControls.allCameras,
+  (item) => item
+);
