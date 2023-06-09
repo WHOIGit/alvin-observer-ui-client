@@ -29,7 +29,6 @@ const initialState = {
   recorderHeartbeatData: null,
   currentCamData: null,
   lastCommand: null,
-  //availableCameras: CAMERAS,
   joystickStatus: null,
   recorderResponseError: false,
   videoSourceEnabled: true,
@@ -66,21 +65,6 @@ export const cameraControlsSlice = createSlice({
           VIDEO_STREAM_CONFIG.stbdObserverSmallVideo;
         state.recordVideoSrc = VIDEO_STREAM_CONFIG.stbdRecordVideo; //mjs-added-19apr2022
       }
-      // set available cameras
-      /*
-      let availableCameras;
-      if (action.payload === "P") {
-        availableCameras = CAMERAS.filter(item => {
-          return item.owner === "port";
-        });
-      }
-      if (action.payload === "S") {
-        availableCameras = CAMERAS.filter(item => {
-          return item.owner === "stbd";
-        });
-      }
-      state.availableCameras = availableCameras;
-      */
     },
     changeActiveCamera: (state, action) => {
       const activeCamera = getCameraConfig(action.payload.camera);
@@ -220,7 +204,6 @@ export const cameraControlsSlice = createSlice({
       state.errorCameraChange = action.payload;
     },
     setAllCameras: (state, action) => {
-      console.log("In REDUX", action.payload);
       state.allCameras = action.payload;
     },
   },

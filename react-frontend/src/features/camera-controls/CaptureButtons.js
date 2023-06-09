@@ -12,6 +12,7 @@ import {
   selectRecordControlsEnabled,
   selectRecorderHeartbeatData,
   selectCamHeartbeatData,
+  selectAllCameras,
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
@@ -39,6 +40,7 @@ export default function CaptureButtons() {
   const recordControlsEnabled = useSelector(selectRecordControlsEnabled);
   const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
   const camSettings = useSelector(selectCamHeartbeatData);
+  const allCameras = useSelector(selectAllCameras);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const [recordTimer, setRecordTimer] = useState(null);
   const [currentRecordFile, setCurrentRecordFile] = useState(null);
@@ -91,7 +93,10 @@ export default function CaptureButtons() {
     // If a RECORD SOURCE action, need to send the previous Recording camera name
     if (commandName === COMMAND_STRINGS.recordSourceCommand) {
       // get the camera ID of the currently recording camera
-      const oldCamera = getCameraConfigFromName(recorderHeartbeatData.camera);
+      const oldCamera = getCameraConfigFromName(
+        recorderHeartbeatData.camera,
+        allCameras
+      );
       payload.oldCamera = oldCamera.camera;
     }
 
