@@ -10,7 +10,7 @@ import {
   changeCamHeartbeatPort,
   changeCamHeartbeatStbd,
   changeRecorderHeartbeat,
-  setCamerasConfig,
+  setAllCameras,
   selectObserverSide,
   selectActiveCamera,
   selectWebSocketNamespace,
@@ -110,7 +110,7 @@ const useCameraWebSocket = (
         } else if (incomingMessage.hasOwnProperty("camera_array")) {
           console.log("GET INITIAL CAMERA CONFIG");
           console.log(socketEvent, incomingMessage);
-          dispatch(setCamerasConfig(incomingMessage.camera_array));
+          dispatch(setAllCameras(incomingMessage.camera_array));
         } else if (incomingMessage.hasOwnProperty("router_output_array")) {
           console.log("GET INITIAL ROUTER OUTPUT CONFIG");
           console.log(socketEvent, incomingMessage);
