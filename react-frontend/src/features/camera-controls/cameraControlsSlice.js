@@ -220,6 +220,7 @@ export const cameraControlsSlice = createSlice({
       state.errorCameraChange = action.payload;
     },
     setCamerasConfig: (state, action) => {
+      console.log("In REDUX", action.payload);
       state.cameras = action.payload;
     },
   },
