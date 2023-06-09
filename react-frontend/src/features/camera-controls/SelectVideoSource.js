@@ -44,6 +44,7 @@ export default function SelectVideoSource({ showLabel }) {
   useEffect(() => {
     console.log("REQ SRC: ", requestedSource);
     console.log("Active Camera: ", activeCamera);
+    console.log("ALL CAMERAS", cameras);
     if (requestedSource === activeCamera || requestedSource === null) {
       if (!isOwner) {
         // non-owned camera changes confirm change too fast,
