@@ -24,7 +24,7 @@ export default function LargeVideo() {
   const observerVideoSrc = useSelector(
     (state) => state.cameraControls.observerVideoSrc
   );
-  console.log(observerVideoSrc);
+
   useEffect(() => {
     if (videoElem.current) {
       const player = new WebRtcPlayer(
