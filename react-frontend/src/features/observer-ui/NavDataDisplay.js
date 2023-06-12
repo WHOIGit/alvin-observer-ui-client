@@ -24,9 +24,6 @@ export default function NavDataDisplay() {
   const classes = useStyles();
   const { messages } = useCameraWebSocket(NAV_HEARTBEAT);
 
-  if (messages === null) {
-    return null;
-  }
   return (
     <div>
       <TableContainer component={Paper}>
@@ -36,7 +33,9 @@ export default function NavDataDisplay() {
               <TableCell component="th" scope="row">
                 Altitude
               </TableCell>
-              <TableCell align="right">{messages.alt} m</TableCell>
+              <TableCell align="right">
+                {messages ? messages.alt : "na"} m
+              </TableCell>
             </TableRow>
             <TableRow key="dep">
               <TableCell component="th" scope="row">
