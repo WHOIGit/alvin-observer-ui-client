@@ -24,6 +24,9 @@ const useStyles = makeStyles((theme) => ({
   buttonWrapper: {
     position: "relative",
   },
+  imgCheckbox: {
+    paddingLeft: 0,
+  },
   buttonProgress: {
     color: green[500],
     position: "absolute",
@@ -165,7 +168,11 @@ export default function CaptureButtons() {
     <>
       <Grid item xs={2}>
         <div className={classes.buttonWrapper}>
-          <Checkbox onChange={handleCheckboxChange} size="small" />
+          <Checkbox
+            onChange={handleCheckboxChange}
+            size="small"
+            className={classes.imgCheckbox}
+          />
         </div>
       </Grid>
       <Grid item xs={5}>
