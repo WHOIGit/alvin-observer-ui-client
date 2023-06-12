@@ -26,8 +26,8 @@ const useStyles = makeStyles((theme) => ({
 export default function NavDataDisplay() {
   const classes = useStyles();
   const camSettings = useSelector(selectCamHeartbeatData);
-  const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
-  console.log(parseISO(recorderHeartbeatData?.timestamp));
+
+  console.log(parseISO(camSettings?.timestamp));
   if (camSettings === null) {
     return null;
   }
@@ -37,9 +37,7 @@ export default function NavDataDisplay() {
         <Table className={classes.table} size="small" aria-label="Nav Data">
           <TableBody>
             <TableRow key="version">
-              <TableCell scope="row">
-                {recorderHeartbeatData?.timestamp}
-              </TableCell>
+              <TableCell scope="row">{camSettings?.timestamp}</TableCell>
             </TableRow>
 
             <TableRow key="cruise">
