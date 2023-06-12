@@ -12,10 +12,7 @@ import {
   Grid,
 } from "@material-ui/core";
 // local
-import {
-  selectCamHeartbeatData,
-  selectRecorderHeartbeatData,
-} from "../camera-controls/cameraControlsSlice";
+import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -37,7 +34,12 @@ export default function NavDataDisplay() {
         <Table className={classes.table} size="small" aria-label="Nav Data">
           <TableBody>
             <TableRow key="version">
-              <TableCell scope="row">{camSettings?.timestamp}</TableCell>
+              <TableCell scope="row">
+                {format(
+                  parseISO(camSettings?.timestamp),
+                  "MM-dd-yyyy HH:mm:ss"
+                )}
+              </TableCell>
             </TableRow>
 
             <TableRow key="cruise">
