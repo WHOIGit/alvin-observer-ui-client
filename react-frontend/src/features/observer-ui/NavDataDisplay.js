@@ -41,25 +41,33 @@ export default function NavDataDisplay() {
               <TableCell component="th" scope="row">
                 Depth
               </TableCell>
-              <TableCell align="right">{messages?.dep} m</TableCell>
+              <TableCell align="right">
+                {messages ? messages?.dep : "na"} m
+              </TableCell>
             </TableRow>
             <TableRow key="hdg">
               <TableCell component="th" scope="row">
                 Heading
               </TableCell>
-              <TableCell align="right">{messages?.hdg} &deg;</TableCell>
+              <TableCell align="right">
+                {messages ? messages?.hdg : "na"} &deg;
+              </TableCell>
             </TableRow>
             <TableRow key="lat">
               <TableCell component="th" scope="row">
                 Lat
               </TableCell>
-              <TableCell align="right">{messages?.lat}</TableCell>
+              <TableCell align="right">
+                {messages ? messages?.lat : "na"}
+              </TableCell>
             </TableRow>
             <TableRow key="lon">
               <TableCell component="th" scope="row">
                 Lon
               </TableCell>
-              <TableCell align="right">{messages?.lon}</TableCell>
+              <TableCell align="right">
+                {messages ? messages?.lon : "na"}
+              </TableCell>
             </TableRow>
             <TableRow key="x-y">
               <TableCell component="th" scope="row">
@@ -68,7 +76,7 @@ export default function NavDataDisplay() {
                     X:
                   </Grid>
                   <Grid item xs={9}>
-                    {messages?.x}
+                    {messages ? messages?.x : "na"}
                   </Grid>
                 </Grid>
               </TableCell>
@@ -78,7 +86,7 @@ export default function NavDataDisplay() {
                     Y:
                   </Grid>
                   <Grid item xs={9}>
-                    {messages?.y}
+                    {messages ? messages?.y : "na"}
                   </Grid>
                 </Grid>
               </TableCell>

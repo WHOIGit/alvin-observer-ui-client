@@ -24,7 +24,6 @@ export default function NavDataDisplay() {
   const classes = useStyles();
   const camSettings = useSelector(selectCamHeartbeatData);
 
-  console.log(parseISO(camSettings?.timestamp));
   if (camSettings === null) {
     return null;
   }

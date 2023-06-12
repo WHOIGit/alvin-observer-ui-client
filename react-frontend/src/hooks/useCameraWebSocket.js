@@ -139,7 +139,7 @@ const useCameraWebSocket = (
 
       // handle RECORDER_HEARTBEAT events here
       if (socketEvent === RECORDER_HEARTBEAT) {
-        console.log("INCOMING REC HEARTBEAT", incomingMessage);
+        //console.log("INCOMING REC HEARTBEAT", incomingMessage);
         dispatch(changeRecorderHeartbeat(incomingMessage));
       }
     });
