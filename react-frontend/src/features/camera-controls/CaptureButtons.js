@@ -165,7 +165,7 @@ export default function CaptureButtons() {
     <>
       <Grid item xs={2}>
         <div className={classes.buttonWrapper}>
-          <Checkbox onChange={handleCheckboxChange} />
+          <Checkbox onChange={handleCheckboxChange} size="small" />
         </div>
       </Grid>
       <Grid item xs={5}>
