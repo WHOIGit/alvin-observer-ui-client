@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
 export default function NavDataDisplay() {
   const classes = useStyles();
   const camSettings = useSelector(selectCamHeartbeatData);
-
+  console.log(camSettings);
   if (camSettings === null) {
     return null;
   }
