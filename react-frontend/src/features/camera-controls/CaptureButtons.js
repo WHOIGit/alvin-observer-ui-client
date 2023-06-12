@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Button, CircularProgress } from "@material-ui/core";
+import { Grid, Button, CircularProgress, Checkbox } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
@@ -46,6 +46,8 @@ export default function CaptureButtons() {
   const [currentRecordFile, setCurrentRecordFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
+  const [checkedImg, setCheckedImg] = React.useState(false);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -100,6 +102,11 @@ export default function CaptureButtons() {
       payload.oldCamera = oldCamera.camera;
     }
 
+    // If a IMG CAPTURE action, need to send checkbox value
+    if (commandName === COMMAND_STRINGS.stillImageCaptureCommand) {
+      payload.imgCaptureChecked = checkedImg;
+    }
+
     sendMessage(payload);
   };
 
@@ -144,6 +151,11 @@ export default function CaptureButtons() {
     }, 2000);
   };
 
+  const handleCheckboxChange = (event) => {
+    console.log(event.target.checked);
+    setCheckedImg(event.target.checked);
+  };
+
   // check to make sure camera has controls, current Observer matches Cam Owner, camera is available
   if (camSettings === null || camSettings?.focus_mode === "ERR") {
     return null;
@@ -151,7 +163,12 @@ export default function CaptureButtons() {
 
   return (
     <>
-      <Grid item xs={6}>
+      <Grid item xs={2}>
+        <div className={classes.buttonWrapper}>
+          <Checkbox onChange={handleCheckboxChange} />
+        </div>
+      </Grid>
+      <Grid item xs={5}>
         <div className={classes.buttonWrapper}>
           <Button
             variant="contained"
@@ -168,7 +185,7 @@ export default function CaptureButtons() {
           )}
         </div>
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={5}>
         <div className={classes.buttonWrapper}>
           <Button
             variant="contained"
