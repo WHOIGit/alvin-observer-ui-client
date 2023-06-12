@@ -1,5 +1,5 @@
 import React from "react";
-import { parseISO, format } from "date-fns/parseISO";
+import { parseISO, format } from "date-fns";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import {
