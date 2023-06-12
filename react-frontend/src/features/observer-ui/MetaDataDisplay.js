@@ -38,10 +38,7 @@ export default function NavDataDisplay() {
           <TableBody>
             <TableRow key="version">
               <TableCell scope="row">
-                {format(
-                  parseISO(recorderHeartbeatData?.timestamp),
-                  "yyyy-MM-dd HH:mm:ss"
-                )}
+                {parseISO(recorderHeartbeatData?.timestamp)}
               </TableCell>
             </TableRow>
 
