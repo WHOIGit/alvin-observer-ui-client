@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import socketIOClient from "socket.io-client";
+import formatISO from "date-fns/formatISO";
 import { v4 as uuidv4 } from "uuid";
 import {
   setLastCommand,
@@ -176,11 +177,12 @@ const useCameraWebSocket = (
         eventId: uuidv4(),
         command: observerSideCmd,
         camera: camera,
+        timestamp: formatISO(new Date()),
         ...messageBody,
       };
 
       try {
-        //console.log("Dispatched payload", payload);
+        console.log("Dispatched payload", payload);
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));
         dispatch(addCommandQueue(payload));
