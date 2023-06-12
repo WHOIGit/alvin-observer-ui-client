@@ -262,12 +262,10 @@ export const selectWebSocketNamespace = (state) =>
 
 // use createSelector to create memoized selector
 // return the current CamHeartbeat data
-//export const selectCamHeartbeatData = createSelector(
-//  (state) => state.cameraControls.camHeartbeatData,
-//  (item) => item
-//);
-export const selectCamHeartbeatData = (state) =>
-  state.cameraControls.camHeartbeatData;
+export const selectCamHeartbeatData = createSelector(
+  (state) => state.cameraControls.camHeartbeatData,
+  (item) => item
+);
 
 // return the Port CamHeartbeat data
 export const selectCamHeartbeatDataPort = (state) =>
