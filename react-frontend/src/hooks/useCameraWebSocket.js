@@ -16,6 +16,8 @@ import {
   selectActiveCamera,
   selectWebSocketNamespace,
   addCommandQueue,
+  setRouterOutputs,
+  setRouterInputs,
 } from "../features/camera-controls/cameraControlsSlice";
 import {
   WS_SERVER,
@@ -115,9 +117,11 @@ const useCameraWebSocket = (
         } else if (incomingMessage.hasOwnProperty("router_output_array")) {
           console.log("GET INITIAL ROUTER OUTPUT CONFIG");
           console.log(socketEvent, incomingMessage);
+          dispatch(setRouterOutputs(incomingMessage.router_output_array));
         } else if (incomingMessage.hasOwnProperty("router_input_array")) {
           console.log("GET INITIAL ROUTER INPUT CONFIG");
           console.log(socketEvent, incomingMessage);
+          dispatch(setRouterInputs(incomingMessage.router_input_array));
         } else {
           dispatch(changeCameraSettings(incomingMessage));
         }

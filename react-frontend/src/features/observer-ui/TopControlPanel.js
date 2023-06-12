@@ -12,7 +12,10 @@ import MetaDataDisplay from "./MetaDataDisplay";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
 import ErrorCard from "../camera-controls/ErrorCard";
-import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
+import {
+  selectCamHeartbeatData,
+  selectRouterInputs,
+} from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -44,6 +47,9 @@ export default function TopControlPanel({
     (state) => state.cameraControls.recordVideoSrc
   );
   const camHeartbeat = useSelector(selectCamHeartbeatData);
+  const routerInputs = useSelector(selectRouterInputs);
+
+  console.log("ROUTER INPUTS", routerInputs);
 
   const renderDynamicGridBox = () => {
     if (camHeartbeat?.focus_mode === "ERR") return <ErrorCard />;

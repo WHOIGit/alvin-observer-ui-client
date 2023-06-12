@@ -37,6 +37,8 @@ const initialState = {
   // array of commands
   commandsQueue: [],
   allCameras: [],
+  routerOutputs: [],
+  routerInputs: [],
 };
 
 const getCameraConfig = (cameraId, cameras) => {
@@ -203,6 +205,12 @@ export const cameraControlsSlice = createSlice({
     setAllCameras: (state, action) => {
       state.allCameras = action.payload;
     },
+    setRouterOutputs: (state, action) => {
+      state.routerOutputs = action.payload;
+    },
+    setRouterInputs: (state, action) => {
+      state.routerInputs = action.payload;
+    },
   },
 });
 
@@ -225,6 +233,8 @@ export const {
   setRecordControlsEnabled,
   setErrorCameraChange,
   setAllCameras,
+  setRouterOutputs,
+  setRouterInputs,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -311,9 +321,19 @@ export const selectErrorCameraChange = (state) =>
   state.cameraControls.errorCameraChange;
 
 // return initial camera config values supplied by AIS
-//export const selectAllCameras = (state) => state.cameraControls.allCameras;
-
 export const selectAllCameras = createSelector(
   (state) => state.cameraControls.allCameras,
+  (item) => item
+);
+
+// return initial router output values supplied by AIS
+export const selectRouterOutputs = createSelector(
+  (state) => state.cameraControls.routerOutputs,
+  (item) => item
+);
+
+// return initial router input values supplied by AIS
+export const selectRouterInputs = createSelector(
+  (state) => state.cameraControls.routerInputs,
   (item) => item
 );

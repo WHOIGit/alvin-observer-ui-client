@@ -36,7 +36,7 @@ export default function NavDataDisplay() {
               <TableCell scope="row">
                 {format(
                   parseISO(camSettings?.timestamp),
-                  "MM-dd-yyyy HH:mm:ss"
+                  "yyyy-MM-dd HH:mm:ss"
                 )}
               </TableCell>
             </TableRow>
