@@ -1,6 +1,4 @@
-import { CAMERAS } from "../config.js";
-
-export const getCameraConfigFromName = (cameraName) => {
-  const cameraConfig = CAMERAS.find((item) => item.cam_name === cameraName);
+export const getCameraConfigFromName = (cameraName, cameras) => {
+  const cameraConfig = cameras.find((item) => item.cam_name === cameraName);
   return cameraConfig;
 };

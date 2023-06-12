@@ -1,5 +1,5 @@
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:16 AS builder
+FROM node:18 AS builder
 
 LABEL maintainer="Ethan Andrews <eandrews@whoi.edu>"
 
@@ -15,10 +15,13 @@ WORKDIR /app
 # && update-ca-certificates
 ARG npm_config_cafile=/etc/ssl/certs/ca-certificates.crt 
 
+# Update NPM to latest version
+RUN npm i npm@latest -g
+
 # Install all node packages
 COPY ./react-frontend/package*.json /app/
 RUN npm install --no-audit --legacy-peer-deps
-
+RUN npx update-browserslist-db@latest
 # Copy sources and build
 COPY ./react-frontend /app
 RUN npm run build

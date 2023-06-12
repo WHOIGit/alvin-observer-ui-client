@@ -22,6 +22,7 @@ window.STBD_RECORDER_VIDEO = "stbd_rec";
 window.PILOT_VIDEO = "pilot";
 window.PILOT_SMALL_VIDEO = "pilot_small";
 
+/*
 window.CAMERAS = [
   { camera: "camera1", cam_name: "port_brow_4k", owner: "port" },
   { camera: "camera2", cam_name: "port_patz", owner: "port" },
@@ -76,7 +77,6 @@ window.ROUTER_INPUTS = [
 ];
 */
 
-
 /*                   
 aja_input_table = {'port_brow_4k'   : 'input1',   
                    'port_patz'      : 'input2', 
@@ -94,7 +94,7 @@ aja_input_table = {'port_brow_4k'   : 'input1',
                    'sci_cam'        : 'input14', 
                    'pilot_cam'      : 'input15', #stbd_flexlink1        
                    'stbd_flexlink2' : 'input16'} 
-*/                      
+*/
 
 window.ROUTER_OUTPUTS = [
   { label: "port_raw_rec", value: "output1" },
@@ -113,8 +113,8 @@ window.ROUTER_OUTPUTS = [
   { label: "OUTPUT 14", value: "output14" },
   { label: "browcam_video", value: "output15" },
   { label: "scicam_video", value: "output16" },
-];  
-  
+];
+
 /*
 aja_output_table = {'port_prores_rec'  : 'output1', #port_video1  
                     'port_proxy_rec'   : 'output2', #port_video2

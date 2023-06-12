@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import socketIOClient from "socket.io-client";
+import formatISO from "date-fns/formatISO";
 import { v4 as uuidv4 } from "uuid";
 import {
   setLastCommand,
@@ -9,10 +10,14 @@ import {
   changeCamHeartbeat,
   changeCamHeartbeatPort,
   changeCamHeartbeatStbd,
+  changeRecorderHeartbeat,
+  setAllCameras,
   selectObserverSide,
   selectActiveCamera,
   selectWebSocketNamespace,
   addCommandQueue,
+  setRouterOutputs,
+  setRouterInputs,
 } from "../features/camera-controls/cameraControlsSlice";
 import {
   WS_SERVER,
@@ -97,11 +102,26 @@ const useCameraWebSocket = (
       if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
         console.log("Incoming message");
         console.log(socketEvent, incomingMessage);
-        // check if message is a Camera Change Package, else it's a Command Receipt
+
+        // check if message is a Camera Change Package
+        // or camera config packages.
+        // Else it's a Command Receipt
         if (incomingMessage.hasOwnProperty("current_settings")) {
           console.log("CAM CHANGE HERE");
           console.log(socketEvent, incomingMessage);
           dispatch(changeCurrentCamData(incomingMessage));
+        } else if (incomingMessage.hasOwnProperty("camera_array")) {
+          console.log("GET INITIAL CAMERA CONFIG");
+          console.log(socketEvent, incomingMessage);
+          dispatch(setAllCameras(incomingMessage.camera_array));
+        } else if (incomingMessage.hasOwnProperty("router_output_array")) {
+          console.log("GET INITIAL ROUTER OUTPUT CONFIG");
+          console.log(socketEvent, incomingMessage);
+          dispatch(setRouterOutputs(incomingMessage.router_output_array));
+        } else if (incomingMessage.hasOwnProperty("router_input_array")) {
+          console.log("GET INITIAL ROUTER INPUT CONFIG");
+          console.log(socketEvent, incomingMessage);
+          dispatch(setRouterInputs(incomingMessage.router_input_array));
         } else {
           dispatch(changeCameraSettings(incomingMessage));
         }
@@ -109,6 +129,7 @@ const useCameraWebSocket = (
 
       // handle CAM_HEARTBEAT events here
       if (socketEvent === CAM_HEARTBEAT && nameSpaceOverride) {
+        //console.log("INCOMING CAM HEARTBEAT", incomingMessage);
         // set Observer specific heartbeats here for Pilot UI
         if (nameSpaceOverride === WS_SERVER_NAMESPACE_PORT) {
           dispatch(changeCamHeartbeatPort(incomingMessage));
@@ -116,8 +137,14 @@ const useCameraWebSocket = (
           dispatch(changeCamHeartbeatStbd(incomingMessage));
         }
       } else if (socketEvent === CAM_HEARTBEAT) {
-        //console.log("INCOMING HEARTBEAT", incomingMessage);
+        //console.log("INCOMING CAM HEARTBEAT", incomingMessage);
         dispatch(changeCamHeartbeat(incomingMessage));
+      }
+
+      // handle RECORDER_HEARTBEAT events here
+      if (socketEvent === RECORDER_HEARTBEAT) {
+        //console.log("INCOMING REC HEARTBEAT", incomingMessage);
+        dispatch(changeRecorderHeartbeat(incomingMessage));
       }
     });
 
@@ -164,11 +191,12 @@ const useCameraWebSocket = (
         eventId: uuidv4(),
         command: observerSideCmd,
         camera: camera,
+        timestamp: formatISO(new Date()),
         ...messageBody,
       };
 
       try {
-        //console.log("Dispatched payload", payload);
+        console.log("Dispatched payload", payload);
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));
         dispatch(addCommandQueue(payload));

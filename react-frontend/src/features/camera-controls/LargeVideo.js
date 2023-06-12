@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function LargeVideo() {
+  console.log("Large Video load");
   const classes = useStyles();
   const videoElem = useRef(null);
   const observerVideoSrc = useSelector(

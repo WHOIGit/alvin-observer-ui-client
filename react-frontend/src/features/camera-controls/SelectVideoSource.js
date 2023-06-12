@@ -12,6 +12,7 @@ import {
   selectActiveCamera,
   selectVideoSourceEnabled,
   setRecordControlsEnabled,
+  selectAllCameras,
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import useIsOwner from "../../hooks/useIsOwner";
@@ -34,7 +35,7 @@ export default function SelectVideoSource({ showLabel }) {
   const dispatch = useDispatch();
   const activeCamera = useSelector(selectActiveCamera);
   const videoSourceEnabled = useSelector(selectVideoSourceEnabled);
-  const cameras = useSelector((state) => state.cameraControls.availableCameras);
+  const cameras = useSelector(selectAllCameras);
   const [requestedSource, setRequestedSource] = useState(null);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { isOwner } = useIsOwner();
@@ -43,6 +44,7 @@ export default function SelectVideoSource({ showLabel }) {
   useEffect(() => {
     console.log("REQ SRC: ", requestedSource);
     console.log("Active Camera: ", activeCamera);
+    console.log("ALL CAMERAS", cameras);
     if (requestedSource === activeCamera || requestedSource === null) {
       if (!isOwner) {
         // non-owned camera changes confirm change too fast,
