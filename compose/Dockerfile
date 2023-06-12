@@ -17,6 +17,7 @@ ARG npm_config_cafile=/etc/ssl/certs/ca-certificates.crt
 
 # Update NPM to latest version
 RUN npm i npm@latest -g
+RUN npx update-browserslist-db@latest
 # Install all node packages
 COPY ./react-frontend/package*.json /app/
 RUN npm install --no-audit --legacy-peer-deps
