@@ -60,7 +60,7 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
   const activeCameraPilot = useSelector(selectCamHeartbeatData);
   const activeCameraPort = useSelector(selectCamHeartbeatDataPort);
   const activeCameraStbd = useSelector(selectCamHeartbeatDataStbd);
-  console.log(allCameras.length);
+
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
     [classes.headerRecording]: messages && isRecording, //only when condition === true
@@ -68,7 +68,6 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
 
   useEffect(() => {
     if (allCameras.length) {
-      console.log("RUNNING EFFECT");
       if (videoType === "REC" && messages) {
         setCameraName(messages.camera);
         setIsRecording(messages.recording === "true");
