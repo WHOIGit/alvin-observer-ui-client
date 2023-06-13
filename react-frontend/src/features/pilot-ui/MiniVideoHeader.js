@@ -10,6 +10,7 @@ import {
   selectCamHeartbeatData,
   selectCamHeartbeatDataPort,
   selectCamHeartbeatDataStbd,
+  selectAllCameras,
 } from "../camera-controls/cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { getCameraConfigFromId } from "../../utils/getCamConfigFromId";
@@ -55,6 +56,7 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
     hookEnabled
   );
 
+  const allCameras = useSelector(selectAllCameras);
   const activeCameraPilot = useSelector(selectCamHeartbeatData);
   const activeCameraPort = useSelector(selectCamHeartbeatDataPort);
   const activeCameraStbd = useSelector(selectCamHeartbeatDataStbd);
@@ -70,13 +72,22 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
       setIsRecording(messages.recording === "true");
     } else if (videoType === "OBS" || videoType === "PILOT") {
       if (observerSide === "port" && activeCameraPort) {
-        const camera = getCameraConfigFromId(activeCameraPort.camera);
+        const camera = getCameraConfigFromId(
+          activeCameraPort.camera,
+          allCameras
+        );
         setCameraName(camera.cam_name);
       } else if (observerSide === "stbd" && activeCameraStbd) {
-        const camera = getCameraConfigFromId(activeCameraStbd.camera);
+        const camera = getCameraConfigFromId(
+          activeCameraStbd.camera,
+          allCameras
+        );
         setCameraName(camera.cam_name);
       } else if (observerSide === "pilot" && activeCameraPilot) {
-        const camera = getCameraConfigFromId(activeCameraPilot.camera);
+        const camera = getCameraConfigFromId(
+          activeCameraPilot.camera,
+          allCameras
+        );
         camera && setCameraName(camera.cam_name);
       }
     }
@@ -87,6 +98,7 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
     activeCameraPort,
     activeCameraStbd,
     activeCameraPilot,
+    allCameras,
   ]);
 
   let title = videoType + ": " + cameraName;
