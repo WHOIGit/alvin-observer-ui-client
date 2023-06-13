@@ -28,6 +28,16 @@ export default function NavDataDisplay() {
   const camSettings = useSelector(selectCamHeartbeatData);
   const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
 
+  let dateDisplay = null;
+  try {
+    dateDisplay = format(
+      parseISO(recorderHeartbeatData?.timestamp),
+      "yyyy-MM-dd HH:mm:ss"
+    );
+  } catch (error) {
+    console.log(error);
+  }
+
   if (camSettings === null) {
     return null;
   }
@@ -37,12 +47,7 @@ export default function NavDataDisplay() {
         <Table className={classes.table} size="small" aria-label="Nav Data">
           <TableBody>
             <TableRow key="version">
-              <TableCell scope="row">
-                {format(
-                  parseISO(recorderHeartbeatData?.timestamp),
-                  "yyyy-MM-dd HH:mm:ss"
-                )}
-              </TableCell>
+              <TableCell scope="row">{dateDisplay}</TableCell>
             </TableRow>
 
             <TableRow key="cruise">
