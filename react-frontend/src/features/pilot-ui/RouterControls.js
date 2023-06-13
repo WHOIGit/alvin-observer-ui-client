@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import clsx from "clsx";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Button, Box } from "@material-ui/core";
 import { blue, green, deepOrange } from "@material-ui/core/colors";
@@ -7,11 +8,10 @@ import { blue, green, deepOrange } from "@material-ui/core/colors";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import ProcessingStatusChip from "./ProcessingStatusChip";
 import {
-  COMMAND_STRINGS,
-  NEW_CAMERA_COMMAND_EVENT,
-  ROUTER_INPUTS,
-  ROUTER_OUTPUTS,
-} from "../../config.js";
+  selectRouterInputs,
+  selectRouterOutputs,
+} from "../camera-controls/cameraControlsSlice";
+import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -46,6 +46,9 @@ export default function RouterControls() {
   const [inputValue, setInputValue] = useState(null);
   const [outputValue, setOutputValue] = useState(null);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  const routerInputs = useSelector(selectRouterInputs);
+  const routerOutputs = useSelector(selectRouterOutputs);
+  console.log(routerOutputs, routerInputs);
 
   // disable Take button until both values have been selected
   const disabled = !inputValue || !outputValue;
@@ -119,7 +122,7 @@ export default function RouterControls() {
       <Grid container spacing={2} alignItems="center" justifyContent="center">
         <Grid item xs={6}>
           <Grid container spacing={1}>
-            {ROUTER_INPUTS.map((item) => renderInputBtns(item))}
+            {routerInputs.map((item) => renderInputBtns(item))}
           </Grid>
 
           <Box className={classes.box} mt={2}>
@@ -135,7 +138,7 @@ export default function RouterControls() {
 
         <Grid item xs={6}>
           <Grid container spacing={1}>
-            {ROUTER_OUTPUTS.map((item) => renderOutputBtns(item))}
+            {routerOutputs.map((item) => renderOutputBtns(item))}
           </Grid>
 
           <Box className={classes.box} mt={2}>
