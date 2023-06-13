@@ -61,7 +61,7 @@ export default function SelectVideoSource({ showLabel }) {
       console.log("DISABLE REC Controls");
       dispatch(setRecordControlsEnabled(false));
     }
-  }, [requestedSource, activeCamera, dispatch, isOwner]);
+  }, [requestedSource, activeCamera, dispatch, isOwner, cameras]);
 
   const handleSendMessage = (event) => {
     const payload = {
