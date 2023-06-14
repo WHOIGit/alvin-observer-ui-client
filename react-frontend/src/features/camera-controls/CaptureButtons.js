@@ -89,12 +89,7 @@ export default function CaptureButtons() {
   ]);
 
   const handleSendMessage = (commandName, commandValue) => {
-    const payload = {
-      action: {
-        name: commandName,
-        value: commandValue,
-      },
-    };
+    let payload;
     // If a RECORD SOURCE action, need to send the previous Recording camera name
     if (commandName === COMMAND_STRINGS.recordSourceCommand) {
       // get the camera ID of the currently recording camera
@@ -102,12 +97,23 @@ export default function CaptureButtons() {
         recorderHeartbeatData.camera,
         allCameras
       );
-      payload.oldCamera = oldCamera.camera;
+      payload = {
+        action: {
+          name: commandName,
+          value: { commandValue },
+        },
+        oldCamera: oldCamera.camera,
+      };
     }
 
     // If a IMG CAPTURE action, need to send checkbox value
     if (commandName === COMMAND_STRINGS.stillImageCaptureCommand) {
-      payload.action.imgCaptureChecked = checkedImg;
+      payload = {
+        action: {
+          name: commandName,
+          value: { interval: commandValue, imgCaptureChecked: checkedImg },
+        },
+      };
     }
 
     sendMessage(payload);
