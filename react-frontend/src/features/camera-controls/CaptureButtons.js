@@ -107,7 +107,7 @@ export default function CaptureButtons() {
 
     // If a IMG CAPTURE action, need to send checkbox value
     if (commandName === COMMAND_STRINGS.stillImageCaptureCommand) {
-      payload.imgCaptureChecked = checkedImg;
+      payload.action.imgCaptureChecked = checkedImg;
     }
 
     sendMessage(payload);
