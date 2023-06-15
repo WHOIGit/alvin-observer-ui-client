@@ -112,7 +112,7 @@ export default function CaptureButtons() {
       payload = {
         action: {
           name: commandName,
-          value: { interval: commandValue, imgCaptureChecked: imageTransfer },
+          value: { interval: commandValue, imgTransferChecked: imageTransfer },
         },
       };
     }
