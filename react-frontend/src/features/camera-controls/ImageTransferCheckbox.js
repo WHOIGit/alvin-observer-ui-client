@@ -12,9 +12,9 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   imgCheckbox: {
-    paddingLeft: 0,
+    padding: "0 0 5px 0",
   },
-  labelText: {
+  root: {
     fontSize: ".8em",
   },
 }));
@@ -33,7 +33,7 @@ export default function ImageTransferCheckbox() {
   return (
     <div>
       <FormControlLabel
-        className={classes.labelText}
+        classes={{ root: classes.root }}
         control={
           <Checkbox
             onChange={handleCheckboxChange}
