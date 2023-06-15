@@ -43,7 +43,7 @@ export default function ImageTransferCheckbox() {
             size="small"
           />
         }
-        label="ACOMMS"
+        label="AIT"
       />
     </div>
   );
