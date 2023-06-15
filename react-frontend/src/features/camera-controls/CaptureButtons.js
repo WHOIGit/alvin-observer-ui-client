@@ -13,6 +13,7 @@ import {
   selectRecorderHeartbeatData,
   selectCamHeartbeatData,
   selectAllCameras,
+  selectImageTransferAcomms,
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
@@ -44,12 +45,12 @@ export default function CaptureButtons() {
   const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
   const camSettings = useSelector(selectCamHeartbeatData);
   const allCameras = useSelector(selectAllCameras);
+  const imageTransfer = useSelector(selectImageTransferAcomms);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const [recordTimer, setRecordTimer] = useState(null);
   const [currentRecordFile, setCurrentRecordFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
-  const [checkedImg, setCheckedImg] = React.useState(false);
 
   const dispatch = useDispatch();
 
@@ -111,7 +112,7 @@ export default function CaptureButtons() {
       payload = {
         action: {
           name: commandName,
-          value: { interval: commandValue, imgCaptureChecked: checkedImg },
+          value: { interval: commandValue, imgCaptureChecked: imageTransfer },
         },
       };
     }
@@ -160,11 +161,6 @@ export default function CaptureButtons() {
     }, 2000);
   };
 
-  const handleCheckboxChange = (event) => {
-    console.log(event.target.checked);
-    setCheckedImg(event.target.checked);
-  };
-
   // check to make sure camera has controls, current Observer matches Cam Owner, camera is available
   if (camSettings === null || camSettings?.focus_mode === "ERR") {
     return null;
@@ -172,16 +168,7 @@ export default function CaptureButtons() {
 
   return (
     <>
-      <Grid item xs={2}>
-        <div className={classes.buttonWrapper}>
-          <Checkbox
-            onChange={handleCheckboxChange}
-            size="small"
-            className={classes.imgCheckbox}
-          />
-        </div>
-      </Grid>
-      <Grid item xs={5}>
+      <Grid item xs={6}>
         <div className={classes.buttonWrapper}>
           <Button
             variant="contained"
@@ -198,7 +185,7 @@ export default function CaptureButtons() {
           )}
         </div>
       </Grid>
-      <Grid item xs={5}>
+      <Grid item xs={6}>
         <div className={classes.buttonWrapper}>
           <Button
             variant="contained"

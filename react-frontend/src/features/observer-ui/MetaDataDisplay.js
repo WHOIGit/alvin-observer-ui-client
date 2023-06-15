@@ -16,6 +16,7 @@ import {
   selectCamHeartbeatData,
   selectRecorderHeartbeatData,
 } from "../camera-controls/cameraControlsSlice";
+import ImageTransferCheckbox from "../camera-controls/ImageTransferCheckbox";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -46,10 +47,6 @@ export default function NavDataDisplay() {
       <TableContainer component={Paper}>
         <Table className={classes.table} size="small" aria-label="Nav Data">
           <TableBody>
-            <TableRow key="version">
-              <TableCell scope="row">{dateDisplay}</TableCell>
-            </TableRow>
-
             <TableRow key="cruise">
               <TableCell scope="row">
                 <Grid container spacing={1}>
@@ -58,6 +55,19 @@ export default function NavDataDisplay() {
                   </Grid>
                   <Grid item xs={6}>
                     Dive: {camSettings.dive}
+                  </Grid>
+                </Grid>
+              </TableCell>
+            </TableRow>
+
+            <TableRow key="version">
+              <TableCell scope="row">
+                <Grid container spacing={1}>
+                  <Grid item xs={4}>
+                    <ImageTransferCheckbox />
+                  </Grid>
+                  <Grid item xs={8}>
+                    {dateDisplay}
                   </Grid>
                 </Grid>
               </TableCell>
