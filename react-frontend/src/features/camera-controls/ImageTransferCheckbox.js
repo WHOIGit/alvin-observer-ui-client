@@ -12,10 +12,10 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   imgCheckbox: {
-    padding: "0 0 5px 0",
+    padding: "0 0 0 5px",
   },
   label: {
-    fontSize: ".8em",
+    fontSize: "0.875rem;",
   },
 }));
 
@@ -43,7 +43,7 @@ export default function ImageTransferCheckbox() {
             size="small"
           />
         }
-        label="AIT"
+        label="ACOMMS"
       />
     </div>
   );
