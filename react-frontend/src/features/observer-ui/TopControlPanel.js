@@ -87,10 +87,10 @@ export default function TopControlPanel({
         </Grid>
         <Grid item xs={3}>
           <Box mb={1}>
-            <MetaDataDisplay />
+            <ObserverDisplayChip />
           </Box>
           <Box mb={1}>
-            <ObserverDisplayChip />
+            <MetaDataDisplay />
           </Box>
           <Paper className={classes.paper}>
             <UpperRightButtons

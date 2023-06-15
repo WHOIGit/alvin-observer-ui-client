@@ -39,6 +39,7 @@ const initialState = {
   allCameras: [],
   routerOutputs: [],
   routerInputs: [],
+  imageTransferAcomms: false,
 };
 
 const getCameraConfig = (cameraId, cameras) => {
@@ -221,6 +222,9 @@ export const cameraControlsSlice = createSlice({
     setRouterInputs: (state, action) => {
       state.routerInputs = action.payload;
     },
+    setImageTransferAcomms: (state, action) => {
+      state.imageTransferAcomms = action.payload;
+    },
   },
 });
 
@@ -245,6 +249,7 @@ export const {
   setAllCameras,
   setRouterOutputs,
   setRouterInputs,
+  setImageTransferAcomms,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -345,3 +350,7 @@ export const selectRouterInputs = createSelector(
   (state) => state.cameraControls.routerInputs,
   (item) => item
 );
+
+// return error disable
+export const selectImageTransferAcomms = (state) =>
+  state.cameraControls.imageTransferAcomms;
