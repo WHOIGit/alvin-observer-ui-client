@@ -12,10 +12,11 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   imgCheckbox: {
-    padding: "0 0 0 5px",
+    padding: "0 5px 0 0",
   },
   label: {
     fontSize: "0.875rem;",
+    paddingBottom: "1px",
   },
 }));
 
