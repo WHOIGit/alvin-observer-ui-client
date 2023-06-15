@@ -100,7 +100,7 @@ export default function CaptureButtons() {
       payload = {
         action: {
           name: commandName,
-          value: { commandValue },
+          value: commandValue,
         },
         oldCamera: oldCamera.camera,
       };
