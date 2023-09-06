@@ -41,11 +41,11 @@ export default function LargeVideo() {
           "0" /* channel */
         );
         setPlayer(newPlayer);
-      } else {
-        // player exists, refresh the connection
-        console.log("REFRESH VIDEO");
-        player.play();
       }
+    } else {
+      // player exists, refresh the connection
+      console.log("REFRESH VIDEO");
+      player.play();
     }
   }, [observerVideoSrc, currentCamData, player]);
 
