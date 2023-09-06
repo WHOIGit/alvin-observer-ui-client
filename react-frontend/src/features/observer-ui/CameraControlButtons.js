@@ -6,7 +6,10 @@ import { Box, Divider } from "@material-ui/core";
 import FocusModeButton from "../camera-controls/FocusModeButton";
 import FocusZoomButtonsGrid from "../camera-controls/FocusZoomButtonsGrid";
 import Joystick from "../camera-controls/Joystick";
-import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
+import {
+  selectCamHeartbeatData,
+  selectRecordControlsEnabled,
+} from "../camera-controls/cameraControlsSlice";
 import useIsOwner from "../../hooks/useIsOwner";
 
 const useStyles = makeStyles((theme) => ({
@@ -18,10 +21,17 @@ const useStyles = makeStyles((theme) => ({
 export default function CameraControlButtons() {
   const classes = useStyles();
   const camSettings = useSelector(selectCamHeartbeatData);
+  const recordControlsEnabled = useSelector(selectRecordControlsEnabled);
   const { isOwner } = useIsOwner();
 
   // check to make sure camera has controls and current Observer matches Cam Owner
-  if (camSettings === null || !isOwner || camSettings?.exposure === "ERR") {
+  // also check if Video Source change has completed before displaying
+  if (
+    camSettings === null ||
+    !isOwner ||
+    camSettings?.exposure === "ERR" ||
+    !recordControlsEnabled
+  ) {
     return null;
   }
 
