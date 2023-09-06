@@ -35,6 +35,8 @@ export default function LargeVideo() {
     }
   }, [observerVideoSrc]);
 
+  console.log("VIDEO ELEM", videoElem.current);
+
   return (
     <div className={classes.root}>
       <div id="videoBoxMain">
