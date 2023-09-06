@@ -32,10 +32,10 @@ export default function LargeVideo() {
         observerVideoSrc /* stream */,
         "0" /* channel */
       );
+
+      console.log("VIDEO Player", player);
     }
   }, [observerVideoSrc]);
-
-  console.log("VIDEO ELEM", videoElem.current);
 
   return (
     <div className={classes.root}>
