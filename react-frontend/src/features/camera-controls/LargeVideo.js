@@ -33,6 +33,7 @@ export default function LargeVideo() {
 
     if (!player) {
       // set the player variable
+      console.log("SET VIDEO");
       if (videoElem.current) {
         const newPlayer = new WebRtcPlayer(
           videoElem.current.id,
@@ -42,10 +43,11 @@ export default function LargeVideo() {
         setPlayer(newPlayer);
       } else {
         // player exists, refresh the connection
+        console.log("REFRESH VIDEO");
         player.play();
       }
     }
-  }, [observerVideoSrc, currentCamData]);
+  }, [observerVideoSrc, currentCamData, player]);
 
   return (
     <div className={classes.root}>
