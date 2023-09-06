@@ -77,7 +77,7 @@ const useCameraWebSocket = (
     if (isEnabled) {
       // Creates a WebSocket connection
       socketRef.current = socketIOClient(WS_SERVER + socketNs, {
-        path: WS_PATH + "/error_path/socket.io",
+        path: WS_PATH + "socket.io",
         query: { client: activeSocketNamespace },
         transports: ["websocket"],
       });
