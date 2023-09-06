@@ -29,8 +29,6 @@ export default function LargeVideo() {
   const [player, setPlayer] = useState(null);
 
   useEffect(() => {
-    console.log("VIDEO CAM DATA", camSettings);
-
     if (!player) {
       // set the player variable
       console.log("SET VIDEO");
