@@ -4,10 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 // local imports
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import { VIDEO_STREAM_CONFIG } from "../../config.js";
-import {
-  selectCurrentCamData,
-  selectCamHeartbeatData,
-} from "./cameraControlsSlice";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
@@ -28,7 +25,6 @@ export default function LargeVideo() {
   const observerVideoSrc = useSelector(
     (state) => state.cameraControls.observerVideoSrc
   );
-  const currentCamData = useSelector(selectCurrentCamData);
   const camSettings = useSelector(selectCamHeartbeatData);
   const [player, setPlayer] = useState(null);
 
