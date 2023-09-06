@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 // local imports
@@ -26,18 +26,26 @@ export default function LargeVideo() {
     (state) => state.cameraControls.observerVideoSrc
   );
   const currentCamData = useSelector(selectCurrentCamData);
-  console.log("VIDEO CAM DATA", currentCamData);
-  useEffect(() => {
-    if (videoElem.current) {
-      const player = new WebRtcPlayer(
-        videoElem.current.id,
-        observerVideoSrc /* stream */,
-        "0" /* channel */
-      );
+  const [player, setPlayer] = useState(null);
 
-      console.log("VIDEO Player", player);
+  useEffect(() => {
+    console.log("VIDEO CAM DATA", currentCamData);
+
+    if (!player) {
+      // set the player variable
+      if (videoElem.current) {
+        const newPlayer = new WebRtcPlayer(
+          videoElem.current.id,
+          observerVideoSrc /* stream */,
+          "0" /* channel */
+        );
+        setPlayer(newPlayer);
+      } else {
+        // player exists, refresh the connection
+        player.play();
+      }
     }
-  }, [observerVideoSrc]);
+  }, [observerVideoSrc, currentCamData]);
 
   return (
     <div className={classes.root}>
