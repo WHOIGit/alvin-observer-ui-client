@@ -18,6 +18,7 @@ import {
   addCommandQueue,
   setRouterOutputs,
   setRouterInputs,
+  setSocketError,
 } from "../features/camera-controls/cameraControlsSlice";
 import {
   WS_SERVER,
@@ -82,11 +83,19 @@ const useCameraWebSocket = (
         transports: ["websocket"],
       });
 
+      socketRef.current.on("connect", () => {
+        // successful connection, remove any errors
+        console.log("Websocket connected!");
+        dispatch(setSocketError(false));
+      });
+
       // handle errors
       socketRef.current.on("connect_error", (err) => {
+        if (err instanceof Error) {
+          dispatch(setSocketError(true));
+        }
         console.log(err instanceof Error); // true
         console.log(err.message); // not authorized
-        console.log(err.data); // { content: "Please retry later" }
       });
 
       // Listens for incoming messages
