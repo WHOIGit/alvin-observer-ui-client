@@ -154,10 +154,14 @@ export default function CaptureButtons() {
   const handleImgCapture = () => {
     setLoadingImgCapture(true);
     handleSendMessage(COMMAND_STRINGS.stillImageCaptureCommand, 0);
+    // set Video Source menu to be disabled
+    console.log("disabling video source");
+    dispatch(setVideoSourceEnabled(false));
 
     // add a "fake" delay to UI to show users that image capture is processing
     setTimeout(() => {
       setLoadingImgCapture(false);
+      dispatch(setVideoSourceEnabled(true));
     }, 2000);
   };
 
