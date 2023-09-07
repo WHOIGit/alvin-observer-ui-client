@@ -6,7 +6,7 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     width: "100%",
     color: "white",
-    backgroundColor: theme.palette.warning.main,
+    backgroundColor: theme.palette.error.main,
   },
 }));
 
