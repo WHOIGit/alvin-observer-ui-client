@@ -13,6 +13,7 @@ import {
   selectVideoSourceEnabled,
   setRecordControlsEnabled,
   selectAllCameras,
+  setVideoSourceEnabled,
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import useIsOwner from "../../hooks/useIsOwner";
@@ -57,9 +58,11 @@ export default function SelectVideoSource({ showLabel }) {
         console.log("ENABLE REC Controls");
         dispatch(setRecordControlsEnabled(true));
       }
+      dispatch(setVideoSourceEnabled(true));
     } else {
       console.log("DISABLE REC Controls");
       dispatch(setRecordControlsEnabled(false));
+      dispatch(setVideoSourceEnabled(false));
     }
   }, [requestedSource, activeCamera, dispatch, isOwner, cameras]);
 
