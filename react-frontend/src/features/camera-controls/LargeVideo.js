@@ -1,9 +1,10 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 // local imports
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import { VIDEO_STREAM_CONFIG } from "../../config.js";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
@@ -24,16 +25,27 @@ export default function LargeVideo() {
   const observerVideoSrc = useSelector(
     (state) => state.cameraControls.observerVideoSrc
   );
+  const camSettings = useSelector(selectCamHeartbeatData);
+  const [player, setPlayer] = useState(null);
 
   useEffect(() => {
-    if (videoElem.current) {
-      const player = new WebRtcPlayer(
-        videoElem.current.id,
-        observerVideoSrc /* stream */,
-        "0" /* channel */
-      );
+    if (!player) {
+      // set the player variable
+      console.log("SET VIDEO");
+      if (videoElem.current) {
+        const newPlayer = new WebRtcPlayer(
+          videoElem.current.id,
+          observerVideoSrc /* stream */,
+          "0" /* channel */
+        );
+        setPlayer(newPlayer);
+      }
+    } else {
+      // player exists, refresh the connection
+      console.log("REFRESH VIDEO");
+      player.play();
     }
-  }, [observerVideoSrc]);
+  }, [observerVideoSrc, camSettings, player]);
 
   return (
     <div className={classes.root}>
