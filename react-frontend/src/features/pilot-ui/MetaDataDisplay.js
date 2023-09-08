@@ -24,7 +24,7 @@ export default function NavDataDisplay() {
     <Grid container spacing={2}>
       <Grid item xs={6}>
         {socketError && <SocketErrorChip />}
-        {camSettings && ` Alvin Pilot Imaging UI {camSettings?.version}`}
+        {camSettings && ` Alvin Pilot Imaging UI ${camSettings?.version}`}
       </Grid>
       <Grid item xs={3}>
         Exp: {camSettings?.cruise}
