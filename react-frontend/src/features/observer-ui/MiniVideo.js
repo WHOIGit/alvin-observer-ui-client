@@ -23,11 +23,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MiniVideo({ videoSrc, videoType }) {
+export default function MiniVideo({ videoType }) {
   const classes = useStyles();
   const videoElem = useRef(null);
   //const camSettings = useSelector(selectCamHeartbeatData);
   const [player, setPlayer] = useState(null);
+  const videoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
 
   console.log(videoType, player);
 
