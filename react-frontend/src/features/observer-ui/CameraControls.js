@@ -32,6 +32,8 @@ export default function CameraControls({ showFullCameraControls }) {
   const classes = useStyles();
   const camHeartbeat = useSelector(selectCamHeartbeatData);
 
+  if (!showFullCameraControls) return null;
+
   return (
     <div
       className={`${classes.root} ${
