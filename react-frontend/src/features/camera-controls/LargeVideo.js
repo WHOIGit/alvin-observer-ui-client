@@ -27,6 +27,21 @@ export default function LargeVideo({ showFullCameraControls }) {
   );
   const [player, setPlayer] = useState(null);
 
+  async function checkVideoStats() {
+    if (player) {
+      const stats = await player.getStats();
+      console.log("CHECK STATS");
+      stats.forEach((report) => {
+        if (report.type === "inbound-rtp" && report.kind === "video") {
+          // Log the frame rate
+          console.log(report.framesPerSecond);
+        }
+      });
+    }
+  }
+
+  checkVideoStats();
+
   useEffect(() => {
     if (showFullCameraControls) {
       if (!player) {
