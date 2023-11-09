@@ -30,7 +30,7 @@ export default function MiniVideo({ videoSrc, videoType }) {
   useEffect(() => {
     if (!player) {
       // set the player variable
-      console.log("SET VIDEO");
+      console.log("SET MINI VIDEO", player);
       if (videoElem.current) {
         const newPlayer = new WebRtcPlayer(
           videoElem.current.id,
@@ -41,7 +41,7 @@ export default function MiniVideo({ videoSrc, videoType }) {
       }
     } else {
       // player exists, refresh the connection
-      console.log("REFRESH VIDEO");
+      console.log("REFRESH MINI VIDEO", player);
       player.play();
     }
 
@@ -60,7 +60,8 @@ export default function MiniVideo({ videoSrc, videoType }) {
           <video
             style={{ width: "100%" }}
             ref={videoElem}
-            id={uuidv4()}
+            id={`${videoType}-minivideo`}
+            //id={uuidv4()}
             autoPlay
             muted
           ></video>
