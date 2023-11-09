@@ -32,6 +32,7 @@ export default function LargeVideo({ showFullCameraControls }) {
       const stats = await player.webrtc.getStats();
       console.log("CHECK STATS");
       stats.forEach((report) => {
+        console.log(report);
         if (report.type === "inbound-rtp" && report.kind === "video") {
           // Log the frame rate
           console.log(report.framesPerSecond);
