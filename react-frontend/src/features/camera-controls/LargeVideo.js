@@ -48,7 +48,7 @@ export default function LargeVideo() {
 
     return () => {
       // clean up, close any open RTC connections
-      console.log("CLOSING LARGE VIDEO CONNECTIONS");
+      console.log("CLOSING LARGE VIDEO CONNECTIONS", player);
       if (!player) player.handleClose();
     };
   }, [observerVideoSrc, camSettings, player]);
