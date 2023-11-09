@@ -25,7 +25,6 @@ export default function LargeVideo({ showFullCameraControls }) {
   const observerVideoSrc = useSelector(
     (state) => state.cameraControls.observerVideoSrc
   );
-  const camSettings = useSelector(selectCamHeartbeatData);
   const [player, setPlayer] = useState(null);
 
   useEffect(() => {
@@ -51,7 +50,7 @@ export default function LargeVideo({ showFullCameraControls }) {
       console.log("CLOSING LARGE VIDEO CONNECTIONS", player);
       if (player) player.handleClose();
     }
-  }, [observerVideoSrc, camSettings, player, showFullCameraControls]);
+  }, [observerVideoSrc, player, showFullCameraControls]);
 
   return (
     <div className={classes.root}>
