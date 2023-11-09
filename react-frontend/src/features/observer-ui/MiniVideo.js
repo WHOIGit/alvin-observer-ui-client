@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 export default function MiniVideo({ videoSrc, videoType }) {
   const classes = useStyles();
   const videoElem = useRef(null);
-  const camSettings = useSelector(selectCamHeartbeatData);
+  //const camSettings = useSelector(selectCamHeartbeatData);
   const [player, setPlayer] = useState(null);
 
   console.log(videoType, player);
@@ -54,7 +54,7 @@ export default function MiniVideo({ videoSrc, videoType }) {
       console.log("CLOSING MINI VIDEO CONNECTION", player);
       if (player) player.handleClose();
     };
-  }, [videoSrc, camSettings, player]);
+  }, [videoSrc, player]);
 
   return (
     <Card className={`${classes.root}`}>
