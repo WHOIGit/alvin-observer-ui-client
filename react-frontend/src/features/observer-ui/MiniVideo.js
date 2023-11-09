@@ -27,8 +27,6 @@ export default function MiniVideo({ videoSrc, videoType }) {
   //const camSettings = useSelector(selectCamHeartbeatData);
   const [player, setPlayer] = useState(null);
 
-  console.log(videoType, player);
-
   useEffect(() => {
     if (!player) {
       // set the player variable
