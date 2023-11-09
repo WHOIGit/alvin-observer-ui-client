@@ -29,7 +29,7 @@ export default function LargeVideo({ showFullCameraControls }) {
 
   async function checkVideoStats() {
     if (player) {
-      const stats = await player.getStats();
+      const stats = await player.webrtc.getStats();
       console.log("CHECK STATS");
       stats.forEach((report) => {
         if (report.type === "inbound-rtp" && report.kind === "video") {
