@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { Card, CardContent } from "@material-ui/core";
 import { v4 as uuidv4 } from "uuid";
@@ -7,7 +6,6 @@ import { v4 as uuidv4 } from "uuid";
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import MiniVideoHeader from "./MiniVideoHeader";
 import { VIDEO_STREAM_CONFIG } from "../../config.js";
-import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
@@ -23,12 +21,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MiniVideo({ videoType }) {
+export default function MiniVideo({ videoSrc, videoType }) {
   const classes = useStyles();
   const videoElem = useRef(null);
   //const camSettings = useSelector(selectCamHeartbeatData);
   const [player, setPlayer] = useState(null);
-  const videoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
 
   console.log(videoType, player);
 
