@@ -49,7 +49,7 @@ export default function LargeVideo({ showFullCameraControls }) {
 
   useEffect(() => {
     if (showFullCameraControls) {
-      console.log("LAST", lastCommand);
+      console.log("LAST", lastCommand, player);
       if (!player) {
         // set the player variable
         console.log("SET VIDEO", player);
