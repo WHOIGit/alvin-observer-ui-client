@@ -19,7 +19,7 @@ export default function ObserverUI({
   setShowFullCameraControls,
 }) {
   const dispatch = useDispatch();
-  console.log("OBERSERV UI comp.");
+
   // connect to observer side newCameraCommand to get global camera data on first connect,
   // send message to set active camera
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
