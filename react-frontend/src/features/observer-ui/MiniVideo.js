@@ -43,7 +43,7 @@ export default function MiniVideo({ videoSrc, videoType }) {
       }
     }
 
-    if (player && lastCommand.action.name === "CAM" && videoType === "OBS") {
+    if (player && lastCommand?.action.name === "CAM" && videoType === "OBS") {
       // Camera change requested, refresh the connection
       console.log("REFRESH VIDEO", player);
       player.play();
