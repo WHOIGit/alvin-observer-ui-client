@@ -29,6 +29,8 @@ export default function MiniVideo({ videoSrc, videoType }) {
   const camSettings = useSelector(selectCamHeartbeatData);
   const [player, setPlayer] = useState(null);
 
+  console.log(videoType, player);
+
   useEffect(() => {
     if (!player) {
       // set the player variable
@@ -46,6 +48,12 @@ export default function MiniVideo({ videoSrc, videoType }) {
       console.log("REFRESH VIDEO");
       player.play();
     }
+
+    return () => {
+      // clean up, close any open RTC connections
+      console.log("CLOSING MINI VIDEO CONNECTION", player);
+      if (player) player.handleClose();
+    };
   }, [videoSrc, camSettings, player]);
 
   return (

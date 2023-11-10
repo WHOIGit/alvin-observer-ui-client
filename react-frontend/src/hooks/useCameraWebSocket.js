@@ -114,8 +114,8 @@ const useCameraWebSocket = (
 
         // handle NEW_CAMERA_COMMAND_EVENT events here
         if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
-          console.log("Incoming message");
-          console.log(socketEvent, incomingMessage);
+          //console.log("Incoming message");
+          //console.log(socketEvent, incomingMessage);
 
           // check if message is a Camera Change Package
           // or camera config packages.
@@ -125,16 +125,16 @@ const useCameraWebSocket = (
             console.log(socketEvent, incomingMessage);
             dispatch(changeCurrentCamData(incomingMessage));
           } else if (incomingMessage.hasOwnProperty("camera_array")) {
-            console.log("GET INITIAL CAMERA CONFIG");
-            console.log(socketEvent, incomingMessage);
+            //console.log("GET INITIAL CAMERA CONFIG");
+            //console.log(socketEvent, incomingMessage);
             dispatch(setAllCameras(incomingMessage.camera_array));
           } else if (incomingMessage.hasOwnProperty("router_output_array")) {
-            console.log("GET INITIAL ROUTER OUTPUT CONFIG");
-            console.log(socketEvent, incomingMessage);
+            //console.log("GET INITIAL ROUTER OUTPUT CONFIG");
+            //console.log(socketEvent, incomingMessage);
             dispatch(setRouterOutputs(incomingMessage.router_output_array));
           } else if (incomingMessage.hasOwnProperty("router_input_array")) {
-            console.log("GET INITIAL ROUTER INPUT CONFIG");
-            console.log(socketEvent, incomingMessage);
+            //console.log("GET INITIAL ROUTER INPUT CONFIG");
+            //console.log(socketEvent, incomingMessage);
             dispatch(setRouterInputs(incomingMessage.router_input_array));
           } else {
             dispatch(changeCameraSettings(incomingMessage));
