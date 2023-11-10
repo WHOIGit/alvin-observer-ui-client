@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Card, CardContent } from "@material-ui/core";
+import { useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 // local import
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import MiniVideoHeader from "./MiniVideoHeader";
 import { VIDEO_STREAM_CONFIG } from "../../config.js";
+import { selectLastCommand } from "./cameraControlsSlice";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
@@ -24,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 export default function MiniVideo({ videoSrc, videoType }) {
   const classes = useStyles();
   const videoElem = useRef(null);
-  //const camSettings = useSelector(selectCamHeartbeatData);
+  const lastCommand = useSelector(selectLastCommand);
   const [player, setPlayer] = useState(null);
 
   useEffect(() => {
@@ -39,9 +41,11 @@ export default function MiniVideo({ videoSrc, videoType }) {
         );
         setPlayer(newPlayer);
       }
-    } else {
-      // player exists, refresh the connection
-      console.log("REFRESH MINI VIDEO", player);
+    }
+
+    if (player && lastCommand.action.name === "CAM" && videoType === "OBS") {
+      // Camera change requested, refresh the connection
+      console.log("REFRESH VIDEO", player);
       player.play();
     }
 
@@ -50,7 +54,7 @@ export default function MiniVideo({ videoSrc, videoType }) {
       console.log("CLOSING MINI VIDEO CONNECTION", player);
       if (player) player.handleClose();
     };
-  }, [videoSrc, player]);
+  }, [videoSrc, player, lastCommand, videoType]);
 
   return (
     <Card className={`${classes.root}`}>
