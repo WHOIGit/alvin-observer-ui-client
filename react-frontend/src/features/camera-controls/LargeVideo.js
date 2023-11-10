@@ -28,6 +28,9 @@ export default function LargeVideo({ showFullCameraControls }) {
   const lastCommand = useSelector(selectLastCommand);
   const [player, setPlayer] = useState(null);
 
+  /*
+  // function to get direct stats from the RTCPeerConnection
+  // probably need to put this on a timer to get useful data
   async function checkVideoStats() {
     if (player) {
       const stats = await player.webrtc.getStats();
@@ -41,8 +44,8 @@ export default function LargeVideo({ showFullCameraControls }) {
       });
     }
   }
-
   checkVideoStats();
+  */
 
   useEffect(() => {
     if (showFullCameraControls) {
@@ -65,7 +68,7 @@ export default function LargeVideo({ showFullCameraControls }) {
         player.play();
       }
     } else {
-      // remove, close any open RTC connections
+      // remove, close any open RTC connections if open
       console.log("CLOSING LARGE VIDEO CONNECTIONS", player);
       if (player) player.handleClose();
     }
