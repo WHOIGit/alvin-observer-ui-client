@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 // local imports
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import { VIDEO_STREAM_CONFIG } from "../../config.js";
-import { selectCamHeartbeatData } from "./cameraControlsSlice";
+import { selectLastCommand } from "./cameraControlsSlice";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
@@ -25,6 +25,7 @@ export default function LargeVideo({ showFullCameraControls }) {
   const observerVideoSrc = useSelector(
     (state) => state.cameraControls.observerVideoSrc
   );
+  const lastCommand = useSelector(selectLastCommand);
   const [player, setPlayer] = useState(null);
 
   async function checkVideoStats() {
@@ -45,6 +46,7 @@ export default function LargeVideo({ showFullCameraControls }) {
 
   useEffect(() => {
     if (showFullCameraControls) {
+      console.log("LAST", lastCommand);
       if (!player) {
         // set the player variable
         console.log("SET VIDEO", player);
@@ -56,17 +58,18 @@ export default function LargeVideo({ showFullCameraControls }) {
           );
           setPlayer(newPlayer);
         }
-      } else {
-        // player exists, refresh the connection
+      }
+      if (player && lastCommand.action.name === "CAM") {
+        // Camera change requested, refresh the connection
         console.log("REFRESH VIDEO", player);
         player.play();
       }
     } else {
-      // clean up, close any open RTC connections
+      // remove, close any open RTC connections
       console.log("CLOSING LARGE VIDEO CONNECTIONS", player);
       if (player) player.handleClose();
     }
-  }, [observerVideoSrc, player, showFullCameraControls]);
+  }, [observerVideoSrc, player, showFullCameraControls, lastCommand]);
 
   return (
     <div className={classes.root}>
