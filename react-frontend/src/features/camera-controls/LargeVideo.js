@@ -62,7 +62,16 @@ export default function LargeVideo({ showFullCameraControls }) {
           setPlayer(newPlayer);
         }
       }
+
+      // camera change, refresh video
       if (player && lastCommand.action.name === "CAM") {
+        // Camera change requested, refresh the connection
+        console.log("REFRESH VIDEO", player);
+        player.play();
+      }
+
+      // check if player webrtc is closed, refresh if needed
+      if (player?.webrtc?.connectionState === "closed") {
         // Camera change requested, refresh the connection
         console.log("REFRESH VIDEO", player);
         player.play();
