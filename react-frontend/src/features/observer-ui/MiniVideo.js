@@ -53,6 +53,7 @@ export default function MiniVideo({ videoSrc, videoType }) {
       // clean up, close any open RTC connections
       console.log("CLOSING MINI VIDEO CONNECTION", player);
       if (player) player.handleClose();
+      setPlayer(null);
     };
   }, [videoSrc, player, lastCommand, videoType]);
 
