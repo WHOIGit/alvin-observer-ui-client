@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function LargeVideo() {
+export default function LargeVideo({ showFullCameraControls }) {
   console.log("Large Video load");
   const classes = useStyles();
   const videoElem = useRef(null);
@@ -29,29 +29,29 @@ export default function LargeVideo() {
   const [player, setPlayer] = useState(null);
 
   useEffect(() => {
-    if (!player) {
-      // set the player variable
-      console.log("SET VIDEO");
-      if (videoElem.current) {
-        const newPlayer = new WebRtcPlayer(
-          videoElem.current.id,
-          observerVideoSrc /* stream */,
-          "0" /* channel */
-        );
-        setPlayer(newPlayer);
+    if (showFullCameraControls) {
+      if (!player) {
+        // set the player variable
+        console.log("SET VIDEO", player);
+        if (videoElem.current) {
+          const newPlayer = new WebRtcPlayer(
+            videoElem.current.id,
+            observerVideoSrc /* stream */,
+            "0" /* channel */
+          );
+          setPlayer(newPlayer);
+        }
+      } else {
+        // player exists, refresh the connection
+        console.log("REFRESH VIDEO", player);
+        player.play();
       }
     } else {
-      // player exists, refresh the connection
-      console.log("REFRESH VIDEO");
-      player.play();
-    }
-
-    return () => {
       // clean up, close any open RTC connections
       console.log("CLOSING LARGE VIDEO CONNECTIONS", player);
       if (player) player.handleClose();
-    };
-  }, [observerVideoSrc, camSettings, player]);
+    }
+  }, [observerVideoSrc, camSettings, player, showFullCameraControls]);
 
   return (
     <div className={classes.root}>

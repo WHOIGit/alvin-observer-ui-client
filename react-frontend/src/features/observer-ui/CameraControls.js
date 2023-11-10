@@ -32,7 +32,6 @@ export default function CameraControls({ showFullCameraControls }) {
   const classes = useStyles();
   const camHeartbeat = useSelector(selectCamHeartbeatData);
   console.log("HB", camHeartbeat);
-  if (!showFullCameraControls) return null;
 
   return (
     <div
@@ -42,7 +41,11 @@ export default function CameraControls({ showFullCameraControls }) {
     >
       <Grid container spacing={2}>
         <Grid item xs={9}>
-          {camHeartbeat?.focus_mode === "ERR" ? <ErrorCard /> : <LargeVideo />}
+          {camHeartbeat?.focus_mode === "ERR" ? (
+            <ErrorCard />
+          ) : (
+            <LargeVideo showFullCameraControls={showFullCameraControls} />
+          )}
         </Grid>
         <Grid item xs={3}>
           <Paper className={classes.paper}>
