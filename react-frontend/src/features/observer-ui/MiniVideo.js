@@ -44,6 +44,13 @@ export default function MiniVideo({ videoSrc, videoType }) {
       }
     }
 
+    // check if player webrtc is closed, refresh if needed
+    if (player?.webrtc?.connectionState === "closed") {
+      // Camera change requested, refresh the connection
+      console.log("REFRESH VIDEO", player);
+      player.play();
+    }
+
     if (player && lastCommand?.action.name === "CAM" && videoType === "OBS") {
       // Camera change requested, refresh the connection
       console.log("REFRESH VIDEO", player);
