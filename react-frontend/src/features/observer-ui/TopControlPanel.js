@@ -17,7 +17,6 @@ import {
   selectSocketError,
 } from "../camera-controls/cameraControlsSlice";
 import SocketErrorChip from "./SocketErrorChip";
-import { VIDEO_STREAM_CONFIG } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -41,23 +40,20 @@ export default function TopControlPanel({
   showFullCameraControls,
   setShowFullCameraControls,
 }) {
-  const observerVideoSmallSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
-  const recordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
-
   const classes = useStyles();
-  /*
+
   const observerVideoSmallSrc = useSelector(
     (state) => state.cameraControls.observerVideoSmallSrc
   );
   const recordVideoSrc = useSelector(
     (state) => state.cameraControls.recordVideoSrc
   );
-  */
-  const camHeartbeat = useSelector(selectCamHeartbeatData);
+
+  //const camHeartbeat = useSelector(selectCamHeartbeatData);
   const socketError = useSelector(selectSocketError);
 
   const renderDynamicGridBox = () => {
-    if (camHeartbeat?.focus_mode === "ERR") return <ErrorCard />;
+    //if (camHeartbeat?.focus_mode === "ERR") return <ErrorCard />;
     if (showFullCameraControls) {
       return <TopCameraCommandsList />;
     } else {
