@@ -23,7 +23,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MiniVideo({ videoSrc, videoType }) {
+export default function MiniVideo({
+  videoSrc,
+  videoType,
+  showFullCameraControls,
+}) {
   const classes = useStyles();
   const videoElem = useRef(null);
   const lastCommand = useSelector(selectLastCommand);
@@ -43,18 +47,18 @@ export default function MiniVideo({ videoSrc, videoType }) {
       }
     }
 
+    if (showFullCameraControls && videoType === "OBS") {
+      // remove, close any open RTC connections if open
+      console.log("CLOSING MINI OBS VIDEO CONNECTIONS", player);
+      if (player) player.handleClose();
+    }
+
     if (player && lastCommand?.action.name === "CAM" && videoType === "OBS") {
       // Camera change requested, refresh the connection
       console.log("REFRESH VIDEO", player);
       player.play();
     }
-
-    return () => {
-      // clean up, close any open RTC connections for OBS video
-      console.log("CLOSING MINI VIDEO CONNECTION", player);
-      if (player && videoType === "OBS") player.handleClose();
-    };
-  }, [videoSrc, player, lastCommand, videoType]);
+  }, [videoSrc, player, lastCommand, videoType, showFullCameraControls]);
 
   return (
     <Card className={`${classes.root}`}>
