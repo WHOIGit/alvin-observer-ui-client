@@ -29,6 +29,7 @@ export default function MiniVideo({ videoSrc, videoType }) {
   const lastCommand = useSelector(selectLastCommand);
   const [player, setPlayer] = useState(null);
 
+  videoType === "OBS" && console.log(player);
   useEffect(() => {
     if (!player) {
       // set the player variable
