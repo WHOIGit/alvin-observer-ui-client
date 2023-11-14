@@ -80,7 +80,15 @@ export default function TopControlPanel({
               />
             </Grid>
             <Grid item xs={6}>
-              {renderDynamicGridBox()}
+              {camHeartbeat?.focus_mode === "ERR" ? (
+                <ErrorCard />
+              ) : (
+                <MiniVideo
+                  videoSrc={observerVideoSmallSrc}
+                  videoType={"OBS"}
+                  showFullCameraControls={showFullCameraControls}
+                />
+              )}
             </Grid>
           </Grid>
 
