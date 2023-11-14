@@ -92,7 +92,7 @@ export default function MiniVideo({
     }
   }, [videoSrc, player, lastCommand, videoType, showFullCameraControls]);
 
-  if (showFullCameraControls) return null;
+  if (showFullCameraControls && videoType === "OBS") return null;
 
   return (
     <Card className={`${classes.root}`}>
