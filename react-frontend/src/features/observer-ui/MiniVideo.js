@@ -73,7 +73,7 @@ export default function MiniVideo({
       }
 
       // camera change, refresh video
-      if (player && lastCommand.action.name === "CAM") {
+      if (player && lastCommand?.action.name === "CAM") {
         // Camera change requested, refresh the connection
         console.log("REFRESH MINI VIDEO", player);
         player.play();
