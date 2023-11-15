@@ -33,66 +33,42 @@ export default function MiniVideo({
   const lastCommand = useSelector(selectLastCommand);
   const [player, setPlayer] = useState(null);
 
+  console.log("LAST COM", lastCommand, showFullCameraControls);
   //videoType === "OBS" && console.log(player);
   useEffect(() => {
-    if (videoType === "REC") {
-      if (!player) {
-        // set the player variable
-        console.log("SET MINI VIDEO", player);
-        if (videoElem.current) {
-          const newPlayer = new WebRtcPlayer(
-            videoElem.current.id,
-            videoSrc /* stream */,
-            "0" /* channel */
-          );
-          setPlayer(newPlayer);
-        }
-      }
-
-      // check if player webrtc is closed, refresh if needed
-      if (player?.webrtc?.connectionState === "closed") {
-        // Camera change requested, refresh the connection
-        console.log("REFRESH VIDEO", player);
-        player.play();
+    if (!player) {
+      // set the player variable
+      console.log("SET MINI VIDEO", player);
+      if (videoElem.current) {
+        const newPlayer = new WebRtcPlayer(
+          videoElem.current.id,
+          videoSrc /* stream */,
+          "0" /* channel */
+        );
+        setPlayer(newPlayer);
       }
     }
 
-    if (videoType === "OBS" && !showFullCameraControls) {
-      console.log("LAST", lastCommand, player);
-      if (!player) {
-        // set the player variable
-        console.log("SET VIDEO", player);
-        if (videoElem.current) {
-          const newPlayer = new WebRtcPlayer(
-            videoElem.current.id,
-            videoSrc /* stream */,
-            "0" /* channel */
-          );
-          setPlayer(newPlayer);
-        }
-      }
-
-      // camera change, refresh video
-      if (player && lastCommand?.action.name === "CAM") {
-        // Camera change requested, refresh the connection
-        console.log("REFRESH MINI VIDEO", player);
-        player.play();
-      }
-
-      // check if player webrtc is closed, refresh if needed
-      if (player?.webrtc?.connectionState === "closed") {
-        // Camera change requested, refresh the connection
-        console.log("REFRESH MINI VIDEO", player);
-        player.play();
-      }
-    } else if (videoType === "OBS" && showFullCameraControls) {
-      // remove, close any open RTC connections if open
-      console.log("CLOSING MINI VIDEO CONNECTIONS", player);
-      if (player) player.handleClose();
+    // check if player webrtc is closed, refresh if needed
+    if (player?.webrtc?.connectionState === "closed") {
+      // Camera change requested, refresh the connection
+      console.log("REFRESH VIDEO", player);
+      player.play();
     }
+
+    if (player && lastCommand?.action.name === "CAM" && videoType === "OBS") {
+      // Camera change requested, refresh the connection
+      console.log("REFRESH VIDEO", player);
+      player.play();
+    }
+
+    return () => {
+      // clean up, close any open RTC connections for OBS video
+      console.log("CLOSING MINI VIDEO CONNECTION", player);
+      console.log("Close function", showFullCameraControls);
+      if (player && videoType === "OBS") player.handleClose();
+    };
   }, [videoSrc, player, lastCommand, videoType, showFullCameraControls]);
-
-  if (showFullCameraControls && videoType === "OBS") return null;
 
   return (
     <Card className={`${classes.root}`}>
