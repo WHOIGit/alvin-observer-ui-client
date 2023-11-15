@@ -33,7 +33,7 @@ export default function MiniVideo({
   const lastCommand = useSelector(selectLastCommand);
   const [player, setPlayer] = useState(null);
 
-  console.log("LAST COM", lastCommand, showFullCameraControls);
+  //console.log("LAST COM", lastCommand, showFullCameraControls);
   //videoType === "OBS" && console.log(player);
   useEffect(() => {
     if (!player) {
@@ -56,18 +56,31 @@ export default function MiniVideo({
       player.play();
     }
 
-    if (player && lastCommand?.action.name === "CAM" && videoType === "OBS") {
-      // Camera change requested, refresh the connection
+    if (
+      player &&
+      lastCommand?.action.name === "CAM" &&
+      videoType === "OBS" &&
+      !showFullCameraControls
+    ) {
+      // Camera change requested, refresh the OBS connection
       console.log("REFRESH VIDEO", player);
       player.play();
     }
 
+    if (showFullCameraControls) {
+      // clean up, close any open RTC connections for OBS video
+      console.log("CLOSING MINI VIDEO CONNECTION", player);
+      console.log("Close function", showFullCameraControls);
+      if (player && videoType === "OBS") player.handleClose();
+    }
+    /*
     return () => {
       // clean up, close any open RTC connections for OBS video
       console.log("CLOSING MINI VIDEO CONNECTION", player);
       console.log("Close function", showFullCameraControls);
       if (player && videoType === "OBS") player.handleClose();
     };
+    */
   }, [videoSrc, player, lastCommand, videoType, showFullCameraControls]);
 
   return (
