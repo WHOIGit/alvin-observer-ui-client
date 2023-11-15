@@ -31,6 +31,13 @@
       Use in place of the REACT_APP style env variables.
     -->
     <script src="%PUBLIC_URL%/configEnv.js"></script>
+    <script>
+      // disable right click menus for long press functions
+      console.log("disable context menu");
+      document.oncontextmenu = function () {
+        return false;
+      };
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
