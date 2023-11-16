@@ -37,10 +37,6 @@
       document.oncontextmenu = function () {
         return false;
       };
-      
-      document.documentElement.style.webkitUserSelect = 'none'; //added-15nov2023-mjs
-      document.documentElement.style.webkitTouchCallout = 'none'; //added-15nov2023-mjs
-            
     </script>
   </head>
   <body>
