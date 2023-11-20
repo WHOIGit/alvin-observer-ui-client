@@ -79,7 +79,10 @@ export default function LargeVideo({ showFullCameraControls }) {
     } else {
       // remove, close any open RTC connections if open
       console.log("CLOSING LARGE VIDEO CONNECTIONS", player);
-      if (player) player.handleClose();
+      if (player) {
+        player.handleClose();
+        setPlayer(null);
+      }
     }
   }, [observerVideoSrc, player, showFullCameraControls, lastCommand]);
 

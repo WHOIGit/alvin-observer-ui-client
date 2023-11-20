@@ -121,6 +121,11 @@ export default class WebRtcPlayer {
     this.mediastream.addTrack(event.track);
   }
 
+  removeTrack(event) {
+    console.log("remove track", event);
+    this.mediastream.removeTrack(event.track);
+  }
+
   handleClose() {
     console.log("Close the RTCPeerConnection");
     this.webrtc.close();

@@ -71,7 +71,10 @@ export default function MiniVideo({
       // clean up, close any open RTC connections for OBS video
       console.log("CLOSING MINI VIDEO CONNECTION", player);
       console.log("Close function", showFullCameraControls);
-      if (player && videoType === "OBS") player.handleClose();
+      if (player && videoType === "OBS") {
+        player.handleClose();
+        setPlayer(null);
+      }
     }
     /*
     return () => {
