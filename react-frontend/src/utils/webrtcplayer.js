@@ -43,7 +43,7 @@ export default class WebRtcPlayer {
     console.log("webrtc play");
     this.mediastream = new MediaStream();
     this.video.srcObject = this.mediastream;
-
+    this.webrtc.close();
     this.webrtc = new RTCPeerConnection({
       iceServers: [
         {
