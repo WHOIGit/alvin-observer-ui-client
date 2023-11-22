@@ -71,7 +71,6 @@ export default function TopControlPanel({
     <>
       <Grid container spacing={2}>
         <Grid item xs={6}>
-          {/* 
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <MiniVideo
@@ -84,7 +83,7 @@ export default function TopControlPanel({
               {renderDynamicGridBox()}
             </Grid>
           </Grid>
-          */}
+
           <Grid container spacing={0} justify="flex-start" alignItems="center">
             <Grid item xs>
               <Grid container spacing={0}>
