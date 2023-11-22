@@ -72,7 +72,7 @@ export default function MiniVideo({
       console.log("CLOSING MINI VIDEO CONNECTION", player);
       console.log("Close function", showFullCameraControls);
       if (player && videoType === "OBS") {
-        player.handleClose();
+        player.close();
         setPlayer(null);
       }
     }

@@ -31,6 +31,7 @@ export default class WebRtcPlayer {
     });
 
     this.play();
+    this.close();
   }
 
   getStreamUrl() {
@@ -126,7 +127,7 @@ export default class WebRtcPlayer {
     this.mediastream.removeTrack(event.track);
   }
 
-  handleClose() {
+  close() {
     console.log("Close the RTCPeerConnection");
     this.webrtc.close();
   }
