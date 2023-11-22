@@ -22,13 +22,13 @@ export default class WebRtcPlayer {
     this.video.addEventListener("error", () => {
       console.error("video error");
     });
-
+    /*
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         console.log("Document became visible, restarting WebRTC stream.");
         this.play();
       }
-    });
+    }); */
 
     this.play();
     this.close();
