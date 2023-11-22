@@ -80,7 +80,7 @@ export default function LargeVideo({ showFullCameraControls }) {
       // remove, close any open RTC connections if open
       console.log("CLOSING LARGE VIDEO CONNECTIONS", player);
       if (player) {
-        player.close();
+        player.webrtc.close();
         setPlayer(null);
       }
     }
