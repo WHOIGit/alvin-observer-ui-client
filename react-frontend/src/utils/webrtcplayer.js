@@ -31,7 +31,6 @@ export default class WebRtcPlayer {
     }); */
 
     this.play();
-    this.close();
   }
 
   getStreamUrl() {
