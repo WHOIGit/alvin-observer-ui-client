@@ -118,7 +118,7 @@ export default function CameraControlContainer() {
 
       <Grid container spacing={2}>
         <Grid item xs={9}>
-          <LargeVideo />
+          <LargeVideo showFullCameraControls={true} />
         </Grid>
         <Grid item xs={3}>
           <div className={classes.controlsBox}>{renderDynamicGridBox()}</div>
