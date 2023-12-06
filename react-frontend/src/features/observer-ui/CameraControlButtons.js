@@ -23,7 +23,7 @@ export default function CameraControlButtons() {
   const camSettings = useSelector(selectCamHeartbeatData);
   const recordControlsEnabled = useSelector(selectRecordControlsEnabled);
   const { isOwner } = useIsOwner();
-
+  console.log("CAM SETTINGS", camSettings);
   // check to make sure camera has controls and current Observer matches Cam Owner
   // also check if Video Source change has completed before displaying
   if (

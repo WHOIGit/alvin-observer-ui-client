@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 // local imports
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import { VIDEO_STREAM_CONFIG } from "../../config.js";
-import { selectCamHeartbeatData } from "./cameraControlsSlice";
+import { selectLastCommand } from "./cameraControlsSlice";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 
@@ -18,34 +18,73 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function LargeVideo() {
+export default function LargeVideo({ showFullCameraControls }) {
   console.log("Large Video load");
   const classes = useStyles();
   const videoElem = useRef(null);
   const observerVideoSrc = useSelector(
     (state) => state.cameraControls.observerVideoSrc
   );
-  const camSettings = useSelector(selectCamHeartbeatData);
+  const lastCommand = useSelector(selectLastCommand);
   const [player, setPlayer] = useState(null);
 
+  /*
+  // function to get direct stats from the RTCPeerConnection
+  // probably need to put this on a timer to get useful data
+  async function checkVideoStats() {
+    if (player) {
+      const stats = await player.webrtc.getStats();
+      console.log("CHECK STATS");
+      stats.forEach((report) => {
+        console.log(report);
+        if (report.type === "inbound-rtp" && report.kind === "video") {
+          // Log the frame rate
+          console.log(report.framesPerSecond);
+        }
+      });
+    }
+  }
+  checkVideoStats();
+  */
+
   useEffect(() => {
-    if (!player) {
-      // set the player variable
-      console.log("SET VIDEO");
-      if (videoElem.current) {
-        const newPlayer = new WebRtcPlayer(
-          videoElem.current.id,
-          observerVideoSrc /* stream */,
-          "0" /* channel */
-        );
-        setPlayer(newPlayer);
+    if (showFullCameraControls) {
+      console.log("LAST", lastCommand, player);
+      if (!player) {
+        // set the player variable
+        console.log("SET VIDEO", player);
+        if (videoElem.current) {
+          const newPlayer = new WebRtcPlayer(
+            videoElem.current.id,
+            observerVideoSrc /* stream */,
+            "0" /* channel */
+          );
+          setPlayer(newPlayer);
+        }
+      }
+
+      // camera change, refresh video
+      if (player && lastCommand.action.name === "CAM") {
+        // Camera change requested, refresh the connection
+        console.log("REFRESH VIDEO", player);
+        player.play();
+      }
+
+      // check if player webrtc is closed, refresh if needed
+      if (player?.webrtc?.connectionState === "closed") {
+        // Camera change requested, refresh the connection
+        console.log("REFRESH VIDEO", player);
+        player.play();
       }
     } else {
-      // player exists, refresh the connection
-      console.log("REFRESH VIDEO");
-      player.play();
+      // remove, close any open RTC connections if open
+      console.log("CLOSING LARGE VIDEO CONNECTIONS", player);
+      if (player) {
+        player.close();
+        setPlayer(null);
+      }
     }
-  }, [observerVideoSrc, camSettings, player]);
+  }, [observerVideoSrc, player, showFullCameraControls, lastCommand]);
 
   return (
     <div className={classes.root}>

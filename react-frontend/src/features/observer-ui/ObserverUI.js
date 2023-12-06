@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
 import TopControlPanel from "./TopControlPanel";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import {
@@ -15,37 +14,10 @@ import {
   COMMAND_STRINGS,
 } from "../../config";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    //backgroundColor: "#f5f5f5",
-    position: "relative",
-    marginTop: 0,
-    paddingBottom: 0,
-    width: "100%",
-    padding: theme.spacing(2),
-    zIndex: 1000,
-    transition: "all 0.4s",
-  },
-  toggleButton: {
-    position: "absolute",
-    bottom: -Math.abs(theme.spacing(8)),
-    right: theme.spacing(2),
-    zIndex: 2000,
-    transition: "all 0.4s",
-  },
-  toggleButtonOff: {
-    bottom: "-500px",
-  },
-  extendedIcon: {
-    marginRight: theme.spacing(1),
-  },
-}));
-
 export default function ObserverUI({
   showFullCameraControls,
   setShowFullCameraControls,
 }) {
-  const classes = useStyles();
   const dispatch = useDispatch();
 
   // connect to observer side newCameraCommand to get global camera data on first connect,

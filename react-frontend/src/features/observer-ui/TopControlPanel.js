@@ -41,12 +41,14 @@ export default function TopControlPanel({
   setShowFullCameraControls,
 }) {
   const classes = useStyles();
+
   const observerVideoSmallSrc = useSelector(
     (state) => state.cameraControls.observerVideoSmallSrc
   );
   const recordVideoSrc = useSelector(
     (state) => state.cameraControls.recordVideoSrc
   );
+
   const camHeartbeat = useSelector(selectCamHeartbeatData);
   const socketError = useSelector(selectSocketError);
 
@@ -55,7 +57,13 @@ export default function TopControlPanel({
     if (showFullCameraControls) {
       return <TopCameraCommandsList />;
     } else {
-      return <MiniVideo videoSrc={observerVideoSmallSrc} videoType={"OBS"} />;
+      return (
+        <MiniVideo
+          videoSrc={observerVideoSmallSrc}
+          videoType={"OBS"}
+          showFullCameraControls={showFullCameraControls}
+        />
+      );
     }
   };
 
@@ -65,7 +73,11 @@ export default function TopControlPanel({
         <Grid item xs={6}>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <MiniVideo videoSrc={recordVideoSrc} videoType={"REC"} />
+              <MiniVideo
+                videoSrc={recordVideoSrc}
+                videoType={"REC"}
+                showFullCameraControls={showFullCameraControls}
+              />
             </Grid>
             <Grid item xs={6}>
               {renderDynamicGridBox()}

@@ -43,19 +43,14 @@ export default function SelectVideoSource({ showLabel }) {
   const labelText = "SOURCE:";
 
   useEffect(() => {
-    console.log("REQ SRC: ", requestedSource);
-    console.log("Active Camera: ", activeCamera);
-    console.log("ALL CAMERAS", cameras);
     if (requestedSource === activeCamera || requestedSource === null) {
       if (!isOwner) {
         // non-owned camera changes confirm change too fast,
         // add a "fake" delay to UI to show users that camera change is happening
         setTimeout(() => {
-          console.log("ENABLE REC Controls");
           dispatch(setRecordControlsEnabled(true));
         }, 2000);
       } else {
-        console.log("ENABLE REC Controls");
         dispatch(setRecordControlsEnabled(true));
       }
       dispatch(setVideoSourceEnabled(true));

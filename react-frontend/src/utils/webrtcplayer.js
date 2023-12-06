@@ -22,15 +22,16 @@ export default class WebRtcPlayer {
     this.video.addEventListener("error", () => {
       console.error("video error");
     });
-
+    /*
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         console.log("Document became visible, restarting WebRTC stream.");
         this.play();
       }
-    });
+    }); */
 
     this.play();
+    this.close();
   }
 
   getStreamUrl() {
@@ -42,28 +43,35 @@ export default class WebRtcPlayer {
     console.log("webrtc play");
     this.mediastream = new MediaStream();
     this.video.srcObject = this.mediastream;
+    // close any existing connections
+    if (this.webrtc) {
+      this.webrtc.close();
+    }
 
     this.webrtc = new RTCPeerConnection({
-      iceServers: [{
-        urls: ["stun:stun.l.google.com:19302"],
-      }],
-      sdpSemantics: "unified-plan"
+      iceServers: [
+        {
+          urls: ["stun:stun.l.google.com:19302"],
+        },
+      ],
+      sdpSemantics: "unified-plan",
     });
 
     this.webrtc.onnegotiationneeded = this.handleNegotiationNeeded.bind(this);
-    this.webrtc.onsignalingstatechange = this.handleSignalingStateChange.bind(this);
+    this.webrtc.onsignalingstatechange =
+      this.handleSignalingStateChange.bind(this);
     this.webrtc.ontrack = this.handleTrack.bind(this);
 
     this.webrtc.addTransceiver("video", {
-      "direction": "sendrecv",
+      direction: "sendrecv",
     });
   }
 
-  async handleNegotiationNeeded() {    
+  async handleNegotiationNeeded() {
     console.log("handleNegotiationNeeded");
     let offer = await this.webrtc.createOffer({
       offerToReceiveAudio: false,
-      offerToReceiveVideo: true
+      offerToReceiveVideo: true,
     });
     await this.webrtc.setLocalDescription(offer);
   }
@@ -79,29 +87,36 @@ export default class WebRtcPlayer {
           body: formData,
         });
 
-        this.webrtc.setRemoteDescription(new RTCSessionDescription({
-          type: "answer",
-          sdp: atob(await response.text()),
-        }));
+        this.webrtc.setRemoteDescription(
+          new RTCSessionDescription({
+            type: "answer",
+            sdp: atob(await response.text()),
+          })
+        );
 
         break;
 
       case "stable":
         /*
-        * There is no ongoing exchange of offer and answer underway.
-        * This may mean that the RTCPeerConnection object is new, in which case both the localDescription and remoteDescription are null;
-        * it may also mean that negotiation is complete and a connection has been established.
-        */
+         * There is no ongoing exchange of offer and answer underway.
+         * This may mean that the RTCPeerConnection object is new, in which case both the localDescription and remoteDescription are null;
+         * it may also mean that negotiation is complete and a connection has been established.
+         */
         break;
 
       case "closed":
         /*
-        * The RTCPeerConnection has been closed.
-        */
+         * The RTCPeerConnection has been closed.
+         */
+        console.log(
+          `The RTCPeerConnection has been closed: ${this.webrtc.signalingState}`
+        );
         break;
 
       default:
-        console.log(`unhandled signalingState is ${this.webrtc.signalingState}`);
+        console.log(
+          `unhandled signalingState is ${this.webrtc.signalingState}`
+        );
         break;
     }
   }
@@ -109,6 +124,16 @@ export default class WebRtcPlayer {
   handleTrack(event) {
     console.log("handle track");
     this.mediastream.addTrack(event.track);
+  }
+
+  removeTrack(event) {
+    console.log("remove track", event);
+    this.mediastream.removeTrack(event.track);
+  }
+
+  async close() {
+    console.log("Close the RTCPeerConnection");
+    this.webrtc.close();
   }
 
   static setServer(serv) {

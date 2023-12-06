@@ -25,7 +25,7 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>Alvin Pilot UI</title>
+    <title>Alvin Observer UI</title>
     <!--
       support configuring Docker runtime environmental variables in production React build.
       Use in place of the REACT_APP style env variables.
@@ -37,10 +37,6 @@
       document.oncontextmenu = function () {
         return false;
       };
-      
-      document.documentElement.style.webkitUserSelect = 'none'; //added-15nov2023-mjs
-      document.documentElement.style.webkitTouchCallout = 'none'; //added-15nov2023-mjs
-            
     </script>
   </head>
   <body>

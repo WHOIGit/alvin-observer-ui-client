@@ -362,3 +362,6 @@ export const selectImageTransferAcomms = (state) =>
 
 // return socket error status
 export const selectSocketError = (state) => state.cameraControls.socketError;
+
+// return last command
+export const selectLastCommand = (state) => state.cameraControls.lastCommand;
