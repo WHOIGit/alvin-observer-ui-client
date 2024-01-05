@@ -69,6 +69,7 @@ export default function SelectCaptureInterval() {
 
     if (camSettings.capture_interval === "0") {
       setCaptureEnabled(true);
+      setValue(camSettings.capture_interval);
     } else {
       setCaptureEnabled(false);
     }
