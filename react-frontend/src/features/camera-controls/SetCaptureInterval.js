@@ -36,7 +36,10 @@ export default function SelectCaptureInterval() {
   //const camData = useSelector(selectCurrentCamData);
   const camSettings = useSelector(selectCamHeartbeatData);
   const [value, setValue] = useState(null);
+  const [captureEnabled, setCaptureEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+
+  console.log("CAM SETTINGS", camSettings);
 
   const handleValueChange = (event) => {
     setValue(event.target.value);
@@ -86,7 +89,7 @@ export default function SelectCaptureInterval() {
               size="small"
               onClick={handleSendMessage}
             >
-              Start
+              {captureEnabled ? "Start" : "Stop"}
             </Button>
           </div>
         </Grid>
