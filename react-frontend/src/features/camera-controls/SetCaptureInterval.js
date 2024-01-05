@@ -46,10 +46,15 @@ export default function SelectCaptureInterval() {
   };
 
   const handleSendMessage = () => {
+    let payloadValue = value;
+    if (!captureEnabled) {
+      // stop capture interval by sending 0 string to the AIS
+      payloadValue = "0";
+    }
     const payload = {
       action: {
         name: COMMAND_STRINGS.captureIntervalCommand,
-        value: value,
+        value: payloadValue,
       },
     };
     sendMessage(payload);
@@ -60,6 +65,12 @@ export default function SelectCaptureInterval() {
     // changing the current value, needs to wait for button push
     if (value === null) {
       camSettings && setValue(camSettings.capture_interval);
+    }
+
+    if (camSettings.capture_interval === "0") {
+      setCaptureEnabled(true);
+    } else {
+      setCaptureEnabled(false);
     }
   }, [camSettings, value]);
 
@@ -72,6 +83,7 @@ export default function SelectCaptureInterval() {
               id="capture-interval-select"
               onChange={handleValueChange}
               value={value}
+              disabled={!captureEnabled}
             >
               {COMMAND_STRINGS.captureIntervalOptions.map((item) => (
                 <MenuItem value={item} key={item}>
