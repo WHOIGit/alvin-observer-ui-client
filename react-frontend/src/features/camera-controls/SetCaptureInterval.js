@@ -66,14 +66,18 @@ export default function SelectCaptureInterval() {
     if (value === null) {
       camSettings && setValue(camSettings.capture_interval);
     }
+  }, [camSettings, value]);
 
+  useEffect(() => {
+    // only set value from camSettings if null so we can update the select field without
+    // changing the current value, needs to wait for button push
     if (camSettings.capture_interval === "0") {
       setCaptureEnabled(true);
       setValue(camSettings.capture_interval);
     } else {
       setCaptureEnabled(false);
     }
-  }, [camSettings, value]);
+  }, [camSettings]);
 
   return (
     <div className={classes.root}>
