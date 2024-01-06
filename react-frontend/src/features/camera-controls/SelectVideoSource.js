@@ -12,6 +12,8 @@ import {
   selectActiveCamera,
   selectVideoSourceEnabled,
   setRecordControlsEnabled,
+  selectAllCameras,
+  setVideoSourceEnabled,
 } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import useIsOwner from "../../hooks/useIsOwner";
@@ -34,32 +36,30 @@ export default function SelectVideoSource({ showLabel }) {
   const dispatch = useDispatch();
   const activeCamera = useSelector(selectActiveCamera);
   const videoSourceEnabled = useSelector(selectVideoSourceEnabled);
-  const cameras = useSelector((state) => state.cameraControls.availableCameras);
+  const cameras = useSelector(selectAllCameras);
   const [requestedSource, setRequestedSource] = useState(null);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { isOwner } = useIsOwner();
   const labelText = "SOURCE:";
 
   useEffect(() => {
-    console.log("REQ SRC: ", requestedSource);
-    console.log("Active Camera: ", activeCamera);
     if (requestedSource === activeCamera || requestedSource === null) {
       if (!isOwner) {
         // non-owned camera changes confirm change too fast,
         // add a "fake" delay to UI to show users that camera change is happening
         setTimeout(() => {
-          console.log("ENABLE REC Controls");
           dispatch(setRecordControlsEnabled(true));
         }, 2000);
       } else {
-        console.log("ENABLE REC Controls");
         dispatch(setRecordControlsEnabled(true));
       }
+      dispatch(setVideoSourceEnabled(true));
     } else {
       console.log("DISABLE REC Controls");
       dispatch(setRecordControlsEnabled(false));
+      dispatch(setVideoSourceEnabled(false));
     }
-  }, [requestedSource, activeCamera, dispatch, isOwner]);
+  }, [requestedSource, activeCamera, dispatch, isOwner, cameras]);
 
   const handleSendMessage = (event) => {
     const payload = {

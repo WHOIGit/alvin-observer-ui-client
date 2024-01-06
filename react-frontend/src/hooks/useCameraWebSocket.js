@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import socketIOClient from "socket.io-client";
+import formatISO from "date-fns/formatISO";
 import { v4 as uuidv4 } from "uuid";
 import {
   setLastCommand,
@@ -10,10 +11,14 @@ import {
   changeCamHeartbeatPort,
   changeCamHeartbeatStbd,
   changeRecorderHeartbeat,
+  setAllCameras,
   selectObserverSide,
   selectActiveCamera,
   selectWebSocketNamespace,
   addCommandQueue,
+  setRouterOutputs,
+  setRouterInputs,
+  setSocketError,
 } from "../features/camera-controls/cameraControlsSlice";
 import {
   WS_SERVER,
@@ -70,74 +75,105 @@ const useCameraWebSocket = (
   }
 
   useEffect(() => {
-    if (!isEnabled) {
-      return null;
-    }
-    // Creates a WebSocket connection
-    socketRef.current = socketIOClient(WS_SERVER + socketNs, {
-      path: WS_PATH + "socket.io",
-      query: { client: activeSocketNamespace },
-      transports: ["websocket"],
-    });
+    if (isEnabled) {
+      // Creates a WebSocket connection
+      socketRef.current = socketIOClient(WS_SERVER + socketNs, {
+        path: WS_PATH + "socket.io",
+        query: { client: activeSocketNamespace },
+        transports: ["websocket"],
+      });
 
-    // Listens for incoming messages
-    socketRef.current.on(socketEvent, (incomingMessage) => {
-      /*
+      socketRef.current.on("connect", () => {
+        // successful connection, remove any errors
+        console.log("Websocket connected!");
+        dispatch(setSocketError(false));
+      });
+
+      // handle errors
+      socketRef.current.on("connect_error", (err) => {
+        if (err instanceof Error) {
+          dispatch(setSocketError(true));
+        }
+        console.log(err instanceof Error); // true
+        console.log(err.message); // not authorized
+      });
+
+      // Listens for incoming messages
+      socketRef.current.on(socketEvent, (incomingMessage) => {
+        /*
       const incomingMessage = {
         ...message,
         ownedByCurrentUser: message.senderId === socketRef.current.id
       };
        */
 
-      if (socketEvent !== CAM_HEARTBEAT) {
-        //console.log(socketEvent, incomingMessage);
-        setMessages(incomingMessage);
-      }
-
-      // handle NEW_CAMERA_COMMAND_EVENT events here
-      if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
-        console.log("Incoming message");
-        console.log(socketEvent, incomingMessage);
-        // check if message is a Camera Change Package, else it's a Command Receipt
-        if (incomingMessage.hasOwnProperty("current_settings")) {
-          console.log("CAM CHANGE HERE");
-          console.log(socketEvent, incomingMessage);
-          dispatch(changeCurrentCamData(incomingMessage));
-        } else {
-          dispatch(changeCameraSettings(incomingMessage));
+        if (socketEvent !== CAM_HEARTBEAT) {
+          //console.log(socketEvent, incomingMessage);
+          setMessages(incomingMessage);
         }
-      }
 
-      // handle CAM_HEARTBEAT events here
-      if (socketEvent === CAM_HEARTBEAT && nameSpaceOverride) {
-        // set Observer specific heartbeats here for Pilot UI
-        if (nameSpaceOverride === WS_SERVER_NAMESPACE_PORT) {
-          dispatch(changeCamHeartbeatPort(incomingMessage));
-        } else if (nameSpaceOverride === WS_SERVER_NAMESPACE_STARBOARD) {
-          dispatch(changeCamHeartbeatStbd(incomingMessage));
+        // handle NEW_CAMERA_COMMAND_EVENT events here
+        if (socketEvent === NEW_CAMERA_COMMAND_EVENT) {
+          //console.log("Incoming message");
+          //console.log(socketEvent, incomingMessage);
+
+          // check if message is a Camera Change Package
+          // or camera config packages.
+          // Else it's a Command Receipt
+          if (incomingMessage.hasOwnProperty("current_settings")) {
+            console.log("CAM CHANGE HERE");
+            console.log(socketEvent, incomingMessage);
+            dispatch(changeCurrentCamData(incomingMessage));
+          } else if (incomingMessage.hasOwnProperty("camera_array")) {
+            //console.log("GET INITIAL CAMERA CONFIG");
+            //console.log(socketEvent, incomingMessage);
+            dispatch(setAllCameras(incomingMessage.camera_array));
+          } else if (incomingMessage.hasOwnProperty("router_output_array")) {
+            //console.log("GET INITIAL ROUTER OUTPUT CONFIG");
+            //console.log(socketEvent, incomingMessage);
+            dispatch(setRouterOutputs(incomingMessage.router_output_array));
+          } else if (incomingMessage.hasOwnProperty("router_input_array")) {
+            //console.log("GET INITIAL ROUTER INPUT CONFIG");
+            //console.log(socketEvent, incomingMessage);
+            dispatch(setRouterInputs(incomingMessage.router_input_array));
+          } else {
+            dispatch(changeCameraSettings(incomingMessage));
+          }
         }
-      } else if (socketEvent === CAM_HEARTBEAT) {
-        //console.log("INCOMING HEARTBEAT", incomingMessage);
-        dispatch(changeCamHeartbeat(incomingMessage));
-      }
 
-      // handle RECORDER_HEARTBEAT events here
-      if (socketEvent === RECORDER_HEARTBEAT) {
-        dispatch(changeRecorderHeartbeat(incomingMessage));
-      }
-    });
+        // handle CAM_HEARTBEAT events here
+        if (socketEvent === CAM_HEARTBEAT && nameSpaceOverride) {
+          //console.log("INCOMING CAM HEARTBEAT", incomingMessage);
+          // set Observer specific heartbeats here for Pilot UI
+          if (nameSpaceOverride === WS_SERVER_NAMESPACE_PORT) {
+            dispatch(changeCamHeartbeatPort(incomingMessage));
+          } else if (nameSpaceOverride === WS_SERVER_NAMESPACE_STARBOARD) {
+            dispatch(changeCamHeartbeatStbd(incomingMessage));
+          }
+        } else if (socketEvent === CAM_HEARTBEAT) {
+          //console.log("INCOMING CAM HEARTBEAT", incomingMessage);
+          dispatch(changeCamHeartbeat(incomingMessage));
+        }
 
-    // Destroys the socket reference
-    // when the connection is closed
-    return () => {
-      // Emit our custom event
-      socketRef.current.on("disconnect", () => {
-        socketRef.current.emit("disconnectEvent", {
-          client: activeSocketNamespace,
-        });
+        // handle RECORDER_HEARTBEAT events here
+        if (socketEvent === RECORDER_HEARTBEAT) {
+          //console.log("INCOMING REC HEARTBEAT", incomingMessage);
+          dispatch(changeRecorderHeartbeat(incomingMessage));
+        }
       });
-      socketRef.current.disconnect();
-    };
+
+      // Destroys the socket reference
+      // when the connection is closed
+      return () => {
+        // Emit our custom event
+        socketRef.current.on("disconnect", () => {
+          socketRef.current.emit("disconnectEvent", {
+            client: activeSocketNamespace,
+          });
+        });
+        socketRef.current.disconnect();
+      };
+    }
   }, [
     socketEvent,
     dispatch,
@@ -160,11 +196,12 @@ const useCameraWebSocket = (
         eventId: uuidv4(),
         command: observerSideCmd,
         camera: camera,
+        timestamp: formatISO(new Date()),
         ...messageBody,
       };
 
       try {
-        //console.log("Dispatched payload", payload);
+        console.log("Dispatched payload", payload);
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));
         dispatch(addCommandQueue(payload));

@@ -1,9 +1,11 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { useSelector } from "react-redux";
 import { Grid, Paper } from "@material-ui/core";
 import CameraControlButtons from "./CameraControlButtons";
 import LargeVideo from "../camera-controls/LargeVideo";
-
+import ErrorCard from "../camera-controls/ErrorCard";
+import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
 const useStyles = makeStyles((theme) => ({
   root: {
     //backgroundColor: "#f5f5f5",
@@ -28,6 +30,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CameraControls({ showFullCameraControls }) {
   const classes = useStyles();
+  const camHeartbeat = useSelector(selectCamHeartbeatData);
+  console.log("HB", camHeartbeat);
 
   return (
     <div
@@ -37,7 +41,11 @@ export default function CameraControls({ showFullCameraControls }) {
     >
       <Grid container spacing={2}>
         <Grid item xs={9}>
-          <LargeVideo />
+          {camHeartbeat?.focus_mode === "ERR" ? (
+            <ErrorCard />
+          ) : (
+            <LargeVideo showFullCameraControls={showFullCameraControls} />
+          )}
         </Grid>
         <Grid item xs={3}>
           <Paper className={classes.paper}>

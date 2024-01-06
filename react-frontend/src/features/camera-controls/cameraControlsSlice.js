@@ -3,7 +3,6 @@ import { isEqual } from "lodash";
 import { createSelector } from "reselect";
 import {
   COMMAND_STRINGS,
-  CAMERAS,
   VIDEO_STREAM_CONFIG,
   WS_SERVER_NAMESPACE_PORT,
   WS_SERVER_NAMESPACE_STARBOARD,
@@ -29,7 +28,6 @@ const initialState = {
   recorderHeartbeatData: null,
   currentCamData: null,
   lastCommand: null,
-  availableCameras: CAMERAS,
   joystickStatus: null,
   recorderResponseError: false,
   videoSourceEnabled: true,
@@ -38,10 +36,15 @@ const initialState = {
   errorCameraChange: false,
   // array of commands
   commandsQueue: [],
+  allCameras: [],
+  routerOutputs: [],
+  routerInputs: [],
+  imageTransferAcomms: false,
+  socketError: false,
 };
 
-const getCameraConfig = (cameraId) => {
-  const cameraConfig = CAMERAS.find((item) => item.camera === cameraId);
+const getCameraConfig = (cameraId, cameras) => {
+  const cameraConfig = cameras.find((item) => item.camera === cameraId);
   return cameraConfig;
 };
 
@@ -65,24 +68,12 @@ export const cameraControlsSlice = createSlice({
           VIDEO_STREAM_CONFIG.stbdObserverSmallVideo;
         state.recordVideoSrc = VIDEO_STREAM_CONFIG.stbdRecordVideo; //mjs-added-19apr2022
       }
-      // set available cameras
-      /*
-      let availableCameras;
-      if (action.payload === "P") {
-        availableCameras = CAMERAS.filter(item => {
-          return item.owner === "port";
-        });
-      }
-      if (action.payload === "S") {
-        availableCameras = CAMERAS.filter(item => {
-          return item.owner === "stbd";
-        });
-      }
-      state.availableCameras = availableCameras;
-      */
     },
     changeActiveCamera: (state, action) => {
-      const activeCamera = getCameraConfig(action.payload.camera);
+      const activeCamera = getCameraConfig(
+        action.payload.camera,
+        state.allCameras
+      );
       state.activeCamera = activeCamera;
     },
     setLastCommand: (state, action) => {
@@ -105,7 +96,10 @@ export const cameraControlsSlice = createSlice({
             switch (element.action.name) {
               // change observer camera
               case COMMAND_STRINGS.cameraChangeCommand:
-                const activeCamera = getCameraConfig(element.action.value);
+                const activeCamera = getCameraConfig(
+                  element.action.value,
+                  state.allCameras
+                );
                 state.activeCamera = activeCamera;
                 break;
               // change focus mode
@@ -147,6 +141,7 @@ export const cameraControlsSlice = createSlice({
       if (state.initialCamHeartbeat === null) {
         state.initialCamHeartbeat = action.payload;
       }
+
       // get the original state to check Heartbeat data
       const currentState = original(state);
       const camHeartbeatData = action.payload;
@@ -156,6 +151,7 @@ export const cameraControlsSlice = createSlice({
       if (isEqual(currentState.camHeartbeatData, camHeartbeatData)) {
         return state;
       }
+
       state.camHeartbeatData = action.payload;
     },
     changeCamHeartbeatPort: (state, action) => {
@@ -187,7 +183,7 @@ export const cameraControlsSlice = createSlice({
       const currentState = original(state);
       const data = action.payload;
       delete data.eventId;
-      delete data.timestamp;
+      //delete data.timestamp;
       if (isEqual(currentState.recorderHeartbeatData, data)) {
         return state;
       }
@@ -218,6 +214,21 @@ export const cameraControlsSlice = createSlice({
     setErrorCameraChange: (state, action) => {
       state.errorCameraChange = action.payload;
     },
+    setAllCameras: (state, action) => {
+      state.allCameras = action.payload;
+    },
+    setRouterOutputs: (state, action) => {
+      state.routerOutputs = action.payload;
+    },
+    setRouterInputs: (state, action) => {
+      state.routerInputs = action.payload;
+    },
+    setImageTransferAcomms: (state, action) => {
+      state.imageTransferAcomms = action.payload;
+    },
+    setSocketError: (state, action) => {
+      state.socketError = action.payload;
+    },
   },
 });
 
@@ -239,6 +250,11 @@ export const {
   setExposureControlsEnabled,
   setRecordControlsEnabled,
   setErrorCameraChange,
+  setAllCameras,
+  setRouterOutputs,
+  setRouterInputs,
+  setImageTransferAcomms,
+  setSocketError,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -266,12 +282,10 @@ export const selectWebSocketNamespace = (state) =>
 
 // use createSelector to create memoized selector
 // return the current CamHeartbeat data
-//export const selectCamHeartbeatData = createSelector(
-//  (state) => state.cameraControls.camHeartbeatData,
-//  (item) => item
-//);
-export const selectCamHeartbeatData = (state) =>
-  state.cameraControls.camHeartbeatData;
+export const selectCamHeartbeatData = createSelector(
+  (state) => state.cameraControls.camHeartbeatData,
+  (item) => item
+);
 
 // return the Port CamHeartbeat data
 export const selectCamHeartbeatDataPort = (state) =>
@@ -320,6 +334,34 @@ export const selectExposureControlsEnabled = (state) =>
 export const selectRecordControlsEnabled = (state) =>
   state.cameraControls.recordControlsEnabled;
 
-// return error disalb
+// return error disable
 export const selectErrorCameraChange = (state) =>
   state.cameraControls.errorCameraChange;
+
+// return initial camera config values supplied by AIS
+export const selectAllCameras = createSelector(
+  (state) => state.cameraControls.allCameras,
+  (item) => item
+);
+
+// return initial router output values supplied by AIS
+export const selectRouterOutputs = createSelector(
+  (state) => state.cameraControls.routerOutputs,
+  (item) => item
+);
+
+// return initial router input values supplied by AIS
+export const selectRouterInputs = createSelector(
+  (state) => state.cameraControls.routerInputs,
+  (item) => item
+);
+
+// return error disable
+export const selectImageTransferAcomms = (state) =>
+  state.cameraControls.imageTransferAcomms;
+
+// return socket error status
+export const selectSocketError = (state) => state.cameraControls.socketError;
+
+// return last command
+export const selectLastCommand = (state) => state.cameraControls.lastCommand;

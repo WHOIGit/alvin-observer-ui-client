@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Button, CircularProgress } from "@material-ui/core";
+import { Grid, Button, CircularProgress, Checkbox } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
@@ -12,6 +12,8 @@ import {
   selectRecordControlsEnabled,
   selectRecorderHeartbeatData,
   selectCamHeartbeatData,
+  selectAllCameras,
+  selectImageTransferAcomms,
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
@@ -22,6 +24,9 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonWrapper: {
     position: "relative",
+  },
+  imgCheckbox: {
+    paddingLeft: 0,
   },
   buttonProgress: {
     color: green[500],
@@ -39,11 +44,14 @@ export default function CaptureButtons() {
   const recordControlsEnabled = useSelector(selectRecordControlsEnabled);
   const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
   const camSettings = useSelector(selectCamHeartbeatData);
+  const allCameras = useSelector(selectAllCameras);
+  const imageTransfer = useSelector(selectImageTransferAcomms);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const [recordTimer, setRecordTimer] = useState(null);
   const [currentRecordFile, setCurrentRecordFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -82,17 +90,31 @@ export default function CaptureButtons() {
   ]);
 
   const handleSendMessage = (commandName, commandValue) => {
-    const payload = {
-      action: {
-        name: commandName,
-        value: commandValue,
-      },
-    };
+    let payload;
     // If a RECORD SOURCE action, need to send the previous Recording camera name
     if (commandName === COMMAND_STRINGS.recordSourceCommand) {
       // get the camera ID of the currently recording camera
-      const oldCamera = getCameraConfigFromName(recorderHeartbeatData.camera);
-      payload.oldCamera = oldCamera.camera;
+      const oldCamera = getCameraConfigFromName(
+        recorderHeartbeatData.camera,
+        allCameras
+      );
+      payload = {
+        action: {
+          name: commandName,
+          value: commandValue,
+        },
+        oldCamera: oldCamera.camera,
+      };
+    }
+
+    // If a IMG CAPTURE action, need to send checkbox value
+    if (commandName === COMMAND_STRINGS.stillImageCaptureCommand) {
+      payload = {
+        action: {
+          name: commandName,
+          value: { interval: commandValue, imgTransferChecked: imageTransfer },
+        },
+      };
     }
 
     sendMessage(payload);
@@ -132,10 +154,14 @@ export default function CaptureButtons() {
   const handleImgCapture = () => {
     setLoadingImgCapture(true);
     handleSendMessage(COMMAND_STRINGS.stillImageCaptureCommand, 0);
+    // set Video Source menu to be disabled
+    console.log("disabling video source");
+    dispatch(setVideoSourceEnabled(false));
 
     // add a "fake" delay to UI to show users that image capture is processing
     setTimeout(() => {
       setLoadingImgCapture(false);
+      dispatch(setVideoSourceEnabled(true));
     }, 2000);
   };
 
