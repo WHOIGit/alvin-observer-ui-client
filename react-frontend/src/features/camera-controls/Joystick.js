@@ -46,7 +46,7 @@ export default function Joystick() {
     // delay loading of the virtual joystick until CSS transtion ends (.4s)
     setTimeout(() => {
       setShowJoystick(true);
-    }, 800);
+    }, 100); //was 800 - changed to be closer to zoom/focus load 07oct2024-mjs
   }, []);
 
   const sendPanTiltCommand = (commandValue) => {

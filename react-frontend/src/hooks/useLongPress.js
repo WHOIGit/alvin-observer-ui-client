@@ -4,7 +4,7 @@ export default function useLongPress({
   onClick = () => {},
   onLongPress = () => {},
   onStop = () => {},
-  ms = 500,
+  ms = 500, 
 } = {}) {
   const timerRef = useRef(false);
   const eventRef = useRef({});

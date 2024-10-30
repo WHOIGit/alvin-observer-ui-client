@@ -1,6 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Paper, Box } from "@material-ui/core";
+//import { Grid, Paper, Box } from "@material-ui/core";
+import { Grid, Paper, Box, Container } from "@material-ui/core";  //mjs
 import { useSelector } from "react-redux";
 // local
 import ObserverDisplayChip from "./ObserverDisplayChip";
@@ -18,6 +19,10 @@ import {
 } from "../camera-controls/cameraControlsSlice";
 import SocketErrorChip from "./SocketErrorChip";
 
+//import './obs_mini_vid_style.css'; //Testing only - added for gamepad style support - 29may2024 - mjs
+
+
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     padding: theme.spacing(2),
@@ -34,12 +39,38 @@ const useStyles = makeStyles((theme) => ({
   exposureGrid: {
     paddingLeft: theme.spacing(4),
   },
+  
+  //added-mjs
+  obsMiniDisplay: {
+    position: 'relative',
+    //height: 100%,
+    //width: 50%,
+    //max-width: 300px,
+  },
+
+  obsMiniDisplayFront: {
+     position: 'absolute',
+     zIndex: -1, 
+     //top: 50%,
+     //left: 50%, 
+  },
+
+  obsMiniDisplayBack: {
+    position: 'absolute', 
+    zIndex: 1,
+    //top: 50%,
+    //left: 50%,
+  },
+  
 }));
 
 export default function TopControlPanel({
   showFullCameraControls,
   setShowFullCameraControls,
 }) {
+  
+  //console.log("TopControlPanel - Refresh - showFullCameraControls:", showFullCameraControls); //testing - mjs
+  
   const classes = useStyles();
 
   const observerVideoSmallSrc = useSelector(
@@ -51,20 +82,28 @@ export default function TopControlPanel({
 
   const camHeartbeat = useSelector(selectCamHeartbeatData);
   const socketError = useSelector(selectSocketError);
-
+  
+   
   const renderDynamicGridBox = () => {
     if (camHeartbeat?.focus_mode === "ERR") return <ErrorCard />;
-    if (showFullCameraControls) {
-      return <TopCameraCommandsList />;
-    } else {
-      return (
-        <MiniVideo
-          videoSrc={observerVideoSmallSrc}
-          videoType={"OBS"}
-          showFullCameraControls={showFullCameraControls}
-        />
-      );
-    }
+      
+    return (
+      <>
+        <div style={{position: 'relative'}}>
+          <div  style={{position: 'absolute', display: !showFullCameraControls ? 'block' : 'none'}}>
+             <MiniVideo 
+               videoSrc={observerVideoSmallSrc}
+               videoType={"OBS"}
+               showFullCameraControls={showFullCameraControls}                            
+             />             
+          </div> 
+          <div style={{position: 'absolute', display: showFullCameraControls ? 'block' : 'none'}}>
+            <TopCameraCommandsList/>
+          </div>  
+        </div>
+      </>
+    );
+  
   };
 
   return (
@@ -76,8 +115,8 @@ export default function TopControlPanel({
               <MiniVideo
                 videoSrc={recordVideoSrc}
                 videoType={"REC"}
-                showFullCameraControls={showFullCameraControls}
-              />
+                showFullCameraControls={showFullCameraControls}                             
+              />              
             </Grid>
             <Grid item xs={6}>
               {renderDynamicGridBox()}
