@@ -46,6 +46,25 @@ export const COMMAND_STRINGS = {
   stillImageCaptureCommand: "SIC",
   quickClickCommand: "QCV",
   recordSourceCommand: "REC",
+  recordStopCommand: "ST",
+  routerIOCommand: "RTR",
+  whiteBalanceCommand: "WB",
+  whiteBalanceOptions: [
+    "AUTO",
+    "INDOOR",
+    "OUTDOOR",
+    "ONE_PUSH_WB",
+  ],
+  whiteBalanceOnePushCommandValue: "ONE_PUSH_TRIGGER",
+  captureIntervalCommand: "SIC",
+  captureIntervalOptions: [
+    "0",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+  ],
 };
 
 export const VIDEO_STREAM_CONFIG = {
@@ -59,3 +78,7 @@ export const VIDEO_STREAM_CONFIG = {
   pilotVideo: envSettings.PILOT_VIDEO,
   pilotSmallVideo: envSettings.PILOT_SMALL_VIDEO,
 };
+
+// Router controls inputs/outputs
+export const ROUTER_INPUTS = envSettings.ROUTER_INPUTS;
+export const ROUTER_OUTPUTS = envSettings.ROUTER_OUTPUTS;

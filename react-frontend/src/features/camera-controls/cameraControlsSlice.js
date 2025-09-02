@@ -9,13 +9,22 @@ import {
   WS_SERVER_NAMESPACE_PILOT,
 } from "../../config.js";
 
+const envSettings = window;
+
 // set default settings
-const defaultObserverVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
-const defaultObserverVideoSmallSrc = VIDEO_STREAM_CONFIG.portObserverSmallVideo;
-const defaultRecordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo;
+const defaultObserverVideoSrc =
+  window.PILOT_MODE === true
+    ? VIDEO_STREAM_CONFIG.pilotObserverVideo
+    : VIDEO_STREAM_CONFIG.portObserverVideo;
+const defaultObserverVideoSmallSrc =
+  window.PILOT_MODE === true
+    ? VIDEO_STREAM_CONFIG.pilotObserverSmallVideo
+    : VIDEO_STREAM_CONFIG.portObserverSmallVideo;
+const defaultRecordVideoSrc =
+  window.PILOT_MODE === true ? null : VIDEO_STREAM_CONFIG.portRecordVideo;
 
 const initialState = {
-  observerSide: null, // P = Port, S = Starboard, PL = Pilot
+  observerSide: window.PILOT_MODE === true ? "PL" : null, // P = Port, S = Starboard, PL = Pilot
   webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
   observerVideoSrc: defaultObserverVideoSrc,
   observerVideoSmallSrc: defaultObserverVideoSmallSrc,
@@ -59,14 +68,18 @@ export const cameraControlsSlice = createSlice({
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
         state.observerVideoSmallSrc =
           VIDEO_STREAM_CONFIG.portObserverSmallVideo;
-        state.recordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo; //mjs-added-19apr2022
+        if (window.PILOT_MODE !== true) {
+          state.recordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo; //mjs-added-19apr2022
+        }
       }
       if (action.payload === "S") {
         state.webSocketNamespace = WS_SERVER_NAMESPACE_STARBOARD;
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.stbdObserverVideo;
         state.observerVideoSmallSrc =
           VIDEO_STREAM_CONFIG.stbdObserverSmallVideo;
-        state.recordVideoSrc = VIDEO_STREAM_CONFIG.stbdRecordVideo; //mjs-added-19apr2022
+        if (window.PILOT_MODE !== true) {
+          state.recordVideoSrc = VIDEO_STREAM_CONFIG.stbdRecordVideo; //mjs-added-19apr2022
+        }
       }
     },
     changeActiveCamera: (state, action) => {

@@ -10,7 +10,7 @@ services:
     networks:
       webservicenet:
         aliases:
-          - observer-ui
+          - pilot-ui
       default:
     volumes:
       # allows env variables to be injected into production React app after image is built

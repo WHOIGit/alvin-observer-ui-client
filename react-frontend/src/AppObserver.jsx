@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function App() {
+export default function AppObserver() {
   const classes = useStyles();
 
   return (

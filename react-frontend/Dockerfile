@@ -1,8 +1,8 @@
-FROM node:16
+FROM node:18
 
 WORKDIR /app
 #COPY package.json package-lock.json /app/
 COPY . /app
-RUN npm install
+RUN npm install --no-audit --legacy-peer-deps
 
-#CMD npm start
+CMD ["npm", "run", "dev", "--", "--host"]
