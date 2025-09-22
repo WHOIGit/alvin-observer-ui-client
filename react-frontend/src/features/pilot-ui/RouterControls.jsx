@@ -78,13 +78,12 @@ export default function RouterControls() {
     });
 
     return (
-      <Grid item xs={3}>
+      <Grid item xs={3} key={item.value}>
         <Button
           variant="contained"
           color="primary"
           size="small"
           className={btnStyle}
-          key={item.value}
           onClick={() => setInputValue(item.value)}
         >
           {item.label}
@@ -102,13 +101,12 @@ export default function RouterControls() {
     });
 
     return (
-      <Grid item xs={3}>
+      <Grid item xs={3} key={item.value}>
         <Button
           variant="contained"
           color="primary"
           size="small"
           className={btnStyle}
-          key={item.value}
           onClick={() => setOutputValue(item.value)}
         >
           {item.label}
