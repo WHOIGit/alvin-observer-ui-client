@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Card, CardContent } from "@material-ui/core";
-import { v4 as uuidv4 } from "uuid";
 // local import
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import MiniVideoHeader from "./MiniVideoHeader";
@@ -54,7 +53,7 @@ export default function MiniVideo({ videoSrc, observerSide, videoType }) {
           <video
             style={{ width: "100%" }}
             ref={videoElem}
-            id={uuidv4()}
+            id={`${videoType}-${observerSide}-minivideo`}
             autoPlay
             muted
           ></video>
