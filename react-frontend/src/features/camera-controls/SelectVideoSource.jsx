@@ -84,7 +84,7 @@ export default function SelectVideoSource({ showLabel }) {
         <FormControl variant="standard" className={classes.formControl}>
           <Select
             id="video-select"
-            value={activeCamera}
+            value={activeCamera || ""}
             onChange={handleSendMessage}
             displayEmpty
             disabled={!videoSourceEnabled}
