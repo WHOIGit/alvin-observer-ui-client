@@ -127,7 +127,7 @@ export default function RouterControlContainer() {
             <PilotRecordButton observerSide={WS_SERVER_NAMESPACE_PORT} />
           </Grid>
 
-          <Grid>
+          <Grid item xs display="flex" justifyContent="center">
             <div className={classes.buttonWrapper}>
               <Button
                 variant="contained"
