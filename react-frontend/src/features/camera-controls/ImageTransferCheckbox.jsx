@@ -39,7 +39,7 @@ export default function ImageTransferCheckbox() {
           <Checkbox
             onChange={handleCheckboxChange}
             name="imgCapture"
-            state={checkedImg}
+            checked={checkedImg}
             className={classes.imgCheckbox}
             size="small"
           />
