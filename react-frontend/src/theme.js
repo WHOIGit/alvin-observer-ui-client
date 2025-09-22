@@ -3,7 +3,20 @@ import { createTheme } from "@mui/material/styles";
 
 // A custom theme for this app
 const theme = createTheme({
-components: {
+  components: {
+    MuiCardHeader: {
+      styleOverrides: {
+        // In MUIv5, the action element in the card header gained a -4px 
+        // bottom margin. This reverts that change.
+        //
+        // FIXME: This is a temporary fix. The proper fix is probably to embrace
+        // the newer grid system.
+        action: {
+          marginBottom: 0,
+        },
+      },
+    },
+
     MuiCssBaseline: {
       styleOverrides: {
         // In MUI v5, the body font size increased, which caused some issues

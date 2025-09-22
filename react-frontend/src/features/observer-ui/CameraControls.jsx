@@ -39,7 +39,7 @@ export default function CameraControls({ showFullCameraControls }) {
         showFullCameraControls ? "active" : classes.rootCollapse
       }`}
     >
-      <Grid container spacing={2}>
+      <Grid container spacing={2} sx={{ mt: -3 }}>
         <Grid item xs={9}>
           {camHeartbeat?.focus_mode === "ERR" ? (
             <ErrorCard />
