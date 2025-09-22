@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import clsx from "clsx";
 import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Button, Box } from "@material-ui/core";
-import { blue, green, deepOrange } from "@material-ui/core/colors";
+import makeStyles from '@mui/styles/makeStyles';
+import { Grid, Button, Box } from "@mui/material";
+import { blue, green, deepOrange } from "@mui/material/colors";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import ProcessingStatusChip from "./ProcessingStatusChip";
@@ -144,7 +144,6 @@ export default function RouterControls() {
           <Box className={classes.box} mt={2}>
             <Button
               variant="contained"
-              color="default"
               disabled={disabled}
               className={classes.takeButton}
               onClick={() => handleSendMessage()}

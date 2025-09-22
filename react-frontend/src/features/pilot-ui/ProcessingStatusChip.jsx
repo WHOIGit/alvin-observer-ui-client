@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
-import { green, red } from "@material-ui/core/colors";
-import { makeStyles } from "@material-ui/core/styles";
-import Chip from "@material-ui/core/Chip";
-import DoneIcon from "@material-ui/icons/Done";
-import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
+import { green, red } from "@mui/material/colors";
+import makeStyles from '@mui/styles/makeStyles';
+import Chip from "@mui/material/Chip";
+import DoneIcon from "@mui/icons-material/Done";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 // local imports
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { RECORDER_HEARTBEAT } from "../../config.js";

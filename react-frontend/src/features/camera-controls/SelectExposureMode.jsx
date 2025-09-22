@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
   MenuItem,
   Grid,
   FormControl,
   Select,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 // local imports
 import {
   selectCamHeartbeatData,

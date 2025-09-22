@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import { Button, CircularProgress } from "@material-ui/core";
-import { green } from "@material-ui/core/colors";
+import makeStyles from '@mui/styles/makeStyles';
+import { Button, CircularProgress } from "@mui/material";
+import { green } from "@mui/material/colors";
 // local imports
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import {

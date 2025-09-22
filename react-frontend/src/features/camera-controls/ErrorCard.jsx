@@ -1,8 +1,8 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { red } from "@material-ui/core/colors";
-import { Card, CardContent, Chip, Box } from "@material-ui/core";
-import ErrorIcon from "@material-ui/icons/Error";
+import makeStyles from '@mui/styles/makeStyles';
+import { red } from "@mui/material/colors";
+import { Card, CardContent, Chip, Box } from "@mui/material";
+import ErrorIcon from "@mui/icons-material/Error";
 // local import
 
 const useStyles = makeStyles((theme) => ({

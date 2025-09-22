@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import { Button, CircularProgress } from "@material-ui/core";
-import { green } from "@material-ui/core/colors";
-import CenterFocusStrongIcon from "@material-ui/icons/CenterFocusStrong";
+import makeStyles from '@mui/styles/makeStyles';
+import { Button, CircularProgress } from "@mui/material";
+import { green } from "@mui/material/colors";
+import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { selectCamHeartbeatData } from "./cameraControlsSlice";

@@ -1,6 +1,6 @@
 import React from "react";
-import { Container, Box } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Container, Box } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 
 import ObserverUIContainer from "./features/observer-ui/ObserverUIContainer";
 import { SEALOG_URL } from "./config";

@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import { Box, Divider } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Box, Divider } from "@mui/material";
 
 import FocusModeButton from "../camera-controls/FocusModeButton";
 import FocusZoomButtonsGrid from "../camera-controls/FocusZoomButtonsGrid";

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import { FormControlLabel, Checkbox } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { FormControlLabel, Checkbox } from "@mui/material";
 import {
   selectActiveCamera,
   selectVideoSourceEnabled,

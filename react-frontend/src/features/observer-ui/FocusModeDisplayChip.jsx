@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import { Chip } from "@material-ui/core";
-import CenterFocusStrongIcon from "@material-ui/icons/CenterFocusStrong";
+import makeStyles from '@mui/styles/makeStyles';
+import { Chip } from "@mui/material";
+import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 // local
 import { selectCurrentCamData } from "../camera-controls/cameraControlsSlice";
 

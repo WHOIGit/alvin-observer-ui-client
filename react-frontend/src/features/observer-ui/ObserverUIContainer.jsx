@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import { Fab } from "@material-ui/core";
-import CameraAltIcon from "@material-ui/icons/CameraAlt";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
+import makeStyles from '@mui/styles/makeStyles';
+import { Fab } from "@mui/material";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import CameraControls from "./CameraControls";
 import ObserverSideSelect from "./ObserverSideSelect";
 import ObserverUI from "./ObserverUI";
@@ -28,7 +28,11 @@ const useStyles = makeStyles((theme) => ({
   },
   toggleButton: {
     position: "absolute",
-    bottom: -Math.abs(theme.spacing(6)),
+    // Support both numeric and string spacing return types
+    bottom: (() => {
+      const s = theme.spacing(6);
+      return typeof s === 'number' ? -Math.abs(s) : `-${s}`;
+    })(),
     right: theme.spacing(2),
     zIndex: 2000,
     transition: "all 0.4s",

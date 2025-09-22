@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableRow,
   Paper,
   Grid,
-} from "@material-ui/core";
+} from "@mui/material";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import SensorDataDisplay from "./SensorDataDisplay";

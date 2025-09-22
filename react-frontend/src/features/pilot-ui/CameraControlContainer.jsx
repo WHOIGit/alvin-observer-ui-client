@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import { Grid, List, ListItem } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Grid, List, ListItem } from "@mui/material";
 // local
 import LargeVideo from "../camera-controls/LargeVideo";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
@@ -106,7 +106,7 @@ export default function CameraControlContainer() {
 
   return (
     <>
-      <Grid container spacing={2} justify="flex-start" alignItems="center">
+      <Grid container spacing={2} justifyContent="flex-start" alignItems="center">
         <Grid item xs={6}>
           <SelectVideoSource />
         </Grid>

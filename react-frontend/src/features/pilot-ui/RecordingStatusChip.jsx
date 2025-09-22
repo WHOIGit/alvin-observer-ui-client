@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import Chip from "@material-ui/core/Chip";
-import VideocamIcon from "@material-ui/icons/Videocam";
-import VideocamOffIcon from "@material-ui/icons/VideocamOff";
+import makeStyles from '@mui/styles/makeStyles';
+import Chip from "@mui/material/Chip";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 // local imports
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { RECORDER_HEARTBEAT } from "../../config.js";

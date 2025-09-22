@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
   MenuItem,
   FormControl,
   Select,
   Grid,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import {
   selectActiveCamera,
   selectVideoSourceEnabled,

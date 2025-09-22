@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Card, CardContent } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Card, CardContent } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 // local import
 import WebRtcPlayer from "../../utils/webrtcplayer";
