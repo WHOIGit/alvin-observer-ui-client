@@ -38,7 +38,7 @@ export default function UpperRightButtons({
             className={classes.camButton}
             onClick={() => setShowFullCameraControls(!showFullCameraControls)}
           >
-            Goto {showFullCameraControls ? "SEALOG" : "Cam Control"}
+            {showFullCameraControls ? "HIDE CAMERA CONTROL" : "SHOW CAMERA CONTROL"}
           </Button>
         </Grid>
         <CaptureButtons />
