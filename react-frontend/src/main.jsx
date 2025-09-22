@@ -1,5 +1,4 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
 import { ThemeProvider as MuiStylesThemeProvider } from "@mui/styles";
@@ -8,7 +7,8 @@ import App from "./App";
 import theme from "./theme";
 import store from "./store";
 
-ReactDOM.render(
+const root = createRoot(document.getElementById("root"));
+root.render(
   <Provider store={store}>
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
@@ -18,6 +18,5 @@ ReactDOM.render(
         </MuiStylesThemeProvider>
       </ThemeProvider>
     </StyledEngineProvider>
-  </Provider>,
-  document.getElementById("root")
+  </Provider>
 );
