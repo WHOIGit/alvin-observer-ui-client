@@ -17,7 +17,7 @@ export default function ObserverSideSelect() {
   };
 
   return (
-    <FormControl component="fieldset">
+    <FormControl variant="standard" component="fieldset">
       <FormLabel component="legend">Select Observer Side</FormLabel>
       <RadioGroup
         aria-label="observerSide"

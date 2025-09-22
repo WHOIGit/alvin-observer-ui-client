@@ -71,7 +71,7 @@ export default function SelectIsoMode() {
 
   return (
     <div className={classes.root}>
-      <FormControl className={classes.formControl}>
+      <FormControl variant="standard" className={classes.formControl}>
         <Select
           labelId="iso-select-label"
           id="iso-select"

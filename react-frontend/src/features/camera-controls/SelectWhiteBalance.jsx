@@ -75,7 +75,7 @@ export default function SelectWhiteBalance({ showLabel }) {
       )}
 
       <Grid item xs={12}>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="standard" className={classes.formControl}>
           <Select
             id="exposure-select"
             value={camSettings.white_balance}

@@ -81,7 +81,7 @@ export default function SelectVideoSource({ showLabel }) {
       )}
 
       <Grid item xs>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="standard" className={classes.formControl}>
           <Select
             id="video-select"
             value={activeCamera}

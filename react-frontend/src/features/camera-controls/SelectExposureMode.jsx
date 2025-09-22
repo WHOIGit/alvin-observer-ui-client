@@ -95,7 +95,7 @@ export default function SelectExposureMode({ showLabel }) {
       )}
 
       <Grid item xs>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="standard" className={classes.formControl}>
           <Select
             id="exposure-select"
             value={camSettings.exposure}

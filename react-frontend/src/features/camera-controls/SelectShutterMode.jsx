@@ -72,7 +72,7 @@ export default function SelectShutterMode() {
 
   return (
     <div className={classes.root}>
-      <FormControl className={classes.formControl}>
+      <FormControl variant="standard" className={classes.formControl}>
         <Select
           labelId="shutter-select-label"
           id="shutter-select"

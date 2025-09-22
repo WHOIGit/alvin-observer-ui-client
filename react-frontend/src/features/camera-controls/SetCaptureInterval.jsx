@@ -83,7 +83,7 @@ export default function SelectCaptureInterval() {
     <div className={classes.root}>
       <Grid container spacing={2}>
         <Grid item>
-          <FormControl className={classes.formControl}>
+          <FormControl variant="standard" className={classes.formControl}>
             <Select
               id="capture-interval-select"
               onChange={handleValueChange}
