@@ -1,7 +1,7 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useSelector } from "react-redux";
-import { Grid, Paper } from "@material-ui/core";
+import { Grid, Paper } from "@mui/material";
 import CameraControlButtons from "./CameraControlButtons";
 import LargeVideo from "../camera-controls/LargeVideo";
 import ErrorCard from "../camera-controls/ErrorCard";
@@ -39,7 +39,7 @@ export default function CameraControls({ showFullCameraControls }) {
         showFullCameraControls ? "active" : classes.rootCollapse
       }`}
     >
-      <Grid container spacing={2}>
+      <Grid container spacing={2} sx={{ mt: -3 }}>
         <Grid item xs={9}>
           {camHeartbeat?.focus_mode === "ERR" ? (
             <ErrorCard />

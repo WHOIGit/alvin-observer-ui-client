@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
   MenuItem,
   Grid,
@@ -8,7 +8,7 @@ import {
   Select,
   Typography,
   Button,
-} from "@material-ui/core";
+} from "@mui/material";
 // local imports
 import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
@@ -75,7 +75,7 @@ export default function SelectWhiteBalance({ showLabel }) {
       )}
 
       <Grid item xs={12}>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="standard" className={classes.formControl}>
           <Select
             id="exposure-select"
             value={camSettings.white_balance}

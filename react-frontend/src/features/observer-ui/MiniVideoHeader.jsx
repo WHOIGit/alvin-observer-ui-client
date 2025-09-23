@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
-import { CardHeader } from "@material-ui/core";
-import VideocamIcon from "@material-ui/icons/Videocam";
-import VideocamOffIcon from "@material-ui/icons/VideocamOff";
+import makeStyles from '@mui/styles/makeStyles';
+import { CardHeader } from "@mui/material";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 // local import
 import {
   selectActiveCameraConfig,

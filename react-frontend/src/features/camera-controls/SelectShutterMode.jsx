@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { shallowEqual, useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
+import makeStyles from '@mui/styles/makeStyles';
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 import {
   selectCurrentCamData,
   selectCamHeartbeatData,
@@ -72,7 +72,7 @@ export default function SelectShutterMode() {
 
   return (
     <div className={classes.root}>
-      <FormControl className={classes.formControl}>
+      <FormControl variant="standard" className={classes.formControl}>
         <Select
           labelId="shutter-select-label"
           id="shutter-select"

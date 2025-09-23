@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
   MenuItem,
   Grid,
   FormControl,
   Select,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 // local imports
 import {
   selectCamHeartbeatData,
@@ -95,7 +95,7 @@ export default function SelectExposureMode({ showLabel }) {
       )}
 
       <Grid item xs>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="standard" className={classes.formControl}>
           <Select
             id="exposure-select"
             value={camSettings.exposure}

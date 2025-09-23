@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Button, Box, CircularProgress } from "@material-ui/core";
-import { green, red } from "@material-ui/core/colors";
+import makeStyles from '@mui/styles/makeStyles';
+import { Grid, Button, Box, CircularProgress } from "@mui/material";
+import { green, red } from "@mui/material/colors";
 // local
 import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import RouterControls from "./RouterControls";
@@ -127,7 +127,7 @@ export default function RouterControlContainer() {
             <PilotRecordButton observerSide={WS_SERVER_NAMESPACE_PORT} />
           </Grid>
 
-          <Grid>
+          <Grid item xs display="flex" justifyContent="center">
             <div className={classes.buttonWrapper}>
               <Button
                 variant="contained"

@@ -1,7 +1,7 @@
 import React from "react";
 import { parseISO, format } from "date-fns";
 import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableRow,
   Paper,
   Grid,
-} from "@material-ui/core";
+} from "@mui/material";
 // local
 import {
   selectCamHeartbeatData,

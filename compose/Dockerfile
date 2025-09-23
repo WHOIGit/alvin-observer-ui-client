@@ -1,5 +1,5 @@
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:18.17-bullseye AS builder
+FROM node:24-bullseye AS builder
 
 LABEL maintainer="Ethan Andrews <eandrews@whoi.edu>"
 
@@ -20,7 +20,7 @@ RUN npm i npm@latest -g
 
 # Install all node packages
 COPY ./react-frontend/package*.json /app/
-RUN npm install --no-audit --legacy-peer-deps
+RUN npm install --no-audit
 RUN npx update-browserslist-db@latest
 # Copy sources and build
 COPY ./react-frontend /app

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Card, CardContent } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { Card, CardContent } from "@mui/material";
 import { useSelector } from "react-redux";
 // local import
 import WebRtcPlayer from "../../utils/webrtcplayer";

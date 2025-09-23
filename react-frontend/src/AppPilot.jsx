@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { Container } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Container } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import PilotUIContainer from "./features/pilot-ui/PilotUIContainer";
 
 import "@fontsource/roboto";

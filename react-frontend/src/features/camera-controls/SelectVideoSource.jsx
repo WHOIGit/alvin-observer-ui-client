@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
   MenuItem,
   FormControl,
   Select,
   Grid,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import {
   selectActiveCamera,
   selectVideoSourceEnabled,
@@ -81,10 +81,10 @@ export default function SelectVideoSource({ showLabel }) {
       )}
 
       <Grid item xs>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="standard" className={classes.formControl}>
           <Select
             id="video-select"
-            value={activeCamera}
+            value={activeCamera || ""}
             onChange={handleSendMessage}
             displayEmpty
             disabled={!videoSourceEnabled}

@@ -1,7 +1,6 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-//import { Grid, Paper, Box } from "@material-ui/core";
-import { Grid, Paper, Box, Container } from "@material-ui/core";  //mjs
+import makeStyles from '@mui/styles/makeStyles';
+import { Grid, Paper, Box } from "@mui/material";
 import { useSelector } from "react-redux";
 // local
 import ObserverDisplayChip from "./ObserverDisplayChip";
@@ -108,7 +107,7 @@ export default function TopControlPanel({
 
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} sx={{ pb: 1 }}>
         <Grid item xs={6}>
           <Grid container spacing={2}>
             <Grid item xs={6}>
@@ -123,7 +122,7 @@ export default function TopControlPanel({
             </Grid>
           </Grid>
 
-          <Grid container spacing={0} justify="flex-start" alignItems="center">
+          <Grid container spacing={0} justifyContent="flex-start" alignItems="center">
             <Grid item xs>
               <Grid container spacing={0}>
                 <Grid item>
