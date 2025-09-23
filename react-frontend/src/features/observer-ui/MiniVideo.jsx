@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import makeStyles from '@mui/styles/makeStyles';
 import { Card, CardContent } from "@mui/material";
 import { useSelector } from "react-redux";
-import { v4 as uuidv4 } from "uuid";
 // local import
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import MiniVideoHeader from "./MiniVideoHeader";
@@ -132,8 +131,7 @@ export default function MiniVideo({
           <video
             style={{ width: "100%" }}
             ref={videoElem}
-            //id={`${videoType}-minivideo`}
-            id={uuidv4()}
+            id={`${videoType}-minivideo`}
             autoPlay
             playsInline  //fix potential for iOS/safari black screen - mjs
             muted

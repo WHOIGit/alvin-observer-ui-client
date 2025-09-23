@@ -2,8 +2,6 @@ import React, { useRef, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 
-import { v4 as uuidv4 } from "uuid";  //for troubleshooting-28june2024-mjs 
-
 // local imports
 import WebRtcPlayer from "../../utils/webrtcplayer";
 import { VIDEO_STREAM_CONFIG } from "../../config.js";
@@ -145,8 +143,7 @@ export default function LargeVideo({ showFullCameraControls }) {
       <div id="videoBoxMain">
         <video
           style={{ width: "100%" }}
-          //id="videoMain"
-          id={uuidv4()} //mjs
+          id="videoMain"
           ref={videoElem}
           autoPlay
           playsInline  //fix potential iOS black screen - mjs
