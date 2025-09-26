@@ -1,17 +1,19 @@
 import { afterEach, expect, test } from "vitest";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { render, cleanup } from "@testing-library/react";
 import { createIoHarness } from "./socket.io-harness";
-import io from "socket.io-client";
+import sio from "socket.io-client";
 
-// Example of a simple component that creates a socket when mounted and emits
-// an event once connected.
-function SocketHello() {
+function SocketHello({ on_message = (msg: any) => {} }) {
   useEffect(() => {
-    const socket = io("/", { transports: ["websocket"], path: "/socket.io" });
+    const socket = sio("/", { transports: ["websocket"], path: "/socket.io" });
 
     socket.on("connect", () => {
       socket.emit("hello", "world");
+    });
+
+    socket.on("hello", (...args) => {
+      on_message(args);
     });
 
     return () => {
@@ -45,6 +47,32 @@ test("intercepts emitted events", async () => {
   render(<SocketHello />);
 
   expect(await helloP).toMatchObject({ event: "hello", data: ["world"] });
+});
+
+test("allows injection of events", async () => {
+  const connectedP = createIoHarness().waitForConnection();
+
+  let received = 0;
+
+  render(<SocketHello on_message={() => received++} />);
+
+  const { io } = await connectedP;
+
+  // This is *almost* the proper way to emit an event *to* the client.
+  io.client.emit("hello");
+
+  // But wait, the message handler hasn't fired yet. Why not? Because Socket.IO
+  // enqueues processing the incoming message until the next tick.
+  expect(received).not.toEqual(1);
+
+  // Wait a tick, and now the message handler should have fired.
+  await new Promise(process.nextTick);
+  expect(received).toEqual(1);
+
+  // This is also not the way to do it -- this is for emitting to the server an
+  // event which has not actually been emitted by the client. It requires that
+  // a real server is connected.
+  expect(() => io.server.emit("hello", 123)).toThrow();
 });
 
 test("connection event doesn't falsely fire", async () => {
