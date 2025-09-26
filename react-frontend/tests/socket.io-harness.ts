@@ -8,30 +8,27 @@ afterEach(() => {
   resetInterceptor();
 });
 
-export type IoHarness = {
+export type SocketIoHarness = {
   waitForConnection(): Promise<{
-    harness: IoHarness;
+    harness: SocketIoHarness;
     io: ReturnType<typeof toSocketIo>;
     conn: any;
   }>;
   waitForClientEmit(event: string): Promise<{
-    harness: IoHarness;
+    harness: SocketIoHarness;
     event: string;
     data: any[];
   }>;
 };
 
-export function createIoHarness(): IoHarness {
-  let ready: Promise<{ io: any; conn: any }>;
-  let resolveReady!: (v: { io: any; conn: any }) => void;
-  ready = new Promise((res) => (resolveReady = res));
-
-  getInterceptor().on("connection", (conn: any) => {
-    const io = toSocketIo(conn);
-    resolveReady({ io, conn });
+export function createSocketIoHarness(): SocketIoHarness {
+  const ready = new Promise<{ io: any; conn: any }>((resolve) => {
+    getInterceptor().on("connection", (conn: any) => {
+      resolve({ io: toSocketIo(conn), conn });
+    });
   });
 
-  const harness: IoHarness = {
+  const harness: SocketIoHarness = {
     async waitForConnection() {
       const { io, conn } = await ready;
       return { harness, io, conn } as const;

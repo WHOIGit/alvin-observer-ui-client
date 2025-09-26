@@ -7,7 +7,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import cameraControlsReducer, {
   changeCamHeartbeat,
 } from "./cameraControlsSlice.js";
-import { createIoHarness } from "../../../tests/socket.io-harness.js";
+import { createSocketIoHarness } from "../../../tests/socket.io-harness.js";
 import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
 import CaptureButtons from "./CaptureButtons.jsx";
 
@@ -29,7 +29,7 @@ afterEach(() => {
 
 test("emits a record source command on click", async () => {
   const user = userEvent.setup();
-  const emitP = createIoHarness()
+  const emitP = createSocketIoHarness()
     .waitForConnection()
     .then(({ harness }) => harness.waitForClientEmit(NEW_CAMERA_COMMAND_EVENT));
 
@@ -77,7 +77,7 @@ test("emits a record source command on click", async () => {
 
 test("emits a still image capture command on click", async () => {
   const user = userEvent.setup();
-  const emitP = createIoHarness()
+  const emitP = createSocketIoHarness()
     .waitForConnection()
     .then(({ harness }) => harness.waitForClientEmit(NEW_CAMERA_COMMAND_EVENT));
 

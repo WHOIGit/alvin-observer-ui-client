@@ -1,12 +1,12 @@
 import { afterEach, expect, test } from "vitest";
 import React, { useEffect, useState } from "react";
 import { render, cleanup } from "@testing-library/react";
-import { createIoHarness } from "./socket.io-harness";
+import { createSocketIoHarness } from "./socket.io-harness";
 import sio from "socket.io-client";
 
 function SocketHello({ on_message = (msg: any) => {} }) {
   useEffect(() => {
-    const socket = sio("/", { transports: ["websocket"], path: "/socket.io" });
+    const socket = sio("/", { transports: ["websocket"] });
 
     socket.on("connect", () => {
       socket.emit("hello", "world");
@@ -30,7 +30,7 @@ afterEach(() => {
 });
 
 test("intercepts connection", async () => {
-  const connP = createIoHarness().waitForConnection();
+  const connP = createSocketIoHarness().waitForConnection();
 
   render(<SocketHello />);
 
@@ -40,7 +40,7 @@ test("intercepts connection", async () => {
 });
 
 test("intercepts emitted events", async () => {
-  const helloP = createIoHarness()
+  const helloP = createSocketIoHarness()
     .waitForConnection()
     .then(({ harness }) => harness.waitForClientEmit("hello"));
 
@@ -50,7 +50,7 @@ test("intercepts emitted events", async () => {
 });
 
 test("allows injection of events", async () => {
-  const connectedP = createIoHarness().waitForConnection();
+  const connectedP = createSocketIoHarness().waitForConnection();
 
   let received = 0;
 
@@ -77,7 +77,7 @@ test("allows injection of events", async () => {
 
 test("connection event doesn't falsely fire", async () => {
   let connected = false;
-  createIoHarness()
+  createSocketIoHarness()
     .waitForConnection()
     .then(() => (connected = true));
   await new Promise((res) => setTimeout(res, 250));
