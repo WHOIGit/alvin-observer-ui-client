@@ -32,6 +32,7 @@
   "devDependencies": {
     "@mswjs/interceptors": "^0.39.6",
     "@mswjs/socket.io-binding": "^0.2.0",
+    "@testing-library/user-event": "^14.5.2",
     "@testing-library/react": "^16.3.0",
     "@types/react": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.1",

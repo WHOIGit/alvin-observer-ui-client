@@ -1,6 +1,7 @@
 import { afterEach, expect, test } from "vitest";
 import React from "react";
-import { render, cleanup } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import cameraControlsReducer, {
@@ -27,6 +28,7 @@ afterEach(() => {
 });
 
 test("emits a record source command on click", async () => {
+  const user = userEvent.setup();
   const emitP = createIoHarness()
     .waitForConnection()
     .then(({ harness }) => harness.waitForClientEmit(NEW_CAMERA_COMMAND_EVENT));
@@ -62,7 +64,7 @@ test("emits a record source command on click", async () => {
   );
 
   // Click the Record Source button
-  getByText("Record Source").click();
+  await user.click(getByText("Record Source"));
 
   const { data } = await emitP;
   expect(data[0]).toMatchObject({
@@ -74,6 +76,7 @@ test("emits a record source command on click", async () => {
 });
 
 test("emits a still image capture command on click", async () => {
+  const user = userEvent.setup();
   const emitP = createIoHarness()
     .waitForConnection()
     .then(({ harness }) => harness.waitForClientEmit(NEW_CAMERA_COMMAND_EVENT));
@@ -90,7 +93,7 @@ test("emits a still image capture command on click", async () => {
   );
 
   // Click the Still Image Capture button
-  getByText("Still Img Capture").click();
+  await user.click(getByText("Still Img Capture"));
 
   const { data } = await emitP;
   expect(data[0]).toMatchObject({
