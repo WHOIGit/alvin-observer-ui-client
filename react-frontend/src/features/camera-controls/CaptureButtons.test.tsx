@@ -69,6 +69,8 @@ test("emits a record source command on click", async () => {
 
   const { data } = await h.gotCmd;
   expect(data[0]).toMatchObject({
+    camera: "cam-1",
+    oldCamera: "cam-1",  // only in this message
     action: {
       name: COMMAND_STRINGS.recordSourceCommand,
       value: activeCamera.camera,
