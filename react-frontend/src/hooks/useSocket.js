@@ -50,3 +50,26 @@ export function useSocket(namespace = "/") {
     ? entryRef.current.socket
     : getOrCreate(namespace).socket;
 }
+
+export function useSocketListener(namespace = "/", event, callback) {
+  const socket = useSocket(namespace);
+  const callbackRef = useRef(callback);
+
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    const handler = (msg) => {
+      if (callbackRef.current) {
+        callbackRef.current(msg);
+      }
+    };
+    socket.on(event, handler);
+    return () => {
+      try {
+        socket.off(event, handler);
+      } catch (_) {}
+    };
+  }, [socket, event]);
+}
