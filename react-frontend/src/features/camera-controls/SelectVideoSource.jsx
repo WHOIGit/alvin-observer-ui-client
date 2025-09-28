@@ -10,15 +10,16 @@ import {
 } from "@mui/material";
 import {
   selectActiveCamera,
-  selectVideoSourceEnabled,
-  setRecordControlsEnabled,
   selectAllCameras,
+  selectObserverSide,
+  selectVideoSourceEnabled,
+  selectWebSocketUserNamespace,
+  setRecordControlsEnabled,
   setVideoSourceEnabled,
 } from "./cameraControlsSlice";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import useIsOwner from "../../hooks/useIsOwner";
-
-import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { COMMAND_STRINGS } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -38,9 +39,15 @@ export default function SelectVideoSource({ showLabel }) {
   const videoSourceEnabled = useSelector(selectVideoSourceEnabled);
   const cameras = useSelector(selectAllCameras);
   const [requestedSource, setRequestedSource] = useState(null);
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { isOwner } = useIsOwner();
   const labelText = "SOURCE:";
+
+  const userNs = useSelector(selectWebSocketUserNamespace);
+  const observerSide = useSelector(selectObserverSide);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    activeCamera,
+    observerSide,
+  });
 
   useEffect(() => {
     if (requestedSource === activeCamera || requestedSource === null) {
@@ -61,13 +68,12 @@ export default function SelectVideoSource({ showLabel }) {
   }, [requestedSource, activeCamera, dispatch, isOwner, cameras]);
 
   const handleSendMessage = (event) => {
-    const payload = {
+    void emit({
       action: {
         name: COMMAND_STRINGS.cameraChangeCommand,
         value: event.target.value,
       },
-    };
-    sendMessage(payload);
+    });
     setRequestedSource(event.target.value);
   };
 

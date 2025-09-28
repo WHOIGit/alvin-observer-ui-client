@@ -3,19 +3,21 @@ import { useSelector, useDispatch } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import { Grid, Button, CircularProgress, Checkbox } from "@mui/material";
 import { green } from "@mui/material/colors";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
 import {
   selectActiveCameraConfig,
-  setRecorderError,
-  setVideoSourceEnabled,
+  selectAllCameras,
+  selectCamHeartbeatData,
+  selectImageTransferAcomms,
+  selectObserverSide,
   selectRecordControlsEnabled,
   selectRecorderHeartbeatData,
-  selectCamHeartbeatData,
-  selectAllCameras,
-  selectImageTransferAcomms,
+  selectWebSocketUserNamespace,
+  setRecorderError,
+  setVideoSourceEnabled,
 } from "./cameraControlsSlice";
-import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { COMMAND_STRINGS } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   ctrlButton: {
@@ -46,7 +48,14 @@ export default function CaptureButtons() {
   const camSettings = useSelector(selectCamHeartbeatData);
   const allCameras = useSelector(selectAllCameras);
   const imageTransfer = useSelector(selectImageTransferAcomms);
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+
+  const userNs = useSelector(selectWebSocketUserNamespace);
+  const observerSide = useSelector(selectObserverSide);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    activeCamera: activeCamera?.camera,
+    observerSide,
+  });
+
   const [recordTimer, setRecordTimer] = useState(null);
   const [currentRecordFile, setCurrentRecordFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -90,7 +99,6 @@ export default function CaptureButtons() {
   ]);
 
   const handleSendMessage = (commandName, commandValue) => {
-    let payload;
     // If a RECORD SOURCE action, need to send the previous Recording camera name
     if (commandName === COMMAND_STRINGS.recordSourceCommand) {
       // get the camera ID of the currently recording camera
@@ -98,26 +106,24 @@ export default function CaptureButtons() {
         recorderHeartbeatData.camera,
         allCameras
       );
-      payload = {
+      return void emit({
         action: {
           name: commandName,
           value: commandValue,
         },
         oldCamera: oldCamera.camera,
-      };
+      });
     }
 
-    // If a IMG CAPTURE action, need to send checkbox value
+    // If an IMG CAPTURE action, need to send checkbox value
     if (commandName === COMMAND_STRINGS.stillImageCaptureCommand) {
-      payload = {
+      return void emit({
         action: {
           name: commandName,
           value: { interval: commandValue, imgTransferChecked: imageTransfer },
         },
-      };
+      });
     }
-
-    sendMessage(payload);
   };
 
   const handleRecordAction = async () => {

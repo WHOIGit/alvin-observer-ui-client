@@ -1,21 +1,25 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import { Grid, Button, Box, CircularProgress } from "@mui/material";
 import { green, red } from "@mui/material/colors";
 // local
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import RouterControls from "./RouterControls";
 import MiniVideo from "./MiniVideo";
 import {
   VIDEO_STREAM_CONFIG,
   COMMAND_STRINGS,
-  NEW_CAMERA_COMMAND_EVENT,
-  CAM_HEARTBEAT,
   WS_SERVER_NAMESPACE_PORT,
   WS_SERVER_NAMESPACE_STARBOARD,
   WS_SERVER_NAMESPACE_PILOT,
 } from "../../config.js";
 import PilotRecordButton from "../camera-controls/PilotRecordButton";
+import {
+  selectActiveCamera,
+  selectObserverSide,
+  selectWebSocketUserNamespace,
+} from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -44,21 +48,23 @@ const useStyles = makeStyles((theme) => ({
 
 export default function RouterControlContainer() {
   const classes = useStyles();
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
-  // establish web socket connections for all CAM_HEARTBEAT namespaces
-  useCameraWebSocket(CAM_HEARTBEAT);
-  useCameraWebSocket(CAM_HEARTBEAT, true, WS_SERVER_NAMESPACE_PORT);
-  useCameraWebSocket(CAM_HEARTBEAT, true, WS_SERVER_NAMESPACE_STARBOARD);
   const [loading, setLoading] = useState(false);
 
+  const userNs = useSelector(selectWebSocketUserNamespace);
+  const observerSide = useSelector(selectObserverSide);
+  const activeCameraId = useSelector(selectActiveCamera);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    activeCamera: activeCameraId,
+    observerSide,
+  });
+
   const handleSendMessage = (commandName, commandValue) => {
-    const payload = {
+    void emit({
       action: {
         name: commandName,
         value: commandValue,
       },
-    };
-    sendMessage(payload);
+    });
   };
 
   const handleStopRecord = () => {

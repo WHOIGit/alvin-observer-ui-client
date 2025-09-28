@@ -5,9 +5,14 @@ import { Button, CircularProgress } from "@mui/material";
 import { green } from "@mui/material/colors";
 import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 // local
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import { selectCamHeartbeatData } from "./cameraControlsSlice";
-import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { COMMAND_STRINGS } from "../../config.js";
+import {
+  selectActiveCamera,
+  selectObserverSide,
+  selectWebSocketUserNamespace,
+} from "./cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   buttonWrapper: {
@@ -28,7 +33,14 @@ const FocusModeButton = () => {
   const camSettings = useSelector(selectCamHeartbeatData);
   const [currentFocusMode, setCurrentFocusMode] = useState("AF");
   const [loading, setLoading] = useState(false);
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+
+  const userNs = useSelector(selectWebSocketUserNamespace);
+  const observerSide = useSelector(selectObserverSide);
+  const activeCameraId = useSelector(selectActiveCamera);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    activeCamera: activeCameraId,
+    observerSide,
+  });
 
   useEffect(() => {
     if (camSettings !== null) {
@@ -50,13 +62,12 @@ const FocusModeButton = () => {
       commandValue = COMMAND_STRINGS.focusAF;
     }
 
-    const payload = {
+    void emit({
       action: {
         name: commandName,
         value: commandValue,
       },
-    };
-    sendMessage(payload);
+    });
   };
 
   return (

@@ -10,13 +10,15 @@ import {
 } from "@mui/material";
 // local imports
 import {
+  selectActiveCamera,
   selectCamHeartbeatData,
+  selectObserverSide,
+  selectWebSocketUserNamespace,
   setExposureControlsEnabled,
 } from "./cameraControlsSlice";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import useIsOwner from "../../hooks/useIsOwner";
 import { COMMAND_STRINGS } from "../../config.js";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -33,20 +35,27 @@ export default function SelectExposureMode({ showLabel }) {
   const classes = useStyles();
   const dispatch = useDispatch();
   const camSettings = useSelector(selectCamHeartbeatData);
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const { isOwner } = useIsOwner();
   const [expModeRequested, setExpModeRequested] = useState(null);
   const labelText = "EXP MODE:";
   //console.log(camSettings);
 
+  const userNs = useSelector(selectWebSocketUserNamespace);
+  const observerSide = useSelector(selectObserverSide);
+  const activeCameraId = useSelector(selectActiveCamera);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    activeCamera: activeCameraId,
+    observerSide,
+  });
+
   const handleSendMessage = (event) => {
-    const payload = {
+    console.log("TARGET VALUE:", event.target.value);
+    void emit({
       action: {
         name: COMMAND_STRINGS.exposureModeCommand,
         value: event.target.value,
       },
-    };
-    sendMessage(payload);
+    });
     setExpModeRequested(event.target.value);
   };
 

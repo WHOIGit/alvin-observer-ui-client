@@ -14,20 +14,21 @@ import FocusModeButton from "../camera-controls/FocusModeButton";
 import FocusZoomButtonsGrid from "../camera-controls/FocusZoomButtonsGrid";
 import Joystick from "../camera-controls/Joystick";
 import SetCaptureInterval from "../camera-controls/SetCaptureInterval";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import useIsOwner from "../../hooks/useIsOwner";
 import RecordingStatusChip from "./RecordingStatusChip";
 import ErrorCard from "../camera-controls/ErrorCard";
 import {
-  selectInitialCamHeartbeatData,
-  selectActiveCamera,
   changeActiveCamera,
+  selectActiveCamera,
   selectCamHeartbeatData,
+  selectInitialCamHeartbeatData,
+  selectObserverSide,
+  selectWebSocketUserNamespace,
 } from "../camera-controls/cameraControlsSlice";
 
 import {
   CAM_HEARTBEAT,
-  NEW_CAMERA_COMMAND_EVENT,
   COMMAND_STRINGS,
 } from "../../config";
 
@@ -43,12 +44,14 @@ const useStyles = makeStyles((theme) => ({
 export default function CameraControlContainer() {
   const classes = useStyles();
   const dispatch = useDispatch();
-  // connect to pilot CAM_HEARTBEAT, store current cam parameters in Redux state
-  const { messages } = useCameraWebSocket(CAM_HEARTBEAT);
   const { isOwner } = useIsOwner();
 
-  // connect to newCameraCommand
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+  const userNs = useSelector(selectWebSocketUserNamespace);
+  const observerSide = useSelector(selectObserverSide);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    observerSide,
+  });
+
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
   const camSettings = useSelector(selectCamHeartbeatData);
@@ -60,14 +63,13 @@ export default function CameraControlContainer() {
       dispatch(changeActiveCamera(initialCamHeartbeat));
 
       // send camera change command to set available settings options
-      const payload = {
+      void emit({
         camera: initialCamHeartbeat.camera,
         action: {
           name: COMMAND_STRINGS.cameraChangeCommand,
           value: initialCamHeartbeat.camera,
         },
-      };
-      sendMessage(payload);
+      });
     };
 
     // set initial camera state only if activeCamera is undefined
@@ -77,7 +79,7 @@ export default function CameraControlContainer() {
         setInitialCamera();
       }
     }
-  }, [activeCamera, dispatch, initialCamHeartbeat, sendMessage]);
+  }, [activeCamera, dispatch, emit, initialCamHeartbeat]);
 
   const renderDynamicGridBox = () => {
     if (camSettings?.focus_mode === "ERR") return <ErrorCard />;
