@@ -1,22 +1,28 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { Grid } from "@mui/material";
 // local
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useSocketListener } from "../../hooks/useSocket";
 import { SENSOR_HEARTBEAT } from "../../config.js";
 
 export default function SensorDataDisplay() {
-  const { messages } = useCameraWebSocket(SENSOR_HEARTBEAT);
+  const [lastMessage, setLastMessage] = useState(null);
+
+  const handleMessage = useCallback((message) => {
+    setLastMessage(message);
+  }, []);
+
+  useSocketListener("/", SENSOR_HEARTBEAT, handleMessage);
 
   return (
     <Grid container spacing={1} justifyContent="center" alignItems="center">
       <Grid item xs>
-        T1: {messages ? messages?.t1 : "na"} &deg;
+        T1: {lastMessage ? lastMessage?.t1 : "na"} &deg;
       </Grid>
       <Grid item xs>
-        T2: {messages ? messages?.t2 : "na"} &deg;
+        T2: {lastMessage ? lastMessage?.t2 : "na"} &deg;
       </Grid>
       <Grid item xs>
-        T3: {messages ? messages?.t3 : "na"} &deg;
+        T3: {lastMessage ? lastMessage?.t3 : "na"} &deg;
       </Grid>
     </Grid>
   );

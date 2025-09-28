@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import makeStyles from '@mui/styles/makeStyles';
 import {
   Table,
@@ -10,7 +10,7 @@ import {
   Grid,
 } from "@mui/material";
 // local
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useSocketListener } from "../../hooks/useSocket";
 import SensorDataDisplay from "./SensorDataDisplay";
 import { NAV_HEARTBEAT } from "../../config.js";
 
@@ -22,7 +22,13 @@ const useStyles = makeStyles((theme) => ({
 
 export default function NavDataDisplay() {
   const classes = useStyles();
-  const { messages } = useCameraWebSocket(NAV_HEARTBEAT);
+  const [lastMessage, setLastMessage] = useState(null);
+
+  const handleMessage = useCallback((message) => {
+    setLastMessage(message);
+  }, []);
+
+  useSocketListener("/", NAV_HEARTBEAT, handleMessage);
 
   return (
     <div>
@@ -34,7 +40,7 @@ export default function NavDataDisplay() {
                 Altitude
               </TableCell>
               <TableCell align="right">
-                {messages ? messages.alt : "na"} m
+                {lastMessage ? lastMessage.alt : "na"} m
               </TableCell>
             </TableRow>
             <TableRow key="dep">
@@ -42,7 +48,7 @@ export default function NavDataDisplay() {
                 Depth
               </TableCell>
               <TableCell align="right">
-                {messages ? messages?.dep : "na"} m
+                {lastMessage ? lastMessage.dep : "na"} m
               </TableCell>
             </TableRow>
             <TableRow key="hdg">
@@ -50,7 +56,7 @@ export default function NavDataDisplay() {
                 Heading
               </TableCell>
               <TableCell align="right">
-                {messages ? messages?.hdg : "na"} &deg;
+                {lastMessage ? lastMessage.hdg : "na"} &deg;
               </TableCell>
             </TableRow>
             <TableRow key="lat">
@@ -58,7 +64,7 @@ export default function NavDataDisplay() {
                 Lat
               </TableCell>
               <TableCell align="right">
-                {messages ? messages?.lat : "na"}
+                {lastMessage ? lastMessage.lat : "na"}
               </TableCell>
             </TableRow>
             <TableRow key="lon">
@@ -66,7 +72,7 @@ export default function NavDataDisplay() {
                 Lon
               </TableCell>
               <TableCell align="right">
-                {messages ? messages?.lon : "na"}
+                {lastMessage ? lastMessage.lon : "na"}
               </TableCell>
             </TableRow>
             <TableRow key="x-y">
@@ -76,7 +82,7 @@ export default function NavDataDisplay() {
                     X:
                   </Grid>
                   <Grid item xs={9}>
-                    {messages ? messages?.x : "na"}
+                    {lastMessage ? lastMessage.x : "na"}
                   </Grid>
                 </Grid>
               </TableCell>
@@ -86,7 +92,7 @@ export default function NavDataDisplay() {
                     Y:
                   </Grid>
                   <Grid item xs={9}>
-                    {messages ? messages?.y : "na"}
+                    {lastMessage ? lastMessage.y : "na"}
                   </Grid>
                 </Grid>
               </TableCell>

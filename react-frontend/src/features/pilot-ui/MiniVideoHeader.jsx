@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import clsx from "clsx";
 import makeStyles from '@mui/styles/makeStyles';
@@ -12,7 +12,7 @@ import {
   selectCamHeartbeatDataStbd,
   selectAllCameras,
 } from "../camera-controls/cameraControlsSlice";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useSocketListener } from "../../hooks/useSocket";
 import { getCameraConfigFromId } from "../../utils/getCamConfigFromId";
 import { RECORDER_HEARTBEAT } from "../../config.js";
 
@@ -40,21 +40,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function MiniVideoHeader({ observerSide, videoType }) {
-  // only use Web Socket hook for recording sources
-  let hookEnabled = false;
-  if (videoType === "REC") {
-    hookEnabled = true;
-  }
-
   const classes = useStyles();
   const [cameraName, setCameraName] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const { messages } = useCameraWebSocket(
-    RECORDER_HEARTBEAT,
-    true,
-    observerSide,
-    hookEnabled
-  );
+  const [lastMessage, setLastMessage] = useState(null);
+
+  const handleMessage = useCallback((message) => {
+    setLastMessage(message);
+  }, []);
+
+  useSocketListener(`/${observerSide}`, RECORDER_HEARTBEAT, handleMessage);
 
   const allCameras = useSelector(selectAllCameras);
   const activeCameraPilot = useSelector(selectCamHeartbeatData);
@@ -63,14 +58,14 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
 
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
-    [classes.headerRecording]: messages && isRecording, //only when condition === true
+    [classes.headerRecording]: lastMessage && isRecording, //only when condition === true
   });
 
   useEffect(() => {
     if (allCameras.length) {
-      if (videoType === "REC" && messages) {
-        setCameraName(messages.camera);
-        setIsRecording(messages.recording === "true");
+      if (videoType === "REC" && lastMessage) {
+        setCameraName(lastMessage.camera);
+        setIsRecording(lastMessage.recording === "true");
       } else if (videoType === "OBS" || videoType === "PILOT") {
         if (observerSide === "port" && activeCameraPort) {
           const camera = getCameraConfigFromId(
@@ -94,13 +89,13 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
       }
     }
   }, [
-    messages,
-    observerSide,
-    videoType,
+    activeCameraPilot,
     activeCameraPort,
     activeCameraStbd,
-    activeCameraPilot,
     allCameras,
+    lastMessage,
+    observerSide,
+    videoType,
   ]);
 
   let title = videoType + ": " + cameraName;
