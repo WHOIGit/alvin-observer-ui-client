@@ -7,7 +7,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import cameraControlsReducer, {
   changeCamHeartbeat,
 } from "./cameraControlsSlice.js";
-import { createSocketIoHarness } from "../../../tests/socket.io-harness.js";
+import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
 import CaptureButtons from "./CaptureButtons.jsx";
 
@@ -29,9 +29,9 @@ afterEach(() => {
 
 test("emits a record source command on click", async () => {
   const user = userEvent.setup();
-  const emitP = createSocketIoHarness()
-    .waitForConnection()
-    .then(({ harness }) => harness.waitForClientEmit(NEW_CAMERA_COMMAND_EVENT));
+  const h = createSocketIoHarness((h, expectEmit) => {
+    h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
+  });
 
   // Initialize the Redux store with recorder heartbeat and camera configs so
   // Record Source can build a proper payload.
@@ -64,9 +64,10 @@ test("emits a record source command on click", async () => {
   );
 
   // Click the Record Source button
+  await h.connected;
   await user.click(getByText("Record Source"));
 
-  const { data } = await emitP;
+  const { data } = await h.gotCmd;
   expect(data[0]).toMatchObject({
     action: {
       name: COMMAND_STRINGS.recordSourceCommand,
@@ -77,9 +78,9 @@ test("emits a record source command on click", async () => {
 
 test("emits a still image capture command on click", async () => {
   const user = userEvent.setup();
-  const emitP = createSocketIoHarness()
-    .waitForConnection()
-    .then(({ harness }) => harness.waitForClientEmit(NEW_CAMERA_COMMAND_EVENT));
+  const h = createSocketIoHarness((h, expectEmit) => {
+    h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
+  });
 
   // Initialize the Redux store and set the focus mode because this bypasses
   // the guard in CaptureButtons that checks that the camera is "active".
@@ -93,9 +94,10 @@ test("emits a still image capture command on click", async () => {
   );
 
   // Click the Still Image Capture button
+  await h.connected;
   await user.click(getByText("Still Img Capture"));
 
-  const { data } = await emitP;
+  const { data } = await h.gotCmd;
   expect(data[0]).toMatchObject({
     action: { name: COMMAND_STRINGS.stillImageCaptureCommand },
   });

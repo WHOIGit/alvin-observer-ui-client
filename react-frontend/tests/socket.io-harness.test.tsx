@@ -4,7 +4,11 @@ import { render, cleanup } from "@testing-library/react";
 import { createSocketIoHarness } from "./socket.io-harness";
 import sio from "socket.io-client";
 
-function SocketHello({ on_message = (msg: any) => {} }) {
+type SocketHelloProps = {
+  onMessage?: (msg: any) => void;
+};
+
+function SocketHello({ onMessage }: SocketHelloProps) {
   useEffect(() => {
     const socket = sio("/", { transports: ["websocket"] });
 
@@ -13,7 +17,7 @@ function SocketHello({ on_message = (msg: any) => {} }) {
     });
 
     socket.on("hello", (...args) => {
-      on_message(args);
+      onMessage?.(args);
     });
 
     return () => {
@@ -30,36 +34,38 @@ afterEach(() => {
 });
 
 test("intercepts connection", async () => {
-  const connP = createSocketIoHarness().waitForConnection();
+  const h = createSocketIoHarness();
 
   render(<SocketHello />);
 
-  const { io, conn } = await connP;
-  expect(io).toBeDefined();
-  expect(conn).toBeDefined();
+  await h.connected;
 });
 
 test("intercepts emitted events", async () => {
-  const helloP = createSocketIoHarness()
-    .waitForConnection()
-    .then(({ harness }) => harness.waitForClientEmit("hello"));
+  const h = createSocketIoHarness((h, expectEmit) => {
+    h.gotHello = expectEmit("hello");
+  });
 
   render(<SocketHello />);
 
-  expect(await helloP).toMatchObject({ event: "hello", data: ["world"] });
+  await h.connected;
+  await expect(h.gotHello).resolves.toMatchObject({
+    event: "hello",
+    data: ["world"],
+  });
 });
 
 test("allows injection of events", async () => {
-  const connectedP = createSocketIoHarness().waitForConnection();
+  const h = createSocketIoHarness();
 
   let received = 0;
 
-  render(<SocketHello on_message={() => received++} />);
+  render(<SocketHello onMessage={() => received++} />);
 
-  const { io } = await connectedP;
+  await h.connected;
 
-  // This is *almost* the proper way to emit an event *to* the client.
-  io.client.emit("hello");
+  // Proper way to emit an event to the client
+  h.emit("hello");
 
   // But wait, the message handler hasn't fired yet. Why not? Because Socket.IO
   // enqueues processing the incoming message until the next tick.
@@ -68,18 +74,11 @@ test("allows injection of events", async () => {
   // Wait a tick, and now the message handler should have fired.
   await new Promise(process.nextTick);
   expect(received).toEqual(1);
-
-  // This is also not the way to do it -- this is for emitting to the server an
-  // event which has not actually been emitted by the client. It requires that
-  // a real server is connected.
-  expect(() => io.server.emit("hello", 123)).toThrow();
 });
 
 test("connection event doesn't falsely fire", async () => {
   let connected = false;
-  createSocketIoHarness()
-    .waitForConnection()
-    .then(() => (connected = true));
+  createSocketIoHarness().connected.then(() => (connected = true));
   await new Promise((res) => setTimeout(res, 250));
   expect(connected).toBe(false);
 });
