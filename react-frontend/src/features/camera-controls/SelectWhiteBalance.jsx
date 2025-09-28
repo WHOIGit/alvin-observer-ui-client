@@ -10,10 +10,14 @@ import {
   Button,
 } from "@mui/material";
 // local imports
-import { selectCamHeartbeatData } from "./cameraControlsSlice";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import {
+  selectActiveCamera,
+  selectCamHeartbeatData,
+  selectObserverSide,
+  selectWebSocketNamespace,
+} from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -33,27 +37,32 @@ const useStyles = makeStyles((theme) => ({
 export default function SelectWhiteBalance({ showLabel }) {
   const classes = useStyles();
   const camSettings = useSelector(selectCamHeartbeatData);
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const labelText = "WHITE BALANCE:";
 
+  const userNs = useSelector(selectWebSocketNamespace);
+  const observerSide = useSelector(selectObserverSide);
+  const activeCameraId = useSelector(selectActiveCamera);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    activeCamera: activeCameraId,
+    observerSide,
+  });
+
   const handleSendMessage = (event) => {
-    const payload = {
+    void emit({
       action: {
         name: COMMAND_STRINGS.whiteBalanceCommand,
         value: event.target.value,
       },
-    };
-    sendMessage(payload);
+    });
   };
 
   const handleOnePushMessage = () => {
-    const payload = {
+    void emit({
       action: {
         name: COMMAND_STRINGS.whiteBalanceCommand,
-        value: COMMAND_STRINGS.whiteBalanceOnePushCommandValue
+        value: COMMAND_STRINGS.whiteBalanceOnePushCommandValue,
       },
-    };
-    sendMessage(payload);
+    });
   };
 
   // set up label options

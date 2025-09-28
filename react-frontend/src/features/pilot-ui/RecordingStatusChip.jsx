@@ -6,9 +6,10 @@ import Chip from "@mui/material/Chip";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 // local imports
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { RECORDER_HEARTBEAT } from "../../config.js";
-import { selectActiveCameraConfig } from "../camera-controls/cameraControlsSlice";
+import {
+  selectActiveCameraConfig,
+  selectRecorderHeartbeatData,
+} from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function RecordingStatusChip() {
   const classes = useStyles();
-  const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
+  const lastMessage = useSelector(selectRecorderHeartbeatData);
   const activeCameraConfig = useSelector(selectActiveCameraConfig);
   const [isRecording, setIsRecording] = useState(false);
 
@@ -34,15 +35,15 @@ export default function RecordingStatusChip() {
   });
 
   useEffect(() => {
-    if (messages && activeCameraConfig) {
+    if (lastMessage && activeCameraConfig) {
       // get list of recording cameras from Pilot Heartbeat
       let recordingCams = [];
-      if (messages.port_recording === "true") {
-        recordingCams.push(messages.port_camera);
+      if (lastMessage.port_recording === "true") {
+        recordingCams.push(lastMessage.port_camera);
       }
 
-      if (messages.stbd_recording === "true") {
-        recordingCams.push(messages.stbd_camera);
+      if (lastMessage.stbd_recording === "true") {
+        recordingCams.push(lastMessage.stbd_camera);
       }
 
       if (recordingCams.includes(activeCameraConfig.cam_name)) {
@@ -51,7 +52,7 @@ export default function RecordingStatusChip() {
         setIsRecording(false);
       }
     }
-  }, [messages, activeCameraConfig]);
+  }, [lastMessage, activeCameraConfig]);
   return (
     <div>
       <Chip

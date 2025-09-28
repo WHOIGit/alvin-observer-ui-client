@@ -1,17 +1,20 @@
 import React, { useState } from "react";
-import clsx from "clsx";
 import { useSelector } from "react-redux";
+import clsx from "clsx";
 import makeStyles from '@mui/styles/makeStyles';
 import { Grid, Button, Box } from "@mui/material";
 import { blue, green, deepOrange } from "@mui/material/colors";
 // local
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import ProcessingStatusChip from "./ProcessingStatusChip";
 import {
+  selectActiveCamera,
+  selectObserverSide,
   selectRouterInputs,
   selectRouterOutputs,
+  selectWebSocketNamespace,
 } from "../camera-controls/cameraControlsSlice";
-import { COMMAND_STRINGS, NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { COMMAND_STRINGS } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -45,7 +48,15 @@ export default function RouterControls() {
 
   const [inputValue, setInputValue] = useState(null);
   const [outputValue, setOutputValue] = useState(null);
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+
+  const userNs = useSelector(selectWebSocketNamespace);
+  const observerSide = useSelector(selectObserverSide);
+  const activeCameraId = useSelector(selectActiveCamera);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    activeCamera: activeCameraId,
+    observerSide,
+  });
+
   const routerInputs = useSelector(selectRouterInputs);
   const routerOutputs = useSelector(selectRouterOutputs);
   console.log(routerOutputs, routerInputs);
@@ -53,13 +64,12 @@ export default function RouterControls() {
   // disable Take button until both values have been selected
   const disabled = !inputValue || !outputValue;
   const handleSendMessage = () => {
-    const payload = {
+    void emit({
       action: {
         name: COMMAND_STRINGS.routerIOCommand,
         value: { input: inputValue, output: outputValue },
       },
-    };
-    sendMessage(payload);
+    });
     // reset local values
     setInputValue(null);
     setOutputValue(null);

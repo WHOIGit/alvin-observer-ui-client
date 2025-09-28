@@ -4,13 +4,14 @@ import makeStyles from '@mui/styles/makeStyles';
 import { Button, CircularProgress } from "@mui/material";
 import { green } from "@mui/material/colors";
 // local imports
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import {
   selectCamHeartbeatDataPort,
   selectCamHeartbeatDataStbd,
+  selectObserverSide,
+  selectWebSocketNamespace,
 } from "./cameraControlsSlice";
 import {
-  NEW_CAMERA_COMMAND_EVENT,
   COMMAND_STRINGS,
   WS_SERVER_NAMESPACE_STARBOARD,
 } from "../../config";
@@ -32,10 +33,15 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PilotRecordButton({ observerSide }) {
   const classes = useStyles();
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const activeCameraPort = useSelector(selectCamHeartbeatDataPort);
   const activeCameraStbd = useSelector(selectCamHeartbeatDataStbd);
   const [loading, setLoading] = useState(false);
+
+  const userNs = useSelector(selectWebSocketNamespace);
+  const globalObserverSide = useSelector(selectObserverSide);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    observerSide: globalObserverSide,
+  });
 
   let activeCamera = activeCameraPort;
   if (observerSide === WS_SERVER_NAMESPACE_STARBOARD) {
@@ -43,14 +49,13 @@ export default function PilotRecordButton({ observerSide }) {
   }
 
   const handleSendMessage = () => {
-    const payload = {
+    void emit({
       action: {
         name: COMMAND_STRINGS.recordSourceCommand,
         value: activeCamera.camera,
       },
       observerSideOverride: observerSide,
-    };
-    sendMessage(payload);
+    });
   };
 
   const handleRecordAction = () => {

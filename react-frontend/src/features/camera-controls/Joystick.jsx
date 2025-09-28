@@ -3,14 +3,16 @@ import { useSelector, useDispatch } from "react-redux";
 import ReactNipple from "react-nipple";
 import makeStyles from '@mui/styles/makeStyles';
 import { Box, Typography } from "@mui/material";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import {
-  setJoystickStatus,
-  selectJoystickStatus,
+  selectActiveCamera,
   selectCamHeartbeatData,
+  selectJoystickStatus,
+  selectObserverSide,
+  selectWebSocketNamespace,
+  setJoystickStatus,
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,8 +27,15 @@ export default function Joystick() {
   const joystickStatus = useSelector(selectJoystickStatus);
   const camSettings = useSelector(selectCamHeartbeatData);
   const [isEnabled, setIsEnabled] = useState(true);
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
   const [showJoystick, setShowJoystick] = useState(false);
+
+  const userNs = useSelector(selectWebSocketNamespace);
+  const observerSide = useSelector(selectObserverSide);
+  const activeCameraId = useSelector(selectActiveCamera);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    activeCamera: activeCameraId,
+    observerSide,
+  });
 
   useEffect(() => {
     // disable joystick if camera has no pan/tilt controls
@@ -52,14 +61,13 @@ export default function Joystick() {
   const sendPanTiltCommand = (commandValue) => {
     // add timestamp to command sent to imaging server for debug
     const timestamp = new Date().toISOString();
-    const payload = {
+    void emit({
       action: {
         name: COMMAND_STRINGS.panTiltCommand,
         value: commandValue,
         timestamp: timestamp,
       },
-    };
-    sendMessage(payload);
+    });
   };
 
   // the joystickSpitter is a ref object that tracks the state of the timer

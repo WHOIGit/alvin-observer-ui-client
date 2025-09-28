@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import {
-  selectCurrentCamData,
+  selectActiveCamera,
   selectCamHeartbeatData,
+  selectCurrentCamData,
   selectExposureControlsEnabled,
+  selectObserverSide,
+  selectWebSocketNamespace,
 } from "./cameraControlsSlice";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
 import { COMMAND_STRINGS } from "../../config.js";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { useSelector } from "react-redux";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,16 +32,22 @@ export default function SelectIsoMode() {
   const camSettings = useSelector(selectCamHeartbeatData);
   const controlEnabled = useSelector(selectExposureControlsEnabled);
   const [isEnabled, setIsEnabled] = useState(true);
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+
+  const userNs = useSelector(selectWebSocketNamespace);
+  const observerSide = useSelector(selectObserverSide);
+  const activeCameraId = useSelector(selectActiveCamera);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    activeCamera: activeCameraId,
+    observerSide,
+  });
 
   const handleSendMessage = (event) => {
-    const payload = {
+    void emit({
       action: {
         name: COMMAND_STRINGS.isoModeCommand,
         value: event.target.value,
       },
-    };
-    sendMessage(payload);
+    });
   };
 
   useEffect(() => {

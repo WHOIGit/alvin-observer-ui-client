@@ -10,10 +10,14 @@ import {
   Typography,
 } from "@mui/material";
 // local imports
-import { selectCamHeartbeatData } from "./cameraControlsSlice";
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
+import {
+  selectActiveCamera,
+  selectCamHeartbeatData,
+  selectObserverSide,
+  selectWebSocketNamespace,
+ } from "./cameraControlsSlice";
+import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import { COMMAND_STRINGS } from "../../config.js";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,25 +41,27 @@ export default function SelectCaptureInterval() {
   const camSettings = useSelector(selectCamHeartbeatData);
   const [value, setValue] = useState(null);
   const [captureEnabled, setCaptureEnabled] = useState(true);
-  const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
+
+  const userNs = useSelector(selectWebSocketNamespace);
+  const observerSide = useSelector(selectObserverSide);
+  const activeCameraId = useSelector(selectActiveCamera);
+  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+    activeCamera: activeCameraId,
+    observerSide,
+  });
 
   const handleValueChange = (event) => {
     setValue(event.target.value);
   };
 
   const handleSendMessage = () => {
-    let payloadValue = value;
-    if (!captureEnabled) {
-      // stop capture interval by sending 0 string to the AIS
-      payloadValue = "0";
-    }
-    const payload = {
+    // stop capture interval by sending 0 string to the AIS
+    void emit({
       action: {
         name: COMMAND_STRINGS.captureIntervalCommand,
-        value: payloadValue,
+        value: captureEnabled ? value : "0",
       },
-    };
-    sendMessage(payload);
+    });
   };
 
   useEffect(() => {

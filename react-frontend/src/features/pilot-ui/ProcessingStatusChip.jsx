@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import clsx from "clsx";
 import { green, red } from "@mui/material/colors";
 import makeStyles from '@mui/styles/makeStyles';
@@ -6,8 +7,7 @@ import Chip from "@mui/material/Chip";
 import DoneIcon from "@mui/icons-material/Done";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 // local imports
-import useCameraWebSocket from "../../hooks/useCameraWebSocket";
-import { RECORDER_HEARTBEAT } from "../../config.js";
+import { selectRecorderHeartbeatData } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ProcessingStatusChip() {
   const classes = useStyles();
-  const { messages } = useCameraWebSocket(RECORDER_HEARTBEAT);
+  const lastMessage = useSelector(selectRecorderHeartbeatData);
   const [isProcessingComplete, setIsProcessingComplete] = useState(false);
 
   const chipStyle = clsx({
@@ -39,12 +39,12 @@ export default function ProcessingStatusChip() {
   });
 
   useEffect(() => {
-    if (messages?.processing_complete === "true") {
+    if (lastMessage?.processing_complete === "true") {
       setIsProcessingComplete(true);
     } else {
       setIsProcessingComplete(false);
     }
-  }, [messages]);
+  }, [lastMessage]);
   return (
     <div className={classes.root}>
       <Chip
