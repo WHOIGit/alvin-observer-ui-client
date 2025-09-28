@@ -1,8 +1,9 @@
 import { afterEach, expect, test } from "vitest";
-import React from "react";
+import React, { useEffect } from "react";
 import { cleanup, render } from "@testing-library/react";
+import { act } from "@testing-library/react";
 import { createSocketIoHarness } from "../../tests/socket.io-harness";
-import { useSocket } from "./useSocket";
+import { useSocket, useSocketListener } from "./useSocket";
 
 afterEach(() => cleanup());
 
@@ -48,4 +49,42 @@ test("useSocket shares one connection per namespace and refcounts", async () => 
     new Promise((res) => setTimeout(() => res("timeout"), 50)),
   ]);
   await expect(timed).resolves.toBe("timeout");
+});
+
+function Listener({
+  event,
+  onMessage,
+}: {
+  event: string;
+  onMessage: (m: any) => void;
+}) {
+  const { lastMessage } = useSocketListener("/", event);
+  useEffect(() => {
+    if (lastMessage) onMessage(lastMessage);
+  }, [lastMessage, onMessage]);
+  return null;
+}
+
+test("useSocketListener attaches and cleans up event handler", async () => {
+  const h = createSocketIoHarness();
+  let received = 0;
+
+  const { unmount } = render(
+    <Listener event="foo:event" onMessage={() => received++} />
+  );
+
+  await h.connected;
+  await act(async () => {
+    h.emit("foo:event", { a: 1 });
+    await new Promise((r) => setTimeout(r, 0));
+  });
+  expect(received).toBe(1);
+
+  // Unmount and emit again; should not trigger
+  unmount();
+  await act(async () => {
+    h.emit("foo:event", { a: 2 });
+    await new Promise((r) => setTimeout(r, 0));
+  });
+  expect(received).toBe(1);
 });

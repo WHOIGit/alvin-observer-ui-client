@@ -50,3 +50,20 @@ export function useSocket(namespace = "/") {
     ? entryRef.current.socket
     : getOrCreate(namespace).socket;
 }
+
+export function useSocketListener(namespace = "/", event) {
+  const socket = useSocket(namespace);
+  const [lastMessage, setLastMessage] = useState(null);
+
+  useEffect(() => {
+    const handler = (msg) => setLastMessage(msg);
+    socket.on(event, handler);
+    return () => {
+      try {
+        socket.off(event, handler);
+      } catch (_) {}
+    };
+  }, [socket, event]);
+
+  return { lastMessage };
+}
