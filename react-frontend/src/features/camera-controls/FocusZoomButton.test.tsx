@@ -49,13 +49,16 @@ test("emits step focus once on click", async () => {
       activeFocusZoomButton={null}
       sendActiveFocusZoomButtonToParent={() => null}
     />,
-    { store }
+    { store },
   );
 
   await h.connected;
   await user.click(getByText("Focus Near"));
 
-  expect((await h.step).data[0]).toMatchObject({
+  expect((await h.step).data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
     action: {
       name: COMMAND_STRINGS.focusControlCommand,
       value: COMMAND_STRINGS.focusNearOneStop,
@@ -94,7 +97,7 @@ test("emits continuous focus on long press", async () => {
       activeFocusZoomButton={null}
       sendActiveFocusZoomButtonToParent={() => null}
     />,
-    { store }
+    { store },
   );
 
   await h.connected;
@@ -104,7 +107,10 @@ test("emits continuous focus on long press", async () => {
   await user.pointer({ target: btn, keys: "[MouseLeft>]" });
   await new Promise((r) => setTimeout(r, 600)); // > 500ms threshold
 
-  expect((await h.start).data[0]).toMatchObject({
+  expect((await h.start).data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
     action: {
       name: COMMAND_STRINGS.focusControlCommand,
       value: COMMAND_STRINGS.focusNearContinuos,
@@ -113,7 +119,10 @@ test("emits continuous focus on long press", async () => {
 
   await user.pointer({ target: btn, keys: "[/MouseLeft]" });
 
-  expect((await h.stop).data[0]).toMatchObject({
+  expect((await h.stop).data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
     action: {
       name: COMMAND_STRINGS.focusControlCommand,
       value: COMMAND_STRINGS.focusStop,

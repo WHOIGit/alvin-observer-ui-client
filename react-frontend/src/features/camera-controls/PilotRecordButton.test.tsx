@@ -33,15 +33,17 @@ test.each([
     side: WS_SERVER_NAMESPACE_PORT,
     label: /Record port Source/i,
     expected: "cam-port",
+    command: "COVP",
   },
   {
     side: WS_SERVER_NAMESPACE_STARBOARD,
     label: /Record stbd Source/i,
     expected: "cam-stbd",
+    command: "COVS",
   },
 ])(
   "emits REC payload with observerSideOverride %s",
-  async ({ side, label, expected }) => {
+  async ({ side, label, expected, command }) => {
     const user = userEvent.setup();
     const h = createSocketIoHarness((h, expectEmit) => {
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
@@ -67,7 +69,11 @@ test.each([
     await user.click(getByText(label));
 
     const { data } = await h.gotCmd;
-    expect(data[0]).toMatchObject({
+    expect(data[0]).toEqual({
+      eventId: expect.any(String),
+      timestamp: expect.any(String),
+      camera: null,
+      command: command,
       observerSideOverride: side,
       action: { name: COMMAND_STRINGS.recordSourceCommand, value: expected },
     });

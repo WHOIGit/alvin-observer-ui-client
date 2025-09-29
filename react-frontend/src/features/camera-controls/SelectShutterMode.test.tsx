@@ -50,7 +50,10 @@ test("emits SHU mode change payload", async () => {
   await user.click(getByText("Shutter: 1/120"));
 
   const { data } = await h.gotCmd;
-  expect(data[0]).toMatchObject({
+  expect(data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
     action: { name: COMMAND_STRINGS.shutterModeCommand, value: "1/120" },
   });
 });

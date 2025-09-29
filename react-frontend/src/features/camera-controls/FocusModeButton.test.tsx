@@ -44,7 +44,10 @@ test.each([
   await user.click(getByText(/Focus/i));
 
   const { data } = await h.gotCmd;
-  expect(data[0]).toMatchObject({
+  expect(data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
     action: { name: COMMAND_STRINGS.focusModeCommand, value: expected },
   });
 });

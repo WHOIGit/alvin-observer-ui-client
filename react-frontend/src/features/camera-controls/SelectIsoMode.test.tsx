@@ -60,7 +60,10 @@ test("emits ISO change payload on select", async () => {
   await user.click(getByText("ISO: 200"));
 
   const { data } = await h.gotCmd;
-  expect(data[0]).toMatchObject({
+  expect(data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
     action: { name: COMMAND_STRINGS.isoModeCommand, value: "200" },
   });
 });

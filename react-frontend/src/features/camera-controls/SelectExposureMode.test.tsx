@@ -57,7 +57,11 @@ test("emits EXP mode change payload", async () => {
   await user.click(getByText("Manual"));
 
   const { data } = await h.gotCmd;
-  expect(data[0]).toMatchObject({
+  expect(data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: "cam-1",
+    command: "COPL",
     action: {
       name: COMMAND_STRINGS.exposureModeCommand,
       value: COMMAND_STRINGS.exposureModeOptions[1],

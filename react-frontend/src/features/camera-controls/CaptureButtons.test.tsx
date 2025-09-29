@@ -68,7 +68,9 @@ test("emits a record source command on click", async () => {
   await user.click(getByText("Record Source"));
 
   const { data } = await h.gotCmd;
-  expect(data[0]).toMatchObject({
+  expect(data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
     camera: "cam-1",
     oldCamera: "cam-1",  // only in this message
     action: {
@@ -100,8 +102,17 @@ test("emits a still image capture command on click", async () => {
   await user.click(getByText("Still Img Capture"));
 
   const { data } = await h.gotCmd;
-  expect(data[0]).toMatchObject({
-    action: { name: COMMAND_STRINGS.stillImageCaptureCommand },
+  expect(data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
+    action: {
+      name: COMMAND_STRINGS.stillImageCaptureCommand,
+      value: {
+        imgTransferChecked: false,
+        interval: 0,
+      }
+    },
   });
 });
 

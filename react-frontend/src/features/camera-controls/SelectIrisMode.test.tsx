@@ -50,7 +50,10 @@ test("emits IRIS mode change payload", async () => {
   await user.click(getByText("IRIS: 2.8"));
 
   const { data } = await h.gotCmd;
-  expect(data[0]).toMatchObject({
+  expect(data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
     action: { name: COMMAND_STRINGS.irisModeCommand, value: "2.8" },
   });
 });

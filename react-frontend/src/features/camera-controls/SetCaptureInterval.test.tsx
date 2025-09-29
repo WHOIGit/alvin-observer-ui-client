@@ -57,7 +57,10 @@ test("emits Start capture interval payload with selected value", async () => {
   await user.click(getByText("Start"));
 
   const { data } = await h.gotCmd;
-  expect(data[0]).toMatchObject({
+  expect(data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
     action: { name: COMMAND_STRINGS.captureIntervalCommand, value: "20" },
   });
 });
@@ -83,7 +86,10 @@ test("emits Stop capture interval payload with value 0", async () => {
   await user.click(getByText("Stop"));
 
   const { data } = await h.gotCmd;
-  expect(data[0]).toMatchObject({
+  expect(data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
     action: { name: COMMAND_STRINGS.captureIntervalCommand, value: "0" },
   });
 });

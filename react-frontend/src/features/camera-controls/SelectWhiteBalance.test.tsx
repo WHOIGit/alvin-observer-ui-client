@@ -49,7 +49,10 @@ test("emits WB change payload on select", async () => {
   await user.click(getByText("AUTO"));
 
   const { data } = await h.gotCmd;
-  expect(data[0]).toMatchObject({
+  expect(data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
     action: { name: COMMAND_STRINGS.whiteBalanceCommand, value: "AUTO" },
   });
 });
@@ -79,7 +82,10 @@ test("emits WB one-push payload on button", async () => {
   await user.click(getByText("WB One Push"));
 
   const { data } = await h.gotCmd;
-  expect(data[0]).toMatchObject({
+  expect(data[0]).toEqual({
+    eventId: expect.any(String),
+    timestamp: expect.any(String),
+    camera: null,
     action: {
       name: COMMAND_STRINGS.whiteBalanceCommand,
       value: COMMAND_STRINGS.whiteBalanceOnePushCommandValue,
