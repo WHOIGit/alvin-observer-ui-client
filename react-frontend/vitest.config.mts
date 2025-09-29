@@ -6,24 +6,14 @@ export default defineConfig({
     include: ['{src,tests}/**/*.test.{js,jsx,ts,tsx}'],
     environment: 'jsdom',
     setupFiles: ['tests/setup.ts'],
-    server: {
-      deps: {
-        // Ensure engine.io-client gets bundled by Vite so that our
-        // resolve.alias rules below take effect.
-        inline: ['socket.io-client', 'engine.io-client'],
-      },
-    },
   },
 
   resolve: {
-    alias: [
-      // Force engine.io-client to use the browser websocket implementation,
-      // which is also compatible with Node 21+. Otherwise, it will use the 'ws'
-      // package, which is not intercepted by MSW.
-      {
-        find: /(^|\/)websocket\.node\.js$/,
-        replacement: "$1websocket.js",
-      },
-    ],
+    alias: {
+      // Use the bundled browser version of socket.io-client for tests. This
+      // version uses the native WebSocket API which can be intercepted by MSW.
+      // Otherwise, Engine.IO uses the `ws` package which cannot be intercepted.
+      'socket.io-client': 'socket.io-client/dist/socket.io.js',
+    },
   },
 })
