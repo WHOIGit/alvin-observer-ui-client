@@ -9,7 +9,6 @@ import {
   selectActiveCamera,
   selectCamHeartbeatData,
   selectObserverSide,
-  selectWebSocketNamespace,
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 
@@ -59,10 +58,9 @@ export default function FocusZoomButton({
     activeButtonPriority.current = priority;   
   };
 
-  const userNs = useSelector(selectWebSocketNamespace);
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     activeCamera: activeCameraId,
     observerSide,
   });

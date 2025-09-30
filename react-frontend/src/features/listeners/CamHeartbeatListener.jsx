@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSocketListener } from "../../hooks/useSocket";
 import {
@@ -10,22 +10,26 @@ import {
   changeCamHeartbeat,
   changeCamHeartbeatPort,
   changeCamHeartbeatStbd,
-  selectWebSocketNamespace,
+  selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
+import { getObserverInfo } from "../../utils/observerSide";
 
 export default function CamHeartbeatListener({ namespaceOverride = null }) {
   const dispatch = useDispatch();
-  const userNamespace = useSelector(selectWebSocketNamespace);
-  const namespace = namespaceOverride || userNamespace;
+  const observerSide = useSelector(selectObserverSide);
+  const namespaceInfo = useMemo(
+    () => getObserverInfo(namespaceOverride || observerSide),
+    [namespaceOverride, observerSide]
+  );
 
   const handleMessage = useCallback(
     (message) => {
       // If namespaceOverride is provided (Pilot UI listening to observers),
       // use observer-specific reducers. Otherwise use main reducer.
       if (namespaceOverride) {
-        if (namespaceOverride === WS_SERVER_NAMESPACE_PORT) {
+        if (namespaceInfo.namespace === WS_SERVER_NAMESPACE_PORT) {
           dispatch(changeCamHeartbeatPort(message));
-        } else if (namespaceOverride === WS_SERVER_NAMESPACE_STARBOARD) {
+        } else if (namespaceInfo.namespace === WS_SERVER_NAMESPACE_STARBOARD) {
           dispatch(changeCamHeartbeatStbd(message));
         }
       } else {
@@ -33,10 +37,10 @@ export default function CamHeartbeatListener({ namespaceOverride = null }) {
         dispatch(changeCamHeartbeat(message));
       }
     },
-    [namespaceOverride, dispatch]
+    [namespaceOverride, namespaceInfo, dispatch]
   );
 
-  useSocketListener(`/${namespace}`, CAM_HEARTBEAT, handleMessage);
+  useSocketListener(namespaceInfo.namespacePath, CAM_HEARTBEAT, handleMessage);
 
   return null;
 }

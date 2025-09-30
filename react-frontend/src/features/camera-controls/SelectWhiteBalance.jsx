@@ -15,7 +15,6 @@ import {
   selectActiveCamera,
   selectCamHeartbeatData,
   selectObserverSide,
-  selectWebSocketNamespace,
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 
@@ -39,10 +38,9 @@ export default function SelectWhiteBalance({ showLabel }) {
   const camSettings = useSelector(selectCamHeartbeatData);
   const labelText = "WHITE BALANCE:";
 
-  const userNs = useSelector(selectWebSocketNamespace);
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     activeCamera: activeCameraId,
     observerSide,
   });

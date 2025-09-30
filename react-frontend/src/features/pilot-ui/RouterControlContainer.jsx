@@ -15,11 +15,7 @@ import {
   WS_SERVER_NAMESPACE_PILOT,
 } from "../../config.js";
 import PilotRecordButton from "../camera-controls/PilotRecordButton";
-import {
-  selectActiveCamera,
-  selectObserverSide,
-  selectWebSocketNamespace,
-} from "../camera-controls/cameraControlsSlice";
+import { selectActiveCamera, selectObserverSide } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -50,10 +46,9 @@ export default function RouterControlContainer() {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
 
-  const userNs = useSelector(selectWebSocketNamespace);
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     activeCamera: activeCameraId,
     observerSide,
   });

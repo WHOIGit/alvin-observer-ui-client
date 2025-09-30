@@ -9,7 +9,6 @@ import {
   selectCamHeartbeatData,
   selectJoystickStatus,
   selectObserverSide,
-  selectWebSocketNamespace,
   setJoystickStatus,
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
@@ -29,10 +28,9 @@ export default function Joystick() {
   const [isEnabled, setIsEnabled] = useState(true);
   const [showJoystick, setShowJoystick] = useState(false);
 
-  const userNs = useSelector(selectWebSocketNamespace);
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     activeCamera: activeCameraId,
     observerSide,
   });

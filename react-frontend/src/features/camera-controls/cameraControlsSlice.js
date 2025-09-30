@@ -1,15 +1,7 @@
 import { createSlice, original } from "@reduxjs/toolkit";
 import { isEqual } from "lodash";
 import { createSelector } from "reselect";
-import {
-  COMMAND_STRINGS,
-  VIDEO_STREAM_CONFIG,
-  WS_SERVER_NAMESPACE_PORT,
-  WS_SERVER_NAMESPACE_STARBOARD,
-  WS_SERVER_NAMESPACE_PILOT,
-} from "../../config.js";
-
-const envSettings = window;
+import { COMMAND_STRINGS, VIDEO_STREAM_CONFIG } from "../../config.js";
 
 // set default settings
 const defaultObserverVideoSrc =
@@ -25,7 +17,6 @@ const defaultRecordVideoSrc =
 
 const initialState = {
   observerSide: window.PILOT_MODE === true ? "PL" : null, // P = Port, S = Starboard, PL = Pilot
-  webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
   observerVideoSrc: defaultObserverVideoSrc,
   observerVideoSmallSrc: defaultObserverVideoSmallSrc,
   recordVideoSrc: defaultRecordVideoSrc,
@@ -64,7 +55,6 @@ export const cameraControlsSlice = createSlice({
     setObserverSide: (state, action) => {
       state.observerSide = action.payload;
       if (action.payload === "P") {
-        state.webSocketNamespace = WS_SERVER_NAMESPACE_PORT;
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
         state.observerVideoSmallSrc =
           VIDEO_STREAM_CONFIG.portObserverSmallVideo;
@@ -73,7 +63,6 @@ export const cameraControlsSlice = createSlice({
         }
       }
       if (action.payload === "S") {
-        state.webSocketNamespace = WS_SERVER_NAMESPACE_STARBOARD;
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.stbdObserverVideo;
         state.observerVideoSmallSrc =
           VIDEO_STREAM_CONFIG.stbdObserverSmallVideo;
@@ -288,10 +277,6 @@ export const selectActiveCameraConfig = (state) =>
 
 // return the current Observer Side
 export const selectObserverSide = (state) => state.cameraControls.observerSide;
-
-// return the current Web Socket server namespace (port/stbd/pilot)
-export const selectWebSocketNamespace = (state) =>
-  state.cameraControls.webSocketNamespace;
 
 // use createSelector to create memoized selector
 // return the current CamHeartbeat data

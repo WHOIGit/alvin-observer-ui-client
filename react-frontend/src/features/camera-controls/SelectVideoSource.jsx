@@ -13,7 +13,6 @@ import {
   selectAllCameras,
   selectObserverSide,
   selectVideoSourceEnabled,
-  selectWebSocketNamespace,
   setRecordControlsEnabled,
   setVideoSourceEnabled,
 } from "./cameraControlsSlice";
@@ -42,9 +41,8 @@ export default function SelectVideoSource({ showLabel }) {
   const { isOwner } = useIsOwner();
   const labelText = "SOURCE:";
 
-  const userNs = useSelector(selectWebSocketNamespace);
   const observerSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     activeCamera,
     observerSide,
   });

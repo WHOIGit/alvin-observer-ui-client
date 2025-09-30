@@ -40,11 +40,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const namespaceWithoutSlash = scenario.namespace.replace(/^\//, "");
-
     const store = makeStore({
       observerSide: scenario.observerSide,
-      webSocketNamespace: namespaceWithoutSlash,
       camHeartbeatData: { capture_interval: "0" },
     });
 
@@ -81,11 +78,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const namespaceWithoutSlash = scenario.namespace.replace(/^\//, "");
-
     const store = makeStore({
       observerSide: scenario.observerSide,
-      webSocketNamespace: namespaceWithoutSlash,
       camHeartbeatData: { capture_interval: "20" },
     });
 

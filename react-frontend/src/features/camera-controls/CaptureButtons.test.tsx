@@ -49,7 +49,6 @@ test.each(SOCKET_USER_SCENARIOS)(
 
     const store = makeStore({
       observerSide: scenario.observerSide,
-      webSocketNamespace: scenario.namespace.replace(/^\//, ""),
       allCameras,
       activeCamera,
       recorderHeartbeatData,
@@ -92,7 +91,6 @@ test.each(SOCKET_USER_SCENARIOS)(
 
     const store = makeStore({
       observerSide: scenario.observerSide,
-      webSocketNamespace: scenario.namespace.replace(/^\//, ""),
     });
     store.dispatch(changeCamHeartbeat({ focus_mode: "AF" } as any));
 
@@ -126,7 +124,7 @@ test.each(SOCKET_USER_SCENARIOS)(
 test("does not render if camera is not initialized", async () => {
   // Initialize the Redux store but we do NOT set the focus mode, so the camera
   // should remain in an 'uninitialized' state.
-  const store = makeStore({ webSocketNamespace: "" });
+  const store = makeStore({});
 
   const { getByText } = render(
     <Provider store={store}>

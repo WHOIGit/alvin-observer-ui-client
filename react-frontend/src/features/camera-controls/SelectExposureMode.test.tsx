@@ -34,7 +34,6 @@ test.each(SOCKET_USER_SCENARIOS)(
 
     const store = makeStore({
       observerSide: scenario.observerSide,
-      webSocketNamespace: scenario.namespace.replace(/^\//, ""),
       camHeartbeatData: {
         exposure: COMMAND_STRINGS.exposureModeOptions[0],
         camctrl: "y",

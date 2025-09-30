@@ -13,7 +13,6 @@ import {
   selectActiveCamera,
   selectCamHeartbeatData,
   selectObserverSide,
-  selectWebSocketNamespace,
   setExposureControlsEnabled,
 } from "./cameraControlsSlice";
 import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
@@ -40,10 +39,9 @@ export default function SelectExposureMode({ showLabel }) {
   const labelText = "EXP MODE:";
   //console.log(camSettings);
 
-  const userNs = useSelector(selectWebSocketNamespace);
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     activeCamera: activeCameraId,
     observerSide,
   });

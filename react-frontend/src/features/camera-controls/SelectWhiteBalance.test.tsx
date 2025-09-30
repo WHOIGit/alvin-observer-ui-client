@@ -34,7 +34,6 @@ test.each(SOCKET_USER_SCENARIOS)(
 
     const store = makeStore({
       observerSide: scenario.observerSide,
-      webSocketNamespace: scenario.namespace.replace(/^\//, ""),
       camHeartbeatData: { white_balance: "INDOOR" },
     });
 
@@ -69,7 +68,6 @@ test.each(SOCKET_USER_SCENARIOS)(
 
     const store = makeStore({
       observerSide: scenario.observerSide,
-      webSocketNamespace: scenario.namespace.replace(/^\//, ""),
       camHeartbeatData: { white_balance: "ONE_PUSH_WB" },
     });
 

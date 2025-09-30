@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSocketListener } from "../../hooks/useSocket";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config";
@@ -8,13 +8,17 @@ import {
   setRouterOutputs,
   setRouterInputs,
   changeCameraSettings,
-  selectWebSocketNamespace,
+  selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
+import { getObserverInfo } from "../../utils/observerSide";
 
 export default function NewCameraCommandListener({ namespaceOverride = null }) {
   const dispatch = useDispatch();
-  const userNamespace = useSelector(selectWebSocketNamespace);
-  const namespace = namespaceOverride || userNamespace;
+  const observerSide = useSelector(selectObserverSide);
+  const namespaceInfo = useMemo(
+    () => getObserverInfo(namespaceOverride || observerSide),
+    [namespaceOverride, observerSide]
+  );
 
   const handleMessage = useCallback(
     (message) => {
@@ -33,7 +37,11 @@ export default function NewCameraCommandListener({ namespaceOverride = null }) {
     [dispatch]
   );
 
-  useSocketListener(`/${namespace}`, NEW_CAMERA_COMMAND_EVENT, handleMessage);
+  useSocketListener(
+    namespaceInfo.namespacePath,
+    NEW_CAMERA_COMMAND_EVENT,
+    handleMessage
+  );
 
   return null;
 }
