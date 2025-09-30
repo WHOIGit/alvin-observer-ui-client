@@ -13,7 +13,6 @@ import {
   selectObserverSide,
   selectRecordControlsEnabled,
   selectRecorderHeartbeatData,
-  selectWebSocketUserNamespace,
   setRecorderError,
   setVideoSourceEnabled,
 } from "./cameraControlsSlice";
@@ -49,9 +48,8 @@ export default function CaptureButtons() {
   const allCameras = useSelector(selectAllCameras);
   const imageTransfer = useSelector(selectImageTransferAcomms);
 
-  const userNs = useSelector(selectWebSocketUserNamespace);
   const observerSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     activeCamera: activeCamera?.camera,
     observerSide,
   });

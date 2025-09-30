@@ -12,7 +12,6 @@ import {
   selectObserverSide,
   selectRouterInputs,
   selectRouterOutputs,
-  selectWebSocketUserNamespace,
 } from "../camera-controls/cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 
@@ -49,10 +48,9 @@ export default function RouterControls() {
   const [inputValue, setInputValue] = useState(null);
   const [outputValue, setOutputValue] = useState(null);
 
-  const userNs = useSelector(selectWebSocketUserNamespace);
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     activeCamera: activeCameraId,
     observerSide,
   });

@@ -8,11 +8,7 @@ import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
-import {
-  selectActiveCamera,
-  selectObserverSide,
-  selectWebSocketUserNamespace,
-} from "./cameraControlsSlice";
+import { selectActiveCamera, selectObserverSide } from "./cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   buttonWrapper: {
@@ -34,10 +30,9 @@ const FocusModeButton = () => {
   const [currentFocusMode, setCurrentFocusMode] = useState("AF");
   const [loading, setLoading] = useState(false);
 
-  const userNs = useSelector(selectWebSocketUserNamespace);
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     activeCamera: activeCameraId,
     observerSide,
   });

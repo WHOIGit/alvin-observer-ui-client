@@ -4,11 +4,13 @@ import { Grid } from "@mui/material";
 // local
 import { useSocketListener } from "../../hooks/useSocket";
 import { SENSOR_HEARTBEAT } from "../../config.js";
-import { selectWebSocketUserNamespace } from "../camera-controls/cameraControlsSlice";
+import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
+import { observerSideToNamespacePath } from "../../utils/observerSide";
 
 export default function SensorDataDisplay() {
-  const userNs = useSelector(selectWebSocketUserNamespace);
-  const { lastMessage } = useSocketListener(`/${userNs}`, SENSOR_HEARTBEAT);
+  const observerSide = useSelector(selectObserverSide);
+  const namespacePath = observerSideToNamespacePath(observerSide);
+  const { lastMessage } = useSocketListener(namespacePath, SENSOR_HEARTBEAT);
 
   return (
     <Grid container spacing={1} justifyContent="center" alignItems="center">

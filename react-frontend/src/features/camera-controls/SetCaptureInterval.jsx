@@ -14,7 +14,6 @@ import {
   selectActiveCamera,
   selectCamHeartbeatData,
   selectObserverSide,
-  selectWebSocketUserNamespace,
  } from "./cameraControlsSlice";
 import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import { COMMAND_STRINGS } from "../../config.js";
@@ -42,10 +41,9 @@ export default function SelectCaptureInterval() {
   const [value, setValue] = useState(null);
   const [captureEnabled, setCaptureEnabled] = useState(true);
 
-  const userNs = useSelector(selectWebSocketUserNamespace);
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     activeCamera: activeCameraId,
     observerSide,
   });

@@ -37,16 +37,13 @@ test.each(SOCKET_USER_SCENARIOS)(
       { camera: "cam-2", cam_name: "Cam 2" },
     ] as any;
 
-    const namespaceWithoutSlash = scenario.namespace.replace(/^\//, "");
-
     const store = makeStore({
       observerSide: scenario.observerSide,
-      webSocketNamespace: namespaceWithoutSlash,
       allCameras,
       activeCamera: allCameras[0],
       camHeartbeatData: {
         camera: "cam-1",
-        owner: namespaceWithoutSlash,
+        owner: scenario.namespace,
       },
       videoSourceEnabled: true,
     });

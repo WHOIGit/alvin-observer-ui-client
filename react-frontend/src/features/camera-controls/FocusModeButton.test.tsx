@@ -36,7 +36,6 @@ test.each(SOCKET_USER_SCENARIOS)(
 
     const store = makeStore({
       observerSide: scenario.observerSide,
-      webSocketNamespace: scenario.namespace.replace(/^\//, ""),
     });
     store.dispatch(
       changeCamHeartbeat({ focus_mode: COMMAND_STRINGS.focusAF } as any),
@@ -72,7 +71,6 @@ test.each(SOCKET_USER_SCENARIOS)(
 
     const store = makeStore({
       observerSide: scenario.observerSide,
-      webSocketNamespace: scenario.namespace.replace(/^\//, ""),
     });
     store.dispatch(
       changeCamHeartbeat({ focus_mode: COMMAND_STRINGS.focusMF } as any),

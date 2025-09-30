@@ -24,7 +24,6 @@ import {
   selectCamHeartbeatData,
   selectInitialCamHeartbeatData,
   selectObserverSide,
-  selectWebSocketUserNamespace,
 } from "../camera-controls/cameraControlsSlice";
 
 import {
@@ -46,9 +45,8 @@ export default function CameraControlContainer() {
   const dispatch = useDispatch();
   const { isOwner } = useIsOwner();
 
-  const userNs = useSelector(selectWebSocketUserNamespace);
   const observerSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     observerSide,
   });
 

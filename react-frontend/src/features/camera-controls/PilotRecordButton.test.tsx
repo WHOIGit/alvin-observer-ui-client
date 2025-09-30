@@ -53,7 +53,6 @@ test.each([
 
     const store = makeStore({
       observerSide: "PL",
-      webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
       camHeartbeatDataPort: { camera: "cam-port" },
       camHeartbeatDataStbd: { camera: "cam-stbd" },
     });

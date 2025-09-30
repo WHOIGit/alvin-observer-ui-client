@@ -2,30 +2,23 @@ import { useDispatch } from "react-redux";
 import formatISO from "date-fns/formatISO";
 import { v4 as uuidv4 } from "uuid";
 import { useSocket } from "./useSocket";
-import {
-  NEW_CAMERA_COMMAND_EVENT,
-  WS_SERVER_NAMESPACE_PORT,
-  WS_SERVER_NAMESPACE_STARBOARD,
-  WS_SERVER_NAMESPACE_PILOT,
-} from "../config";
+import { NEW_CAMERA_COMMAND_EVENT } from "../config";
 import {
   setLastCommand,
   addCommandQueue,
 } from "../features/camera-controls/cameraControlsSlice";
+import {
+  observerSideToCommand,
+  observerSideToNamespacePath,
+} from "../utils/observerSide";
 
-export function useCameraCommandEmitter(
-  namespace = "/",
-  { activeCamera, observerSide } = {}
-) {
+export function useCameraCommandEmitter({
+  observerSide,
+  activeCamera,
+} = {}) {
+  const namespace = observerSideToNamespacePath(observerSide);
   const socket = useSocket(namespace);
   const dispatch = useDispatch();
-
-  const sideToCmd = (side) => {
-    if (side === "P" || side === WS_SERVER_NAMESPACE_PORT) return "COVP";
-    if (side === "S" || side === WS_SERVER_NAMESPACE_STARBOARD) return "COVS";
-    if (side === "PL" || side === WS_SERVER_NAMESPACE_PILOT) return "COPL";
-    return undefined;
-  };
 
   return {
     emit: (messageBody = {}) => {
@@ -35,7 +28,9 @@ export function useCameraCommandEmitter(
       }
 
       // Determine command from override or options
-      const cmd = sideToCmd(messageBody.observerSideOverride ?? observerSide);
+      const cmd = observerSideToCommand(
+        messageBody.observerSideOverride ?? observerSide
+      );
 
       const payload = {
         eventId: uuidv4(),
@@ -45,6 +40,10 @@ export function useCameraCommandEmitter(
         ...messageBody,
       };
 
+      if (cmd === undefined) {
+        delete payload.command;
+      }
+
       // Persist command to Redux.
       //
       // We do this before emitting so that there's no race condition with
@@ -52,8 +51,12 @@ export function useCameraCommandEmitter(
       //
       // FIXME: setLastCommand() mutates its parameter. We provide a copy here.
       // This should be fixed along with other opportunities for refactoring.
-      dispatch(setLastCommand(payload));
-      dispatch(addCommandQueue(payload));
+      const payloadForState = {
+        ...payload,
+        action: payload.action ? { ...payload.action } : payload.action,
+      };
+      dispatch(setLastCommand(payloadForState));
+      dispatch(addCommandQueue(payloadForState));
 
       // TODO: We could return a promise that resolves on ack from server
       socket.emit(NEW_CAMERA_COMMAND_EVENT, payload);

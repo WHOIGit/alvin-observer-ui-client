@@ -32,11 +32,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const namespaceWithoutSlash = scenario.namespace.replace(/^\//, "");
-
     const store = makeStore({
       observerSide: scenario.observerSide,
-      webSocketNamespace: namespaceWithoutSlash,
       currentCamData: { IRS: ["1.8", "2.8", "4.0"] },
       camHeartbeatData: { exposure: "MAN", iris: "1.8" },
       exposureControlsEnabled: true,

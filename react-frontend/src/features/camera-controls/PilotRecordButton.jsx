@@ -9,7 +9,6 @@ import {
   selectCamHeartbeatDataPort,
   selectCamHeartbeatDataStbd,
   selectObserverSide,
-  selectWebSocketUserNamespace,
 } from "./cameraControlsSlice";
 import {
   COMMAND_STRINGS,
@@ -37,9 +36,8 @@ export default function PilotRecordButton({ observerSide }) {
   const activeCameraStbd = useSelector(selectCamHeartbeatDataStbd);
   const [loading, setLoading] = useState(false);
 
-  const userNs = useSelector(selectWebSocketUserNamespace);
   const globalObserverSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     observerSide: globalObserverSide,
   });
 

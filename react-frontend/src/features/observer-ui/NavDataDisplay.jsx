@@ -14,7 +14,8 @@ import {
 import { useSocketListener } from "../../hooks/useSocket";
 import SensorDataDisplay from "./SensorDataDisplay";
 import { NAV_HEARTBEAT } from "../../config.js";
-import { selectWebSocketUserNamespace } from "../camera-controls/cameraControlsSlice";
+import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
+import { observerSideToNamespacePath } from "../../utils/observerSide";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -25,8 +26,9 @@ const useStyles = makeStyles((theme) => ({
 export default function NavDataDisplay() {
   const classes = useStyles();
 
-  const userNs = useSelector(selectWebSocketUserNamespace);
-  const { lastMessage } = useSocketListener(`/${userNs}`, NAV_HEARTBEAT);
+  const observerSide = useSelector(selectObserverSide);
+  const namespacePath = observerSideToNamespacePath(observerSide);
+  const { lastMessage } = useSocketListener(namespacePath, NAV_HEARTBEAT);
 
   return (
     <div>

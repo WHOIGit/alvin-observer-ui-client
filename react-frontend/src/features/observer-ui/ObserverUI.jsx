@@ -7,7 +7,6 @@ import {
   selectActiveCamera,
   selectInitialCamHeartbeatData,
   selectObserverSide,
-  selectWebSocketUserNamespace,
 } from "../camera-controls/cameraControlsSlice";
 import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
 import NewCameraCommandListener from "../listeners/NewCameraCommandListener";
@@ -21,9 +20,8 @@ export default function ObserverUI({
   const dispatch = useDispatch();
 
   // emitter for camera commands on the user's namespace
-  const userNs = useSelector(selectWebSocketUserNamespace);
   const observerSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter(`/${userNs}`, {
+  const { emit } = useCameraCommandEmitter({
     observerSide,
   });
 
