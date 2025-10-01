@@ -51,7 +51,8 @@ test("intercepts emitted events", async () => {
   await h.connected;
   await expect(h.gotHello).resolves.toEqual({
     event: "hello",
-    data: ["world"],
+    namespace: "/",
+    args: ["world"],
   });
 });
 

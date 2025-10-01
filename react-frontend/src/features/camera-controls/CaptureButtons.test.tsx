@@ -67,8 +67,9 @@ test("emits a record source command on click", async () => {
   await h.connected;
   await user.click(getByText("Record Source"));
 
-  const { data } = await h.gotCmd;
-  expect(data[0]).toEqual({
+  const { namespace, args } = await h.gotCmd;
+  expect(namespace).toBe("/");
+  expect(args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: "cam-1",
@@ -101,8 +102,9 @@ test("emits a still image capture command on click", async () => {
   await h.connected;
   await user.click(getByText("Still Img Capture"));
 
-  const { data } = await h.gotCmd;
-  expect(data[0]).toEqual({
+  const { namespace, args } = await h.gotCmd;
+  expect(namespace).toBe("/");
+  expect(args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: null,

@@ -55,7 +55,9 @@ test("emits step focus once on click", async () => {
   await h.connected;
   await user.click(getByText("Focus Near"));
 
-  expect((await h.step).data[0]).toEqual({
+  const { namespace, args } = await h.step;
+  expect(namespace).toBe("/");
+  expect(args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: null,
@@ -107,7 +109,9 @@ test("emits continuous focus on long press", async () => {
   await user.pointer({ target: btn, keys: "[MouseLeft>]" });
   await new Promise((r) => setTimeout(r, 600)); // > 500ms threshold
 
-  expect((await h.start).data[0]).toEqual({
+  const start = await h.start;
+  expect(start.namespace).toBe("/");
+  expect(start.args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: null,
@@ -119,7 +123,9 @@ test("emits continuous focus on long press", async () => {
 
   await user.pointer({ target: btn, keys: "[/MouseLeft]" });
 
-  expect((await h.stop).data[0]).toEqual({
+  const stop = await h.stop;
+  expect(stop.namespace).toBe("/");
+  expect(stop.args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: null,

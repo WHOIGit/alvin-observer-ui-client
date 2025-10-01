@@ -49,8 +49,9 @@ test("emits IRIS mode change payload", async () => {
   await user.click(getByRole("combobox"));
   await user.click(getByText("IRIS: 2.8"));
 
-  const { data } = await h.gotCmd;
-  expect(data[0]).toEqual({
+  const { namespace, args } = await h.gotCmd;
+  expect(namespace).toBe("/");
+  expect(args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: null,

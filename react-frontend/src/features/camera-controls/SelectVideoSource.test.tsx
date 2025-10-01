@@ -56,8 +56,9 @@ test("emits camera change payload on select", async () => {
   await user.click(getByRole("combobox", { name: /Video Source/i }));
   await user.click(getByText("Cam 2"));
 
-  const { data } = await h.gotCmd;
-  expect(data[0]).toEqual({
+  const { namespace, args } = await h.gotCmd;
+  expect(namespace).toBe("/");
+  expect(args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: "cam-1",

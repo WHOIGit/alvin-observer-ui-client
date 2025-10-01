@@ -48,8 +48,9 @@ test("emits WB change payload on select", async () => {
   await user.click(getByRole("combobox"));
   await user.click(getByText("AUTO"));
 
-  const { data } = await h.gotCmd;
-  expect(data[0]).toEqual({
+  const { namespace, args } = await h.gotCmd;
+  expect(namespace).toBe("/");
+  expect(args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: null,
@@ -81,8 +82,9 @@ test("emits WB one-push payload on button", async () => {
   await h.connected;
   await user.click(getByText("WB One Push"));
 
-  const { data } = await h.gotCmd;
-  expect(data[0]).toEqual({
+  const { namespace, args } = await h.gotCmd;
+  expect(namespace).toBe("/");
+  expect(args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: null,

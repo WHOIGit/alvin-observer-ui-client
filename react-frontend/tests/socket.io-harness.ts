@@ -10,12 +10,13 @@ afterEach(() => {
 
 type ExpectEmitResult = {
   event: string;
-  data: any[];
+  namespace: string;
+  args: any[];
 };
 
 export type SocketIoHarness = {
   connected: Promise<void>;
-  emit(event: string, ...data: any[]): void;
+  emit(event: string, ...args: any[]): void;
 
   // Allow attaching labeled expectations: h.someLabel = expectEmit("evt")
   [label: string]: any;
@@ -35,13 +36,18 @@ export function createSocketIoHarness(
   // Ensure a listener is attached for the specified event.
   // socket.io-binding does not allow us to listen for all events, so we attach
   // listeners on demand the first time an expectation is registered.
-  const ensureListener = (event: string) => {
-    if (queues.has(event)) return;
-    queues.set(event, []);
-    io!.client.on(event, (_evt: any, ...data: any[]) => {
+  const ensureListener = (eventName: string) => {
+    if (queues.has(eventName)) return;
+    queues.set(eventName, []);
+    io!.client.on(eventName, (event: MessageEvent, ...args: any[]) => {
       // Resolve the oldest expectation promise (FIFO), if there is one
-      const resolve = queues.get(event)!.shift();
-      if (resolve) resolve({ event, data });
+      const resolve = queues.get(eventName)!.shift();
+      if (resolve)
+        resolve({
+          event: eventName,
+          namespace: (event as any).socketio.namespace,
+          args,
+        });
     });
   };
 
@@ -53,9 +59,9 @@ export function createSocketIoHarness(
   };
 
   const harness: SocketIoHarness = {
-    emit(event: string, ...data: any[]) {
+    emit(event: string, ...args: any[]) {
       if (!io) throw new Error("Cannot emit - no connection yet");
-      io.client.emit(event, ...data); // as in server -> client
+      io.client.emit(event, ...args); // as in server -> client
     },
 
     // connected is a promise that gets resolved when the connection is

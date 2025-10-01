@@ -56,8 +56,9 @@ test("emits Start capture interval payload with selected value", async () => {
   await user.click(opt);
   await user.click(getByText("Start"));
 
-  const { data } = await h.gotCmd;
-  expect(data[0]).toEqual({
+  const { namespace, args } = await h.gotCmd;
+  expect(namespace).toBe("/");
+  expect(args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: null,
@@ -85,8 +86,9 @@ test("emits Stop capture interval payload with value 0", async () => {
   await h.connected;
   await user.click(getByText("Stop"));
 
-  const { data } = await h.gotCmd;
-  expect(data[0]).toEqual({
+  const { namespace, args } = await h.gotCmd;
+  expect(namespace).toBe("/");
+  expect(args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: null,

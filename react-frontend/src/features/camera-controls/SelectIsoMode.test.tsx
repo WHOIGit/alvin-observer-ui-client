@@ -59,8 +59,9 @@ test("emits ISO change payload on select", async () => {
   await user.click(getByRole("combobox"));
   await user.click(getByText("ISO: 200"));
 
-  const { data } = await h.gotCmd;
-  expect(data[0]).toEqual({
+  const { namespace, args } = await h.gotCmd;
+  expect(namespace).toBe("/");
+  expect(args[0]).toEqual({
     eventId: expect.any(String),
     timestamp: expect.any(String),
     camera: null,
