@@ -55,7 +55,6 @@ export default function SelectVideoSource({ showLabel }) {
       }
       dispatch(setVideoSourceEnabled(true));
     } else {
-      console.log("DISABLE REC Controls");
       dispatch(setRecordControlsEnabled(false));
       dispatch(setVideoSourceEnabled(false));
     }

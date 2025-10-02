@@ -85,7 +85,6 @@ const useCameraWebSocket = (
 
       socketRef.current.on("connect", () => {
         // successful connection, remove any errors
-        console.log("Websocket connected!");
         dispatch(setSocketError(false));
       });
 
@@ -211,7 +210,6 @@ const useCameraWebSocket = (
       };
 
       try {
-        console.log("Dispatched payload", payload);
         socketRef.current.emit(NEW_CAMERA_COMMAND_EVENT, payload);
         dispatch(setLastCommand(payload));
         dispatch(addCommandQueue(payload));

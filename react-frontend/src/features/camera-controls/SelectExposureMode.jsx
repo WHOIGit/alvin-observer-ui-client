@@ -46,14 +46,12 @@ export default function SelectExposureMode({ showLabel }) {
         value: event.target.value,
       },
     };
-    console.log("TARGET VALUE:", event.target.value);
     sendMessage(payload);
     setExpModeRequested(event.target.value);
   };
 
   useEffect(() => {
     // set initial
-    console.log("SET INITIAL EXP MODE", camSettings?.exposure);
     if (camSettings) setExpModeRequested(camSettings.exposure);
   }, []);
 

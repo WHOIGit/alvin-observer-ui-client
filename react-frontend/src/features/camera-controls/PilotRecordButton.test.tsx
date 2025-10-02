@@ -2,26 +2,28 @@ import { afterEach, expect, test } from "vitest";
 import React from "react";
 import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import cameraControlsReducer from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import {
-  NEW_CAMERA_COMMAND_EVENT,
   COMMAND_STRINGS,
-  WS_SERVER_NAMESPACE_STARBOARD,
+  NEW_CAMERA_COMMAND_EVENT,
+  WS_SERVER_NAMESPACE_PILOT,
   WS_SERVER_NAMESPACE_PORT,
+  WS_SERVER_NAMESPACE_STARBOARD,
 } from "../../config.js";
 import PilotRecordButton from "./PilotRecordButton.jsx";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
+import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 
 type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
 
-function bootstrapState(overrides: Partial<CameraControlsState> = {}) {
-  const base = cameraControlsReducer(undefined, {
-    type: "@@INIT",
-  } as any) as any;
-  return { ...base, ...overrides } as any;
+function makeStore(overrides: Partial<CameraControlsState> = {}) {
+  const baseState = cameraControlsReducer(undefined, { type: "@@INIT" } as any);
+  return configureStore({
+    reducer: { cameraControls: cameraControlsReducer },
+    preloadedState: { cameraControls: { ...baseState, ...overrides } },
+  });
 }
 
 afterEach(() => {
@@ -49,15 +51,11 @@ test.each([
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const state = bootstrapState({
-      webSocketNamespace: "",
+    const store = makeStore({
+      observerSide: "PL",
+      webSocketNamespace: WS_SERVER_NAMESPACE_PILOT,
       camHeartbeatDataPort: { camera: "cam-port" },
       camHeartbeatDataStbd: { camera: "cam-stbd" },
-    });
-
-    const store = configureStore({
-      reducer: { cameraControls: cameraControlsReducer },
-      preloadedState: { cameraControls: state },
     });
 
     const { getByText } = renderWithProviders(
@@ -69,14 +67,17 @@ test.each([
     await user.click(getByText(label));
 
     const { namespace, args } = await h.gotCmd;
-    expect(namespace).toBe("/");
+    expect(namespace).toBe(`/${WS_SERVER_NAMESPACE_PILOT}`);
     expect(args[0]).toEqual({
       eventId: expect.any(String),
       timestamp: expect.any(String),
       camera: null,
       command: command,
       observerSideOverride: side,
-      action: { name: COMMAND_STRINGS.recordSourceCommand, value: expected },
+      action: {
+        name: COMMAND_STRINGS.recordSourceCommand,
+        value: expected,
+      },
     });
   },
 );

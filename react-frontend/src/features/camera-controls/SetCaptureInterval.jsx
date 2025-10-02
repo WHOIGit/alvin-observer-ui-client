@@ -39,8 +39,6 @@ export default function SelectCaptureInterval() {
   const [captureEnabled, setCaptureEnabled] = useState(true);
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
-  console.log("CAM SETTINGS", camSettings);
-
   const handleValueChange = (event) => {
     setValue(event.target.value);
   };
