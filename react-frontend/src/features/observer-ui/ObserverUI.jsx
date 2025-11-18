@@ -13,6 +13,9 @@ import {
   NEW_CAMERA_COMMAND_EVENT,
   COMMAND_STRINGS,
 } from "../../config";
+import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
+import NewCameraCommandListener from "../listeners/NewCameraCommandListener";
+import RecorderHeartbeatListener from "../listeners/RecorderHeartbeatListener";
 
 export default function ObserverUI({
   showFullCameraControls,
@@ -24,9 +27,6 @@ export default function ObserverUI({
   // send message to set active camera
   const { sendMessage } = useCameraWebSocket(NEW_CAMERA_COMMAND_EVENT);
 
-  // connect to CAM_HEARTBEAT and RECORDER_HEARTBEAT, store current cam parameters in Redux state
-  useCameraWebSocket(CAM_HEARTBEAT);
-  useCameraWebSocket(RECORDER_HEARTBEAT);
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
 
@@ -53,12 +53,18 @@ export default function ObserverUI({
         setInitialCamera();
       }
     }
-  }, [activeCamera, dispatch, initialCamHeartbeat, sendMessage]);
+  }, [activeCamera, dispatch, initialCamHeartbeat]);
 
   return (
-    <TopControlPanel
-      showFullCameraControls={showFullCameraControls}
-      setShowFullCameraControls={setShowFullCameraControls}
-    />
+    <>
+      <CamHeartbeatListener />
+      <NewCameraCommandListener />
+      <RecorderHeartbeatListener />
+
+      <TopControlPanel
+        showFullCameraControls={showFullCameraControls}
+        setShowFullCameraControls={setShowFullCameraControls}
+      />
+    </>
   );
 }
