@@ -76,6 +76,9 @@ export default function Joystick() {
   });
 
   const startSpitter = () => {
+    if (joystickSpitter.current.intervalId) {
+      return;
+    }
     console.log("START SPITTER FUNC");
     joystickSpitter.current.intervalId = setInterval(() => {
       // continuously spit out the last move message
@@ -104,16 +107,6 @@ export default function Joystick() {
   useEffect(() => {
     if (!joystickStatus) {
       // no op
-    } else if (joystickStatus.actionType === "start") {
-      sendPanTiltCommand(joystickStatus);
-      startSpitter();
-      // enqueue a fake "move" event for the spitter
-      // note: angle and direction will be undefined
-      joystickSpitter.current.lastMove = {
-        ...joystickStatus,
-        distance: 0,
-        actionType: "move",
-      };
     } else if (joystickStatus.actionType === "move") {
       // enqueue this move for the spitter timer
       joystickSpitter.current.lastMove = joystickStatus;
@@ -131,6 +124,17 @@ export default function Joystick() {
       angle: data.angle,
       direction: data.direction,
     };
+    if (evt.type === "start") {
+      sendPanTiltCommand(payload);
+      startSpitter();
+      // enqueue a fake "move" event for the spitter
+      // note: angle and direction will be undefined
+      joystickSpitter.current.lastMove = {
+        ...payload,
+        distance: 0,
+        actionType: "move",
+      };
+    }
     dispatch(setJoystickStatus(payload));
   };
 
