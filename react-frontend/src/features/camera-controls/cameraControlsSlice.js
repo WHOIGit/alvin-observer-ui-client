@@ -6,11 +6,11 @@ import { COMMAND_STRINGS, VIDEO_STREAM_CONFIG } from "../../config.js";
 // set default settings
 const defaultObserverVideoSrc =
   window.PILOT_MODE === true
-    ? VIDEO_STREAM_CONFIG.pilotObserverVideo
+    ? VIDEO_STREAM_CONFIG.pilotVideo
     : VIDEO_STREAM_CONFIG.portObserverVideo;
 const defaultObserverVideoSmallSrc =
   window.PILOT_MODE === true
-    ? VIDEO_STREAM_CONFIG.pilotObserverSmallVideo
+    ? VIDEO_STREAM_CONFIG.pilotSmallVideo
     : VIDEO_STREAM_CONFIG.portObserverSmallVideo;
 const defaultRecordVideoSrc =
   window.PILOT_MODE === true ? null : VIDEO_STREAM_CONFIG.portRecordVideo;
