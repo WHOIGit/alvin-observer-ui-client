@@ -8,6 +8,8 @@ import { VIDEO_STREAM_CONFIG } from "../../config.js";
 import { selectLastCommand } from "./cameraControlsSlice";
 
 WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
+WebRtcPlayer.setProtocol(VIDEO_STREAM_CONFIG.protocol);
+WebRtcPlayer.setUrlTemplate(VIDEO_STREAM_CONFIG.urlTemplate);
 
 const useStyles = makeStyles((theme) => ({
   root: {
