@@ -69,6 +69,8 @@ export const COMMAND_STRINGS = {
 
 export const VIDEO_STREAM_CONFIG = {
   server: envSettings.VIDEO_STREAM_SERVER,
+  protocol: envSettings.VIDEO_STREAM_PROTOCOL,
+  urlTemplate: envSettings.VIDEO_STREAM_URL_TEMPLATE,
   portObserverVideo: envSettings.PORT_OBSERVER_VIDEO,
   portObserverSmallVideo: envSettings.PORT_OBSERVER_SMALL_VIDEO,
   stbdObserverVideo: envSettings.STBD_OBSERVER_VIDEO,
