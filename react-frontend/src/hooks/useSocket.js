@@ -1,28 +1,34 @@
 import { useEffect, useRef, useState } from "react";
 import socketIOClient from "socket.io-client";
-import { WS_SERVER, WS_PATH } from "../config";
+import { WS_ENDPOINTS } from "../config";
 
-// Simple shared socket pool by namespace (e.g., "/", "/pilot", "/port").
+// Shared socket pool keyed by `${apiVersion}:${namespace}` so the same
+// namespace name can coexist on different backend API versions.
 const pool = new Map();
 
-function getOrCreate(namespace) {
-  let entry = pool.get(namespace);
+function getOrCreate(namespace, apiVersion) {
+  const key = `${apiVersion}:${namespace}`;
+  let entry = pool.get(key);
   if (!entry) {
-    const socket = socketIOClient(WS_SERVER + namespace, {
-      path: WS_PATH + "socket.io",
+    const endpoint = WS_ENDPOINTS[apiVersion];
+    if (!endpoint) {
+      throw new Error(`No WS_ENDPOINTS entry for API version ${apiVersion}`);
+    }
+    const socket = socketIOClient(endpoint.server + namespace, {
+      path: endpoint.path + "socket.io",
       transports: ["websocket"],
     });
-    entry = { socket, refCount: 0 };
-    pool.set(namespace, entry);
+    entry = { socket, refCount: 0, key };
+    pool.set(key, entry);
   }
   return entry;
 }
 
-export function useSocket(namespace = "/") {
+export function useSocket(namespace = "/", { apiVersion = "1" } = {}) {
   const entryRef = useRef(null);
 
   useEffect(() => {
-    const entry = getOrCreate(namespace);
+    const entry = getOrCreate(namespace, apiVersion);
     entry.refCount += 1;
     entryRef.current = entry;
 
@@ -31,7 +37,7 @@ export function useSocket(namespace = "/") {
       if (!e) return;
       e.refCount -= 1;
       if (e.refCount <= 0) {
-        pool.delete(namespace);
+        pool.delete(e.key);
 
         // Good bye message to server is a historical part of the ICS protocol
         try {
@@ -44,15 +50,20 @@ export function useSocket(namespace = "/") {
         e.socket.disconnect();
       }
     };
-  }, [namespace]);
+  }, [namespace, apiVersion]);
 
   return entryRef.current
     ? entryRef.current.socket
-    : getOrCreate(namespace).socket;
+    : getOrCreate(namespace, apiVersion).socket;
 }
 
-export function useSocketListener(namespace = "/", event, callback) {
-  const socket = useSocket(namespace);
+export function useSocketListener(
+  namespace = "/",
+  event,
+  callback,
+  { apiVersion = "1" } = {}
+) {
+  const socket = useSocket(namespace, { apiVersion });
   const callbackRef = useRef(callback);
 
   useEffect(() => {

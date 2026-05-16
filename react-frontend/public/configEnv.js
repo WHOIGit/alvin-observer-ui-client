@@ -3,11 +3,11 @@
 
 window.PILOT_MODE = false;
 
-// Web socket server root URL
-window.WS_SERVER = "https://128.128.184.62";
-//window.WS_SERVER = "https://128.128.184.62";
-// Web socket server path, ex: "/websocket-server-path/"
-window.WS_PATH = "/imaging-control/";
+// Web socket endpoints by backend API version.
+window.WS_ENDPOINTS = {
+  "1":   { server: "https://128.128.184.62", path: "/imaging-control/" },
+  "1.5": { server: "https://128.128.184.62", path: "/api/v1.5/" },
+};
 
 // sealog url for iframe
 window.SEALOG_URL = "https://sealog.whoi.edu/sealog-alvin/";

@@ -7,5 +7,7 @@ import { initInterceptor } from "./ws-interceptor";
 initInterceptor();
 
 // Populate settings used for Socket.IO connections
-window.WS_SERVER = "http://example.invalid";
-window.WS_PATH = "/imaging-server/";
+window.WS_ENDPOINTS = {
+  "1":   { server: "http://example.invalid", path: "/imaging-server/" },
+  "1.5": { server: "http://example.invalid", path: "/api/v1.5/" },
+};

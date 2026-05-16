@@ -1,9 +1,8 @@
 // Get the environmental variables from the window object
 // Local file: /public/configEnv.js
 const envSettings = window;
-// Web socket server
-export const WS_SERVER = envSettings.WS_SERVER;
-export const WS_PATH = envSettings.WS_PATH;
+// One entry per backend API version. Each entry is { server, path }.
+export const WS_ENDPOINTS = envSettings.WS_ENDPOINTS;
 export const WS_SERVER_NAMESPACE_PORT = "port";
 export const WS_SERVER_NAMESPACE_STARBOARD = "stbd";
 export const WS_SERVER_NAMESPACE_PILOT = "pilot";
