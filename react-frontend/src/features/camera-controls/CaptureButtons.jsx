@@ -9,7 +9,6 @@ import {
   selectActiveCameraConfig,
   selectAllCameras,
   selectCamHeartbeatData,
-  selectImageTransferAcomms,
   selectObserverSide,
   selectRecordControlsEnabled,
   selectRecorderHeartbeatData,
@@ -46,7 +45,6 @@ export default function CaptureButtons() {
   const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
   const camSettings = useSelector(selectCamHeartbeatData);
   const allCameras = useSelector(selectAllCameras);
-  const imageTransfer = useSelector(selectImageTransferAcomms);
 
   const observerSide = useSelector(selectObserverSide);
   const { emit } = useCameraCommandEmitter({
@@ -113,12 +111,11 @@ export default function CaptureButtons() {
       });
     }
 
-    // If an IMG CAPTURE action, need to send checkbox value
     if (commandName === COMMAND_STRINGS.stillImageCaptureCommand) {
       return void emit({
         action: {
           name: commandName,
-          value: { interval: commandValue, imgTransferChecked: imageTransfer },
+          value: { interval: commandValue, imgTransferChecked: false },
         },
       });
     }
