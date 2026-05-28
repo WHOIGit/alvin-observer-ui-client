@@ -9,10 +9,48 @@ This repo contains multiple services:
 - Node JS socket-io server example
 - Go service to convert and stream camera feeds
 
-## How to use
+## Local development
 
-A docker-compose file is included at the project root to run all the apps in a Docker network.
+Run the React frontend directly when working on UI code:
 
-Just run the following command from the repo root to start a development version on your local machine:
+```sh
+cd react-frontend
+npm install
+npm run dev
+```
 
-`docker-compose up`
+## Systemd Quadlet deployment
+
+Production deployments use Podman Quadlet units instead of docker-compose.
+Build the image locally on the target host:
+
+```sh
+podman build -f compose/Dockerfile -t alvin-observer-ui:latest
+```
+
+Copy the Quadlet files to the system container unit directory:
+
+```sh
+sudo install -d /opt/alvin-observer-ui-client
+sudo install -m 0644 configEnv-pilot.js configEnv-observer.js /opt/alvin-observer-ui-client/
+sudo install -m 0644 sealog.network pilot-ui.container observer-ui.container /etc/containers/systemd/
+sudo systemctl daemon-reload
+sudo systemctl enable --now sealog-network.service pilot-ui.service observer-ui.service
+```
+
+The generated services mount their runtime config from:
+
+- `/opt/alvin-observer-ui-client/configEnv-pilot.js`
+- `/opt/alvin-observer-ui-client/configEnv-observer.js`
+
+The `sealog.network` unit creates or reuses the shared Podman network named
+`sealog`. The container units join that network as `pilot-ui` and `observer-ui`,
+respectively.
+
+Because Caddy runs with `Network=host`, the UI containers also publish their
+nginx ports on host loopback only:
+
+- Observer UI: `127.0.0.1:18080`
+- Pilot UI: `127.0.0.1:18081`
+
+Caddy should proxy `/observer-ui/*` and `/pilot-ui/*` to those loopback ports.
