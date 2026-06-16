@@ -79,7 +79,3 @@ export const VIDEO_STREAM_CONFIG = {
   pilotVideo: envSettings.PILOT_VIDEO,
   pilotSmallVideo: envSettings.PILOT_SMALL_VIDEO,
 };
-
-// Router controls inputs/outputs
-export const ROUTER_INPUTS = envSettings.ROUTER_INPUTS;
-export const ROUTER_OUTPUTS = envSettings.ROUTER_OUTPUTS;
