@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import clsx from "clsx";
 import makeStyles from '@mui/styles/makeStyles';
-import { Grid, Button, Box } from "@mui/material";
-import { blue, green, deepOrange } from "@mui/material/colors";
+import { Grid, Button, Box, CircularProgress } from "@mui/material";
+import { blue, green, red, deepOrange } from "@mui/material/colors";
+import DoneIcon from "@mui/icons-material/Done";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 // local
 import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import ProcessingStatusChip from "./ProcessingStatusChip";
@@ -12,8 +14,14 @@ import {
   selectObserverSide,
   selectRouterInputs,
   selectRouterOutputs,
+  selectRouterTakeStatus,
+  setRouterTakeStatus,
 } from "../camera-controls/cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
+
+// How long the success/failure indicator stays on the TAKE button before it
+// resets to idle.
+const TAKE_RESULT_DISPLAY_MS = 2500;
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -40,10 +48,29 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: green[800],
     },
   },
+  takeButtonError: {
+    backgroundColor: red[600] + " !important",
+    "&:hover": {
+      backgroundColor: red[800] + " !important",
+    },
+  },
+  buttonWrapper: {
+    position: "relative",
+    display: "inline-block",
+  },
+  buttonProgress: {
+    color: "white",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
+  },
 }));
 
 export default function RouterControls() {
   const classes = useStyles();
+  const dispatch = useDispatch();
 
   const [inputValue, setInputValue] = useState(null);
   const [outputValue, setOutputValue] = useState(null);
@@ -57,25 +84,46 @@ export default function RouterControls() {
 
   const routerInputs = useSelector(selectRouterInputs);
   const routerOutputs = useSelector(selectRouterOutputs);
-  console.log(routerOutputs, routerInputs);
 
-  // disable Take button until both values have been selected
-  const disabled = !inputValue || !outputValue;
+  // Result of the most recent TAKE, set from the command receipt in Redux.
+  const takeStatus = useSelector(selectRouterTakeStatus);
+  const isPending = takeStatus === "PENDING";
+  const isOk = takeStatus === "OK";
+  const isErr = takeStatus === "ERR";
+
+  // Once a take resolves, clear the indicator after a short delay. On success
+  // we also clear the selection (the route is set); on failure we keep it so
+  // the pilot can retry without re-selecting.
+  useEffect(() => {
+    if (!isOk && !isErr) return undefined;
+    const timer = setTimeout(() => {
+      if (isOk) {
+        setInputValue(null);
+        setOutputValue(null);
+      }
+      dispatch(setRouterTakeStatus(null));
+    }, TAKE_RESULT_DISPLAY_MS);
+    return () => clearTimeout(timer);
+  }, [isOk, isErr, dispatch]);
+
+  // disable Take until both values are selected, while a take is in flight,
+  // or while a success indicator is showing.
+  const disabled = !inputValue || !outputValue || isPending || isOk;
+
   const handleSendMessage = () => {
+    dispatch(setRouterTakeStatus("PENDING"));
     void emit({
       action: {
         name: COMMAND_STRINGS.routerIOCommand,
         value: { input: inputValue, output: outputValue },
       },
     });
-    // reset local values
-    setInputValue(null);
-    setOutputValue(null);
   };
 
   const resetValues = () => {
     setInputValue(null);
     setOutputValue(null);
+    if (takeStatus) dispatch(setRouterTakeStatus(null));
   };
 
   const renderInputBtns = (item) => {
@@ -148,14 +196,30 @@ export default function RouterControls() {
           </Grid>
 
           <Box className={classes.box} mt={2}>
-            <Button
-              variant="contained"
-              disabled={disabled}
-              className={classes.takeButton}
-              onClick={() => handleSendMessage()}
-            >
-              TAKE
-            </Button>
+            <div className={classes.buttonWrapper}>
+              <Button
+                variant="contained"
+                disabled={disabled}
+                startIcon={
+                  isOk ? <DoneIcon /> : isErr ? <ErrorOutlineIcon /> : null
+                }
+                className={clsx(classes.takeButton, {
+                  [classes.takeButtonError]: isErr,
+                })}
+                onClick={() => handleSendMessage()}
+              >
+                {isPending
+                  ? "SENDING…"
+                  : isOk
+                  ? "ROUTED"
+                  : isErr
+                  ? "TAKE FAILED"
+                  : "TAKE"}
+              </Button>
+              {isPending && (
+                <CircularProgress size={24} className={classes.buttonProgress} />
+              )}
+            </div>
           </Box>
         </Grid>
 

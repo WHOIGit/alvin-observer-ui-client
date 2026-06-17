@@ -34,6 +34,10 @@ const initialState = {
   allCameras: [],
   routerOutputs: [],
   routerInputs: [],
+  // Result of the most recent router TAKE, driven by the command receipt:
+  // null (idle), "PENDING", "OK", or "ERR". Used to give the pilot inline
+  // success/failure feedback on the TAKE button.
+  routerTakeStatus: null,
   socketError: false,
 };
 
@@ -116,11 +120,21 @@ export const cameraControlsSlice = createSlice({
                 state.currentCamData.currentSettings.exposure_mode =
                   element.action.value;
                 break;
+              // router take confirmed by the device; surface success on the
+              // TAKE button. We don't track the live routing matrix yet, so
+              // there's no settings state to update here.
+              case COMMAND_STRINGS.routerIOCommand:
+                state.routerTakeStatus = "OK";
+                break;
               default:
             }
           } else {
-            console.log("ERROR Received from AIS");
             state.errorCameraChange = true;
+            // Flag a failed router take so the TAKE button can show the error
+            // inline (the detail also lands in the system message bar).
+            if (element.action.name === COMMAND_STRINGS.routerIOCommand) {
+              state.routerTakeStatus = "ERR";
+            }
           }
         }
         // remove command from queue
@@ -215,6 +229,9 @@ export const cameraControlsSlice = createSlice({
     setRouterInputs: (state, action) => {
       state.routerInputs = action.payload;
     },
+    setRouterTakeStatus: (state, action) => {
+      state.routerTakeStatus = action.payload;
+    },
     setSocketError: (state, action) => {
       state.socketError = action.payload;
     },
@@ -242,6 +259,7 @@ export const {
   setAllCameras,
   setRouterOutputs,
   setRouterInputs,
+  setRouterTakeStatus,
   setSocketError,
 } = cameraControlsSlice.actions;
 
@@ -339,6 +357,11 @@ export const selectRouterInputs = createSelector(
   (state) => state.cameraControls.routerInputs,
   (item) => item
 );
+
+// return the result of the most recent router TAKE
+// (null | "PENDING" | "OK" | "ERR")
+export const selectRouterTakeStatus = (state) =>
+  state.cameraControls.routerTakeStatus;
 
 // return socket error status
 export const selectSocketError = (state) => state.cameraControls.socketError;
