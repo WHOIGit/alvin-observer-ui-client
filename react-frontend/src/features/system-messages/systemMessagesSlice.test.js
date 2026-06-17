@@ -4,6 +4,7 @@ import reducer, {
   dismissReadSystemMessages,
   markAllSystemMessagesRead,
   removeExpiredSystemMessages,
+  selectActiveAlertSources,
   selectSystemMessages,
   selectUnreadSystemMessageCount,
   selectUnreadSystemMessageCounts,
@@ -115,6 +116,63 @@ test("expires ttl messages but keeps sticky messages", () => {
   expect(selectSystemMessages(rootState(state)).map((message) => message.id)).toEqual([
     "sticky-1",
   ]);
+});
+
+test("tracks active alert sources by worst unread level", () => {
+  let state = reducer(undefined, { type: "@@INIT" });
+
+  // INFO is below the highlight threshold and should be ignored.
+  state = reducer(
+    state,
+    addSystemMessage(
+      {
+        correlation_id: "info-recorder",
+        timestamp: "2026-06-15T12:00:00Z",
+        message: "Recording started outside Suboptica",
+        level: "INFO",
+        source: "recorder",
+      },
+      1000
+    )
+  );
+
+  state = reducer(
+    state,
+    addSystemMessage(
+      {
+        correlation_id: "warn-telemetry",
+        timestamp: "2026-06-15T12:00:01Z",
+        message: "ADN dive number mismatch",
+        level: "WARN",
+        source: "telemetry",
+      },
+      1000
+    )
+  );
+
+  state = reducer(
+    state,
+    addSystemMessage(
+      {
+        correlation_id: "error-recorder",
+        timestamp: "2026-06-15T12:00:02Z",
+        message: "Recorder fault",
+        level: "ERROR",
+        source: "recorder",
+      },
+      1000
+    )
+  );
+
+  // Worst level wins per source; sub-threshold and sourceless messages drop out.
+  expect(selectActiveAlertSources(rootState(state))).toEqual({
+    telemetry: "WARN",
+    recorder: "ERROR",
+  });
+
+  // Acknowledging clears the highlights.
+  state = reducer(state, markAllSystemMessagesRead());
+  expect(selectActiveAlertSources(rootState(state))).toEqual({});
 });
 
 test("refreshes messages with the same correlation id", () => {

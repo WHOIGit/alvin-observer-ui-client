@@ -6,6 +6,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import { setObserverSide } from "../camera-controls/cameraControlsSlice";
+import AlertHighlight from "../system-messages/AlertHighlight";
 
 export default function ObserverSideSelect() {
   const [value, setValue] = useState(null);
@@ -17,17 +18,19 @@ export default function ObserverSideSelect() {
   };
 
   return (
-    <FormControl variant="standard" component="fieldset">
-      <FormLabel component="legend">Select Observer Side</FormLabel>
-      <RadioGroup
-        aria-label="observerSide"
-        name="observerSide"
-        value={value}
-        onChange={handleChange}
-      >
-        <FormControlLabel value="P" control={<Radio />} label="Port" />
-        <FormControlLabel value="S" control={<Radio />} label="Starboard" />
-      </RadioGroup>
-    </FormControl>
+    <AlertHighlight source="station" display="inline-block">
+      <FormControl variant="standard" component="fieldset">
+        <FormLabel component="legend">Select Observer Side</FormLabel>
+        <RadioGroup
+          aria-label="observerSide"
+          name="observerSide"
+          value={value}
+          onChange={handleChange}
+        >
+          <FormControlLabel value="P" control={<Radio />} label="Port" />
+          <FormControlLabel value="S" control={<Radio />} label="Starboard" />
+        </RadioGroup>
+      </FormControl>
+    </AlertHighlight>
   );
 }

@@ -3,6 +3,7 @@ import { Grid } from "@mui/material";
 // local
 import { useSocketListener } from "../../hooks/useSocket";
 import { SENSOR_HEARTBEAT } from "../../config.js";
+import AlertHighlight from "../system-messages/AlertHighlight";
 
 export default function SensorDataDisplay() {
   const [lastMessage, setLastMessage] = useState(null);
@@ -14,16 +15,18 @@ export default function SensorDataDisplay() {
   useSocketListener("/", SENSOR_HEARTBEAT, handleMessage);
 
   return (
-    <Grid container spacing={1} justifyContent="center" alignItems="center">
-      <Grid item xs>
-        T1: {lastMessage ? lastMessage?.t1 : "na"} &deg;
+    <AlertHighlight source="sensor">
+      <Grid container spacing={1} justifyContent="center" alignItems="center">
+        <Grid item xs>
+          T1: {lastMessage ? lastMessage?.t1 : "na"} &deg;
+        </Grid>
+        <Grid item xs>
+          T2: {lastMessage ? lastMessage?.t2 : "na"} &deg;
+        </Grid>
+        <Grid item xs>
+          T3: {lastMessage ? lastMessage?.t3 : "na"} &deg;
+        </Grid>
       </Grid>
-      <Grid item xs>
-        T2: {lastMessage ? lastMessage?.t2 : "na"} &deg;
-      </Grid>
-      <Grid item xs>
-        T3: {lastMessage ? lastMessage?.t3 : "na"} &deg;
-      </Grid>
-    </Grid>
+    </AlertHighlight>
   );
 }

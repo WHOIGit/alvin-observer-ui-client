@@ -5,6 +5,7 @@ import { Grid, Paper } from "@mui/material";
 import CameraControlButtons from "./CameraControlButtons";
 import LargeVideo from "../camera-controls/LargeVideo";
 import ErrorCard from "../camera-controls/ErrorCard";
+import AlertHighlight from "../system-messages/AlertHighlight";
 import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,11 +42,13 @@ export default function CameraControls({ showFullCameraControls }) {
     >
       <Grid container spacing={2} sx={{ mt: -3 }}>
         <Grid item xs={9}>
-          {camHeartbeat?.focus_mode === "ERR" ? (
-            <ErrorCard />
-          ) : (
-            <LargeVideo showFullCameraControls={showFullCameraControls} />
-          )}
+          <AlertHighlight source="camera">
+            {camHeartbeat?.focus_mode === "ERR" ? (
+              <ErrorCard />
+            ) : (
+              <LargeVideo showFullCameraControls={showFullCameraControls} />
+            )}
+          </AlertHighlight>
         </Grid>
         <Grid item xs={3}>
           <Paper className={classes.paper}>
