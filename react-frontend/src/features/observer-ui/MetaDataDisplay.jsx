@@ -16,6 +16,7 @@ import {
   selectCamHeartbeatData,
   selectRecorderHeartbeatData,
 } from "../camera-controls/cameraControlsSlice";
+import AlertHighlight from "../system-messages/AlertHighlight";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -42,7 +43,7 @@ export default function NavDataDisplay() {
     return null;
   }
   return (
-    <div>
+    <AlertHighlight source="telemetry">
       <TableContainer component={Paper}>
         <Table className={classes.table} size="small" aria-label="Nav Data">
           <TableBody>
@@ -65,6 +66,6 @@ export default function NavDataDisplay() {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </AlertHighlight>
   );
 }

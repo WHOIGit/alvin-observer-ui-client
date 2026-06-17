@@ -8,6 +8,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 // local imports
 import { selectRecorderHeartbeatData } from "../camera-controls/cameraControlsSlice";
+import AlertHighlight from "../system-messages/AlertHighlight";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,12 +48,14 @@ export default function ProcessingStatusChip() {
   }, [lastMessage]);
   return (
     <div className={classes.root}>
-      <Chip
-        icon={isProcessingComplete ? <DoneIcon /> : <HourglassEmptyIcon />}
-        label={isProcessingComplete ? "Processing Complete" : "Processing..."}
-        color="default"
-        className={chipStyle}
-      />
+      <AlertHighlight source="capture" display="inline-flex">
+        <Chip
+          icon={isProcessingComplete ? <DoneIcon /> : <HourglassEmptyIcon />}
+          label={isProcessingComplete ? "Processing Complete" : "Processing..."}
+          color="default"
+          className={chipStyle}
+        />
+      </AlertHighlight>
     </div>
   );
 }

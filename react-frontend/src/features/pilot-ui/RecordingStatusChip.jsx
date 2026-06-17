@@ -10,6 +10,7 @@ import {
   selectActiveCameraConfig,
   selectRecorderHeartbeatData,
 } from "../camera-controls/cameraControlsSlice";
+import AlertHighlight from "../system-messages/AlertHighlight";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -55,12 +56,14 @@ export default function RecordingStatusChip() {
   }, [lastMessage, activeCameraConfig]);
   return (
     <div>
-      <Chip
-        icon={isRecording ? <VideocamIcon /> : <VideocamOffIcon />}
-        label={isRecording ? "RECORDING" : "NOT RECORDING"}
-        color="default"
-        className={chipStyle}
-      />
+      <AlertHighlight source="recorder" display="inline-flex">
+        <Chip
+          icon={isRecording ? <VideocamIcon /> : <VideocamOffIcon />}
+          label={isRecording ? "RECORDING" : "NOT RECORDING"}
+          color="default"
+          className={chipStyle}
+        />
+      </AlertHighlight>
     </div>
   );
 }

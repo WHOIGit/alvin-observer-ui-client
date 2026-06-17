@@ -18,6 +18,7 @@ import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import useIsOwner from "../../hooks/useIsOwner";
 import RecordingStatusChip from "./RecordingStatusChip";
 import ErrorCard from "../camera-controls/ErrorCard";
+import AlertHighlight from "../system-messages/AlertHighlight";
 import {
   changeActiveCamera,
   selectActiveCamera,
@@ -121,7 +122,9 @@ export default function CameraControlContainer() {
           <LargeVideo showFullCameraControls={true} />
         </Grid>
         <Grid item xs={3}>
-          <div className={classes.controlsBox}>{renderDynamicGridBox()}</div>
+          <AlertHighlight source={["command", "camera"]}>
+            <div className={classes.controlsBox}>{renderDynamicGridBox()}</div>
+          </AlertHighlight>
         </Grid>
       </Grid>
 

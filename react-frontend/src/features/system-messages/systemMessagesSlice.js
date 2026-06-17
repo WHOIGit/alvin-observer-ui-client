@@ -152,3 +152,31 @@ export const selectWorstSystemMessageLevel = createSelector(
       return worstLevel;
     }, null)
 );
+
+// Lowest level worth drawing attention to on a control. INFO messages stay in
+// the notification panel only, so highlighting stays quiet during normal ops.
+const HIGHLIGHT_MIN_PRIORITY = SYSTEM_MESSAGE_PRIORITY.WARN;
+
+// Maps each message `source` to the worst unread level currently affecting it,
+// e.g. { recorder: "ERROR", telemetry: "WARN" }. Controls subscribe to this to
+// highlight where an issue originates; the entry clears once messages are read.
+export const selectActiveAlertSources = createSelector(
+  selectUnreadSystemMessages,
+  (messages) =>
+    messages.reduce((sources, message) => {
+      if (!message.source) return sources;
+      if (SYSTEM_MESSAGE_PRIORITY[message.level] < HIGHLIGHT_MIN_PRIORITY) {
+        return sources;
+      }
+
+      const current = sources[message.source];
+      if (
+        current === undefined ||
+        SYSTEM_MESSAGE_PRIORITY[message.level] > SYSTEM_MESSAGE_PRIORITY[current]
+      ) {
+        sources[message.source] = message.level;
+      }
+
+      return sources;
+    }, {})
+);

@@ -16,6 +16,7 @@ import {
 } from "../../config.js";
 import PilotRecordButton from "../camera-controls/PilotRecordButton";
 import { selectActiveCamera, selectObserverSide } from "../camera-controls/cameraControlsSlice";
+import AlertHighlight from "../system-messages/AlertHighlight";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -154,7 +155,9 @@ export default function RouterControlContainer() {
         </Grid>
       </Box>
       <Box mt={3}>
-        <RouterControls />
+        <AlertHighlight source="command">
+          <RouterControls />
+        </AlertHighlight>
       </Box>
     </>
   );
