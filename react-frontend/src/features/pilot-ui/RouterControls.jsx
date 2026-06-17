@@ -1,46 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import clsx from "clsx";
-import makeStyles from '@mui/styles/makeStyles';
-import { Grid, Button, Box, CircularProgress } from "@mui/material";
-import { blue, green, red, deepOrange } from "@mui/material/colors";
+import makeStyles from "@mui/styles/makeStyles";
+import { Grid, Button, Box, Typography, CircularProgress } from "@mui/material";
+import { green, red, grey } from "@mui/material/colors";
 import DoneIcon from "@mui/icons-material/Done";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 // local
 import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import ProcessingStatusChip from "./ProcessingStatusChip";
+import RouterMatrix from "./RouterMatrix";
 import {
   selectActiveCamera,
   selectObserverSide,
   selectRouterInputs,
   selectRouterOutputs,
+  selectRouterRouting,
   selectRouterTakeStatus,
   setRouterTakeStatus,
+  setRouterRoute,
 } from "../camera-controls/cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
+import {
+  MOCK_ROUTER_INPUTS,
+  MOCK_ROUTER_OUTPUTS,
+  MOCK_ROUTER_ROUTING,
+} from "./routerMatrixMock";
 
 // How long the success/failure indicator stays on the TAKE button before it
 // resets to idle.
 const TAKE_RESULT_DISPLAY_MS = 2500;
 
 const useStyles = makeStyles((theme) => ({
-  box: {
-    textAlign: "center",
-  },
-  ctrlButton: {
-    width: "100%",
-    fontSize: ".7em",
-  },
-  outputButton: {
-    color: "white",
-    backgroundColor: blue[500],
-    "&:hover": {
-      backgroundColor: blue[800],
-    },
-  },
-  activeButton: {
-    backgroundColor: deepOrange[500] + " !important",
-  },
   takeButton: {
     color: "white",
     backgroundColor: green[500],
@@ -66,14 +58,30 @@ const useStyles = makeStyles((theme) => ({
     marginTop: -12,
     marginLeft: -12,
   },
+  staged: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: theme.spacing(1),
+    minHeight: 28,
+    color: grey[300],
+    fontSize: ".85rem",
+  },
+  stagedArrow: {
+    fontSize: "1rem",
+    color: grey[500],
+  },
+  placeholder: {
+    color: grey[600],
+  },
 }));
+
+const labelFor = (items, value) =>
+  items.find((item) => item.value === value)?.label ?? value;
 
 export default function RouterControls() {
   const classes = useStyles();
   const dispatch = useDispatch();
-
-  const [inputValue, setInputValue] = useState(null);
-  const [outputValue, setOutputValue] = useState(null);
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
@@ -84,149 +92,139 @@ export default function RouterControls() {
 
   const routerInputs = useSelector(selectRouterInputs);
   const routerOutputs = useSelector(selectRouterOutputs);
-
-  // Result of the most recent TAKE, set from the command receipt in Redux.
+  const routing = useSelector(selectRouterRouting);
   const takeStatus = useSelector(selectRouterTakeStatus);
+
+  // Fall back to static mock data when no router ports are available (e.g. no
+  // backend connected) so the matrix is reviewable. See routerMatrixMock.js.
+  const usingMock = routerInputs.length === 0;
+  const inputs = usingMock ? MOCK_ROUTER_INPUTS : routerInputs;
+  const outputs = usingMock ? MOCK_ROUTER_OUTPUTS : routerOutputs;
+  const effectiveRouting =
+    usingMock && Object.keys(routing).length === 0 ? MOCK_ROUTER_ROUTING : routing;
+
+  // The crosspoint the pilot has staged but not yet committed.
+  const [staged, setStaged] = useState({ input: null, output: null });
+
   const isPending = takeStatus === "PENDING";
   const isOk = takeStatus === "OK";
   const isErr = takeStatus === "ERR";
+  const hasStaged = staged.input && staged.output;
 
   // Once a take resolves, clear the indicator after a short delay. On success
-  // we also clear the selection (the route is set); on failure we keep it so
-  // the pilot can retry without re-selecting.
+  // we optimistically record the route and clear the staged selection; on
+  // failure we keep it so the pilot can retry without re-selecting.
   useEffect(() => {
     if (!isOk && !isErr) return undefined;
     const timer = setTimeout(() => {
-      if (isOk) {
-        setInputValue(null);
-        setOutputValue(null);
+      if (isOk && staged.input && staged.output) {
+        dispatch(setRouterRoute({ output: staged.output, input: staged.input }));
+        setStaged({ input: null, output: null });
       }
       dispatch(setRouterTakeStatus(null));
     }, TAKE_RESULT_DISPLAY_MS);
     return () => clearTimeout(timer);
-  }, [isOk, isErr, dispatch]);
+  }, [isOk, isErr, staged.input, staged.output, dispatch]);
 
-  // disable Take until both values are selected, while a take is in flight,
-  // or while a success indicator is showing.
-  const disabled = !inputValue || !outputValue || isPending || isOk;
+  const handleSelect = (input, output) => {
+    if (isPending) return;
+    setStaged({ input, output });
+  };
 
-  const handleSendMessage = () => {
+  const handleTake = () => {
+    if (!hasStaged) return;
     dispatch(setRouterTakeStatus("PENDING"));
     void emit({
       action: {
         name: COMMAND_STRINGS.routerIOCommand,
-        value: { input: inputValue, output: outputValue },
+        value: { input: staged.input, output: staged.output },
       },
     });
   };
 
-  const resetValues = () => {
-    setInputValue(null);
-    setOutputValue(null);
+  const handleCancel = () => {
+    setStaged({ input: null, output: null });
     if (takeStatus) dispatch(setRouterTakeStatus(null));
   };
 
-  const renderInputBtns = (item) => {
-    const activeBtn = item.value === inputValue;
-    const btnStyle = clsx({
-      [classes.ctrlButton]: true, //always applies
-      [classes.activeButton]: activeBtn, //only when open === true
-    });
-
-    return (
-      <Grid item xs={3} key={item.value}>
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          className={btnStyle}
-          onClick={() => setInputValue(item.value)}
-        >
-          {item.label}
-        </Button>
-      </Grid>
-    );
-  };
-
-  const renderOutputBtns = (item) => {
-    const activeBtn = item.value === outputValue;
-    const btnStyle = clsx({
-      [classes.ctrlButton]: true, //always applies
-      [classes.outputButton]: true, //always applies
-      [classes.activeButton]: activeBtn, //only when open === true
-    });
-
-    return (
-      <Grid item xs={3} key={item.value}>
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          className={btnStyle}
-          onClick={() => setOutputValue(item.value)}
-        >
-          {item.label}
-        </Button>
-      </Grid>
-    );
-  };
+  const takeDisabled = !hasStaged || isPending || isOk;
 
   return (
     <>
-      <Grid container spacing={2} alignItems="center" justifyContent="center">
-        <Grid item xs={6}>
-          <Grid container spacing={1}>
-            {routerInputs.map((item) => renderInputBtns(item))}
-          </Grid>
+      <RouterMatrix
+        inputs={inputs}
+        outputs={outputs}
+        routing={effectiveRouting}
+        stagedInput={staged.input}
+        stagedOutput={staged.output}
+        onSelect={handleSelect}
+      />
 
-          <Box className={classes.box} mt={2}>
+      <Box mt={2} className={classes.staged}>
+        {hasStaged ? (
+          <>
+            <span>{labelFor(inputs, staged.input)}</span>
+            <ArrowForwardIcon className={classes.stagedArrow} />
+            <span>{labelFor(outputs, staged.output)}</span>
+          </>
+        ) : (
+          <span className={classes.placeholder}>
+            Select a crosspoint to stage a route
+          </span>
+        )}
+      </Box>
+
+      <Grid
+        container
+        spacing={2}
+        alignItems="center"
+        justifyContent="center"
+        mt={0}
+      >
+        <Grid item>
+          <Button variant="contained" color="inherit" onClick={handleCancel}>
+            CANCEL
+          </Button>
+        </Grid>
+        <Grid item>
+          <div className={classes.buttonWrapper}>
             <Button
               variant="contained"
-              color="inherit"
-              onClick={() => resetValues()}
+              disabled={takeDisabled}
+              startIcon={
+                isOk ? <DoneIcon /> : isErr ? <ErrorOutlineIcon /> : null
+              }
+              className={clsx(classes.takeButton, {
+                [classes.takeButtonError]: isErr,
+              })}
+              onClick={handleTake}
             >
-              CANCEL
+              {isPending
+                ? "SENDING…"
+                : isOk
+                ? "ROUTED"
+                : isErr
+                ? "TAKE FAILED"
+                : "TAKE"}
             </Button>
-          </Box>
-        </Grid>
-
-        <Grid item xs={6}>
-          <Grid container spacing={1}>
-            {routerOutputs.map((item) => renderOutputBtns(item))}
-          </Grid>
-
-          <Box className={classes.box} mt={2}>
-            <div className={classes.buttonWrapper}>
-              <Button
-                variant="contained"
-                disabled={disabled}
-                startIcon={
-                  isOk ? <DoneIcon /> : isErr ? <ErrorOutlineIcon /> : null
-                }
-                className={clsx(classes.takeButton, {
-                  [classes.takeButtonError]: isErr,
-                })}
-                onClick={() => handleSendMessage()}
-              >
-                {isPending
-                  ? "SENDING…"
-                  : isOk
-                  ? "ROUTED"
-                  : isErr
-                  ? "TAKE FAILED"
-                  : "TAKE"}
-              </Button>
-              {isPending && (
-                <CircularProgress size={24} className={classes.buttonProgress} />
-              )}
-            </div>
-          </Box>
-        </Grid>
-
-        <Grid item xs={12}>
-          <ProcessingStatusChip />
+            {isPending && (
+              <CircularProgress size={24} className={classes.buttonProgress} />
+            )}
+          </div>
         </Grid>
       </Grid>
+
+      {usingMock && (
+        <Box mt={1} textAlign="center">
+          <Typography variant="caption" color="textSecondary">
+            Showing mock routing — no router connected
+          </Typography>
+        </Box>
+      )}
+
+      <Box mt={2}>
+        <ProcessingStatusChip />
+      </Box>
     </>
   );
 }

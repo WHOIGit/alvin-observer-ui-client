@@ -3,7 +3,10 @@ import reducer, {
   addCommandQueue,
   changeCameraSettings,
   setRouterTakeStatus,
+  setRouterRouting,
+  setRouterRoute,
   selectRouterTakeStatus,
+  selectRouterRouting,
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 
@@ -44,4 +47,29 @@ test("an ERR receipt marks the router take failed", () => {
 
   expect(state.routerTakeStatus).toBe("ERR");
   expect(state.commandsQueue).toHaveLength(0);
+});
+
+test("routing map is empty by default", () => {
+  const state = reducer(undefined, { type: "@@INIT" });
+  expect(selectRouterRouting({ cameraControls: state })).toEqual({});
+});
+
+test("setRouterRouting replaces the whole routing map", () => {
+  let state = reducer(undefined, { type: "@@INIT" });
+  state = reducer(
+    state,
+    setRouterRouting({ output1: "input1", output2: "input3" })
+  );
+  expect(state.routerRouting).toEqual({ output1: "input1", output2: "input3" });
+});
+
+test("setRouterRoute sets a single crosspoint without disturbing others", () => {
+  let state = reducer(undefined, { type: "@@INIT" });
+  state = reducer(state, setRouterRouting({ output1: "input1" }));
+  state = reducer(state, setRouterRoute({ output: "output2", input: "input5" }));
+  expect(state.routerRouting).toEqual({ output1: "input1", output2: "input5" });
+
+  // overwriting an output's source replaces just that entry
+  state = reducer(state, setRouterRoute({ output: "output1", input: "input9" }));
+  expect(state.routerRouting).toEqual({ output1: "input9", output2: "input5" });
 });

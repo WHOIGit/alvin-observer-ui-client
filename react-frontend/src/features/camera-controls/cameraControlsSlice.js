@@ -34,6 +34,11 @@ const initialState = {
   allCameras: [],
   routerOutputs: [],
   routerInputs: [],
+  // Current routing crosspoints as a map of output value -> input value, e.g.
+  // { output1: "input1" }. Each output is fed by exactly one input. Populated
+  // from the backend (once it exposes routing) and updated optimistically on a
+  // successful TAKE so the matrix reflects the change immediately.
+  routerRouting: {},
   // Result of the most recent router TAKE, driven by the command receipt:
   // null (idle), "PENDING", "OK", or "ERR". Used to give the pilot inline
   // success/failure feedback on the TAKE button.
@@ -232,6 +237,16 @@ export const cameraControlsSlice = createSlice({
     setRouterTakeStatus: (state, action) => {
       state.routerTakeStatus = action.payload;
     },
+    // Replace the whole routing map (authoritative state from the backend).
+    setRouterRouting: (state, action) => {
+      state.routerRouting = action.payload;
+    },
+    // Set a single crosspoint: output is now fed by input. Used for the
+    // optimistic update after a confirmed TAKE.
+    setRouterRoute: (state, action) => {
+      const { output, input } = action.payload;
+      state.routerRouting[output] = input;
+    },
     setSocketError: (state, action) => {
       state.socketError = action.payload;
     },
@@ -260,6 +275,8 @@ export const {
   setRouterOutputs,
   setRouterInputs,
   setRouterTakeStatus,
+  setRouterRouting,
+  setRouterRoute,
   setSocketError,
 } = cameraControlsSlice.actions;
 
@@ -362,6 +379,12 @@ export const selectRouterInputs = createSelector(
 // (null | "PENDING" | "OK" | "ERR")
 export const selectRouterTakeStatus = (state) =>
   state.cameraControls.routerTakeStatus;
+
+// return the current routing map (output value -> input value)
+export const selectRouterRouting = createSelector(
+  (state) => state.cameraControls.routerRouting,
+  (item) => item
+);
 
 // return socket error status
 export const selectSocketError = (state) => state.cameraControls.socketError;
