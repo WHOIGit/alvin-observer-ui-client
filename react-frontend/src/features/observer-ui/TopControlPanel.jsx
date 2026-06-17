@@ -1,6 +1,6 @@
 import React from "react";
 import makeStyles from '@mui/styles/makeStyles';
-import { Grid, Paper, Box } from "@mui/material";
+import { Grid, Paper, Box, Stack } from "@mui/material";
 import { useSelector } from "react-redux";
 // local
 import ObserverDisplayChip from "./ObserverDisplayChip";
@@ -17,6 +17,7 @@ import {
   selectSocketError,
 } from "../camera-controls/cameraControlsSlice";
 import SocketErrorChip from "./SocketErrorChip";
+import SystemNotificationsBadge from "../system-messages/SystemNotificationsBadge";
 
 //import './obs_mini_vid_style.css'; //Testing only - added for gamepad style support - 29may2024 - mjs
 
@@ -142,7 +143,12 @@ export default function TopControlPanel({
         </Grid>
         <Grid item xs={3}>
           <Box mb={1}>
-            {socketError ? <SocketErrorChip /> : <ObserverDisplayChip />}
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                {socketError ? <SocketErrorChip /> : <ObserverDisplayChip />}
+              </Box>
+              <SystemNotificationsBadge />
+            </Stack>
           </Box>
           <Box mb={1}>
             <MetaDataDisplay />

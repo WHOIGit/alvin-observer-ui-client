@@ -70,7 +70,8 @@ test("marks messages read and clears read messages", () => {
   state = reducer(state, markAllSystemMessagesRead());
 
   expect(selectUnreadSystemMessageCount(rootState(state))).toBe(0);
-  expect(selectWorstSystemMessageLevel(rootState(state))).toBe("ERROR");
+  // Worst level reflects only unread messages, so reading clears it.
+  expect(selectWorstSystemMessageLevel(rootState(state))).toBeNull();
 
   state = reducer(state, dismissReadSystemMessages());
 
