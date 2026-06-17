@@ -48,10 +48,8 @@ export default function FocusZoomButton({
   const buttonClickEvent = useRef(false); //block extra stop loop on mouse up event - 29oct2024-mjs
   const loadingTime = useRef(1000); //allow different stop loading time for onClick vs onLongPress - 30oct2024-mjs
   
-  //console.log(new Date().toISOString(), "Entering FocusZoomButton - buttonID:", id, activeFocusZoomButton); //test only 24oct2024 - mjs
-  
-  //disable other zoom/focus buttons on button event - 24oct2024-mjs
-  const activeButton = useRef(null); 
+  //disable other zoom/focus buttons on button event
+  const activeButton = useRef(null);
   const activeButtonPriority = useRef(null);
   const handleActiveButton = (btn, priority) => {
     activeButton.current = btn; 
@@ -66,14 +64,7 @@ export default function FocusZoomButton({
   });
 
   const handleZoomHold = (commandName, commandValue) => {
-    handleSendMessage(commandName, commandValue); 
-    //// Set a Timeout to resend command every 1 sec //removed - 08oct2024 - mjs
-    //timerRef.current = setTimeout(
-    //  handleZoomHold,
-    //  1000,
-    //  commandName,
-    //  commandValue
-    //);
+    handleSendMessage(commandName, commandValue);
   };
 
   const handleStop = (commandName) => {
@@ -81,61 +72,38 @@ export default function FocusZoomButton({
       clearTimeout(timerRef.current);
     }
     // delay Stop message sending to avoid collisions with last button actions
-    //setTimeout(handleSendMessage, 100, commandName, COMMAND_STRINGS.focusStop); 
-    setTimeout(() => { //changed to allow console.log 24oct2024 - mjs
-      //console.log(new Date().toISOString(), "FocusZoomButton - onStop - handleSendMessage - buttonID:", id, activeButton.current); //test only 24oct2024 - mjs
+    setTimeout(() => {
       handleSendMessage(commandName, COMMAND_STRINGS.focusStop);
-    }, 10); //was 100 - 28oct2024-mjs
+    }, 10);
 
-    
-    
     // add a delay to UI to block aggressive user interactions
     setLoading(true);
     setTimeout(() => {
-      
-      handleActiveButton(null, id); //24oct2024 - mjs  
-      //console.log(new Date().toISOString(), "FocusZoomButton - onStop - blockRelease- buttonID:", id, activeButton.current); //test only 24oct2024 - mjs
-      
-      buttonClickEvent.current = false; //29oct2024-mjs
-      
-      setLoading(false);       
-      
-    }, loadingTime.current);  //was 1000 - changed 08oct2024 - mjs
-    
-    
-    
+      handleActiveButton(null, id);
+      buttonClickEvent.current = false;
+      setLoading(false);
+    }, loadingTime.current);
   };
 
   const btnProps = useLongPress({
     onClick: () => {
-      
-      buttonClickEvent.current = true; //29oct2024 - mjs
-      loadingTime.current = 1000; //30oct2024 - mjs
-      
-      handleActiveButton(id, id); //24oct2024 - mjs
-      //console.log(new Date().toISOString(), "FocusZoomButton - onClick - buttonID:", id, activeButton.current); //test only 24oct2024 - mjs
-       
-      handleSendMessage(commandStringControl, commandStringOneStop) 
+      buttonClickEvent.current = true;
+      loadingTime.current = 1000;
+      handleActiveButton(id, id);
+      handleSendMessage(commandStringControl, commandStringOneStop);
     },
-    
+
     onLongPress: () => {
-    
-      buttonClickEvent.current = true; //29oct2024 - mjs
-      loadingTime.current = 500; //30oct2024 - mjs
-    
-      handleActiveButton(id, id); //24oct2024 - mjs
-      //console.log(new Date().toISOString(), "FocusZoomButton - onLongPress - buttonID:", id, activeButton.current); //test only 24oct2024 - mjs
-    
-      handleZoomHold(commandStringControl, commandStringContinuous)
+      buttonClickEvent.current = true;
+      loadingTime.current = 500;
+      handleActiveButton(id, id);
+      handleZoomHold(commandStringControl, commandStringContinuous);
     },
-    
-    onStop: () => {    
-      
-      if (buttonClickEvent.current) { //29oct2024 - mjs
-        handleStop(commandStringControl)
+
+    onStop: () => {
+      if (buttonClickEvent.current) {
+        handleStop(commandStringControl);
       }
-      
-      
     },
   });
 
@@ -157,39 +125,28 @@ export default function FocusZoomButton({
       camSettings.focus_mode === "AF" &&
       buttonFunction === "focus"
     ) {
-      setIsEnabled(false);      
+      setIsEnabled(false);
     } else {
-      setIsEnabled(true);      
+      setIsEnabled(true);
     }
-    
-    //console.log(new Date().toISOString(), "FocusZoomButton- UseEffect (1) - buttonFunction:", buttonFunction, isEnabled); //test only 24oct2024 - mjs
-        
   }, [buttonFunction, camSettings]);
-  
-  
-  //Enable/Disable all Focus/Zoom buttons except active button when a Focus/Zoom button is pressed - 24oct2024 - mjs 
-  useEffect(() => {     
-    
-    //console.log(new Date().toISOString(), "FocusZoomButton - useEffect (2) - buttonID:", id, activeButton.current, activeFocusZoomButton, activeButtonPriority.current); //test only 24oct2024 - mjs
-   
-    if (activeFocusZoomButton === null) {
-    
-       handleActiveButton(null, null);  
-              
-       if ((camSettings.focus_mode === "MF" && buttonFunction === "focus") || (buttonFunction === "zoom")) {
-         setIsEnabled(true);      
-       }
-    
-    } else {
-    
-      if (activeButtonPriority.current !== id) {
-         setIsEnabled(false);  
-      }       
-    }
- 
-  }, [activeFocusZoomButton]);
 
-  //console.log(new Date().toISOString(), "Exiting FocusZoomButton - buttonID:", id, activeButton.current, activeFocusZoomButton, activeButtonPriority.current); //test only 24oct2024 - mjs
+
+  // Enable/disable all focus/zoom buttons except the active one while a
+  // focus/zoom button is pressed
+  useEffect(() => {
+    if (activeFocusZoomButton === null) {
+      handleActiveButton(null, null);
+
+      if ((camSettings.focus_mode === "MF" && buttonFunction === "focus") || (buttonFunction === "zoom")) {
+        setIsEnabled(true);
+      }
+    } else {
+      if (activeButtonPriority.current !== id) {
+        setIsEnabled(false);
+      }
+    }
+  }, [activeFocusZoomButton]);
 
   return (
     <div className={classes.buttonWrapper}>

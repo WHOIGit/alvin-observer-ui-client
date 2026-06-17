@@ -31,7 +31,6 @@ const useStyles = makeStyles((theme) => ({
 export default function CameraControls({ showFullCameraControls }) {
   const classes = useStyles();
   const camHeartbeat = useSelector(selectCamHeartbeatData);
-  console.log("HB", camHeartbeat);
 
   return (
     <div

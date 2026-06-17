@@ -37,7 +37,6 @@ export default function SelectExposureMode({ showLabel }) {
   const { isOwner } = useIsOwner();
   const [expModeRequested, setExpModeRequested] = useState(null);
   const labelText = "EXP MODE:";
-  //console.log(camSettings);
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
@@ -47,7 +46,6 @@ export default function SelectExposureMode({ showLabel }) {
   });
 
   const handleSendMessage = (event) => {
-    console.log("TARGET VALUE:", event.target.value);
     void emit({
       action: {
         name: COMMAND_STRINGS.exposureModeCommand,

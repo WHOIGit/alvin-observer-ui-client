@@ -34,8 +34,8 @@ export default function NavDataDisplay() {
       parseISO(recorderHeartbeatData?.timestamp),
       "yyyy-MM-dd HH:mm:ss"
     );
-  } catch (error) {
-    console.log(error);
+  } catch {
+    // timestamp missing or unparseable; leave the date blank
   }
 
   if (camSettings === null) {

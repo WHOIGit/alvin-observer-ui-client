@@ -119,7 +119,7 @@ export const cameraControlsSlice = createSlice({
               default:
             }
           } else {
-            console.log("ERROR Received from AIS");
+            console.error("Camera command rejected by AIS", action.payload);
             state.errorCameraChange = true;
           }
         }
