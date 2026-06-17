@@ -139,7 +139,7 @@ export const selectUnreadSystemMessageCount = createSelector(
 );
 
 export const selectWorstSystemMessageLevel = createSelector(
-  selectSystemMessages,
+  selectUnreadSystemMessages,
   (messages) =>
     messages.reduce((worstLevel, message) => {
       if (

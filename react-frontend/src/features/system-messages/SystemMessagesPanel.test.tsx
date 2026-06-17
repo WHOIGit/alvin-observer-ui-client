@@ -1,10 +1,9 @@
 import { afterEach, expect, test } from "vitest";
 import React from "react";
 import { cleanup } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { configureStore } from "@reduxjs/toolkit";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
-import SystemNotificationsBar from "./SystemNotificationsBar";
+import SystemMessagesPanel from "./SystemMessagesPanel";
 import systemMessagesReducer, { addSystemMessage } from "./systemMessagesSlice";
 
 function makeStore() {
@@ -19,27 +18,18 @@ afterEach(() => {
   cleanup();
 });
 
-test("shows a stable idle fixture when there are no messages", async () => {
-  const user = userEvent.setup();
+test("shows an empty system messages state", () => {
   const store = makeStore();
 
-  const { getByLabelText, getByText } = renderWithProviders(
-    <SystemNotificationsBar />,
-    { store }
-  );
-
-  expect(getByLabelText("Expand system notifications")).toBeTruthy();
-  expect(getByText("System")).toBeTruthy();
-  expect(getByText("0")).toBeTruthy();
-
-  await user.click(getByLabelText("Expand system notifications"));
+  const { getByText } = renderWithProviders(<SystemMessagesPanel />, {
+    store,
+  });
 
   expect(getByText("No active notifications")).toBeTruthy();
   expect(getByText("No system messages")).toBeTruthy();
 });
 
-test("shows unread severity counters and expands into a message tray", async () => {
-  const user = userEvent.setup();
+test("shows active system messages", () => {
   const store = makeStore();
 
   store.dispatch(
@@ -66,15 +56,9 @@ test("shows unread severity counters and expands into a message tray", async () 
     )
   );
 
-  const { getByLabelText, getByText } = renderWithProviders(
-    <SystemNotificationsBar />,
-    { store }
-  );
-
-  expect(getByLabelText("1 unread warning message")).toBeTruthy();
-  expect(getByLabelText("1 unread error message")).toBeTruthy();
-
-  await user.click(getByLabelText("Expand system notifications"));
+  const { getByText } = renderWithProviders(<SystemMessagesPanel />, {
+    store,
+  });
 
   expect(getByText("2 active notifications")).toBeTruthy();
   expect(getByText("Low disk space")).toBeTruthy();

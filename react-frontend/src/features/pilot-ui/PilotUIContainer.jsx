@@ -1,11 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import makeStyles from '@mui/styles/makeStyles';
+import { useSelector } from "react-redux";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
 // local
@@ -16,6 +16,12 @@ import { WS_SERVER_NAMESPACE_PORT, WS_SERVER_NAMESPACE_STARBOARD } from "../../c
 import RouterControlContainer from "./RouterControlContainer";
 import CameraControlContainer from "./CameraControlContainer";
 import MetaDataDisplay from "./MetaDataDisplay";
+import SystemMessagesPanel from "../system-messages/SystemMessagesPanel";
+import {
+  selectUnreadSystemMessageCount,
+  selectWorstSystemMessageLevel,
+} from "../system-messages/systemMessagesSlice";
+import { IDLE_META, LEVEL_META } from "../system-messages/systemMessageUi";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -30,7 +36,7 @@ function TabPanel(props) {
     >
       {value === index && (
         <Box p={3}>
-          <Typography>{children}</Typography>
+          {children}
         </Box>
       )}
     </div>
@@ -70,6 +76,11 @@ const useStyles = makeStyles((theme) => ({
 export default function SimpleTabs() {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
+  const unreadSystemMessageCount = useSelector(selectUnreadSystemMessageCount);
+  const worstSystemMessageLevel = useSelector(selectWorstSystemMessageLevel);
+  const systemBadgeColor = worstSystemMessageLevel
+    ? LEVEL_META[worstSystemMessageLevel].color
+    : IDLE_META.color;
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -97,6 +108,41 @@ export default function SimpleTabs() {
               >
                 <Tab label="ROUTER CONTROL" {...tabProps(0)} />
                 <Tab label="CAMERA CONTROL" {...tabProps(1)} />
+                <Tab
+                  label={
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.75,
+                      }}
+                    >
+                      SYSTEM
+                      {unreadSystemMessageCount ? (
+                        <Box
+                          component="span"
+                          sx={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            minWidth: 20,
+                            height: 20,
+                            px: 0.5,
+                            borderRadius: "10px",
+                            bgcolor: systemBadgeColor,
+                            color: "#fff",
+                            fontSize: 12,
+                            fontWeight: 700,
+                            lineHeight: 1,
+                          }}
+                        >
+                          {unreadSystemMessageCount}
+                        </Box>
+                      ) : null}
+                    </Box>
+                  }
+                  {...tabProps(2)}
+                />
               </Tabs>
             </div>
 
@@ -110,6 +156,9 @@ export default function SimpleTabs() {
         </TabPanel>
         <TabPanel value={value} index={1}>
           <CameraControlContainer />
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          <SystemMessagesPanel maxHeight={520} />
         </TabPanel>
       </div>
     </>
