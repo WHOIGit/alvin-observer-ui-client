@@ -95,13 +95,18 @@ export default function RouterControls() {
   const routing = useSelector(selectRouterRouting);
   const takeStatus = useSelector(selectRouterTakeStatus);
 
-  // Fall back to static mock data when no router ports are available (e.g. no
-  // backend connected) so the matrix is reviewable. See routerMatrixMock.js.
-  const usingMock = routerInputs.length === 0;
-  const inputs = usingMock ? MOCK_ROUTER_INPUTS : routerInputs;
-  const outputs = usingMock ? MOCK_ROUTER_OUTPUTS : routerOutputs;
-  const effectiveRouting =
-    usingMock && Object.keys(routing).length === 0 ? MOCK_ROUTER_ROUTING : routing;
+  // Real router ports arrive from the backend bootstrap. The mock dataset is
+  // dev-only review scaffolding (see routerMatrixMock.js) so a deployed build
+  // never presents fabricated routes when no router is connected.
+  const hasPorts = routerInputs.length > 0 && routerOutputs.length > 0;
+  const useMock = !hasPorts && import.meta.env.DEV;
+  const inputs = useMock ? MOCK_ROUTER_INPUTS : routerInputs;
+  const outputs = useMock ? MOCK_ROUTER_OUTPUTS : routerOutputs;
+  // routerRouting is only populated by backends that support the routing query.
+  // When it's absent the matrix simply shows no active crosspoints; staging and
+  // TAKE still work and update optimistically, so the take interface is fully
+  // usable against a backend that doesn't report routing yet.
+  const effectiveRouting = useMock ? MOCK_ROUTER_ROUTING : routing;
 
   // The crosspoint the pilot has staged but not yet committed.
   const [staged, setStaged] = useState({ input: null, output: null });
@@ -148,6 +153,18 @@ export default function RouterControls() {
   };
 
   const takeDisabled = !hasStaged || isPending || isOk;
+
+  // No router ports and not in dev review mode: show a graceful placeholder
+  // rather than an empty grid.
+  if (!hasPorts && !useMock) {
+    return (
+      <Box my={4} textAlign="center">
+        <Typography variant="body2" color="textSecondary">
+          Router controls unavailable — no router connected.
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -214,7 +231,7 @@ export default function RouterControls() {
         </Grid>
       </Grid>
 
-      {usingMock && (
+      {useMock && (
         <Box mt={1} textAlign="center">
           <Typography variant="caption" color="textSecondary">
             Showing mock routing — no router connected
