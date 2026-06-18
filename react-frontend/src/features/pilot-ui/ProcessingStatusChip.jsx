@@ -11,10 +11,8 @@ import { selectRecorderHeartbeatData } from "../camera-controls/cameraControlsSl
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    position: "absolute",
-    marginTop: "-50px",
-    left: "50%",
-    transform: "translate(-50%, 0)",
+    display: "flex",
+    justifyContent: "center",
   },
   formControl: {
     margin: theme.spacing(1),

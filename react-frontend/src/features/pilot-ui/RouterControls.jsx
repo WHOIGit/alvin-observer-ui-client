@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: theme.spacing(1),
-    minHeight: 28,
+    minWidth: 220,
     color: grey[300],
     fontSize: ".85rem",
   },
@@ -177,70 +177,62 @@ export default function RouterControls() {
         onSelect={handleSelect}
       />
 
-      <Box mt={2} className={classes.staged}>
-        {hasStaged ? (
-          <>
-            <span>{labelFor(inputs, staged.input)}</span>
-            <ArrowForwardIcon className={classes.stagedArrow} />
-            <span>{labelFor(outputs, staged.output)}</span>
-          </>
-        ) : (
-          <span className={classes.placeholder}>
-            Select a crosspoint to stage a route
-          </span>
-        )}
-      </Box>
-
-      <Grid
-        container
-        spacing={2}
+      <Box
+        mt={2}
+        display="flex"
         alignItems="center"
         justifyContent="center"
-        mt={0}
+        flexWrap="wrap"
+        gap={2}
       >
-        <Grid item>
-          <Button variant="contained" color="inherit" onClick={handleCancel}>
-            CANCEL
-          </Button>
-        </Grid>
-        <Grid item>
-          <div className={classes.buttonWrapper}>
-            <Button
-              variant="contained"
-              disabled={takeDisabled}
-              startIcon={
-                isOk ? <DoneIcon /> : isErr ? <ErrorOutlineIcon /> : null
-              }
-              className={clsx(classes.takeButton, {
-                [classes.takeButtonError]: isErr,
-              })}
-              onClick={handleTake}
-            >
-              {isPending
-                ? "SENDING…"
-                : isOk
-                ? "ROUTED"
-                : isErr
-                ? "TAKE FAILED"
-                : "TAKE"}
-            </Button>
-            {isPending && (
-              <CircularProgress size={24} className={classes.buttonProgress} />
-            )}
-          </div>
-        </Grid>
-      </Grid>
+        <Box className={classes.staged}>
+          {hasStaged ? (
+            <>
+              <span>{labelFor(inputs, staged.input)}</span>
+              <ArrowForwardIcon className={classes.stagedArrow} />
+              <span>{labelFor(outputs, staged.output)}</span>
+            </>
+          ) : (
+            <span className={classes.placeholder}>
+              Select a crosspoint to stage a route
+            </span>
+          )}
+        </Box>
 
-      {useMock && (
-        <Box mt={1} textAlign="center">
+        <Button variant="contained" color="inherit" onClick={handleCancel}>
+          CANCEL
+        </Button>
+
+        <div className={classes.buttonWrapper}>
+          <Button
+            variant="contained"
+            disabled={takeDisabled}
+            startIcon={isOk ? <DoneIcon /> : isErr ? <ErrorOutlineIcon /> : null}
+            className={clsx(classes.takeButton, {
+              [classes.takeButtonError]: isErr,
+            })}
+            onClick={handleTake}
+          >
+            {isPending
+              ? "SENDING…"
+              : isOk
+              ? "ROUTED"
+              : isErr
+              ? "TAKE FAILED"
+              : "TAKE"}
+          </Button>
+          {isPending && (
+            <CircularProgress size={24} className={classes.buttonProgress} />
+          )}
+        </div>
+
+        <ProcessingStatusChip />
+
+        {useMock && (
           <Typography variant="caption" color="textSecondary">
             Showing mock routing — no router connected
           </Typography>
-        </Box>
-      )}
-
-      <Box mt={2}>
-        <ProcessingStatusChip />
+        )}
       </Box>
     </>
   );
