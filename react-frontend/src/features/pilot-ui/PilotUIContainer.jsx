@@ -7,6 +7,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { deepOrange } from "@mui/material/colors";
 // local
 import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
@@ -24,6 +25,7 @@ import CameraControlContainer from "./CameraControlContainer";
 import MetaDataDisplay from "./MetaDataDisplay";
 import SystemMessagesPanel from "../system-messages/SystemMessagesPanel";
 import SystemMessageCountPill from "../system-messages/SystemMessageCountPill";
+import SystemHealthPanel from "../system-health/SystemHealthPanel";
 import {
   selectUnreadSystemMessageCount,
   selectWorstSystemMessageLevel,
@@ -166,7 +168,24 @@ export default function SimpleTabs() {
           <CameraControlContainer />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          <SystemMessagesPanel maxHeight={520} />
+          {/* Health matrix on top, shrunken notifications below. */}
+          <SystemHealthPanel maxHeight={380} />
+          <Box sx={{ mt: 2 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "grey.400",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}
+            >
+              Notifications
+            </Typography>
+            <Box sx={{ mt: 0.75 }}>
+              <SystemMessagesPanel maxHeight={200} />
+            </Box>
+          </Box>
         </TabPanel>
       </div>
     </>
