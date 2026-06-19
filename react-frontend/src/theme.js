@@ -48,7 +48,8 @@ const theme = createTheme({
       main: red.A400,
     },
     background: {
-      default: "#fff",
+      // Match the dark paper grey so no white shows below page content.
+      default: "#121212",
     },
   },
 });
