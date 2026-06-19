@@ -11,3 +11,29 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Bomb button agitation — amplitude/speed driven by inline --amp. */
+@keyframes bomb-shake {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  20% {
+    transform: translate(calc(var(--amp, 1) * -1px), calc(var(--amp, 1) * 0.6px))
+      rotate(calc(var(--amp, 1) * -1deg));
+  }
+  40% {
+    transform: translate(calc(var(--amp, 1) * 1px), calc(var(--amp, 1) * -0.6px))
+      rotate(calc(var(--amp, 1) * 1deg));
+  }
+  60% {
+    transform: translate(calc(var(--amp, 1) * -1px), calc(var(--amp, 1) * -0.4px))
+      rotate(calc(var(--amp, 1) * -0.7deg));
+  }
+  80% {
+    transform: translate(calc(var(--amp, 1) * 1px), calc(var(--amp, 1) * 0.4px))
+      rotate(calc(var(--amp, 1) * 0.7deg));
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}

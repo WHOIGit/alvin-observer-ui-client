@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useSelector } from "react-redux";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -12,7 +12,10 @@ import { deepOrange } from "@mui/material/colors";
 import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
 import NewCameraCommandListener from "../listeners/NewCameraCommandListener";
 import RecorderHeartbeatListener from "../listeners/RecorderHeartbeatListener";
-import { WS_SERVER_NAMESPACE_PORT, WS_SERVER_NAMESPACE_STARBOARD } from "../../config";
+import {
+  WS_SERVER_NAMESPACE_PORT,
+  WS_SERVER_NAMESPACE_STARBOARD,
+} from "../../config";
 import RouterControlContainer from "./RouterControlContainer";
 import CameraControlContainer from "./CameraControlContainer";
 import MetaDataDisplay from "./MetaDataDisplay";
@@ -23,6 +26,7 @@ import {
   selectWorstSystemMessageLevel,
 } from "../system-messages/systemMessagesSlice";
 import { IDLE_META, LEVEL_META } from "../system-messages/systemMessageUi";
+import RestartButton from "./RestartButton";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -35,11 +39,7 @@ function TabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box p={3}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box p={3}>{children}</Box>}
     </div>
   );
 }
@@ -90,8 +90,12 @@ export default function SimpleTabs() {
   return (
     <>
       <CamHeartbeatListener />
-      <CamHeartbeatListener namespaceOverride={`/${WS_SERVER_NAMESPACE_PORT}`} />
-      <CamHeartbeatListener namespaceOverride={`/${WS_SERVER_NAMESPACE_STARBOARD}`} />
+      <CamHeartbeatListener
+        namespaceOverride={`/${WS_SERVER_NAMESPACE_PORT}`}
+      />
+      <CamHeartbeatListener
+        namespaceOverride={`/${WS_SERVER_NAMESPACE_STARBOARD}`}
+      />
       <NewCameraCommandListener />
       <RecorderHeartbeatListener />
 
@@ -145,6 +149,7 @@ export default function SimpleTabs() {
           <SystemMessagesPanel maxHeight={520} />
         </TabPanel>
       </div>
+      <RestartButton />
     </>
   );
 }
