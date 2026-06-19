@@ -40,8 +40,9 @@ export function worstOf(statuses) {
   return worst;
 }
 
-// Station grouping for matrix columns.
-export const STATION_ORDER = ["port", "stbd", "pilot", "shared"];
+// Station grouping for matrix columns. Shared leads so the cross-cutting paths
+// (router, telemetry) stay visible without horizontal scrolling.
+export const STATION_ORDER = ["shared", "port", "stbd", "pilot"];
 export const STATION_LABELS = {
   port: "Port",
   stbd: "Stbd",

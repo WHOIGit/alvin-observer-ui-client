@@ -90,13 +90,13 @@ export default function SystemHealthPanel({ maxHeight = 520 }) {
       {/* Scrollable matrix + services */}
       <Box sx={{ maxHeight, overflowY: "auto", pr: 0.5 }}>
         <Stack spacing={1.25}>
-          <HealthMatrix
-            paths={document.paths || []}
+          <ServicesGrid
+            services={document.services || []}
             stale={stale}
             onSelect={setSelection}
           />
-          <ServicesGrid
-            services={document.services || []}
+          <HealthMatrix
+            paths={document.paths || []}
             stale={stale}
             onSelect={setSelection}
           />

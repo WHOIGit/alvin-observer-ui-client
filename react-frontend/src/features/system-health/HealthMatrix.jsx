@@ -10,8 +10,8 @@ import {
 
 const HEADER_BG = "#0d141b";
 const BORDER = "1px solid rgba(255,255,255,0.10)";
-const ROW_LABEL_W = 168;
-const COL_W = 92;
+const ROW_LABEL_W = 132;
+const COL_W = 88;
 
 // Station-grouped status matrix: columns = paths by station then kind, rows =
 // probe ladder + class rows. When `stale`, every cell + light greys to unknown.
@@ -159,7 +159,7 @@ export default function HealthMatrix({ paths = [], stale = false, onSelect }) {
                   bgcolor: "#0b1117",
                   borderBottom: BORDER,
                   borderRight: BORDER,
-                  px: 1,
+                  px: 0.75,
                   py: 0.4,
                   textAlign: "left",
                   color: "grey.300",
