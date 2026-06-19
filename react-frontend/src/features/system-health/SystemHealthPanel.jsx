@@ -1,26 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import useHealthSnapshot from "./useHealthSnapshot";
 import HealthMatrix from "./HealthMatrix";
 import ServicesGrid from "./ServicesGrid";
 import HealthDetailDrawer from "./HealthDetailDrawer";
-import StatusBadge from "./StatusBadge";
-import { STATUS, formatAge, isFeedStale, statusMeta } from "./healthUi";
+import { useHealthContext } from "./HealthContext";
+import { formatAge } from "./healthUi";
 
-// System health view: overall banner + "updated Xs ago", station-grouped
-// matrix, services grid, and cell detail drawer. A stale feed greys everything.
+// System health view: station-grouped matrix + services grid + cell detail
+// drawer. The overall status lives on the SYSTEM tab; here "updated Xs ago"
+// rides in the services header and a stale feed greys everything.
 export default function SystemHealthPanel({ maxHeight = 520 }) {
-  const { document, receivedAt } = useHealthSnapshot();
+  const { document, now, stale } = useHealthContext();
   const [selection, setSelection] = useState(null);
-
-  // Tick once a second so "updated Xs ago" and staleness stay live.
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
 
   if (!document) {
     return (
@@ -32,49 +25,16 @@ export default function SystemHealthPanel({ maxHeight = 520 }) {
     );
   }
 
-  const stale = isFeedStale(receivedAt, now);
-  const overall = stale ? STATUS.UNKNOWN : document.overall;
-  const overallMeta = statusMeta(overall);
   const ageLabel = formatAge(document.generated_at, now);
-  const dive = document.dive || {};
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
-      {/* Overall banner */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 1,
-          px: 1.5,
-          py: 1,
-          borderRadius: 1,
-          bgcolor: `${overallMeta.color}1f`,
-          border: `1px solid ${overallMeta.color}`,
-        }}
-      >
-        <StatusBadge status={overall} variant="light" />
-        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-          <Typography sx={{ color: "grey.50", fontWeight: 800, fontSize: 14, lineHeight: 1.1 }}>
-            System {overallMeta.label}
-          </Typography>
-          <Typography sx={{ color: "grey.400", fontSize: 11 }}>
-            {[dive.cruise_name, dive.dive_name].filter(Boolean).join(" · ") || "—"}
-          </Typography>
-        </Box>
-        <Typography
-          sx={{ color: stale ? "#ffb300" : "grey.400", fontSize: 11, fontWeight: 600, whiteSpace: "nowrap" }}
-        >
-          updated {ageLabel}
-        </Typography>
-      </Box>
-
-      {/* Stale / dropped feed banner */}
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+      {/* Stale / dropped feed banner (only when stale) */}
       {stale ? (
         <Box
           sx={{
             px: 1.5,
-            py: 0.75,
+            py: 0.5,
             borderRadius: 1,
             bgcolor: "#78909c22",
             border: "1px solid #78909c",
@@ -87,13 +47,25 @@ export default function SystemHealthPanel({ maxHeight = 520 }) {
         </Box>
       ) : null}
 
-      {/* Scrollable matrix + services */}
+      {/* Scrollable services + matrix */}
       <Box sx={{ maxHeight, overflowY: "auto", pr: 0.5 }}>
-        <Stack spacing={1.25}>
+        <Stack spacing={1}>
           <ServicesGrid
             services={document.services || []}
             stale={stale}
             onSelect={setSelection}
+            headerRight={
+              <Typography
+                sx={{
+                  color: stale ? "#ffb300" : "grey.500",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                updated {ageLabel}
+              </Typography>
+            }
           />
           <HealthMatrix
             paths={document.paths || []}

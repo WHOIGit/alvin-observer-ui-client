@@ -4,29 +4,40 @@ import Typography from "@mui/material/Typography";
 import StatusBadge from "./StatusBadge";
 import { STATUS, statusMeta } from "./healthUi";
 
-// "System services" card grid below the matrix. Greyed to unknown when stale.
-export default function ServicesGrid({ services = [], stale = false, onSelect }) {
+// "System services" card grid. Greyed to unknown when stale. `headerRight`
+// renders in the header row (the panel puts "updated Xs ago" there).
+export default function ServicesGrid({ services = [], stale = false, onSelect, headerRight }) {
   if (!services.length) return null;
 
   return (
     <Box>
-      <Typography
-        variant="caption"
-        sx={{
-          color: "grey.400",
-          fontWeight: 800,
-          textTransform: "uppercase",
-          letterSpacing: 1,
-        }}
-      >
-        System services
-      </Typography>
       <Box
         sx={{
-          mt: 0.75,
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: 1,
+        }}
+      >
+        <Typography
+          variant="caption"
+          sx={{
+            color: "grey.400",
+            fontWeight: 800,
+            textTransform: "uppercase",
+            letterSpacing: 1,
+          }}
+        >
+          System services
+        </Typography>
+        {headerRight}
+      </Box>
+      <Box
+        sx={{
+          mt: 0.5,
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-          gap: 0.75,
+          gridTemplateColumns: "repeat(auto-fill, minmax(176px, 1fr))",
+          gap: 0.5,
         }}
       >
         {services.map((svc) => {
@@ -46,7 +57,8 @@ export default function ServicesGrid({ services = [], stale = false, onSelect })
               }}
               sx={{
                 cursor: "pointer",
-                p: 1,
+                px: 1,
+                py: 0.6,
                 borderRadius: 1,
                 bgcolor: "#0d141b",
                 border: `1px solid ${meta.color}55`,
@@ -67,6 +79,7 @@ export default function ServicesGrid({ services = [], stale = false, onSelect })
                     color: "grey.100",
                     fontSize: 12,
                     fontWeight: 700,
+                    lineHeight: 1.2,
                     overflowWrap: "anywhere",
                   }}
                 >
@@ -76,7 +89,7 @@ export default function ServicesGrid({ services = [], stale = false, onSelect })
               </Box>
               {svc.detail ? (
                 <Typography
-                  sx={{ color: "grey.400", fontSize: 11, mt: 0.25, overflowWrap: "anywhere" }}
+                  sx={{ color: "grey.400", fontSize: 11, lineHeight: 1.25, overflowWrap: "anywhere" }}
                 >
                   {svc.detail}
                 </Typography>
