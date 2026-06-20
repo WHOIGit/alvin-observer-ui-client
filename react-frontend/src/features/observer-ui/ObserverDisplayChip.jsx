@@ -20,9 +20,9 @@ export default function ObserverDisplayChip() {
   if (observerSide === null) {
     return null;
   } else if (observerSide === "P") {
-    label = "OBSERVER SIDE: PORT";
+    label = "PORT OBSERVER";
   } else if (observerSide === "S") {
-    label = "OBSERVER SIDE: STBD";
+    label = "STBD OBSERVER";
   }
 
   return <Chip label={label} className={classes.chip} color="primary" />;
