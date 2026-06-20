@@ -19,7 +19,7 @@ const SPARKS_AT_MS = 7000;
 // Red wash never goes fully opaque — peak and trough alpha.
 const RED_MAX = 0.85;
 const RED_MIN = 0.14;
-const RESTART_URL = `http://${window.location.hostname}:8082/restart`;
+const RESTART_URL = `https://${window.location.hostname}/restart`;
 
 const useStyles = makeStyles(() => ({
   root: {
