@@ -137,6 +137,7 @@ export default function SimpleTabs() {
             <div className={classes.metaData}>
               <MetaDataDisplay />
             </div>
+            <RestartButton />
           </Toolbar>
         </AppBar>
         <TabPanel value={value} index={0}>
@@ -149,7 +150,6 @@ export default function SimpleTabs() {
           <SystemMessagesPanel maxHeight={520} />
         </TabPanel>
       </div>
-      <RestartButton />
     </>
   );
 }

@@ -23,12 +23,13 @@ const RESTART_URL = `http://${window.location.hostname}:8082/restart`;
 
 const useStyles = makeStyles(() => ({
   root: {
-    position: "fixed",
-    bottom: 16,
-    left: 16,
-    zIndex: 1300,
-    width: 56,
-    height: 56,
+    // Lives inline at the far-right of the toolbar.
+    position: "relative",
+    zIndex: 1300, // stay above the red wash (1299)
+    flexShrink: 0,
+    marginLeft: 12,
+    width: 40,
+    height: 40,
     padding: 0,
     border: "none",
     borderRadius: "50%",
@@ -40,10 +41,13 @@ const useStyles = makeStyles(() => ({
     WebkitUserSelect: "none",
     touchAction: "none",
     outline: "none",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   img: {
-    width: 32,
-    height: 32,
+    width: 24,
+    height: 24,
     pointerEvents: "none",
     // Sit above the progress fill.
     position: "relative",
@@ -119,8 +123,8 @@ const useStyles = makeStyles(() => ({
   // "PRESS & HOLD" nudge shown after a tap/cancel.
   hint: {
     position: "fixed",
-    left: 84,
-    bottom: 30,
+    top: 64,
+    right: 12,
     zIndex: 1301,
     padding: "8px 14px",
     borderRadius: 6,
