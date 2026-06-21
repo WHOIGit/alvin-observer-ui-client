@@ -5,9 +5,6 @@ import { NEW_CAMERA_COMMAND_EVENT } from "../../config";
 import {
   changeCurrentCamData,
   setAllCameras,
-  setRouterOutputs,
-  setRouterInputs,
-  setRouterRouting,
   changeCameraSettings,
   selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
@@ -27,13 +24,9 @@ export default function NewCameraCommandListener({ namespaceOverride = null }) {
         dispatch(changeCurrentCamData(message));
       } else if ("camera_array" in message) {
         dispatch(setAllCameras(message.camera_array));
-      } else if ("router_output_array" in message) {
-        dispatch(setRouterOutputs(message.router_output_array));
-      } else if ("router_input_array" in message) {
-        dispatch(setRouterInputs(message.router_input_array));
-      } else if ("router_routing" in message) {
-        dispatch(setRouterRouting(message.router_routing));
       } else {
+        // Router state (ports + routing) now arrives on the v1.5 /router
+        // namespace; the legacy router_*_array messages are ignored here.
         dispatch(changeCameraSettings(message));
       }
     },

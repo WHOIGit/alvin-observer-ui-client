@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import clsx from "clsx";
 import makeStyles from "@mui/styles/makeStyles";
@@ -8,20 +8,26 @@ import DoneIcon from "@mui/icons-material/Done";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 // local
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useSocket, useSocketListener } from "../../hooks/useSocket";
 import ProcessingStatusChip from "./ProcessingStatusChip";
 import RouterMatrix from "./RouterMatrix";
 import {
-  selectActiveCamera,
-  selectObserverSide,
   selectRouterInputs,
   selectRouterOutputs,
   selectRouterRouting,
   selectRouterTakeStatus,
+  setRouterInputs,
+  setRouterOutputs,
+  setRouterRouting,
   setRouterTakeStatus,
   setRouterRoute,
 } from "../camera-controls/cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
+import {
+  WS_API_VERSION_V1_5,
+  WS_ROUTER_NAMESPACE,
+  ROUTER_STATE_EVENT,
+  ROUTER_TAKE_EVENT,
+} from "../../config.js";
 import {
   MOCK_ROUTER_INPUTS,
   MOCK_ROUTER_OUTPUTS,
@@ -31,6 +37,10 @@ import {
 // How long the success/failure indicator stays on the TAKE button before it
 // resets to idle.
 const TAKE_RESULT_DISPLAY_MS = 2500;
+
+// Give a take a bounded window to be acknowledged so the button never sticks
+// on SENDING if the backend is unreachable.
+const TAKE_ACK_TIMEOUT_MS = 5000;
 
 const useStyles = makeStyles((theme) => ({
   takeButton: {
@@ -83,11 +93,26 @@ export default function RouterControls() {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
+  // Router state and takes live on the v1.5 /router namespace (not the legacy
+  // v1 API), so the whole router surface is served from one place.
+  const routerSocket = useSocket(WS_ROUTER_NAMESPACE, {
+    apiVersion: WS_API_VERSION_V1_5,
+  });
+
+  // Apply the authoritative snapshot the gateway sends on connect and after
+  // every take.
+  const handleRouterState = useCallback(
+    (state) => {
+      if (Array.isArray(state?.inputs)) dispatch(setRouterInputs(state.inputs));
+      if (Array.isArray(state?.outputs)) {
+        dispatch(setRouterOutputs(state.outputs));
+      }
+      if (state?.routing) dispatch(setRouterRouting(state.routing));
+    },
+    [dispatch]
+  );
+  useSocketListener(WS_ROUTER_NAMESPACE, ROUTER_STATE_EVENT, handleRouterState, {
+    apiVersion: WS_API_VERSION_V1_5,
   });
 
   const routerInputs = useSelector(selectRouterInputs);
@@ -138,13 +163,17 @@ export default function RouterControls() {
 
   const handleTake = () => {
     if (!hasStaged) return;
+    const { input, output } = staged;
     dispatch(setRouterTakeStatus("PENDING"));
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.routerIOCommand,
-        value: { input: staged.input, output: staged.output },
-      },
-    });
+    // The gateway replies with a Socket.IO ack {status: OK|ERR}; a timeout
+    // surfaces an unreachable backend as a failure rather than a stuck button.
+    routerSocket
+      .timeout(TAKE_ACK_TIMEOUT_MS)
+      .emit(ROUTER_TAKE_EVENT, { input, output }, (err, ack) => {
+        dispatch(
+          setRouterTakeStatus(!err && ack?.status === "OK" ? "OK" : "ERR")
+        );
+      });
   };
 
   const handleCancel = () => {

@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { configureStore } from "@reduxjs/toolkit";
 import cameraControlsReducer from "../camera-controls/cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { ROUTER_TAKE_EVENT, WS_ROUTER_NAMESPACE } from "../../config.js";
 import RouterControls from "./RouterControls.jsx";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
 
@@ -32,20 +32,16 @@ afterEach(() => {
   cleanup();
 });
 
-// The backend may ship later: ports arrive at bootstrap but routerRouting is
-// never sent. The matrix should still be usable and TAKE should emit RTR.
-test("stages a crosspoint and emits a router take without backend routing", async () => {
+// Router state + takes are served on the v1.5 /router namespace (not the legacy
+// v1 newCameraCommand path). Staging a crosspoint and pressing TAKE should emit
+// a 'take' there with the selected ports.
+test("stages a crosspoint and emits a take on the v1.5 /router namespace", async () => {
   const user = userEvent.setup();
   const h = createSocketIoHarness((h, expectEmit) => {
-    h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
+    h.gotTake = expectEmit(ROUTER_TAKE_EVENT);
   });
 
-  const store = makeStore({
-    observerSide: "PL",
-    routerInputs,
-    routerOutputs,
-    routerRouting: {}, // backend without the routing query
-  });
+  const store = makeStore({ routerInputs, routerOutputs, routerRouting: {} });
 
   const { getByLabelText, getByText } = renderWithProviders(<RouterControls />, {
     store,
@@ -56,9 +52,7 @@ test("stages a crosspoint and emits a router take without backend routing", asyn
   await user.click(getByLabelText("Route INPUT2 to PRORES_REC"));
   await user.click(getByText("TAKE"));
 
-  const { args } = await h.gotCmd;
-  expect(args[0].action).toEqual({
-    name: COMMAND_STRINGS.routerIOCommand,
-    value: { input: "input2", output: "output2" },
-  });
+  const { namespace, args } = await h.gotTake;
+  expect(namespace).toBe(WS_ROUTER_NAMESPACE);
+  expect(args[0]).toEqual({ input: "input2", output: "output2" });
 });
