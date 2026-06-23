@@ -7,7 +7,8 @@ import ObserverDisplayChip from "./ObserverDisplayChip";
 import UpperRightButtons from "./UpperRightButtons";
 import NavDataDisplay from "./NavDataDisplay";
 import TopCameraCommandsList from "./TopCameraCommandsList";
-import MiniVideo from "./MiniVideo";
+import MiniVideo from "../camera-controls/MiniVideo";
+import MiniVideoHeader from "./MiniVideoHeader";
 import MetaDataDisplay from "./MetaDataDisplay";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
@@ -73,8 +74,10 @@ export default function TopControlPanel({
   
   const classes = useStyles();
 
-  const observerVideoSmallSrc = useSelector(
-    (state) => state.cameraControls.observerVideoSmallSrc
+  // Full-res source — the OBS mini uses the same source as the large feed so
+  // they share one connection and toggling needs no renegotiation.
+  const observerVideoSrc = useSelector(
+    (state) => state.cameraControls.observerVideoSrc
   );
   const recordVideoSrc = useSelector(
     (state) => state.cameraControls.recordVideoSrc
@@ -91,12 +94,12 @@ export default function TopControlPanel({
       <>
         <div style={{position: 'relative'}}>
           <div  style={{position: 'absolute', display: !showFullCameraControls ? 'block' : 'none'}}>
-             <MiniVideo 
-               videoSrc={observerVideoSmallSrc}
+             <MiniVideo
+               videoSrc={observerVideoSrc}
                videoType={"OBS"}
-               showFullCameraControls={showFullCameraControls}                            
-             />             
-          </div> 
+               header={<MiniVideoHeader videoType={"OBS"} />}
+             />
+          </div>
           <div style={{position: 'absolute', display: showFullCameraControls ? 'block' : 'none'}}>
             <TopCameraCommandsList/>
           </div>  
@@ -115,8 +118,8 @@ export default function TopControlPanel({
               <MiniVideo
                 videoSrc={recordVideoSrc}
                 videoType={"REC"}
-                showFullCameraControls={showFullCameraControls}                             
-              />              
+                header={<MiniVideoHeader videoType={"REC"} />}
+              />
             </Grid>
             <Grid item xs={6}>
               {renderDynamicGridBox()}

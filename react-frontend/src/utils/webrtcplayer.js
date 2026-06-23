@@ -17,17 +17,22 @@ export default class WebRtcPlayer {
     this.server = WebRtcPlayer.server;
     this.protocol = WebRtcPlayer.protocol;
     this.urlTemplate = WebRtcPlayer.urlTemplate;
-    this.video = document.getElementById(id);
+    this.video = id ? document.getElementById(id) : null;
     this.stream = stream;
     this.channel = channel;
 
-    this.video.addEventListener("loadeddata", () => {
-      this.video.play();
-    });
+    // The connection can be owned without a <video> element (the React
+    // components attach this.mediastream to their own elements). Only wire up
+    // element listeners when we were given one.
+    if (this.video) {
+      this.video.addEventListener("loadeddata", () => {
+        this.video.play();
+      });
 
-    this.video.addEventListener("error", () => {
-      console.error("webRTC - video error", this.stream);
-    });
+      this.video.addEventListener("error", () => {
+        console.error("webRTC - video error", this.stream);
+      });
+    }
     /*
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
@@ -49,7 +54,7 @@ export default class WebRtcPlayer {
   async play() {
     //console.log("webrtc play, this.stream");
     this.mediastream = new MediaStream();
-    this.video.srcObject = this.mediastream;
+    if (this.video) this.video.srcObject = this.mediastream;
     console.log("webRTC play:", this.stream, this.mediastream);
 
     // close any existing connections  //I don't think this is appropriate here - need to clean up tracks via close() first - mjs
@@ -207,7 +212,7 @@ export default class WebRtcPlayer {
       //this.webrtc = null;
       this.mediastream = null;
 
-      this.video.srcObject = null;
+      if (this.video) this.video.srcObject = null;
 
       //this.video.src = '';
 

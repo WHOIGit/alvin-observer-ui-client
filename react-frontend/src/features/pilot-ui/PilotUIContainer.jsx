@@ -13,9 +13,11 @@ import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
 import NewCameraCommandListener from "../listeners/NewCameraCommandListener";
 import RecorderHeartbeatListener from "../listeners/RecorderHeartbeatListener";
 import {
+  VIDEO_STREAM_CONFIG,
   WS_SERVER_NAMESPACE_PORT,
   WS_SERVER_NAMESPACE_STARBOARD,
 } from "../../config";
+import { useWarmStreams } from "../camera-controls/WebRtcProvider";
 import RouterControlContainer from "./RouterControlContainer";
 import CameraControlContainer from "./CameraControlContainer";
 import MetaDataDisplay from "./MetaDataDisplay";
@@ -27,6 +29,18 @@ import {
 } from "../system-messages/systemMessagesSlice";
 import { IDLE_META, LEVEL_META } from "../system-messages/systemMessageUi";
 import RestartButton from "./RestartButton";
+
+// Every feed the pilot UI shows, across all tabs. Pinned open for the whole
+// pilot session so switching tabs never reconnects. Module-level constant so
+// the array identity is stable across renders.
+const PILOT_WARM_STREAMS = [
+  VIDEO_STREAM_CONFIG.pilotVideo,
+  VIDEO_STREAM_CONFIG.pilotSmallVideo,
+  VIDEO_STREAM_CONFIG.portObserverSmallVideo,
+  VIDEO_STREAM_CONFIG.portRecordVideo,
+  VIDEO_STREAM_CONFIG.stbdObserverSmallVideo,
+  VIDEO_STREAM_CONFIG.stbdRecordVideo,
+];
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -82,6 +96,10 @@ export default function SimpleTabs() {
   const systemBadgeColor = worstSystemMessageLevel
     ? LEVEL_META[worstSystemMessageLevel].color
     : IDLE_META.color;
+
+  // Keep every pilot feed connected for the whole session, regardless of which
+  // tab is showing, so tab/view swaps are instant and never renegotiate.
+  useWarmStreams(PILOT_WARM_STREAMS);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

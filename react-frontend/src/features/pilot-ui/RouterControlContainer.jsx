@@ -6,7 +6,8 @@ import { green, red } from "@mui/material/colors";
 // local
 import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import RouterControls from "./RouterControls";
-import MiniVideo from "./MiniVideo";
+import MiniVideo from "../camera-controls/MiniVideo";
+import MiniVideoHeader from "./MiniVideoHeader";
 import {
   VIDEO_STREAM_CONFIG,
   COMMAND_STRINGS,
@@ -81,16 +82,28 @@ export default function RouterControlContainer() {
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.portRecordVideo}
-            observerSide={WS_SERVER_NAMESPACE_PORT}
             videoType="REC"
+            id={`REC-${WS_SERVER_NAMESPACE_PORT}-minivideo`}
+            header={
+              <MiniVideoHeader
+                observerSide={WS_SERVER_NAMESPACE_PORT}
+                videoType="REC"
+              />
+            }
             key="video1"
           />
         </Grid>
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.portObserverSmallVideo}
-            observerSide={WS_SERVER_NAMESPACE_PORT}
             videoType="OBS"
+            id={`OBS-${WS_SERVER_NAMESPACE_PORT}-minivideo`}
+            header={
+              <MiniVideoHeader
+                observerSide={WS_SERVER_NAMESPACE_PORT}
+                videoType="OBS"
+              />
+            }
             key="video0"
           />
         </Grid>
@@ -98,8 +111,14 @@ export default function RouterControlContainer() {
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.pilotSmallVideo}
-            observerSide={WS_SERVER_NAMESPACE_PILOT}
             videoType="PILOT"
+            id={`PILOT-${WS_SERVER_NAMESPACE_PILOT}-minivideo`}
+            header={
+              <MiniVideoHeader
+                observerSide={WS_SERVER_NAMESPACE_PILOT}
+                videoType="PILOT"
+              />
+            }
             key="video2"
           />
         </Grid>
@@ -107,16 +126,28 @@ export default function RouterControlContainer() {
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.stbdObserverSmallVideo}
-            observerSide={WS_SERVER_NAMESPACE_STARBOARD}
             videoType="OBS"
+            id={`OBS-${WS_SERVER_NAMESPACE_STARBOARD}-minivideo`}
+            header={
+              <MiniVideoHeader
+                observerSide={WS_SERVER_NAMESPACE_STARBOARD}
+                videoType="OBS"
+              />
+            }
             key="video3"
           />
         </Grid>
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.stbdRecordVideo}
-            observerSide={WS_SERVER_NAMESPACE_STARBOARD}
             videoType="REC"
+            id={`REC-${WS_SERVER_NAMESPACE_STARBOARD}-minivideo`}
+            header={
+              <MiniVideoHeader
+                observerSide={WS_SERVER_NAMESPACE_STARBOARD}
+                videoType="REC"
+              />
+            }
             key="video4"
           />
         </Grid>

@@ -1,15 +1,10 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 
 // local imports
-import WebRtcPlayer from "../../utils/webrtcplayer";
-import { VIDEO_STREAM_CONFIG } from "../../config.js";
-import { selectLastCommand } from "./cameraControlsSlice";
-
-WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
-WebRtcPlayer.setProtocol(VIDEO_STREAM_CONFIG.protocol);
-WebRtcPlayer.setUrlTemplate(VIDEO_STREAM_CONFIG.urlTemplate);
+import { useStream } from "./WebRtcProvider";
+import { selectObserverSide } from "./cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -21,125 +16,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function LargeVideo({ showFullCameraControls }) {
-  //console.log("Large Video load", showFullCameraControls); //testing - mjs
-  
+// Pure sink for the large observer/pilot feed. Resolves the same `observerVideoSrc`
+// the OBS mini uses, so both share one WebRTC connection (owned by WebRtcProvider)
+// and showing/hiding the camera controls never renegotiates.
+export default function LargeVideo() {
   const classes = useStyles();
   const videoElem = useRef(null);
   const observerVideoSrc = useSelector(
     (state) => state.cameraControls.observerVideoSrc
   );
-  const lastCommand = useSelector(selectLastCommand);
-  const [player, setPlayer] = useState(null);
-  
-  const showVideo = useRef(false);
-  
-  /*
-  // function to get direct stats from the RTCPeerConnection
-  // probably need to put this on a timer to get useful data
-  async function checkVideoStats() {
-    if (player) {
-      const stats = await player.webrtc.getStats();
-      console.log("CHECK STATS");
-      stats.forEach((report) => {
-        console.log(report);
-        if (report.type === "inbound-rtp" && report.kind === "video") {
-          // Log the frame rate
-          console.log(report.framesPerSecond);
-        }
-      });
-    }
-  }
-  checkVideoStats();
-  */
-
-  //console.log("Large Video - Caller status:", observerVideoSrc, player, showFullCameraControls, lastCommand, videoElem.current);
+  const observerSide = useSelector(selectObserverSide);
+  // Wait until a side (and therefore a real source) is chosen before connecting.
+  const stream = useStream(observerSide ? observerVideoSrc : null);
 
   useEffect(() => {
-    if (showFullCameraControls) {
-      //console.log("Large Video - showFullCameraControls:", showFullCameraControls, lastCommand, player);
-      //console.log("Large Video - Player status:", player);
-      if (!player) {
-        // set the player variable
-        console.log("Large Video - Player does not exist..!", player, videoElem.current);
-        if (videoElem.current) {
-          const newPlayer = new WebRtcPlayer(
-            videoElem.current.id,
-            observerVideoSrc /* stream */,
-            "0" /* channel */
-          );
-          setPlayer(newPlayer);
-          console.log("Large Video - New Player Created:", player, newPlayer, videoElem.current);
-          //newPlayer.play();  //mjs not sure about this
-          //console.log("Large Video - New Player started:", player, newPlayer);
-                
-        } 
-      }
-
-      
-      /*
-      // camera change, refresh video
-      if (player && lastCommand.action.name === "CAM") {
-        // Camera change requested, close existing tracks and conenctions - added 26june2024 - mjs
-        console.log("Large Video - Cam Change - CLOSING CONNECTIONS", player);
-        player.close();
-        //setPlayer(null);
-        
-        // Camera change requested, refresh the connection
-        console.log("Large Video - Cam Change - Refresh Video Player", player);
-        player.play();
-      }
-      */ 
-      
-      //if (player && lastCommand.action.name === "CAM") {
-      //  console.log("Large Video - Cam Change", observerVideoSrc);
-      //}     
-
-      // check if player webrtc is closed, refresh if needed
-      if (player?.webrtc?.connectionState === "closed") {
-        // Camera change requested, refresh the connection
-        console.log("Large Video - Player Closed - Refresh Video", player);
-        player.play();
-      }
-      
-      
-      showVideo.current = true;
-      console.log("Large Video - showVideo:", showVideo.current);
-      
-    } else {
-      // remove, close any open RTC connections if open
-      //console.log("LARGE VIDEO CLOSING CONNECTIONS", player);
-      
-      /*
-      if (player) {
-        console.log("LARGE VIDEO CLOSING PLAYER CONNECTIONS", player);
-        player.close();
-        setPlayer(null);
-        
-        //videoElem.current = null;
-        //console.log("LARGE VIDEO CLEANING UP VIDEO ELEMENTS", videoElem.current);
-             
-      }
-      */
-      
-      //var videoElement = document.getElementById(videoElem.current.id);
-      //videoElement.pause();
-      //videoElement.removeAttribute('src'); // empty source
-      //videoElement.load();
-      
-      showVideo.current = false;
-      console.log("Large Video - showVideo:", showVideo.current);
-      
+    if (videoElem.current && stream) {
+      videoElem.current.srcObject = stream;
     }
-    
-    //console.log("Large Video - Moving On..!", observerVideoSrc, player, showFullCameraControls, lastCommand, videoElem.current);
-    
-  //}, [observerVideoSrc, player, showFullCameraControls, lastCommand]); //removed lastCommand, causes excess renders and cpu usage - 29oct2024 - mjs
-  }, [observerVideoSrc, player, showFullCameraControls]);
-  
-  //console.log("Large Video - Nothing to do..!", observerVideoSrc, player, showFullCameraControls, lastCommand, videoElem.current);
-  
-      
+  }, [stream]);
+
   return (
     <div className={classes.root}>
       <div id="videoBoxMain">
@@ -154,6 +49,4 @@ export default function LargeVideo({ showFullCameraControls }) {
       </div>
     </div>
   );
-  
-     
 }
