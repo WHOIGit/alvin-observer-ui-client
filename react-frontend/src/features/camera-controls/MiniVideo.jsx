@@ -32,8 +32,12 @@ export default function MiniVideo({ videoSrc, videoType, header, id }) {
   const stream = useStream(videoSrc);
 
   useEffect(() => {
-    if (videoElem.current && stream) {
-      videoElem.current.srcObject = stream;
+    const el = videoElem.current;
+    if (el && stream) {
+      el.srcObject = stream;
+      // Sharing one MediaStream across elements: autoPlay doesn't reliably
+      // start a second element, so kick off playback explicitly.
+      el.play?.().catch(() => {});
     }
   }, [stream]);
 

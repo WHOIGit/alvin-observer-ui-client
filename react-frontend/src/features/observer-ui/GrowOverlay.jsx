@@ -43,7 +43,11 @@ export default function GrowOverlay({ active }) {
 
   // Keep the overlay pointed at the shared stream.
   useEffect(() => {
-    if (videoRef.current && stream) videoRef.current.srcObject = stream;
+    const el = videoRef.current;
+    if (el && stream) {
+      el.srcObject = stream;
+      el.play?.().catch(() => {});
+    }
   }, [stream]);
 
   // Cache whichever resting rect is currently measurable, so both directions of

@@ -30,8 +30,10 @@ export default function LargeVideo() {
   const stream = useStream(observerSide ? observerVideoSrc : null);
 
   useEffect(() => {
-    if (videoElem.current && stream) {
-      videoElem.current.srcObject = stream;
+    const el = videoElem.current;
+    if (el && stream) {
+      el.srcObject = stream;
+      el.play?.().catch(() => {});
     }
   }, [stream]);
 
