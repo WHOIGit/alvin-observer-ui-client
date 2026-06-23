@@ -8,17 +8,12 @@ const defaultObserverVideoSrc =
   window.PILOT_MODE === true
     ? VIDEO_STREAM_CONFIG.pilotVideo
     : VIDEO_STREAM_CONFIG.portObserverVideo;
-const defaultObserverVideoSmallSrc =
-  window.PILOT_MODE === true
-    ? VIDEO_STREAM_CONFIG.pilotSmallVideo
-    : VIDEO_STREAM_CONFIG.portObserverSmallVideo;
 const defaultRecordVideoSrc =
   window.PILOT_MODE === true ? null : VIDEO_STREAM_CONFIG.portRecordVideo;
 
 const initialState = {
   observerSide: window.PILOT_MODE === true ? "PL" : null, // P = Port, S = Starboard, PL = Pilot
   observerVideoSrc: defaultObserverVideoSrc,
-  observerVideoSmallSrc: defaultObserverVideoSmallSrc,
   recordVideoSrc: defaultRecordVideoSrc,
   initialCamHeartbeat: null,
   activeCamera: null,
@@ -55,16 +50,12 @@ export const cameraControlsSlice = createSlice({
       state.observerSide = action.payload;
       if (action.payload === "P") {
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
-        state.observerVideoSmallSrc =
-          VIDEO_STREAM_CONFIG.portObserverSmallVideo;
         if (window.PILOT_MODE !== true) {
           state.recordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo; //mjs-added-19apr2022
         }
       }
       if (action.payload === "S") {
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.stbdObserverVideo;
-        state.observerVideoSmallSrc =
-          VIDEO_STREAM_CONFIG.stbdObserverSmallVideo;
         if (window.PILOT_MODE !== true) {
           state.recordVideoSrc = VIDEO_STREAM_CONFIG.stbdRecordVideo; //mjs-added-19apr2022
         }

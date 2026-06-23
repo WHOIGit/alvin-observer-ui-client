@@ -35,10 +35,9 @@ import RestartButton from "./RestartButton";
 // the array identity is stable across renders.
 const PILOT_WARM_STREAMS = [
   VIDEO_STREAM_CONFIG.pilotVideo,
-  VIDEO_STREAM_CONFIG.pilotSmallVideo,
-  VIDEO_STREAM_CONFIG.portObserverSmallVideo,
+  VIDEO_STREAM_CONFIG.portObserverVideo,
   VIDEO_STREAM_CONFIG.portRecordVideo,
-  VIDEO_STREAM_CONFIG.stbdObserverSmallVideo,
+  VIDEO_STREAM_CONFIG.stbdObserverVideo,
   VIDEO_STREAM_CONFIG.stbdRecordVideo,
 ];
 
