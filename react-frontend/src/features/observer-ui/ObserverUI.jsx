@@ -11,6 +11,7 @@ import {
 import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
 import NewCameraCommandListener from "../listeners/NewCameraCommandListener";
 import RecorderHeartbeatListener from "../listeners/RecorderHeartbeatListener";
+import ConnectionStatusListener from "../listeners/ConnectionStatusListener";
 import { COMMAND_STRINGS } from "../../config";
 
 export default function ObserverUI({
@@ -57,6 +58,7 @@ export default function ObserverUI({
       <CamHeartbeatListener />
       <NewCameraCommandListener />
       <RecorderHeartbeatListener />
+      <ConnectionStatusListener />
 
       <TopControlPanel
         showFullCameraControls={showFullCameraControls}

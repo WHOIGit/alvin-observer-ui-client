@@ -12,6 +12,7 @@ import { deepOrange } from "@mui/material/colors";
 import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
 import NewCameraCommandListener from "../listeners/NewCameraCommandListener";
 import RecorderHeartbeatListener from "../listeners/RecorderHeartbeatListener";
+import ConnectionStatusListener from "../listeners/ConnectionStatusListener";
 import {
   VIDEO_STREAM_CONFIG,
   WS_SERVER_NAMESPACE_PORT,
@@ -115,6 +116,7 @@ export default function SimpleTabs() {
       />
       <NewCameraCommandListener />
       <RecorderHeartbeatListener />
+      <ConnectionStatusListener />
 
       <div className={classes.root}>
         <AppBar position="static">
