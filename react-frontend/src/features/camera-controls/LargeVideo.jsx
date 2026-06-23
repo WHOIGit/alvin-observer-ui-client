@@ -3,7 +3,8 @@ import { useSelector } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 
 // local imports
-import { useStream } from "./WebRtcProvider";
+import { useStream, useStreamStatus } from "./WebRtcProvider";
+import VideoStatusOverlay from "./VideoStatusOverlay";
 import { selectObserverSide } from "./cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
@@ -27,7 +28,9 @@ export default function LargeVideo() {
   );
   const observerSide = useSelector(selectObserverSide);
   // Wait until a side (and therefore a real source) is chosen before connecting.
-  const stream = useStream(observerSide ? observerVideoSrc : null);
+  const src = observerSide ? observerVideoSrc : null;
+  const stream = useStream(src);
+  const status = useStreamStatus(src);
 
   useEffect(() => {
     const el = videoElem.current;
@@ -39,7 +42,7 @@ export default function LargeVideo() {
 
   return (
     <div className={classes.root}>
-      <div id="videoBoxMain">
+      <div id="videoBoxMain" style={{ position: "relative" }}>
         <video
           style={{ width: "100%" }}
           id="videoMain"
@@ -48,6 +51,7 @@ export default function LargeVideo() {
           playsInline  //fix potential iOS black screen - mjs
           muted
         ></video>
+        <VideoStatusOverlay status={status} />
       </div>
     </div>
   );

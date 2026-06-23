@@ -1,3 +1,23 @@
+// Possible values passed to the optional `onStatusChange` callback.
+export const PLAYER_STATUS = {
+  CONNECTING: "connecting",
+  CONNECTED: "connected",
+  RECONNECTING: "reconnecting",
+  CLOSED: "closed",
+};
+
+const RECONNECT_BASE_MS = 1000;
+const RECONNECT_MAX_MS = 10000;
+
+// Media-progress watchdog. The peer connection can stay "connected" at the
+// ICE/transport level while zero frames actually decode (a frozen picture),
+// which the connection-state handlers never see. Poll getStats() and force a
+// reconnect when neither decoded frames nor received bytes advance. (Received
+// bytes are checked too so a warm-but-unrendered stream — RTP still arriving,
+// no <video> sink decoding it — isn't mistaken for a stall.)
+export const STATS_POLL_MS = 2000;
+export const STALL_LIMIT = 3; // consecutive idle polls (~6s) before reconnecting
+
 export default class WebRtcPlayer {
   static server = "http://127.0.0.1:8083";
   static protocol = "whep";
@@ -13,35 +33,208 @@ export default class WebRtcPlayer {
   mediastream = null;
   video = null;
 
-  constructor(id, stream, channel) {
+  // Reconnection / status state. The peer connection has no retry of its own,
+  // so an ICE drop (common on a flaky shipboard/sub link) would otherwise
+  // freeze the video forever. We watch the connection and re-offer with backoff.
+  status = "idle";
+  onStatusChange = null;
+  closed = false;
+  reconnectTimer = null;
+  reconnectAttempts = 0;
+
+  // Media-progress watchdog state.
+  statsTimer = null;
+  lastSample = null;
+  stalledChecks = 0;
+
+  constructor(id, stream, channel, { onStatusChange = null } = {}) {
     this.server = WebRtcPlayer.server;
     this.protocol = WebRtcPlayer.protocol;
     this.urlTemplate = WebRtcPlayer.urlTemplate;
+    // The connection can be owned without a <video> element (the React
+    // components attach this.mediastream to their own elements).
     this.video = id ? document.getElementById(id) : null;
     this.stream = stream;
     this.channel = channel;
+    this.onStatusChange = onStatusChange;
 
-    // The connection can be owned without a <video> element (the React
-    // components attach this.mediastream to their own elements). Only wire up
-    // element listeners when we were given one.
+    // One stable MediaStream for the player's lifetime: reconnects swap the
+    // peer connection and its tracks, but consumers that attached this stream
+    // keep rendering without re-wiring.
+    this.mediastream = new MediaStream();
+
     if (this.video) {
-      this.video.addEventListener("loadeddata", () => {
-        this.video.play();
-      });
-
-      this.video.addEventListener("error", () => {
-        console.error("webRTC - video error", this.stream);
-      });
+      this.video.srcObject = this.mediastream;
+      this.video.addEventListener("loadeddata", this.handleLoadedData);
+      this.video.addEventListener("error", this.handleVideoError);
     }
-    /*
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
-        console.log("Document became visible, restarting WebRTC stream.");
-        this.play();
-      }
-    }); */
 
     this.play();
+  }
+
+  setStatus(status) {
+    if (this.status === status) return;
+    this.status = status;
+    if (this.onStatusChange) {
+      try {
+        this.onStatusChange(status);
+      } catch (_) {}
+    }
+  }
+
+  handleLoadedData = () => {
+    this.video?.play?.().catch(() => {});
+  };
+
+  handleVideoError = () => {
+    console.error("webRTC - video error", this.stream);
+    this.scheduleReconnect();
+  };
+
+  handleConnectionStateChange = () => {
+    if (!this.webrtc) return;
+    const state = this.webrtc.connectionState;
+    if (state === "connected") {
+      this.reconnectAttempts = 0;
+      this.setStatus(PLAYER_STATUS.CONNECTED);
+    } else if (
+      state === "failed" ||
+      state === "disconnected" ||
+      state === "closed"
+    ) {
+      this.scheduleReconnect();
+    }
+  };
+
+  handleIceConnectionStateChange = () => {
+    if (!this.webrtc) return;
+    const state = this.webrtc.iceConnectionState;
+    if (state === "failed" || state === "disconnected") {
+      this.scheduleReconnect();
+    }
+  };
+
+  // --- media-progress watchdog -------------------------------------------
+
+  startStatsMonitor() {
+    this.stopStatsMonitor();
+    this.lastSample = null;
+    this.stalledChecks = 0;
+    if (typeof setInterval !== "function") return;
+    this.statsTimer = setInterval(() => {
+      void this.checkMediaProgress();
+    }, STATS_POLL_MS);
+  }
+
+  stopStatsMonitor() {
+    if (this.statsTimer) {
+      clearInterval(this.statsTimer);
+      this.statsTimer = null;
+    }
+  }
+
+  async checkMediaProgress() {
+    if (this.closed || !this.webrtc) return;
+    // Only meaningful once the transport claims to be up.
+    if (this.webrtc.connectionState !== "connected") return;
+    if (typeof this.webrtc.getStats !== "function") return;
+
+    let frames = null;
+    let bytes = null;
+    try {
+      const report = await this.webrtc.getStats();
+      report.forEach((stat) => {
+        if (
+          stat.type === "inbound-rtp" &&
+          (stat.kind === "video" || stat.mediaType === "video")
+        ) {
+          if (typeof stat.framesDecoded === "number") frames = stat.framesDecoded;
+          if (typeof stat.bytesReceived === "number") bytes = stat.bytesReceived;
+        }
+      });
+    } catch (_) {
+      return;
+    }
+
+    if (frames === null && bytes === null) return;
+    const sample = { frames: frames ?? 0, bytes: bytes ?? 0 };
+
+    // First sample just establishes a baseline.
+    if (this.lastSample === null) {
+      this.lastSample = sample;
+      this.stalledChecks = 0;
+      return;
+    }
+
+    const progressed =
+      sample.frames > this.lastSample.frames ||
+      sample.bytes > this.lastSample.bytes;
+    this.lastSample = sample;
+
+    if (progressed) {
+      this.stalledChecks = 0;
+      return;
+    }
+
+    this.stalledChecks += 1;
+    if (this.stalledChecks >= STALL_LIMIT) {
+      console.warn(
+        `webRTC - media stalled for ${this.stream} (connected but no frames), reconnecting`
+      );
+      this.stopStatsMonitor();
+      this.scheduleReconnect();
+    }
+  }
+
+  // -----------------------------------------------------------------------
+
+  scheduleReconnect() {
+    if (this.closed) return;
+    if (this.reconnectTimer) return;
+
+    this.stopStatsMonitor();
+    this.setStatus(PLAYER_STATUS.RECONNECTING);
+    const delay = Math.min(
+      RECONNECT_BASE_MS * 2 ** this.reconnectAttempts,
+      RECONNECT_MAX_MS
+    );
+    this.reconnectAttempts += 1;
+    console.warn(
+      `webRTC - scheduling reconnect for ${this.stream} in ${delay}ms (attempt ${this.reconnectAttempts})`
+    );
+
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      if (this.closed) return;
+      this.teardownPeer();
+      this.play();
+    }, delay);
+  }
+
+  // Close the current peer connection and release its tracks, keeping the
+  // shared MediaStream object intact (used between reconnect attempts).
+  teardownPeer() {
+    this.stopStatsMonitor();
+    if (this.mediastream) {
+      this.mediastream.getTracks().forEach((track) => {
+        try {
+          track.stop();
+        } catch (_) {}
+        this.mediastream.removeTrack(track);
+      });
+    }
+    if (!this.webrtc) return;
+    try {
+      this.webrtc.ontrack = null;
+      this.webrtc.onremovetrack = null;
+      this.webrtc.onnegotiationneeded = null;
+      this.webrtc.onconnectionstatechange = null;
+      this.webrtc.oniceconnectionstatechange = null;
+      this.webrtc.close();
+    } catch (error) {
+      console.error("webRTC - teardown error", this.stream, error);
+    }
+    this.webrtc = null;
   }
 
   getStreamUrl() {
@@ -52,31 +245,36 @@ export default class WebRtcPlayer {
   }
 
   async play() {
-    //console.log("webrtc play, this.stream");
-    this.mediastream = new MediaStream();
-    if (this.video) this.video.srcObject = this.mediastream;
-    console.log("webRTC play:", this.stream, this.mediastream);
+    if (this.closed) return;
 
-    // close any existing connections  //I don't think this is appropriate here - need to clean up tracks via close() first - mjs
-    //if (this.webrtc) {
-    //  console.log("webrtc.play() -  Close any existing connections"); //logging-mjs
-    //  this.webrtc.close();
-    //}
+    // Always start from a clean peer connection so reconnect attempts don't
+    // stack RTCPeerConnections or leave stale tracks attached.
+    this.teardownPeer();
+    this.setStatus(
+      this.reconnectAttempts > 0
+        ? PLAYER_STATUS.RECONNECTING
+        : PLAYER_STATUS.CONNECTING
+    );
+
+    if (!this.mediastream) this.mediastream = new MediaStream();
+    if (this.video) this.video.srcObject = this.mediastream;
 
     this.webrtc = new RTCPeerConnection({
       iceServers: [],
       sdpSemantics: "unified-plan",
     });
 
-
-    //this.webrtc.ontrack = this.handleTrack.bind(this); //move before negotiation - mjs test
     this.webrtc.onnegotiationneeded = this.handleNegotiationNeeded.bind(this);
     this.webrtc.ontrack = this.handleTrack.bind(this);
-    this.webrtc.onremovetrack = this.removeTrack.bind(this); //mjs - 11sept2024
+    this.webrtc.onremovetrack = this.removeTrack.bind(this);
+    this.webrtc.onconnectionstatechange = this.handleConnectionStateChange;
+    this.webrtc.oniceconnectionstatechange = this.handleIceConnectionStateChange;
 
     this.webrtc.addTransceiver("video", {
       direction: "recvonly",
     });
+
+    this.startStatsMonitor();
   }
 
   async waitForIceGatheringComplete() {
@@ -100,16 +298,14 @@ export default class WebRtcPlayer {
   }
 
   async handleNegotiationNeeded() {
-    console.log("webRTC - handleNegotiationNeeded:", this.stream);
-    let offer = await this.webrtc.createOffer({
-      offerToReceiveAudio: false,
-      offerToReceiveVideo: true,
-    });
-    console.log("webRTC - handleNegotiationNeeded - offer:", this.stream, offer, this.mediastream);
-    await this.webrtc.setLocalDescription(offer);
-    await this.waitForIceGatheringComplete();
-
     try {
+      const offer = await this.webrtc.createOffer({
+        offerToReceiveAudio: false,
+        offerToReceiveVideo: true,
+      });
+      await this.webrtc.setLocalDescription(offer);
+      await this.waitForIceGatheringComplete();
+
       const response = await this.sendOffer();
       await this.webrtc.setRemoteDescription(
         new RTCSessionDescription({
@@ -118,7 +314,10 @@ export default class WebRtcPlayer {
         })
       );
     } catch (error) {
-      console.log(`webRTC - ERROR: handleNegotiationNeeded ${this.stream} : ${error}`);
+      // A failed signalling exchange (e.g. the stream server is down) never
+      // produces an ICE state change, so reconnect must be driven from here.
+      console.error(`webRTC - negotiation failed for ${this.stream}: ${error}`);
+      this.scheduleReconnect();
     }
   }
 
@@ -168,66 +367,28 @@ export default class WebRtcPlayer {
   }
 
   handleTrack(event) {
-    console.log("webRTC - handle track", this.stream, event);
-    this.mediastream.addTrack(event.track);
+    if (this.mediastream) this.mediastream.addTrack(event.track);
   }
-
 
   removeTrack(event) {
-    console.log("webRTC - remove track", this.stream, event);
-    this.mediastream.removeTrack(event.track);
+    if (this.mediastream) this.mediastream.removeTrack(event.track);
   }
 
-  async close() {
-
-    console.log("webRTC - Closing connection", this.stream);
-
-    if (this.webrtc) {
-      this.mediastream.getTracks().forEach(track => {
-        console.log("webRTC - Closing stream tracks", this.stream);
-        track.enabled = false;
-        track.stop()
-        //this.mediastream.removeTrack(track);
-      });
-
-
-
-
-
-
-      this.webrtc.ontrack = null;
-      //this.webrtc.onremovetrack = null;
-      //this.webrtc.onicecandidate = null;
-      //this.webrtc.oniceconnectionstatechange = null;
-      this.webrtc.onnegotiationneeded = null;
-
-
-      this.webrtc.close();
-      //this.close();
-
-      //this.server = null;
-      //this.stream = null;
-      //this.channel = null;
-
-      //this.webrtc = null;
-      this.mediastream = null;
-
-      if (this.video) this.video.srcObject = null;
-
-      //this.video.src = '';
-
-      //this.video = null; 
-      //this.video.remove();
-      //this.video.pause();
-
-      console.log("webRTC - Connection closed!", this.stream);
-
-    } else {
-
-      console.log("webRTC not found!", this.stream);
+  close() {
+    this.closed = true;
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
     }
+    this.teardownPeer();
+    if (this.video) {
+      this.video.removeEventListener("loadeddata", this.handleLoadedData);
+      this.video.removeEventListener("error", this.handleVideoError);
+      this.video.srcObject = null;
+    }
+    this.mediastream = null;
+    this.setStatus(PLAYER_STATUS.CLOSED);
   }
-
 
   static setServer(serv) {
     this.server = serv;
@@ -238,6 +399,7 @@ export default class WebRtcPlayer {
   }
 
   static setUrlTemplate(urlTemplate) {
-    this.urlTemplate = urlTemplate || "/stream/{stream}/channel/{channel}/webrtc/whep";
+    this.urlTemplate =
+      urlTemplate || "/stream/{stream}/channel/{channel}/webrtc/whep";
   }
 }

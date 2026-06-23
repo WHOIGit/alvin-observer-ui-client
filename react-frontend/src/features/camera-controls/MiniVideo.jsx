@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from "react";
 import makeStyles from '@mui/styles/makeStyles';
 import { Card, CardContent } from "@mui/material";
 // local import
-import { useStream } from "./WebRtcProvider";
+import { useStream, useStreamStatus } from "./WebRtcProvider";
+import VideoStatusOverlay from "./VideoStatusOverlay";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,6 +31,7 @@ export default function MiniVideo({ videoSrc, videoType, header, id }) {
   const classes = useStyles();
   const videoElem = useRef(null);
   const stream = useStream(videoSrc);
+  const status = useStreamStatus(videoSrc);
 
   useEffect(() => {
     const el = videoElem.current;
@@ -45,7 +47,7 @@ export default function MiniVideo({ videoSrc, videoType, header, id }) {
     <Card className={`${classes.root}`}>
       {header}
       <CardContent className={classes.cardContent}>
-        <div>
+        <div style={{ position: "relative" }}>
           <video
             style={{ width: "100%" }}
             ref={videoElem}
@@ -54,6 +56,7 @@ export default function MiniVideo({ videoSrc, videoType, header, id }) {
             playsInline  //fix potential for iOS/safari black screen - mjs
             muted
           ></video>
+          <VideoStatusOverlay status={status} />
         </div>
       </CardContent>
     </Card>

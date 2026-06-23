@@ -15,7 +15,12 @@ WebRtcPlayer.setServer(VIDEO_STREAM_CONFIG.server);
 WebRtcPlayer.setProtocol(VIDEO_STREAM_CONFIG.protocol);
 WebRtcPlayer.setUrlTemplate(VIDEO_STREAM_CONFIG.urlTemplate);
 
+// Kept in two contexts on purpose: the registry API is stable for the app's
+// lifetime, while per-source connection status changes frequently. Splitting
+// them means a status change doesn't churn the acquire/release identity and
+// re-run every useStream effect (which would tear down and re-open streams).
 const StreamRegistryContext = createContext(null);
+const StreamStatusContext = createContext({});
 
 /**
  * Owns every WebRTC connection for the app, keyed by source URL. A connection
@@ -27,6 +32,8 @@ const StreamRegistryContext = createContext(null);
 export function WebRtcProvider({ children }) {
   // Map<src, { player, stream, refs }>
   const registry = useRef(new Map());
+  // { [src]: PLAYER_STATUS } — drives the per-video connection overlays.
+  const [statuses, setStatuses] = useState({});
 
   const acquire = useCallback((src) => {
     let entry = registry.current.get(src);
@@ -34,7 +41,13 @@ export function WebRtcProvider({ children }) {
       const player = new WebRtcPlayer(
         null /* no DOM element — connection only */,
         src /* stream */,
-        "0" /* channel */
+        "0" /* channel */,
+        {
+          onStatusChange: (status) =>
+            setStatuses((prev) =>
+              prev[src] === status ? prev : { ...prev, [src]: status }
+            ),
+        }
       );
       entry = { player, stream: player.mediastream, refs: 0 };
       registry.current.set(src, entry);
@@ -50,14 +63,22 @@ export function WebRtcProvider({ children }) {
     if (entry.refs <= 0) {
       entry.player.close();
       registry.current.delete(src);
+      setStatuses((prev) => {
+        if (!(src in prev)) return prev;
+        const next = { ...prev };
+        delete next[src];
+        return next;
+      });
     }
   }, []);
 
-  const value = useMemo(() => ({ acquire, release }), [acquire, release]);
+  const api = useMemo(() => ({ acquire, release }), [acquire, release]);
 
   return (
-    <StreamRegistryContext.Provider value={value}>
-      {children}
+    <StreamRegistryContext.Provider value={api}>
+      <StreamStatusContext.Provider value={statuses}>
+        {children}
+      </StreamStatusContext.Provider>
     </StreamRegistryContext.Provider>
   );
 }
@@ -100,4 +121,11 @@ export function useStream(src) {
   }, [src, registry]);
 
   return stream;
+}
+
+// Returns the current PLAYER_STATUS for `src` (or null), so a view can show a
+// connecting/reconnecting overlay over its video.
+export function useStreamStatus(src) {
+  const statuses = useContext(StreamStatusContext);
+  return src ? statuses[src] ?? null : null;
 }
