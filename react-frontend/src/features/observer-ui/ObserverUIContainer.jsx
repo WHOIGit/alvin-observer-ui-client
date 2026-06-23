@@ -6,6 +6,7 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import CameraControls from "./CameraControls";
+import GrowOverlay from "./GrowOverlay";
 import ObserverSideSelect from "./ObserverSideSelect";
 import ObserverUI from "./ObserverUI";
 import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
@@ -93,6 +94,7 @@ export default function ObserverUIContainer() {
         </Fab>
       </div>
       <CameraControls showFullCameraControls={showFullCameraControls} />
+      {observerSide && <GrowOverlay active={showFullCameraControls} />}
     </>
   );
 }
