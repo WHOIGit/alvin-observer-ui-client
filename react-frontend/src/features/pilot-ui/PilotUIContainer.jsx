@@ -187,7 +187,7 @@ export default function SimpleTabs() {
           <CameraControlContainer />
         </TabPanel>
         <TabPanel value={value} index={2} p={1.5}>
-          {/* Health matrix on top, shrunken notifications below. */}
+          {/* Health matrix on top, notifications below. */}
           <SystemHealthPanel maxHeight={400} />
           <Box sx={{ mt: 1.25 }}>
             <Typography
@@ -202,7 +202,7 @@ export default function SimpleTabs() {
               Notifications
             </Typography>
             <Box sx={{ mt: 0.5 }}>
-              <SystemMessagesPanel maxHeight={160} />
+              <SystemMessagesPanel maxHeight={340} />
             </Box>
           </Box>
           <Box sx={{ mt: 1.5, display: "flex", justifyContent: "flex-end" }}>
