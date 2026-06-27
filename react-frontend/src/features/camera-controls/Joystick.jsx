@@ -4,6 +4,7 @@ import ReactNipple from "react-nipple";
 import makeStyles from '@mui/styles/makeStyles';
 import { Box, Typography } from "@mui/material";
 import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useGamepad } from "../../hooks/useGamepad";
 import {
   selectActiveCamera,
   selectCamHeartbeatData,
@@ -11,7 +12,11 @@ import {
   selectObserverSide,
   setJoystickStatus,
 } from "./cameraControlsSlice";
+import { nippleDataFromVector } from "./nippleData";
 import { COMMAND_STRINGS } from "../../config.js";
+
+const SIZE = 150;
+const THRESHOLD = 0.3;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -116,15 +121,8 @@ export default function Joystick() {
     }
   }, [joystickStatus]);
 
-  const handleJoystickEvents = (evt, data) => {
-    const payload = {
-      actionType: evt.type,
-      position: data.position,
-      distance: data.distance,
-      angle: data.angle,
-      direction: data.direction,
-    };
-    if (evt.type === "start") {
+  const processJoystickPayload = (payload) => {
+    if (payload.actionType === "start") {
       sendPanTiltCommand(payload);
       startSpitter();
       // enqueue a fake "move" event for the spitter
@@ -138,33 +136,90 @@ export default function Joystick() {
     dispatch(setJoystickStatus(payload));
   };
 
+  const handleJoystickEvents = (evt, data) => {
+    processJoystickPayload({
+      actionType: evt.type,
+      position: data.position,
+      distance: data.distance,
+      angle: data.angle,
+      direction: data.direction,
+    });
+  };
+
+  // Drive the nipplejs knob so hardware input is visible on the virtual stick.
+  const zoneRef = useRef(null);
+
+  const nippleCenter = () => {
+    const back = zoneRef.current?.querySelector(".back");
+    if (!back) return { x: 0, y: 0 };
+    const r = back.getBoundingClientRect();
+    return {
+      x: r.left + r.width / 2 + window.scrollX,
+      y: r.top + r.height / 2 + window.scrollY,
+    };
+  };
+
+  const moveKnob = (vx, vy) => {
+    const front = zoneRef.current?.querySelector(".front");
+    if (!front) return;
+    front.style.transition = "none";
+    front.style.left = `${vx * (SIZE / 2)}px`;
+    front.style.top = `${vy * (SIZE / 2)}px`;
+  };
+
+  const restKnob = () => {
+    const front = zoneRef.current?.querySelector(".front");
+    if (!front) return;
+    front.style.left = "0px";
+    front.style.top = "0px";
+  };
+
+  const handleGamepad = (actionType) => (v) => {
+    if (!isEnabled) return;
+    const data = nippleDataFromVector(v.x, v.y, SIZE, nippleCenter(), THRESHOLD);
+    processJoystickPayload({ actionType, ...data });
+    if (actionType === "end") restKnob();
+    else moveKnob(v.x, v.y);
+  };
+
+  const { connected: gamepadConnected } = useGamepad({
+    onStart: handleGamepad("start"),
+    onMove: handleGamepad("move"),
+    onEnd: handleGamepad("end"),
+  });
+
   if (!showJoystick || !isEnabled) {
     return null;
   }
 
   return (
     <Box mt={3} className={classes.root}>
-      <ReactNipple
-        options={{
-          mode: "static",
-          size: 150,
-          position: { top: "50%", left: "50%" },
-          color: "#e1f5fe",
-          restOpacity: 0.8,
-          dynamicPage: true,
-          threshold: 0.3,
-        }}
-        style={{
-          position: "relative",
-          width: "100%",
-          height: 150,
-          // if you pass position: 'relative', you don't need to import the stylesheet
-        }}
-        onStart={(evt, data) => handleJoystickEvents(evt, data)}
-        onEnd={(evt, data) => handleJoystickEvents(evt, data)}
-        onMove={(evt, data) => handleJoystickEvents(evt, data)}
-      />
+      <Box ref={zoneRef}>
+        <ReactNipple
+          options={{
+            mode: "static",
+            size: SIZE,
+            position: { top: "50%", left: "50%" },
+            color: "#e1f5fe",
+            restOpacity: 0.8,
+            dynamicPage: true,
+            threshold: THRESHOLD,
+          }}
+          style={{
+            position: "relative",
+            width: "100%",
+            height: SIZE,
+            // if you pass position: 'relative', you don't need to import the stylesheet
+          }}
+          onStart={(evt, data) => handleJoystickEvents(evt, data)}
+          onEnd={(evt, data) => handleJoystickEvents(evt, data)}
+          onMove={(evt, data) => handleJoystickEvents(evt, data)}
+        />
+      </Box>
       <Typography variant="h6">P & T</Typography>
+      {gamepadConnected && (
+        <Typography variant="caption">🎮 Gamepad connected</Typography>
+      )}
     </Box>
   );
 }
