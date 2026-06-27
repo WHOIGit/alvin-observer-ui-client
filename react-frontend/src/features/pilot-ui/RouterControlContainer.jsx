@@ -11,6 +11,7 @@ import MiniVideoHeader from "./MiniVideoHeader";
 import EncoderActions from "./EncoderActions";
 import {
   VIDEO_STREAM_CONFIG,
+  ENCODER_KEYS,
   COMMAND_STRINGS,
   WS_SERVER_NAMESPACE_PORT,
   WS_SERVER_NAMESPACE_STARBOARD,
@@ -93,7 +94,7 @@ export default function RouterControlContainer() {
             }
             key="video1"
           />
-          <EncoderActions name={VIDEO_STREAM_CONFIG.portRecordVideo} />
+          <EncoderActions name={ENCODER_KEYS.portRecorder} />
         </Grid>
         <Grid item xs>
           <MiniVideo
@@ -108,7 +109,7 @@ export default function RouterControlContainer() {
             }
             key="video0"
           />
-          <EncoderActions name={VIDEO_STREAM_CONFIG.portObserverVideo} />
+          <EncoderActions name={ENCODER_KEYS.portObserver} />
         </Grid>
 
         <Grid item xs>
@@ -124,7 +125,7 @@ export default function RouterControlContainer() {
             }
             key="video2"
           />
-          <EncoderActions name={VIDEO_STREAM_CONFIG.pilotVideo} />
+          <EncoderActions name={ENCODER_KEYS.pilot} />
         </Grid>
 
         <Grid item xs>
@@ -140,7 +141,7 @@ export default function RouterControlContainer() {
             }
             key="video3"
           />
-          <EncoderActions name={VIDEO_STREAM_CONFIG.stbdObserverVideo} />
+          <EncoderActions name={ENCODER_KEYS.stbdObserver} />
         </Grid>
         <Grid item xs>
           <MiniVideo
@@ -155,7 +156,7 @@ export default function RouterControlContainer() {
             }
             key="video4"
           />
-          <EncoderActions name={VIDEO_STREAM_CONFIG.stbdRecordVideo} />
+          <EncoderActions name={ENCODER_KEYS.stbdRecorder} />
         </Grid>
       </Grid>
 
