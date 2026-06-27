@@ -87,3 +87,14 @@ export const VIDEO_STREAM_CONFIG = {
   stbdRecordVideo: envSettings.STBD_RECORDER_VIDEO,
   pilotVideo: envSettings.PILOT_VIDEO,
 };
+
+// Suboptica encoder keys, used as the {name} in v1.5 /encoder/{name} REST
+// paths. Distinct from the video stream names above (MediaMTX paths) and fixed
+// by the Suboptica topology, so they live here rather than in configEnv.
+export const ENCODER_KEYS = {
+  portObserver: "port_mon_enc",
+  stbdObserver: "stbd_mon_enc",
+  pilot: "pilot_mon_enc",
+  portRecorder: "port_rec_enc",
+  stbdRecorder: "stbd_rec_enc",
+};
