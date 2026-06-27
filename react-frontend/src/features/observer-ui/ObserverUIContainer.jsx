@@ -51,7 +51,6 @@ export default function ObserverUIContainer() {
   const observerSide = useSelector(selectObserverSide);
   const [showTopControls, setShowTopControls] = useState(false);
   const [showFullCameraControls, setShowFullCameraControls] = useState(false);
-  console.log("OBERSERV UI comp.");
 
   const handleControlToggle = () => {
     // close CameraControls if we're hiding panels

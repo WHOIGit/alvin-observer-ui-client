@@ -47,6 +47,18 @@ export const cameraControlsSlice = createSlice({
   initialState: initialState,
   reducers: {
     setObserverSide: (state, action) => {
+      // Switching sides points us at a different camera socket, so drop the
+      // previous side's camera state and let the new side's heartbeat
+      // re-initialize it (see ObserverUI's initial-camera effect).
+      if (state.observerSide !== null && state.observerSide !== action.payload) {
+        state.activeCamera = null;
+        state.initialCamHeartbeat = null;
+        state.camHeartbeatData = null;
+        state.currentCamData = null;
+        state.lastCommand = null;
+        state.commandsQueue = [];
+      }
+
       state.observerSide = action.payload;
       if (action.payload === "P") {
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
@@ -119,7 +131,7 @@ export const cameraControlsSlice = createSlice({
               default:
             }
           } else {
-            console.log("ERROR Received from AIS");
+            console.error("Camera command rejected by AIS", action.payload);
             state.errorCameraChange = true;
           }
         }

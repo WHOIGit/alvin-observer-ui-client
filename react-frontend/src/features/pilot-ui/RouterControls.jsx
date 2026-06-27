@@ -57,7 +57,6 @@ export default function RouterControls() {
 
   const routerInputs = useSelector(selectRouterInputs);
   const routerOutputs = useSelector(selectRouterOutputs);
-  console.log(routerOutputs, routerInputs);
 
   // disable Take button until both values have been selected
   const disabled = !inputValue || !outputValue;

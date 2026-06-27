@@ -127,14 +127,9 @@ export default function CaptureButtons() {
     setCurrentRecordFile(recorderHeartbeatData.filename);
     handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
     // set Video Source menu to be disabled
-    console.log("disabling video source");
-    const payloadVideoSrc = false;
-    dispatch(setVideoSourceEnabled(payloadVideoSrc));
+    dispatch(setVideoSourceEnabled(false));
     // reset error status in Redux
-    console.log("reset recording error");
-    const payload = false;
-    console.log("disabling video source");
-    dispatch(setRecorderError(payload));
+    dispatch(setRecorderError(false));
 
     // This is the maximum time the spinner will display
     // Cancel this timer if we get a OK response from socket message in useEffect above
@@ -145,9 +140,7 @@ export default function CaptureButtons() {
       const payloadRecError = true;
       dispatch(setRecorderError(payloadRecError));
       // reenable Video Source menu
-      console.log("enabling video source");
-      const payloadVideoSrc = true;
-      dispatch(setVideoSourceEnabled(payloadVideoSrc));
+      dispatch(setVideoSourceEnabled(true));
     }, 12000);
     setRecordTimer(timer);
   };
@@ -156,7 +149,6 @@ export default function CaptureButtons() {
     setLoadingImgCapture(true);
     handleSendMessage(COMMAND_STRINGS.stillImageCaptureCommand, 0);
     // set Video Source menu to be disabled
-    console.log("disabling video source");
     dispatch(setVideoSourceEnabled(false));
 
     // add a "fake" delay to UI to show users that image capture is processing

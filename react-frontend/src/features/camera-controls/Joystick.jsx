@@ -79,7 +79,6 @@ export default function Joystick() {
     if (joystickSpitter.current.intervalId) {
       return;
     }
-    console.log("START SPITTER FUNC");
     joystickSpitter.current.intervalId = setInterval(() => {
       // continuously spit out the last move message
       if (joystickSpitter.current.lastMove) {
