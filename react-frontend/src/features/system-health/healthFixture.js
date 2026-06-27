@@ -18,10 +18,8 @@ const check = (id, label, status, opts = {}) => ({
   remediation: opts.remediation ?? null,
 });
 
-const LADDER_OK = (extra = {}) => [
+const LADDER_OK = () => [
   check("net_reachable", "network reachable", "ok", { detail: "12ms", value: 12 }),
-  check("port_open", "control port open", extra.port_open ?? "ok"),
-  check("responds", "responds to inquiry", "ok", { detail: "VISCA reply 0.3s" }),
   check("reports_healthy", "reports healthy", "ok"),
   check("last_command", "last command ok", "ok", { detail: "CommandSucceeded" }),
 ];
@@ -48,7 +46,7 @@ const HEALTH_FIXTURE = {
       rollup: "ok",
       endpoint: { host: "10.100.162.105", port: 52109, proto: "udp" },
       checks: [
-        ...LADDER_OK({ port_open: "na" }),
+        ...LADDER_OK(),
         check("video_flowing", "video flowing", "ok", { detail: "snapshot 1s old" }),
       ],
     },
@@ -62,11 +60,6 @@ const HEALTH_FIXTURE = {
       endpoint: { host: "10.100.162.105", port: 52111, proto: "udp" },
       checks: [
         check("net_reachable", "network reachable", "ok", { detail: "13ms", value: 13 }),
-        check("port_open", "control port open", "na"),
-        check("responds", "responds to inquiry", "warn", {
-          detail: "last reply 6s ago (near stale)",
-          remediation: "verify port imaging bottle power",
-        }),
         check("reports_healthy", "reports healthy", "ok"),
         check("last_command", "last command ok", "ok"),
         check("video_flowing", "video flowing", "warn", { detail: "snapshot 9s old" }),
@@ -81,7 +74,7 @@ const HEALTH_FIXTURE = {
       rollup: "ok",
       endpoint: { host: "10.100.162.105", port: 52000, proto: "udp" },
       checks: [
-        ...LADDER_OK({ port_open: "na" }),
+        ...LADDER_OK(),
         check("at_fault_or_limit", "at fault / limit", "ok"),
         check("watchdog_fed", "watchdog fed", "na", { detail: "SIDUS has no watchdog" }),
       ],
@@ -96,8 +89,6 @@ const HEALTH_FIXTURE = {
       endpoint: { host: "10.100.162.120", port: 9993, proto: "tcp" },
       checks: [
         check("net_reachable", "network reachable", "ok", { detail: "2ms", value: 2 }),
-        check("port_open", "control port open", "ok", { detail: "TCP 9993 open" }),
-        check("responds", "responds to inquiry", "ok"),
         check("reports_healthy", "reports healthy", "ok"),
         check("last_command", "last command ok", "ok"),
         check("media_present", "media present", "ok", { detail: "slot 1" }),
@@ -121,11 +112,6 @@ const HEALTH_FIXTURE = {
       endpoint: { host: "10.100.162.122", port: 9993, proto: "tcp" },
       checks: [
         check("net_reachable", "network reachable", "ok", { detail: "3ms", value: 3 }),
-        check("port_open", "control port open", "ok"),
-        check("responds", "responds to inquiry", "unknown", {
-          detail: "no observation in 40s (stale)",
-          checked_at_s: 40,
-        }),
         check("reports_healthy", "reports healthy", "unknown"),
         check("last_command", "last command ok", "unknown"),
         check("media_present", "media present", "unknown"),
@@ -162,11 +148,6 @@ const HEALTH_FIXTURE = {
           detail: "jbox 10.100.162.106 12ms",
           value: 12,
         }),
-        check("port_open", "control port open", "na"),
-        check("responds", "responds to inquiry", "fault", {
-          detail: "no VISCA reply in 8s",
-          remediation: "check power/cable at stbd imaging bottle",
-        }),
         check("reports_healthy", "reports healthy", "fault"),
         check("last_command", "last command ok", "fault", { detail: "CommandFailed" }),
         check("video_flowing", "video flowing", "fault", { detail: "no snapshot 22s" }),
@@ -181,7 +162,7 @@ const HEALTH_FIXTURE = {
       rollup: "ok",
       endpoint: { host: "10.100.162.106", port: 52112, proto: "udp" },
       checks: [
-        ...LADDER_OK({ port_open: "na" }),
+        ...LADDER_OK(),
         check("video_flowing", "video flowing", "ok"),
       ],
     },
@@ -194,7 +175,7 @@ const HEALTH_FIXTURE = {
       rollup: "ok",
       endpoint: { host: "10.100.162.106", port: 52001, proto: "udp" },
       checks: [
-        ...LADDER_OK({ port_open: "na" }),
+        ...LADDER_OK(),
         check("at_fault_or_limit", "at fault / limit", "ok"),
         check("watchdog_fed", "watchdog fed", "na"),
       ],
@@ -212,8 +193,6 @@ const HEALTH_FIXTURE = {
           detail: "no route to 10.100.162.121",
           remediation: "check recorder power / network switch",
         }),
-        check("port_open", "control port open", "fault", { detail: "connect refused" }),
-        check("responds", "responds to inquiry", "unknown"),
         check("reports_healthy", "reports healthy", "unknown"),
         check("last_command", "last command ok", "unknown"),
         check("media_present", "media present", "unknown"),
@@ -231,7 +210,7 @@ const HEALTH_FIXTURE = {
       rollup: "warn",
       endpoint: { host: "10.100.162.105", port: 52002, proto: "udp" },
       checks: [
-        ...LADDER_OK({ port_open: "na" }),
+        ...LADDER_OK(),
         check("at_fault_or_limit", "at fault / limit", "ok"),
         check("watchdog_fed", "watchdog fed", "warn", {
           detail: "watchdog fed late (0.9s)",
@@ -264,13 +243,8 @@ const HEALTH_FIXTURE = {
       endpoint: { host: "10.100.162.154", port: 12345, proto: "tcp" },
       checks: [
         check("net_reachable", "network reachable", "ok", { detail: "1ms", value: 1 }),
-        check("port_open", "control port open", "ok"),
-        check("responds", "responds to inquiry", "ok"),
         check("reports_healthy", "reports healthy", "ok"),
         check("last_command", "last command ok", "ok"),
-        check("route_integrity", "route integrity", "ok", {
-          detail: "commanded sources match topology()",
-        }),
       ],
     },
     {
@@ -300,7 +274,6 @@ const HEALTH_FIXTURE = {
       endpoint: { host: "0.0.0.0", port: 50043, proto: "udp" },
       checks: [
         check("net_reachable", "network reachable", "na", { detail: "UDP listener" }),
-        check("fresh", "feed fresh", "ok", { detail: "packet 0.2s ago" }),
         check("parses", "parses", "ok"),
         check("sane", "sane (not frozen)", "ok"),
       ],

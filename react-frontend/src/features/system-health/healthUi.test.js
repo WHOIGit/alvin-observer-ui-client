@@ -33,7 +33,7 @@ describe("buildRowCatalog", () => {
       },
       {
         checks: [
-          { id: "responds", label: "responds to inquiry", status: "ok" },
+          { id: "reports_healthy", label: "reports healthy", status: "ok" },
           { id: "net_reachable", label: "network reachable", status: "ok" },
         ],
       },
@@ -41,7 +41,7 @@ describe("buildRowCatalog", () => {
     const rows = buildRowCatalog(paths);
     expect(rows.map((r) => r.id)).toEqual([
       "net_reachable",
-      "responds",
+      "reports_healthy",
       "video_flowing",
     ]);
   });

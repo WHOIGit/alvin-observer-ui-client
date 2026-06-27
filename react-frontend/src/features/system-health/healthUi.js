@@ -64,10 +64,8 @@ export const KIND_ORDER = [
 // Canonical row order: probe ladder first, then class-specific rows. The matrix
 // renders the subset present on at least one path; unlisted ids sort last.
 export const ROW_CATALOG = [
-  // Probe ladder (rungs 1-6)
+  // Probe ladder
   { id: "net_reachable", label: "network reachable" },
-  { id: "port_open", label: "control port open" },
-  { id: "responds", label: "responds to inquiry" },
   { id: "reports_healthy", label: "reports healthy" },
   { id: "last_command", label: "last command ok" },
   // Recorder
@@ -76,8 +74,6 @@ export const ROW_CATALOG = [
   { id: "timecode_advancing", label: "timecode advancing" },
   { id: "not_dropping_frames", label: "not dropping frames" },
   { id: "recorder_state", label: "recorder state" },
-  // Router
-  { id: "route_integrity", label: "route integrity" },
   // Camera / video
   { id: "video_flowing", label: "video flowing" },
   // Pan/tilt
@@ -87,7 +83,6 @@ export const ROW_CATALOG = [
   { id: "usb_present", label: "USB present" },
   { id: "capture_ok", label: "capture ok" },
   // Telemetry feed
-  { id: "fresh", label: "feed fresh" },
   { id: "parses", label: "parses" },
   { id: "sane", label: "sane (not frozen)" },
 ];
