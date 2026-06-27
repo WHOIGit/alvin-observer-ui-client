@@ -55,6 +55,7 @@ export const KIND_ORDER = [
   "camera",
   "pantilt",
   "recorder",
+  "encoder",
   "router",
   "image_capture",
   "telemetry",
@@ -68,7 +69,6 @@ export const ROW_CATALOG = [
   { id: "port_open", label: "control port open" },
   { id: "responds", label: "responds to inquiry" },
   { id: "reports_healthy", label: "reports healthy" },
-  { id: "suboptica_available", label: "suboptica available" },
   { id: "last_command", label: "last command ok" },
   // Recorder
   { id: "media_present", label: "media present" },

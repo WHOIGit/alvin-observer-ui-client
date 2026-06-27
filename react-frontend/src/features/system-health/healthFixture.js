@@ -23,7 +23,6 @@ const LADDER_OK = (extra = {}) => [
   check("port_open", "control port open", extra.port_open ?? "ok"),
   check("responds", "responds to inquiry", "ok", { detail: "VISCA reply 0.3s" }),
   check("reports_healthy", "reports healthy", "ok"),
-  check("suboptica_available", "suboptica available", "ok"),
   check("last_command", "last command ok", "ok", { detail: "CommandSucceeded" }),
 ];
 
@@ -69,7 +68,6 @@ const HEALTH_FIXTURE = {
           remediation: "verify port imaging bottle power",
         }),
         check("reports_healthy", "reports healthy", "ok"),
-        check("suboptica_available", "suboptica available", "ok"),
         check("last_command", "last command ok", "ok"),
         check("video_flowing", "video flowing", "warn", { detail: "snapshot 9s old" }),
       ],
@@ -101,7 +99,6 @@ const HEALTH_FIXTURE = {
         check("port_open", "control port open", "ok", { detail: "TCP 9993 open" }),
         check("responds", "responds to inquiry", "ok"),
         check("reports_healthy", "reports healthy", "ok"),
-        check("suboptica_available", "suboptica available", "ok"),
         check("last_command", "last command ok", "ok"),
         check("media_present", "media present", "ok", { detail: "slot 1" }),
         check("free_space", "free space", "warn", {
@@ -130,10 +127,24 @@ const HEALTH_FIXTURE = {
           checked_at_s: 40,
         }),
         check("reports_healthy", "reports healthy", "unknown"),
-        check("suboptica_available", "suboptica available", "unknown"),
         check("last_command", "last command ok", "unknown"),
         check("media_present", "media present", "unknown"),
         check("recorder_state", "recorder state", "unknown"),
+      ],
+    },
+    {
+      id: "port_mon",
+      label: "port mon encoder",
+      kind: "encoder",
+      station: "port",
+      in_use: true,
+      rollup: "ok",
+      endpoint: { host: "10.100.162.146", port: 80, proto: "tcp" },
+      checks: [
+        // Encoders carry no liveness/fault in Suboptica — only net_reachable
+        // (vitals probes the web host) and last_command.
+        check("net_reachable", "network reachable", "ok", { detail: "4ms", value: 4 }),
+        check("last_command", "last command ok", "ok"),
       ],
     },
 
@@ -157,9 +168,6 @@ const HEALTH_FIXTURE = {
           remediation: "check power/cable at stbd imaging bottle",
         }),
         check("reports_healthy", "reports healthy", "fault"),
-        check("suboptica_available", "suboptica available", "fault", {
-          detail: "engine fault",
-        }),
         check("last_command", "last command ok", "fault", { detail: "CommandFailed" }),
         check("video_flowing", "video flowing", "fault", { detail: "no snapshot 22s" }),
       ],
@@ -207,7 +215,6 @@ const HEALTH_FIXTURE = {
         check("port_open", "control port open", "fault", { detail: "connect refused" }),
         check("responds", "responds to inquiry", "unknown"),
         check("reports_healthy", "reports healthy", "unknown"),
-        check("suboptica_available", "suboptica available", "unknown"),
         check("last_command", "last command ok", "unknown"),
         check("media_present", "media present", "unknown"),
         check("recorder_state", "recorder state", "unknown"),
@@ -242,7 +249,7 @@ const HEALTH_FIXTURE = {
       endpoint: null,
       checks: [
         check("net_reachable", "network reachable", "na", { detail: "flexlink, no IP" }),
-        check("video_flowing", "video flowing", "ok", { detail: "rtsptoweb online" }),
+        check("video_flowing", "video flowing", "ok", { detail: "mediamtx ready" }),
       ],
     },
 
@@ -260,7 +267,6 @@ const HEALTH_FIXTURE = {
         check("port_open", "control port open", "ok"),
         check("responds", "responds to inquiry", "ok"),
         check("reports_healthy", "reports healthy", "ok"),
-        check("suboptica_available", "suboptica available", "ok"),
         check("last_command", "last command ok", "ok"),
         check("route_integrity", "route integrity", "ok", {
           detail: "commanded sources match topology()",
@@ -334,13 +340,13 @@ const HEALTH_FIXTURE = {
       remediation: "systemctl restart caddy.service",
     },
     {
-      id: "rtsptoweb",
-      label: "rtsptoweb",
+      id: "mediamtx",
+      label: "MediaMTX (host-native)",
       status: "ok",
       checked_at: ago(5),
-      detail: "12/12 streams online",
+      detail: "reachable (HTTP 200)",
       source: "http",
-      remediation: "systemctl restart rtsptoweb.service",
+      remediation: "systemctl restart mediamtx.service",
     },
     {
       id: "sealog-mongodb",
@@ -418,7 +424,7 @@ const HEALTH_FIXTURE = {
       detail: "AIS-vs-sub skew 2.4s",
       value: 2.4,
       source: "host",
-      remediation: "check chrony / AIS time source",
+      remediation: "check systemd-timesyncd / AIS time source",
     },
   ],
 };
