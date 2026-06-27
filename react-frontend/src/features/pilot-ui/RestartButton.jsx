@@ -3,8 +3,6 @@ import {
   Button,
   Dialog,
   DialogActions,
-  DialogContent,
-  DialogContentText,
   DialogTitle,
   IconButton,
   Tooltip,
@@ -40,12 +38,6 @@ export default function RestartButton() {
       </Tooltip>
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Restart imaging server?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            This will restart the imaging server and reload this page. Are you
-            sure?
-          </DialogContentText>
-        </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} disabled={restarting}>
             Cancel
