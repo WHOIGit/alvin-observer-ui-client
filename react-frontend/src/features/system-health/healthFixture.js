@@ -119,7 +119,7 @@ const HEALTH_FIXTURE = {
       ],
     },
     {
-      id: "port_mon",
+      id: "port_mon_enc",
       label: "port mon encoder",
       kind: "encoder",
       station: "port",
