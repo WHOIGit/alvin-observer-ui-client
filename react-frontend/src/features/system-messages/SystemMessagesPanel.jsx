@@ -11,7 +11,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import {
-  dismissReadSystemMessages,
+  dismissAllSystemMessages,
   dismissSystemMessage,
   markAllSystemMessagesRead,
   selectSystemMessages,
@@ -109,21 +109,21 @@ export default function SystemMessagesPanel({
         <Tooltip title="Mark all read">
           <IconButton
             aria-label="Mark all system notifications read"
-            size="small"
+            size="large"
             onClick={() => dispatch(markAllSystemMessagesRead())}
             sx={{ color: "grey.300" }}
           >
-            <DoneAllIcon fontSize="small" />
+            <DoneAllIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Clear read">
+        <Tooltip title="Clear all">
           <IconButton
-            aria-label="Clear read system notifications"
-            size="small"
-            onClick={() => dispatch(dismissReadSystemMessages())}
+            aria-label="Clear all system notifications"
+            size="large"
+            onClick={() => dispatch(dismissAllSystemMessages())}
             sx={{ color: "grey.300" }}
           >
-            <DeleteSweepIcon fontSize="small" />
+            <DeleteSweepIcon />
           </IconButton>
         </Tooltip>
       </Stack>

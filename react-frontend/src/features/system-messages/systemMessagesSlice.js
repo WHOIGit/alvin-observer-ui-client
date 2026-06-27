@@ -92,8 +92,8 @@ export const systemMessagesSlice = createSlice({
     dismissSystemMessage: (state, action) => {
       state.items = state.items.filter((message) => message.id !== action.payload);
     },
-    dismissReadSystemMessages: (state) => {
-      state.items = state.items.filter((message) => !message.read);
+    dismissAllSystemMessages: (state) => {
+      state.items = [];
     },
     removeExpiredSystemMessages: {
       reducer: (state, action) => {
@@ -116,7 +116,7 @@ export const systemMessagesSlice = createSlice({
 
 export const {
   addSystemMessage,
-  dismissReadSystemMessages,
+  dismissAllSystemMessages,
   dismissSystemMessage,
   markAllSystemMessagesRead,
   removeExpiredSystemMessages,
