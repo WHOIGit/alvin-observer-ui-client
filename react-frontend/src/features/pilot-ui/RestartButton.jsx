@@ -7,7 +7,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import bombIcon from "../../images/bomb.png";
 
 const RESTART_URL = `https://${window.location.hostname}/restart`;
 
@@ -33,7 +33,7 @@ export default function RestartButton() {
           onClick={() => setOpen(true)}
           sx={{ ml: 1.5, flexShrink: 0 }}
         >
-          <RestartAltIcon />
+          <img src={bombIcon} alt="" width={24} height={24} />
         </IconButton>
       </Tooltip>
       <Dialog open={open} onClose={() => setOpen(false)}>
