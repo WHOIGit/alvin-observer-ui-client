@@ -39,10 +39,11 @@ export default function RestartButton() {
         </IconButton>
       </Tooltip>
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Restart?</DialogTitle>
+        <DialogTitle>Restart imaging server?</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            This will restart the system and reload this page. Are you sure?
+            This will restart the imaging server and reload this page. Are you
+            sure?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
