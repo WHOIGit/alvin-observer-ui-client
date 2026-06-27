@@ -178,7 +178,6 @@ export default function SimpleTabs() {
             <div className={classes.metaData}>
               <MetaDataDisplay />
             </div>
-            <RestartButton />
           </Toolbar>
         </AppBar>
         <TabPanel value={value} index={0}>
@@ -205,6 +204,9 @@ export default function SimpleTabs() {
             <Box sx={{ mt: 0.5 }}>
               <SystemMessagesPanel maxHeight={160} />
             </Box>
+          </Box>
+          <Box sx={{ mt: 1.5, display: "flex", justifyContent: "flex-end" }}>
+            <RestartButton />
           </Box>
         </TabPanel>
       </div>
