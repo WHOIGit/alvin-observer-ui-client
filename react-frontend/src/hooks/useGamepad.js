@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 const DEFAULT_DEADZONE = 0.15;
 const AXIS_X = 0;
 const AXIS_Y = 1;
-const MOVE_EPSILON = 0.004;
 
 // Poll the Gamepad API and emit nipplejs-style start/move/end lifecycle
 // events for the left stick. Vectors are screen-space (x right+, y down+)
@@ -36,7 +35,6 @@ export function useGamepad({
     if (!connected) return;
     let raf;
     let active = false;
-    let last = { x: 0, y: 0 };
 
     const readStick = () => {
       for (const pad of navigator.getGamepads?.() ?? []) {
@@ -55,15 +53,13 @@ export function useGamepad({
     const loop = () => {
       const v = readStick();
       if (v.magnitude > 0) {
+        // A deflected stick is continuous input: emit every frame so the
+        // command spitter always has the current deflection, even when the
+        // stick is held perfectly still.
         if (!active) {
           active = true;
-          last = v;
           cbs.current.onStart?.(v);
-        } else if (
-          Math.abs(v.x - last.x) > MOVE_EPSILON ||
-          Math.abs(v.y - last.y) > MOVE_EPSILON
-        ) {
-          last = v;
+        } else {
           cbs.current.onMove?.(v);
         }
       } else if (active) {
