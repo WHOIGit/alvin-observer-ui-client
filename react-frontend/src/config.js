@@ -8,6 +8,17 @@ export const WS_SERVER_NAMESPACE_STARBOARD = "stbd";
 export const WS_SERVER_NAMESPACE_PILOT = "pilot";
 // sealog url for iframe
 export const SEALOG_URL = envSettings.SEALOG_URL;
+
+// alvin-vitals system-health feed.
+// REST base for the GET /health fallback (Caddy proxies to vitals:4050).
+export const VITALS_REST_URL = envSettings.VITALS_URL;
+// useSocket pool key + namespace/event for the vitals socket push.
+export const VITALS_WS_APIVERSION = "vitals";
+export const VITALS_HEALTH_NAMESPACE = "/health";
+export const HEALTH_SNAPSHOT_EVENT = "HealthSnapshot";
+// Dev-only: seed the static fixture so the view renders without vitals running.
+export const MOCK_HEALTH = Boolean(envSettings.MOCK_HEALTH);
+
 // Web socket event names
 export const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
 export const NAV_HEARTBEAT = "NavHeartbeat";

@@ -7,6 +7,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { deepOrange } from "@mui/material/colors";
 // local
 import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
@@ -24,6 +25,10 @@ import CameraControlContainer from "./CameraControlContainer";
 import MetaDataDisplay from "./MetaDataDisplay";
 import SystemMessagesPanel from "../system-messages/SystemMessagesPanel";
 import SystemMessageCountPill from "../system-messages/SystemMessageCountPill";
+import SystemHealthPanel from "../system-health/SystemHealthPanel";
+import { HealthProvider, useHealthContext } from "../system-health/HealthContext";
+import StatusBadge from "../system-health/StatusBadge";
+import { STATUS } from "../system-health/healthUi";
 import {
   selectUnreadSystemMessageCount,
   selectWorstSystemMessageLevel,
@@ -43,7 +48,7 @@ const PILOT_WARM_STREAMS = [
 ];
 
 function TabPanel(props) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, p = 3, ...other } = props;
 
   return (
     <div
@@ -53,7 +58,7 @@ function TabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box p={3}>{children}</Box>}
+      {value === index && <Box p={p}>{children}</Box>}
     </div>
   );
 }
@@ -62,6 +67,32 @@ TabPanel.propTypes = {
   children: PropTypes.node,
   index: PropTypes.any.isRequired,
   value: PropTypes.any.isRequired,
+  p: PropTypes.number,
+};
+
+// SYSTEM tab label: a fault/warn/stale icon on the left (mirrors the
+// notifications badge on the right) so the pilot sees trouble without opening
+// the tab.
+function SystemTabLabel({ unreadCount, badgeColor }) {
+  const health = useHealthContext();
+  const overall = health ? health.overall : null;
+  const showHealth =
+    overall === STATUS.FAULT ||
+    overall === STATUS.WARN ||
+    overall === STATUS.UNKNOWN;
+
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+      {showHealth ? <StatusBadge status={overall} variant="light" /> : null}
+      SYSTEM
+      <SystemMessageCountPill count={unreadCount} color={badgeColor} />
+    </Box>
+  );
+}
+
+SystemTabLabel.propTypes = {
+  unreadCount: PropTypes.number,
+  badgeColor: PropTypes.string,
 };
 
 function tabProps(index) {
@@ -106,7 +137,7 @@ export default function SimpleTabs() {
   };
 
   return (
-    <>
+    <HealthProvider>
       <CamHeartbeatListener />
       <CamHeartbeatListener
         namespaceOverride={`/${WS_SERVER_NAMESPACE_PORT}`}
@@ -134,19 +165,10 @@ export default function SimpleTabs() {
                 <Tab label="CAMERA CONTROL" {...tabProps(1)} />
                 <Tab
                   label={
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 0.75,
-                      }}
-                    >
-                      SYSTEM
-                      <SystemMessageCountPill
-                        count={unreadSystemMessageCount}
-                        color={systemBadgeColor}
-                      />
-                    </Box>
+                    <SystemTabLabel
+                      unreadCount={unreadSystemMessageCount}
+                      badgeColor={systemBadgeColor}
+                    />
                   }
                   {...tabProps(2)}
                 />
@@ -165,10 +187,27 @@ export default function SimpleTabs() {
         <TabPanel value={value} index={1}>
           <CameraControlContainer />
         </TabPanel>
-        <TabPanel value={value} index={2}>
-          <SystemMessagesPanel maxHeight={520} />
+        <TabPanel value={value} index={2} p={1.5}>
+          {/* Health matrix on top, shrunken notifications below. */}
+          <SystemHealthPanel maxHeight={400} />
+          <Box sx={{ mt: 1.25 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "grey.400",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}
+            >
+              Notifications
+            </Typography>
+            <Box sx={{ mt: 0.5 }}>
+              <SystemMessagesPanel maxHeight={160} />
+            </Box>
+          </Box>
         </TabPanel>
       </div>
-    </>
+    </HealthProvider>
   );
 }
