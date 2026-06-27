@@ -8,6 +8,7 @@ import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
 import RouterControls from "./RouterControls";
 import MiniVideo from "../camera-controls/MiniVideo";
 import MiniVideoHeader from "./MiniVideoHeader";
+import EncoderActions from "./EncoderActions";
 import {
   VIDEO_STREAM_CONFIG,
   COMMAND_STRINGS,
@@ -92,6 +93,7 @@ export default function RouterControlContainer() {
             }
             key="video1"
           />
+          <EncoderActions name={VIDEO_STREAM_CONFIG.portRecordVideo} />
         </Grid>
         <Grid item xs>
           <MiniVideo
@@ -106,6 +108,7 @@ export default function RouterControlContainer() {
             }
             key="video0"
           />
+          <EncoderActions name={VIDEO_STREAM_CONFIG.portObserverVideo} />
         </Grid>
 
         <Grid item xs>
@@ -121,6 +124,7 @@ export default function RouterControlContainer() {
             }
             key="video2"
           />
+          <EncoderActions name={VIDEO_STREAM_CONFIG.pilotVideo} />
         </Grid>
 
         <Grid item xs>
@@ -136,6 +140,7 @@ export default function RouterControlContainer() {
             }
             key="video3"
           />
+          <EncoderActions name={VIDEO_STREAM_CONFIG.stbdObserverVideo} />
         </Grid>
         <Grid item xs>
           <MiniVideo
@@ -150,6 +155,7 @@ export default function RouterControlContainer() {
             }
             key="video4"
           />
+          <EncoderActions name={VIDEO_STREAM_CONFIG.stbdRecordVideo} />
         </Grid>
       </Grid>
 
