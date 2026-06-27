@@ -24,10 +24,14 @@ function getOrCreate(namespace, apiVersion) {
   return entry;
 }
 
-export function useSocket(namespace = "/", { apiVersion = "1" } = {}) {
+// `enabled: false` skips the connection entirely (returns null) so a caller can
+// opt out without breaking the rules of hooks — used when a feature's endpoint
+// is unconfigured or it's running off mock data.
+export function useSocket(namespace = "/", { apiVersion = "1", enabled = true } = {}) {
   const entryRef = useRef(null);
 
   useEffect(() => {
+    if (!enabled) return undefined;
     const entry = getOrCreate(namespace, apiVersion);
     entry.refCount += 1;
     entryRef.current = entry;
@@ -50,8 +54,9 @@ export function useSocket(namespace = "/", { apiVersion = "1" } = {}) {
         e.socket.disconnect();
       }
     };
-  }, [namespace, apiVersion]);
+  }, [namespace, apiVersion, enabled]);
 
+  if (!enabled) return null;
   return entryRef.current
     ? entryRef.current.socket
     : getOrCreate(namespace, apiVersion).socket;
@@ -61,9 +66,9 @@ export function useSocketListener(
   namespace = "/",
   event,
   callback,
-  { apiVersion = "1" } = {}
+  { apiVersion = "1", enabled = true } = {}
 ) {
-  const socket = useSocket(namespace, { apiVersion });
+  const socket = useSocket(namespace, { apiVersion, enabled });
   const callbackRef = useRef(callback);
 
   useEffect(() => {
@@ -71,6 +76,7 @@ export function useSocketListener(
   }, [callback]);
 
   useEffect(() => {
+    if (!socket) return undefined;
     const handler = (msg) => {
       if (callbackRef.current) {
         callbackRef.current(msg);
