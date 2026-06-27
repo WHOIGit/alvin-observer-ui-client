@@ -188,7 +188,7 @@ export default function SimpleTabs() {
         </TabPanel>
         <TabPanel value={value} index={2} p={1.5}>
           {/* Health matrix on top, notifications below. */}
-          <SystemHealthPanel maxHeight={400} />
+          <SystemHealthPanel maxHeight={700} />
           <Box sx={{ mt: 1.25 }}>
             <Typography
               variant="caption"
@@ -202,7 +202,7 @@ export default function SimpleTabs() {
               Notifications
             </Typography>
             <Box sx={{ mt: 0.5 }}>
-              <SystemMessagesPanel maxHeight={340} />
+              <SystemMessagesPanel maxHeight={300} />
             </Box>
           </Box>
           <Box sx={{ mt: 1.5, display: "flex", justifyContent: "flex-end" }}>
