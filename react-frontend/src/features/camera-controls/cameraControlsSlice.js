@@ -34,6 +34,15 @@ const initialState = {
   allCameras: [],
   routerOutputs: [],
   routerInputs: [],
+  // Current routing crosspoints as a map of output value -> input value, e.g.
+  // { output1: "input1" }. Each output is fed by exactly one input. Populated
+  // from the backend (once it exposes routing) and updated optimistically on a
+  // successful TAKE so the matrix reflects the change immediately.
+  routerRouting: {},
+  // Result of the most recent router TAKE, driven by the command receipt:
+  // null (idle), "PENDING", "OK", or "ERR". Used to give the pilot inline
+  // success/failure feedback on the TAKE button.
+  routerTakeStatus: null,
   socketError: false,
 };
 
@@ -116,11 +125,21 @@ export const cameraControlsSlice = createSlice({
                 state.currentCamData.currentSettings.exposure_mode =
                   element.action.value;
                 break;
+              // router take confirmed by the device; surface success on the
+              // TAKE button. We don't track the live routing matrix yet, so
+              // there's no settings state to update here.
+              case COMMAND_STRINGS.routerIOCommand:
+                state.routerTakeStatus = "OK";
+                break;
               default:
             }
           } else {
-            console.log("ERROR Received from AIS");
             state.errorCameraChange = true;
+            // Flag a failed router take so the TAKE button can show the error
+            // inline (the detail also lands in the system message bar).
+            if (element.action.name === COMMAND_STRINGS.routerIOCommand) {
+              state.routerTakeStatus = "ERR";
+            }
           }
         }
         // remove command from queue
@@ -215,6 +234,19 @@ export const cameraControlsSlice = createSlice({
     setRouterInputs: (state, action) => {
       state.routerInputs = action.payload;
     },
+    setRouterTakeStatus: (state, action) => {
+      state.routerTakeStatus = action.payload;
+    },
+    // Replace the whole routing map (authoritative state from the backend).
+    setRouterRouting: (state, action) => {
+      state.routerRouting = action.payload;
+    },
+    // Set a single crosspoint: output is now fed by input. Used for the
+    // optimistic update after a confirmed TAKE.
+    setRouterRoute: (state, action) => {
+      const { output, input } = action.payload;
+      state.routerRouting[output] = input;
+    },
     setSocketError: (state, action) => {
       state.socketError = action.payload;
     },
@@ -242,6 +274,9 @@ export const {
   setAllCameras,
   setRouterOutputs,
   setRouterInputs,
+  setRouterTakeStatus,
+  setRouterRouting,
+  setRouterRoute,
   setSocketError,
 } = cameraControlsSlice.actions;
 
@@ -337,6 +372,17 @@ export const selectRouterOutputs = createSelector(
 // return initial router input values supplied by AIS
 export const selectRouterInputs = createSelector(
   (state) => state.cameraControls.routerInputs,
+  (item) => item
+);
+
+// return the result of the most recent router TAKE
+// (null | "PENDING" | "OK" | "ERR")
+export const selectRouterTakeStatus = (state) =>
+  state.cameraControls.routerTakeStatus;
+
+// return the current routing map (output value -> input value)
+export const selectRouterRouting = createSelector(
+  (state) => state.cameraControls.routerRouting,
   (item) => item
 );
 

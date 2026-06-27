@@ -160,37 +160,33 @@ export default function RouterControlContainer() {
       </Grid>
 
       <Box mt={1.5}>
-        <Grid container justifyContent="center" spacing={2}>
+        <Grid container spacing={2} alignItems="center">
           <Grid item xs>
             <PilotRecordButton observerSide={WS_SERVER_NAMESPACE_PORT} />
           </Grid>
-
           <Grid item xs display="flex" justifyContent="center">
             <div className={classes.buttonWrapper}>
               <Button
-                variant="contained"
-                color="primary"
+                variant="outlined"
+                size="small"
+                color="error"
                 disabled={loading}
-                className={classes.recStopButton}
                 onClick={() => handleStopRecord()}
               >
                 Stop All Recordings
               </Button>
               {loading && (
-                <CircularProgress
-                  size={24}
-                  className={classes.buttonProgress}
-                />
+                <CircularProgress size={20} className={classes.buttonProgress} />
               )}
             </div>
           </Grid>
-
           <Grid item xs className={classes.rightAlign}>
             <PilotRecordButton observerSide={WS_SERVER_NAMESPACE_STARBOARD} />
           </Grid>
         </Grid>
       </Box>
-      <Box mt={3}>
+
+      <Box mt={1.5}>
         <RouterControls />
       </Box>
     </>

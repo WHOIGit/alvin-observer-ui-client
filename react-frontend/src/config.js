@@ -6,6 +6,11 @@ export const WS_ENDPOINTS = envSettings.WS_ENDPOINTS;
 export const WS_SERVER_NAMESPACE_PORT = "port";
 export const WS_SERVER_NAMESPACE_STARBOARD = "stbd";
 export const WS_SERVER_NAMESPACE_PILOT = "pilot";
+// Router state + takes live on the v1.5 API under a dedicated namespace.
+export const WS_API_VERSION_V1_5 = "1.5";
+export const WS_ROUTER_NAMESPACE = "/router";
+export const ROUTER_STATE_EVENT = "RouterState";
+export const ROUTER_TAKE_EVENT = "take";
 // sealog url for iframe
 export const SEALOG_URL = envSettings.SEALOG_URL;
 // Web socket event names
