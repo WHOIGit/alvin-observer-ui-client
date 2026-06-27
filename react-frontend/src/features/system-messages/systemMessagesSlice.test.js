@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import reducer, {
   addSystemMessage,
-  dismissReadSystemMessages,
+  dismissAllSystemMessages,
   markAllSystemMessagesRead,
   removeExpiredSystemMessages,
   selectSystemMessages,
@@ -51,7 +51,7 @@ test("adds unread messages and summarizes severity", () => {
   expect(selectWorstSystemMessageLevel(rootState(state))).toBe("CRITICAL");
 });
 
-test("marks messages read and clears read messages", () => {
+test("marks messages read and clears all messages regardless of read state", () => {
   let state = reducer(undefined, { type: "@@INIT" });
 
   state = reducer(
@@ -73,7 +73,21 @@ test("marks messages read and clears read messages", () => {
   // Worst level reflects only unread messages, so reading clears it.
   expect(selectWorstSystemMessageLevel(rootState(state))).toBeNull();
 
-  state = reducer(state, dismissReadSystemMessages());
+  state = reducer(
+    state,
+    addSystemMessage(
+      {
+        correlation_id: "warn-1",
+        timestamp: "2026-06-15T12:01:00Z",
+        message: "Recorder unresponsive",
+        level: "WARN",
+      },
+      2000
+    )
+  );
+
+  // Clears everything, including the still-unread message.
+  state = reducer(state, dismissAllSystemMessages());
 
   expect(selectSystemMessages(rootState(state))).toHaveLength(0);
 });
