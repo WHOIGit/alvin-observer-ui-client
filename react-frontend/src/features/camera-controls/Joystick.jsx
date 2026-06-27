@@ -177,7 +177,9 @@ export default function Joystick() {
   const handleGamepad = (actionType) => (v) => {
     if (!isEnabled) return;
     const data = nippleDataFromVector(v.x, v.y, SIZE, nippleCenter(), THRESHOLD);
-    processJoystickPayload({ actionType, ...data });
+    // Route through the same builder as touch so the emitted payload is
+    // identical — the backend rejects any extra fields.
+    handleJoystickEvents({ type: actionType }, data);
     if (actionType === "end") restKnob();
     else moveKnob(v.x, v.y);
   };

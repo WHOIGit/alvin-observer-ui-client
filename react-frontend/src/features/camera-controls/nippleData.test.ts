@@ -19,14 +19,18 @@ describe("nippleDataFromVector", () => {
     expect(nippleDataFromVector(1, 0, SIZE).direction.angle).toBe("right");
   });
 
-  it("clamps distance to the joystick radius and scales force 0..1", () => {
-    const full = nippleDataFromVector(2, 0, SIZE);
-    expect(full.distance).toBeCloseTo(SIZE / 2);
-    expect(full.force).toBeCloseTo(1);
+  it("clamps distance to the joystick radius", () => {
+    expect(nippleDataFromVector(2, 0, SIZE).distance).toBeCloseTo(SIZE / 2);
+    expect(nippleDataFromVector(0.5, 0, SIZE).distance).toBeCloseTo(SIZE / 4);
+  });
 
-    const half = nippleDataFromVector(0.5, 0, SIZE);
-    expect(half.distance).toBeCloseTo(SIZE / 4);
-    expect(half.force).toBeCloseTo(0.5);
+  it("emits only the fields the backend accepts (no force)", () => {
+    expect(Object.keys(nippleDataFromVector(0.5, -0.5, SIZE)).sort()).toEqual([
+      "angle",
+      "direction",
+      "distance",
+      "position",
+    ]);
   });
 
   it("offsets page position from the supplied center", () => {

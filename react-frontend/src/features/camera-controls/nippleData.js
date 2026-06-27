@@ -39,10 +39,11 @@ export function nippleDataFromVector(
   // math and keeping atan2 on the same branch.
   const screenDeg = Math.atan2(0 - dy, 0 - dx) / RAD;
 
+  // Only the fields the joystick forwards to the backend; force drives the
+  // direction threshold but is never emitted (the backend rejects extra keys).
   return {
     position: { x: center.x + dx * radius, y: center.y + dy * radius },
     distance,
-    force,
     angle: {
       radian: (180 - screenDeg) * RAD,
       degree: 180 - screenDeg,
