@@ -1,62 +1,34 @@
-import { useEffect, useRef, useState } from "react";
-import socketIOClient from "socket.io-client";
-import { WS_ENDPOINTS } from "../config";
+import { useEffect, useRef } from "react";
+import { unstable_getSharedConnectionPool } from "../lib/imaging-client";
 
-// Shared socket pool keyed by `${apiVersion}:${namespace}` so the same
-// namespace name can coexist on different backend API versions.
-const pool = new Map();
-
-function getOrCreate(namespace, apiVersion) {
-  const key = `${apiVersion}:${namespace}`;
-  let entry = pool.get(key);
-  if (!entry) {
-    const endpoint = WS_ENDPOINTS[apiVersion];
-    if (!endpoint) {
-      throw new Error(`No WS_ENDPOINTS entry for API version ${apiVersion}`);
-    }
-    const socket = socketIOClient(endpoint.server + namespace, {
-      path: endpoint.path + "socket.io",
-      transports: ["websocket"],
-    });
-    entry = { socket, refCount: 0, key };
-    pool.set(key, entry);
-  }
-  return entry;
-}
-
+/**
+ * @deprecated Transitional shim over the imaging-client library's shared
+ * connection pool. New code should use the semantic hooks in
+ * useImagingClient.js (or the library directly) instead of raw sockets.
+ * This file is deleted once the last consumer migrates.
+ */
 export function useSocket(namespace = "/", { apiVersion = "1" } = {}) {
-  const entryRef = useRef(null);
+  const pool = unstable_getSharedConnectionPool();
+  const heldRef = useRef(null);
 
   useEffect(() => {
-    const entry = getOrCreate(namespace, apiVersion);
-    entry.refCount += 1;
-    entryRef.current = entry;
+    const held = pool.acquire(namespace, apiVersion);
+    heldRef.current = held;
 
     return () => {
-      const e = entryRef.current;
-      if (!e) return;
-      e.refCount -= 1;
-      if (e.refCount <= 0) {
-        pool.delete(e.key);
-
-        // Good bye message to server is a historical part of the ICS protocol
-        try {
-          const client = namespace.startsWith("/")
-            ? namespace.slice(1)
-            : namespace;
-          e.socket.emit("disconnectEvent", { client });
-        } catch (_) {}
-
-        e.socket.disconnect();
-      }
+      heldRef.current = null;
+      held.release();
     };
-  }, [namespace, apiVersion]);
+  }, [pool, namespace, apiVersion]);
 
-  return entryRef.current
-    ? entryRef.current.socket
-    : getOrCreate(namespace, apiVersion).socket;
+  // Like the original hook, the socket is available during the first render,
+  // before the effect has taken its reference.
+  return heldRef.current
+    ? heldRef.current.socket
+    : pool.get(namespace, apiVersion);
 }
 
+/** @deprecated See useSocket. */
 export function useSocketListener(
   namespace = "/",
   event,
