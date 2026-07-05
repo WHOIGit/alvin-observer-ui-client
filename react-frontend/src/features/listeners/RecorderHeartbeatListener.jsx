@@ -1,20 +1,14 @@
-import React, { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSocketListener } from "../../hooks/useSocket";
-import { RECORDER_HEARTBEAT } from "../../config";
+import { useRecorderHeartbeat } from "../../hooks/useImagingClient";
 import {
   changeRecorderHeartbeat,
   selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
-import { getObserverInfo } from "../../utils/observerSide";
 
 export default function RecorderHeartbeatListener({ isEnabled = true }) {
   const dispatch = useDispatch();
   const observerSide = useSelector(selectObserverSide);
-  const namespaceInfo = useMemo(
-    () => getObserverInfo(observerSide),
-    [observerSide]
-  );
 
   const handleMessage = useCallback(
     (message) => {
@@ -23,11 +17,7 @@ export default function RecorderHeartbeatListener({ isEnabled = true }) {
     [dispatch]
   );
 
-  useSocketListener(
-    namespaceInfo.namespacePath,
-    RECORDER_HEARTBEAT,
-    handleMessage
-  );
+  useRecorderHeartbeat(observerSide, handleMessage);
 
   return null;
 }

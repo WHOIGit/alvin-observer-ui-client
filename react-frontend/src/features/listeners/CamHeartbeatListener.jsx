@@ -1,8 +1,7 @@
-import React, { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSocketListener } from "../../hooks/useSocket";
+import { useCamHeartbeat } from "../../hooks/useImagingClient";
 import {
-  CAM_HEARTBEAT,
   WS_SERVER_NAMESPACE_PORT,
   WS_SERVER_NAMESPACE_STARBOARD,
 } from "../../config";
@@ -40,7 +39,7 @@ export default function CamHeartbeatListener({ namespaceOverride = null }) {
     [namespaceOverride, namespaceInfo, dispatch]
   );
 
-  useSocketListener(namespaceInfo.namespacePath, CAM_HEARTBEAT, handleMessage);
+  useCamHeartbeat(namespaceOverride || observerSide, handleMessage);
 
   return null;
 }

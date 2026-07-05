@@ -1,7 +1,11 @@
-import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSocketListener } from "../../hooks/useSocket";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config";
+import {
+  useCameraList,
+  useCameraSettings,
+  useCommandReceipt,
+  useRouterInputs,
+  useRouterOutputs,
+} from "../../hooks/useImagingClient";
 import {
   changeCurrentCamData,
   setAllCameras,
@@ -10,38 +14,21 @@ import {
   changeCameraSettings,
   selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
-import { getObserverInfo } from "../../utils/observerSide";
 
+// Feeds the server's newCameraCommand traffic into Redux. The library splits
+// the event's several message shapes into typed channels: configuration
+// broadcasts (camera list, router topology, settings options) and command
+// receipts, which resolve entries in the pending-ack queue.
 export default function NewCameraCommandListener({ namespaceOverride = null }) {
   const dispatch = useDispatch();
   const observerSide = useSelector(selectObserverSide);
-  const namespaceInfo = useMemo(
-    () => getObserverInfo(namespaceOverride || observerSide),
-    [namespaceOverride, observerSide]
-  );
+  const side = namespaceOverride || observerSide;
 
-  const handleMessage = useCallback(
-    (message) => {
-      if ("current_settings" in message) {
-        dispatch(changeCurrentCamData(message));
-      } else if ("camera_array" in message) {
-        dispatch(setAllCameras(message.camera_array));
-      } else if ("router_output_array" in message) {
-        dispatch(setRouterOutputs(message.router_output_array));
-      } else if ("router_input_array" in message) {
-        dispatch(setRouterInputs(message.router_input_array));
-      } else {
-        dispatch(changeCameraSettings(message));
-      }
-    },
-    [dispatch]
-  );
-
-  useSocketListener(
-    namespaceInfo.namespacePath,
-    NEW_CAMERA_COMMAND_EVENT,
-    handleMessage
-  );
+  useCameraSettings(side, (message) => dispatch(changeCurrentCamData(message)));
+  useCameraList(side, (cameras) => dispatch(setAllCameras(cameras)));
+  useRouterOutputs(side, (outputs) => dispatch(setRouterOutputs(outputs)));
+  useRouterInputs(side, (inputs) => dispatch(setRouterInputs(inputs)));
+  useCommandReceipt(side, (message) => dispatch(changeCameraSettings(message)));
 
   return null;
 }

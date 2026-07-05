@@ -12,9 +12,9 @@ import {
   selectCamHeartbeatDataStbd,
   selectAllCameras,
 } from "../camera-controls/cameraControlsSlice";
-import { useSocketListener } from "../../hooks/useSocket";
+import { useRecorderHeartbeat } from "../../hooks/useImagingClient";
 import { getCameraConfigFromId } from "../../utils/getCamConfigFromId";
-import { RECORDER_HEARTBEAT } from "../../config.js";
+
 
 const useStyles = makeStyles((theme) => ({
   headerRoot: {
@@ -49,7 +49,7 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
     setLastMessage(message);
   }, []);
 
-  useSocketListener(`/${observerSide}`, RECORDER_HEARTBEAT, handleMessage);
+  useRecorderHeartbeat(observerSide, handleMessage);
 
   const allCameras = useSelector(selectAllCameras);
   const activeCameraPilot = useSelector(selectCamHeartbeatData);
