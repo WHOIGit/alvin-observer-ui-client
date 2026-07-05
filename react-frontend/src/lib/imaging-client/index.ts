@@ -5,11 +5,7 @@
  * in this directory is an implementation detail of the wire protocol.
  */
 
-export {
-  createImagingClient,
-  getSharedImagingClient,
-  unstable_getSharedConnectionPool,
-} from "./client";
+export { createImagingClient, getSharedImagingClient } from "./client";
 export type {
   CameraHandle,
   CommandContext,

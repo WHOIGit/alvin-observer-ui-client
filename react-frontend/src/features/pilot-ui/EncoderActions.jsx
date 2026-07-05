@@ -3,15 +3,13 @@ import { Box, IconButton, Tooltip } from "@mui/material";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 // local
-import { WS_ENDPOINTS } from "../../config";
+import { getSharedImagingClient } from "../../lib/imaging-client";
 
-// POST {server}/api/v1.5/encoder/{name}/{action}
-function postEncoder(name, action) {
-  const { server, path } = WS_ENDPOINTS["1.5"];
-  const base = `${server}${path}`.replace(/\/+$/, "");
-  return fetch(`${base}/encoder/${encodeURIComponent(name)}/${action}`, {
-    method: "POST",
-  }).catch((error) => {
+function encoderAction(name, action) {
+  const client = getSharedImagingClient();
+  const request =
+    action === "reboot" ? client.rebootEncoder(name) : client.restartEncoder(name);
+  return request.catch((error) => {
     console.error(`encoder ${action} failed for ${name}`, error);
   });
 }
@@ -26,7 +24,7 @@ export default function EncoderActions({ name }) {
           size="small"
           color="inherit"
           aria-label={`Restart encoder ${name}`}
-          onClick={() => postEncoder(name, "restart_encoder")}
+          onClick={() => encoderAction(name, "restart_encoder")}
         >
           <RestartAltIcon fontSize="small" />
         </IconButton>
@@ -36,7 +34,7 @@ export default function EncoderActions({ name }) {
           size="small"
           color="inherit"
           aria-label={`Reboot ${name}`}
-          onClick={() => postEncoder(name, "reboot")}
+          onClick={() => encoderAction(name, "reboot")}
         >
           <PowerSettingsNewIcon fontSize="small" />
         </IconButton>

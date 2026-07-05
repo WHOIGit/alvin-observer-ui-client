@@ -142,6 +142,11 @@ export interface ImagingClient {
   // v1.5 REST
   restartEncoder(name: string): Promise<void>;
   rebootEncoder(name: string): Promise<void>;
+  /**
+   * Fire-and-forget restart of the imaging server host (the page's own
+   * host). Opaque no-cors request; resolves without a readable response.
+   */
+  restartServer(): Promise<void>;
 
   /**
    * Hard teardown of every connection this client owns, without the
@@ -484,6 +489,13 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       return encoderAction(name, "reboot");
     },
 
+    async restartServer() {
+      await fetch(`https://${globalThis.location.hostname}/restart`, {
+        method: "GET",
+        mode: "no-cors",
+      });
+    },
+
     close() {
       pool.closeAll();
     },
@@ -508,13 +520,3 @@ export function getSharedImagingClient(): ImagingClient {
   return sharedClient;
 }
 
-/**
- * @deprecated Transition-only escape hatch for hooks/useSocket.js so the
- * legacy hook and the client share one connection pool (one socket per
- * namespace) while consumers migrate. Removed along with that shim.
- */
-export function unstable_getSharedConnectionPool(): ConnectionPool {
-  const pool = clientPools.get(getSharedImagingClient());
-  if (!pool) throw new Error("shared client has no pool");
-  return pool;
-}

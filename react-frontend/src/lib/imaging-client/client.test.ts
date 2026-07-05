@@ -361,6 +361,26 @@ describe("vehicle-wide channels", () => {
     expect(sensor[0]).toMatchObject({ t2: 4.2 });
   });
 
+  test("releasing the last root-namespace subscription sends its good-bye", async () => {
+    let expectEmitFn!: (event: string) => Promise<any>;
+    const h = createSocketIoHarness((_h, expectEmit) => {
+      expectEmitFn = expectEmit;
+    });
+
+    const client = makeClient();
+    const unsubscribe = client.onNavHeartbeat(() => {});
+
+    await h.connected;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    const goodbye = expectEmitFn("disconnectEvent");
+    unsubscribe();
+
+    const { namespace, args } = await goodbye;
+    expect(namespace).toBe("/");
+    expect(args[0]).toEqual({ client: "" });
+  });
+
   test("system messages arrive from the v1.5 /system namespace", async () => {
     const h = createSocketIoHarness();
 
