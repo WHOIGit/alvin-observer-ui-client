@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import { Button, CircularProgress } from "@mui/material";
 import { green } from "@mui/material/colors";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import useLongPress from "../../hooks/useLongPress";
 import {
   selectActiveCamera,
@@ -60,10 +60,7 @@ export default function FocusZoomButton({
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
 
   const handleZoomHold = (commandName, commandValue) => {
     handleSendMessage(commandName, commandValue); 
@@ -139,13 +136,12 @@ export default function FocusZoomButton({
     },
   });
 
-  const handleSendMessage = (commandName, commandValue = "UND") => {            
-    void emit({
-      action: {
-        name: commandName,
-        value: commandValue,
-      },
-    });
+  const handleSendMessage = (commandName, commandValue = "UND") => {
+    if (commandName === COMMAND_STRINGS.zoomControlCommand) {
+      camera.zoom(commandValue);
+    } else {
+      camera.focus(commandValue);
+    }
   };
 
   useEffect(() => {

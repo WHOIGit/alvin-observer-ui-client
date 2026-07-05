@@ -12,7 +12,7 @@ import {
 } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 import { useSelector } from "react-redux";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,18 +34,10 @@ export default function SelectIsoMode() {
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
 
   const handleSendMessage = (event) => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.isoModeCommand,
-        value: event.target.value,
-      },
-    });
+    camera.setIso(event.target.value);
   };
 
   useEffect(() => {

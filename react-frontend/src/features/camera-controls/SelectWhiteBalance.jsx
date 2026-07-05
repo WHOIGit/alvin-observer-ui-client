@@ -10,7 +10,7 @@ import {
   Button,
 } from "@mui/material";
 // local imports
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import {
   selectActiveCamera,
   selectCamHeartbeatData,
@@ -40,27 +40,14 @@ export default function SelectWhiteBalance({ showLabel }) {
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
 
   const handleSendMessage = (event) => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.whiteBalanceCommand,
-        value: event.target.value,
-      },
-    });
+    camera.setWhiteBalance(event.target.value);
   };
 
   const handleOnePushMessage = () => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.whiteBalanceCommand,
-        value: COMMAND_STRINGS.whiteBalanceOnePushCommandValue,
-      },
-    });
+    camera.setWhiteBalance(COMMAND_STRINGS.whiteBalanceOnePushCommandValue);
   };
 
   // set up label options

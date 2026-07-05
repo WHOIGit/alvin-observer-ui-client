@@ -16,9 +16,8 @@ import {
   setRecordControlsEnabled,
   setVideoSourceEnabled,
 } from "./cameraControlsSlice";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import useIsOwner from "../../hooks/useIsOwner";
-import { COMMAND_STRINGS } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -42,10 +41,7 @@ export default function SelectVideoSource({ showLabel }) {
   const labelText = "SOURCE:";
 
   const observerSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera,
-    observerSide,
-  });
+  const station = useImagingStation(observerSide);
 
   useEffect(() => {
     if (requestedSource === activeCamera || requestedSource === null) {
@@ -66,12 +62,7 @@ export default function SelectVideoSource({ showLabel }) {
   }, [requestedSource, activeCamera, dispatch, isOwner, cameras]);
 
   const handleSendMessage = (event) => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.cameraChangeCommand,
-        value: event.target.value,
-      },
-    });
+    station.selectCamera(event.target.value, { activeCamera });
     setRequestedSource(event.target.value);
   };
 

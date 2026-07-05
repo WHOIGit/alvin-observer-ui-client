@@ -5,7 +5,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import { Grid, Button, Box } from "@mui/material";
 import { blue, green, deepOrange } from "@mui/material/colors";
 // local
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import ProcessingStatusChip from "./ProcessingStatusChip";
 import {
   selectActiveCamera,
@@ -13,7 +13,6 @@ import {
   selectRouterInputs,
   selectRouterOutputs,
 } from "../camera-controls/cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -50,10 +49,7 @@ export default function RouterControls() {
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const station = useImagingStation(observerSide);
 
   const routerInputs = useSelector(selectRouterInputs);
   const routerOutputs = useSelector(selectRouterOutputs);
@@ -62,12 +58,7 @@ export default function RouterControls() {
   // disable Take button until both values have been selected
   const disabled = !inputValue || !outputValue;
   const handleSendMessage = () => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.routerIOCommand,
-        value: { input: inputValue, output: outputValue },
-      },
-    });
+    station.takeRoute(inputValue, outputValue, { activeCamera: activeCameraId });
     // reset local values
     setInputValue(null);
     setOutputValue(null);

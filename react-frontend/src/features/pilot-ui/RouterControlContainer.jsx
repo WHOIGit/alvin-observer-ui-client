@@ -4,14 +4,13 @@ import makeStyles from '@mui/styles/makeStyles';
 import { Grid, Button, Box, CircularProgress } from "@mui/material";
 import { green, red } from "@mui/material/colors";
 // local
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import RouterControls from "./RouterControls";
 import MiniVideo from "../camera-controls/MiniVideo";
 import MiniVideoHeader from "./MiniVideoHeader";
 import EncoderActions from "./EncoderActions";
 import {
   VIDEO_STREAM_CONFIG,
-  COMMAND_STRINGS,
   WS_SERVER_NAMESPACE_PORT,
   WS_SERVER_NAMESPACE_STARBOARD,
   WS_SERVER_NAMESPACE_PILOT,
@@ -50,26 +49,11 @@ export default function RouterControlContainer() {
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
-
-  const handleSendMessage = (commandName, commandValue) => {
-    void emit({
-      action: {
-        name: commandName,
-        value: commandValue,
-      },
-    });
-  };
+  const station = useImagingStation(observerSide);
 
   const handleStopRecord = () => {
     setLoading(true);
-    handleSendMessage(
-      COMMAND_STRINGS.recordSourceCommand,
-      COMMAND_STRINGS.recordStopCommand
-    );
+    station.stopRecording({ activeCamera: activeCameraId });
 
     // add a "fake" delay to UI to show users that image capture is processing
     setTimeout(() => {

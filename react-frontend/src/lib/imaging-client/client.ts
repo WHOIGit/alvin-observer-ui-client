@@ -55,7 +55,7 @@ export interface CommandContext {
   activeCamera?: string | null;
 }
 
-export interface RecordOptions {
+export interface RecordOptions extends CommandContext {
   /**
    * The camera that was previously being recorded (from the recorder
    * heartbeat); the legacy protocol requires it on record-source commands.
@@ -99,7 +99,7 @@ export interface Station {
   // Commands
   selectCamera(cameraId: string, context?: CommandContext): SentCommand;
   record(cameraId: string, options?: RecordOptions): SentCommand;
-  stopRecording(options?: Pick<RecordOptions, "as">): SentCommand;
+  stopRecording(options?: Omit<RecordOptions, "previousCamera">): SentCommand;
   takeRoute(input: string, output: string, context?: CommandContext): SentCommand;
   /** Escape hatch for actions without a dedicated method. */
   send(body: CameraCommandBody, context?: CommandContext): SentCommand;
@@ -216,6 +216,13 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
     const commandSentCallbacks = new Set<(payload: SentCommand["payload"]) => void>();
     const pendingAcks = new Map<string, (receipt: CommandReceipt) => void>();
 
+    // The socket most recently used for sending. After the station's last
+    // reference is released and its connection torn down, stray sends (e.g.
+    // a debounced stop firing after a UI unmounts) go to this dead socket,
+    // where socket.io buffers them forever — the same silent swallow the
+    // legacy hook had — instead of resurrecting the connection.
+    let lastSendSocket: Socket | null = null;
+
     // The receipt-correlation listener rides on whatever socket currently
     // backs this namespace, without holding a reference of its own. Sockets
     // are recreated when the pool entry cycles, so track attachment per
@@ -263,7 +270,11 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         cb(copyPayload(payload));
       }
 
-      const socket = pool.get(namespacePath, V1);
+      const socket =
+        pool.peek(namespacePath, V1) ??
+        lastSendSocket ??
+        pool.get(namespacePath, V1);
+      lastSendSocket = socket;
       ensureAckListener(socket);
       const ack = registerAck(payload.eventId);
       socket.emit(EVENTS.newCameraCommand, payload);
@@ -340,7 +351,7 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         if (options.as !== undefined) {
           body.observerSideOverride = options.as;
         }
-        return send(body);
+        return send(body, { activeCamera: options.activeCamera });
       },
 
       stopRecording(options = {}) {
@@ -350,7 +361,7 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         if (options.as !== undefined) {
           body.observerSideOverride = options.as;
         }
-        return send(body);
+        return send(body, { activeCamera: options.activeCamera });
       },
 
       takeRoute(input, output, context) {

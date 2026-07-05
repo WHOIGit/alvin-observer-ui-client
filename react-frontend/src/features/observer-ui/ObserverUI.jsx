@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import TopControlPanel from "./TopControlPanel";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import {
   changeActiveCamera,
   selectActiveCamera,
@@ -9,10 +9,10 @@ import {
   selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
 import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
+import CommandStateListener from "../listeners/CommandStateListener";
 import NewCameraCommandListener from "../listeners/NewCameraCommandListener";
 import RecorderHeartbeatListener from "../listeners/RecorderHeartbeatListener";
 import ConnectionStatusListener from "../listeners/ConnectionStatusListener";
-import { COMMAND_STRINGS } from "../../config";
 
 export default function ObserverUI({
   showFullCameraControls,
@@ -20,11 +20,9 @@ export default function ObserverUI({
 }) {
   const dispatch = useDispatch();
 
-  // emitter for camera commands on the user's namespace
+  // camera commands go out on the user's own station
   const observerSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter({
-    observerSide,
-  });
+  const station = useImagingStation(observerSide);
 
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
@@ -36,12 +34,8 @@ export default function ObserverUI({
       dispatch(changeActiveCamera(initialCamHeartbeat));
 
       // send camera change command to set available settings options
-      void emit({
-        camera: initialCamHeartbeat.camera,
-        action: {
-          name: COMMAND_STRINGS.cameraChangeCommand,
-          value: initialCamHeartbeat.camera,
-        },
+      station.selectCamera(initialCamHeartbeat.camera, {
+        activeCamera: initialCamHeartbeat.camera,
       });
     };
 
@@ -56,6 +50,7 @@ export default function ObserverUI({
   return (
     <>
       <CamHeartbeatListener />
+      <CommandStateListener />
       <NewCameraCommandListener />
       <RecorderHeartbeatListener />
       <ConnectionStatusListener />

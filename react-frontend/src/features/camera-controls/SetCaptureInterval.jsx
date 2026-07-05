@@ -15,7 +15,7 @@ import {
   selectCamHeartbeatData,
   selectObserverSide,
  } from "./cameraControlsSlice";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import { COMMAND_STRINGS } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
@@ -43,10 +43,7 @@ export default function SelectCaptureInterval() {
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
 
   const handleValueChange = (event) => {
     setValue(event.target.value);
@@ -54,12 +51,7 @@ export default function SelectCaptureInterval() {
 
   const handleSendMessage = () => {
     // stop capture interval by sending 0 string to the AIS
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.captureIntervalCommand,
-        value: captureEnabled ? value : "0",
-      },
-    });
+    camera.captureStill(captureEnabled ? value : "0");
   };
 
   useEffect(() => {

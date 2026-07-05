@@ -23,6 +23,8 @@ export interface ConnectionPool {
    * adopted by the next acquire() for the same namespace.
    */
   get(namespace?: string, apiVersion?: string): Socket;
+  /** Returns the pooled socket only if one currently exists. */
+  peek(namespace?: string, apiVersion?: string): Socket | null;
   /**
    * Returns the pooled socket plus a release function. When the last
    * reference is released the connection sends the historical ICS good-bye
@@ -61,6 +63,10 @@ export function createConnectionPool(getEndpoints: () => WsEndpoints): Connectio
   return {
     get(namespace = "/", apiVersion = "1") {
       return getOrCreate(namespace, apiVersion).socket;
+    },
+
+    peek(namespace = "/", apiVersion = "1") {
+      return pool.get(`${apiVersion}:${namespace}`)?.socket ?? null;
     },
 
     acquire(namespace = "/", apiVersion = "1") {

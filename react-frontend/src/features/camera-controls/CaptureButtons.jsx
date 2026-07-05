@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import { Grid, Button, CircularProgress, Checkbox } from "@mui/material";
 import { green } from "@mui/material/colors";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
 import {
   selectActiveCameraConfig,
@@ -47,10 +47,7 @@ export default function CaptureButtons() {
   const allCameras = useSelector(selectAllCameras);
 
   const observerSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCamera?.camera,
-    observerSide,
-  });
+  const station = useImagingStation(observerSide);
 
   const [recordTimer, setRecordTimer] = useState(null);
   const [currentRecordFile, setCurrentRecordFile] = useState(null);
@@ -102,21 +99,14 @@ export default function CaptureButtons() {
         recorderHeartbeatData.camera,
         allCameras
       );
-      return void emit({
-        action: {
-          name: commandName,
-          value: commandValue,
-        },
-        oldCamera: oldCamera.camera,
-      });
+      station.record(commandValue, { previousCamera: oldCamera.camera });
+      return;
     }
 
     if (commandName === COMMAND_STRINGS.stillImageCaptureCommand) {
-      return void emit({
-        action: {
-          name: commandName,
-          value: { interval: commandValue, imgTransferChecked: false },
-        },
+      station.camera(activeCamera?.camera ?? null).captureStill({
+        interval: commandValue,
+        imgTransferChecked: false,
       });
     }
   };

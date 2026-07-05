@@ -15,7 +15,7 @@ import {
   selectObserverSide,
   setExposureControlsEnabled,
 } from "./cameraControlsSlice";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import useIsOwner from "../../hooks/useIsOwner";
 import { COMMAND_STRINGS } from "../../config.js";
 
@@ -41,19 +41,11 @@ export default function SelectExposureMode({ showLabel }) {
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
 
   const handleSendMessage = (event) => {
     console.log("TARGET VALUE:", event.target.value);
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.exposureModeCommand,
-        value: event.target.value,
-      },
-    });
+    camera.setExposureMode(event.target.value);
     setExpModeRequested(event.target.value);
   };
 

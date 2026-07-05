@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import ReactNipple from "react-nipple";
 import makeStyles from '@mui/styles/makeStyles';
 import { Box, Typography } from "@mui/material";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import {
   selectActiveCamera,
   selectCamHeartbeatData,
@@ -11,7 +11,6 @@ import {
   selectObserverSide,
   setJoystickStatus,
 } from "./cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,10 +29,7 @@ export default function Joystick() {
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
 
   useEffect(() => {
     // disable joystick if camera has no pan/tilt controls
@@ -57,15 +53,8 @@ export default function Joystick() {
   }, []);
 
   const sendPanTiltCommand = (commandValue) => {
-    // add timestamp to command sent to imaging server for debug
-    const timestamp = new Date().toISOString();
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.panTiltCommand,
-        value: commandValue,
-        timestamp: timestamp,
-      },
-    });
+    // the library stamps the action with a debug timestamp
+    camera.panTilt(commandValue);
   };
 
   // the joystickSpitter is a ref object that tracks the state of the timer

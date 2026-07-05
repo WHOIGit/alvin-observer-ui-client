@@ -5,7 +5,7 @@ import { Button, CircularProgress } from "@mui/material";
 import { green } from "@mui/material/colors";
 import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 // local
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import { COMMAND_STRINGS } from "../../config.js";
 import { selectActiveCamera, selectObserverSide } from "./cameraControlsSlice";
@@ -32,10 +32,7 @@ const FocusModeButton = () => {
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
 
   useEffect(() => {
     if (camSettings !== null) {
@@ -43,7 +40,7 @@ const FocusModeButton = () => {
     }
   }, [camSettings]);
 
-  const handleSendMessage = (commandName) => {
+  const handleSendMessage = () => {
     // add a "fake" delay to UI to show users that image capture is processing
     setLoading(true);
     setTimeout(() => {
@@ -57,12 +54,7 @@ const FocusModeButton = () => {
       commandValue = COMMAND_STRINGS.focusAF;
     }
 
-    void emit({
-      action: {
-        name: commandName,
-        value: commandValue,
-      },
-    });
+    camera.setFocusMode(commandValue);
   };
 
   return (
@@ -73,7 +65,7 @@ const FocusModeButton = () => {
         size="small"
         startIcon={<CenterFocusStrongIcon />}
         disabled={loading}
-        onClick={() => handleSendMessage(COMMAND_STRINGS.focusModeCommand)}
+        onClick={() => handleSendMessage()}
       >
         Focus {currentFocusMode}
       </Button>

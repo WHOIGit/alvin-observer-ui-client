@@ -11,7 +11,7 @@ import {
   selectExposureControlsEnabled,
   selectObserverSide,
 } from "./cameraControlsSlice";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import { COMMAND_STRINGS } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
@@ -34,18 +34,10 @@ export default function SelectIrisMode() {
 
   const observerSide = useSelector(selectObserverSide);
   const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
 
   const handleSendMessage = (event) => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.irisModeCommand,
-        value: event.target.value,
-      },
-    });
+    camera.setIris(event.target.value);
   };
 
   useEffect(() => {

@@ -14,7 +14,7 @@ import FocusModeButton from "../camera-controls/FocusModeButton";
 import FocusZoomButtonsGrid from "../camera-controls/FocusZoomButtonsGrid";
 import Joystick from "../camera-controls/Joystick";
 import SetCaptureInterval from "../camera-controls/SetCaptureInterval";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import useIsOwner from "../../hooks/useIsOwner";
 import RecordingStatusChip from "./RecordingStatusChip";
 import ErrorCard from "../camera-controls/ErrorCard";
@@ -26,10 +26,7 @@ import {
   selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
 
-import {
-  CAM_HEARTBEAT,
-  COMMAND_STRINGS,
-} from "../../config";
+import { CAM_HEARTBEAT } from "../../config";
 
 const useStyles = makeStyles((theme) => ({
   joystickBox: {
@@ -46,9 +43,7 @@ export default function CameraControlContainer() {
   const { isOwner } = useIsOwner();
 
   const observerSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter({
-    observerSide,
-  });
+  const station = useImagingStation(observerSide);
 
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
@@ -61,12 +56,8 @@ export default function CameraControlContainer() {
       dispatch(changeActiveCamera(initialCamHeartbeat));
 
       // send camera change command to set available settings options
-      void emit({
-        camera: initialCamHeartbeat.camera,
-        action: {
-          name: COMMAND_STRINGS.cameraChangeCommand,
-          value: initialCamHeartbeat.camera,
-        },
+      station.selectCamera(initialCamHeartbeat.camera, {
+        activeCamera: initialCamHeartbeat.camera,
       });
     };
 
@@ -77,7 +68,7 @@ export default function CameraControlContainer() {
         setInitialCamera();
       }
     }
-  }, [activeCamera, dispatch, emit, initialCamHeartbeat]);
+  }, [activeCamera, dispatch, station, initialCamHeartbeat]);
 
   const renderDynamicGridBox = () => {
     if (camSettings?.focus_mode === "ERR") return <ErrorCard />;

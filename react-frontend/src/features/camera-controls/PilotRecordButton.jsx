@@ -4,16 +4,13 @@ import makeStyles from '@mui/styles/makeStyles';
 import { Button, CircularProgress } from "@mui/material";
 import { green } from "@mui/material/colors";
 // local imports
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useImagingStation } from "../../hooks/useImagingClient";
 import {
   selectCamHeartbeatDataPort,
   selectCamHeartbeatDataStbd,
   selectObserverSide,
 } from "./cameraControlsSlice";
-import {
-  COMMAND_STRINGS,
-  WS_SERVER_NAMESPACE_STARBOARD,
-} from "../../config";
+import { WS_SERVER_NAMESPACE_STARBOARD } from "../../config";
 
 const useStyles = makeStyles((theme) => ({
   buttonWrapper: {
@@ -37,9 +34,7 @@ export default function PilotRecordButton({ observerSide }) {
   const [loading, setLoading] = useState(false);
 
   const globalObserverSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter({
-    observerSide: globalObserverSide,
-  });
+  const station = useImagingStation(globalObserverSide);
 
   let activeCamera = activeCameraPort;
   if (observerSide === WS_SERVER_NAMESPACE_STARBOARD) {
@@ -47,13 +42,7 @@ export default function PilotRecordButton({ observerSide }) {
   }
 
   const handleSendMessage = () => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.recordSourceCommand,
-        value: activeCamera.camera,
-      },
-      observerSideOverride: observerSide,
-    });
+    station.record(activeCamera.camera, { as: observerSide });
   };
 
   const handleRecordAction = () => {
