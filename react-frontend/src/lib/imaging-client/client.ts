@@ -20,28 +20,30 @@ import {
   NAMESPACE_ROOT,
   NAMESPACE_SYSTEM,
   RECORD_STOP,
+  WHITE_BALANCE_ONE_PUSH_TRIGGER,
   buildCameraCommand,
   getObserverInfo,
 } from "./protocol";
 import type { ObserverSide, ObserverSideInput } from "./protocol";
+import type { FocusControl, ZoomControl } from "./domain";
+import type {
+  ConnectionStatusEvent,
+  SentCommand,
+  Unsubscribe,
+  WsEndpoints,
+} from "./types";
 import type {
   CamHeartbeat,
   CameraArrayEntry,
   CameraCommandBody,
   CameraSettingsPayload,
   CommandReceipt,
-  ConnectionStatusEvent,
-  FocusControl,
   NavHeartbeat,
   RecorderHeartbeat,
   RouterPortEntry,
   SensorHeartbeat,
-  SentCommand,
   SystemMessage,
-  Unsubscribe,
-  WsEndpoints,
-  ZoomControl,
-} from "./types";
+} from "./wire";
 
 const V1 = "1";
 const V1_5 = "1.5";
@@ -73,10 +75,15 @@ export interface CameraHandle {
   setExposureMode(value: string): SentCommand;
   setFocusMode(value: string): SentCommand;
   setWhiteBalance(value: string): SentCommand;
-  /** Drive focus: near/far, one-stop/continuous, or "ST" to stop. */
+  /** Fire an armed one-push white balance (see WHITE_BALANCE_MODES.ONE_PUSH). */
+  triggerOnePushWhiteBalance(): SentCommand;
+  /** Drive focus with a FOCUS_CONTROLS value; STOP ends a continuous move. */
   focus(control: FocusControl | string): SentCommand;
-  /** Drive zoom: "TC[:speed]", "TS", "WC[:speed]", "WS", or "ST". */
-  zoom(control: ZoomControl): SentCommand;
+  /**
+   * Drive zoom with a ZOOM_CONTROLS value; STOP ends a continuous move.
+   * Speed applies only to the continuous controls.
+   */
+  zoom(control: ZoomControl | string, speed?: number): SentCommand;
   /** Joystick pan/tilt; `value` is the nipplejs-shaped move descriptor. */
   panTilt(value: unknown): SentCommand;
   /**
@@ -309,10 +316,28 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         setExposureMode: setting(ACTIONS.exposureMode),
         setFocusMode: setting(ACTIONS.focusMode),
         setWhiteBalance: setting(ACTIONS.whiteBalance),
+        triggerOnePushWhiteBalance: () =>
+          send(
+            {
+              action: {
+                name: ACTIONS.whiteBalance,
+                value: WHITE_BALANCE_ONE_PUSH_TRIGGER,
+              },
+            },
+            context
+          ),
         focus: (control) =>
           send({ action: { name: ACTIONS.focusControl, value: control } }, context),
-        zoom: (control) =>
-          send({ action: { name: ACTIONS.zoomControl, value: control } }, context),
+        zoom: (control, speed) =>
+          send(
+            {
+              action: {
+                name: ACTIONS.zoomControl,
+                value: speed != null ? `${control}:${speed}` : control,
+              },
+            },
+            context
+          ),
         panTilt: (value) =>
           send(
             {

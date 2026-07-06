@@ -6,7 +6,7 @@
  */
 
 import formatISO from "date-fns/formatISO";
-import type { CameraCommandBody, CameraCommandPayload } from "./types";
+import type { CameraCommandBody, CameraCommandPayload } from "./wire";
 
 /** Normalized station side identifiers used throughout the app. */
 export type ObserverSide = "P" | "S" | "PL";
@@ -61,6 +61,12 @@ export const ACTIONS = {
 
 /** REC action value that stops the current recording. */
 export const RECORD_STOP = "ST";
+
+/**
+ * WB action value that fires an armed one-push white balance. Not a mode —
+ * the camera is put into ONE_PUSH mode first, then this triggers it.
+ */
+export const WHITE_BALANCE_ONE_PUSH_TRIGGER = "ONE_PUSH_TRIGGER";
 
 export function normalizeObserverSide(rawSide: ObserverSideInput): ObserverSide | null {
   if (!rawSide) return null;
