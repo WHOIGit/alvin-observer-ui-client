@@ -65,7 +65,7 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
     if (allCameras.length) {
       if (videoType === "REC" && lastMessage) {
         setCameraName(lastMessage.camera);
-        setIsRecording(lastMessage.recording === "true");
+        setIsRecording(lastMessage.isRecording);
       } else if (videoType === "OBS" || videoType === "PILOT") {
         if (observerSide === "port" && activeCameraPort) {
           const camera = getCameraConfigFromId(

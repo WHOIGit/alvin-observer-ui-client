@@ -57,7 +57,7 @@ test("stores recorder heartbeats for the observer's own side", async () => {
 
   await vi.waitFor(() =>
     expect(store.getState().cameraControls.recorderHeartbeatData).toMatchObject({
-      recording: "true",
+      isRecording: true,
       filename: "clip_0042.mov",
     })
   );

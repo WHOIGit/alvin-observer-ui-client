@@ -36,7 +36,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       observerSide: scenario.observerSide,
       camHeartbeatData: {
         exposure: COMMAND_STRINGS.exposureModeOptions[0],
-        camctrl: "y",
+        isControllable: true,
         camera: "cam-1",
         owner: scenario.namespace.replace(/^\//, ""),
       },

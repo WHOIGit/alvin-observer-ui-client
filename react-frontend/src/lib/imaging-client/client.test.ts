@@ -276,6 +276,54 @@ describe("station subscriptions", () => {
     expect(portSeen).toHaveLength(0);
   });
 
+  test("heartbeat flags are delivered as booleans", async () => {
+    const h = createSocketIoHarness();
+
+    const client = makeClient();
+    const station = client.station("P");
+
+    const camSeen: any[] = [];
+    const recSeen: any[] = [];
+    station.onCamHeartbeat((msg) => camSeen.push(msg));
+    station.onRecorderHeartbeat((msg) => recSeen.push(msg));
+
+    await stationConnected(station);
+
+    emitTo(h, "/port", "CamHeartbeat", {
+      camera: "port_brow_4k",
+      pantilt: "y",
+      camctrl: "n",
+    });
+    emitTo(h, "/port", "RecorderHeartbeat", {
+      command: "SRVP",
+      camera: "Port Brow",
+      recording: "true",
+      filename: "clip_0001.mov",
+    });
+    emitTo(h, "/port", "RecorderHeartbeat", {
+      command: "SRPL",
+      port_camera: "Port Brow",
+      stbd_camera: "Stbd Brow",
+      port_recording: "true",
+      stbd_recording: "false",
+      filename: "none",
+      processing_complete: "false",
+    });
+
+    await vi.waitFor(() => expect(recSeen).toHaveLength(2));
+    expect(camSeen[0]).toMatchObject({
+      camera: "port_brow_4k",
+      hasPanTilt: true,
+      isControllable: false,
+    });
+    expect(recSeen[0]).toMatchObject({ isRecording: true });
+    expect(recSeen[1]).toMatchObject({
+      isPortRecording: true,
+      isStbdRecording: false,
+      isProcessingComplete: false,
+    });
+  });
+
   test("splits incoming newCameraCommand messages by shape", async () => {
     const h = createSocketIoHarness();
 

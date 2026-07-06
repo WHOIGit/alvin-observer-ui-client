@@ -72,7 +72,7 @@ export default function CameraControlContainer() {
 
   const renderDynamicGridBox = () => {
     if (camSettings?.focus_mode === "ERR") return <ErrorCard />;
-    if (camSettings?.camctrl === "y" && isOwner) {
+    if (camSettings?.isControllable && isOwner) {
       return (
         <List>
           <ListItem>
@@ -123,17 +123,17 @@ export default function CameraControlContainer() {
 
         <>
           <Grid item xs>
-            {camSettings?.camctrl === "y" && isOwner && <FocusModeButton />}
+            {camSettings?.isControllable && isOwner && <FocusModeButton />}
           </Grid>
           <Grid item xs>
-            {camSettings?.camctrl === "y" && isOwner && (
+            {camSettings?.isControllable && isOwner && (
               <FocusZoomButtonsGrid />
             )}
           </Grid>
         </>
 
         <Grid item xs>
-          {camSettings?.pantilt === "y" && isOwner && (
+          {camSettings?.hasPanTilt && isOwner && (
             <div className={classes.joystickBox}>
               <Joystick />
             </div>

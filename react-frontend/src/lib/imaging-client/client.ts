@@ -33,17 +33,17 @@ import type {
   WsEndpoints,
 } from "./types";
 import type {
-  CamHeartbeat,
   CameraArrayEntry,
   CameraCommandBody,
   CameraSettingsPayload,
   CommandReceipt,
   NavHeartbeat,
-  RecorderHeartbeat,
   RouterPortEntry,
   SensorHeartbeat,
   SystemMessage,
 } from "./wire";
+import { normalizeCamHeartbeat, normalizeRecorderHeartbeat } from "./telemetry";
+import type { CamHeartbeat, RecorderHeartbeat } from "./telemetry";
 
 const V1 = "1";
 const V1_5 = "1.5";
@@ -399,11 +399,15 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       },
 
       onCamHeartbeat(cb) {
-        return subscribe(namespacePath, V1, EVENTS.camHeartbeat, cb);
+        return subscribe(namespacePath, V1, EVENTS.camHeartbeat, (msg) =>
+          cb(normalizeCamHeartbeat(msg))
+        );
       },
 
       onRecorderHeartbeat(cb) {
-        return subscribe(namespacePath, V1, EVENTS.recorderHeartbeat, cb);
+        return subscribe(namespacePath, V1, EVENTS.recorderHeartbeat, (msg) =>
+          cb(normalizeRecorderHeartbeat(msg))
+        );
       },
 
       onConnectionStatus(cb) {

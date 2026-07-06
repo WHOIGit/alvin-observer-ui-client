@@ -38,11 +38,11 @@ export default function RecordingStatusChip() {
     if (lastMessage && activeCameraConfig) {
       // get list of recording cameras from Pilot Heartbeat
       let recordingCams = [];
-      if (lastMessage.port_recording === "true") {
+      if (lastMessage.isPortRecording) {
         recordingCams.push(lastMessage.port_camera);
       }
 
-      if (lastMessage.stbd_recording === "true") {
+      if (lastMessage.isStbdRecording) {
         recordingCams.push(lastMessage.stbd_camera);
       }
 

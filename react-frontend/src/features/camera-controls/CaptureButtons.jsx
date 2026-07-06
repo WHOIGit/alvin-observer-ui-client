@@ -70,7 +70,7 @@ export default function CaptureButtons() {
     // also check if RECORDER_HEARTBEAT filename has changed, indicates new recording for same camera
     if (recorderHeartbeatData && recordTimer) {
       if (
-        recorderHeartbeatData.recording === "true" &&
+        recorderHeartbeatData.isRecording &&
         activeCamera.cam_name === recorderHeartbeatData.camera &&
         recorderHeartbeatData.filename !== currentRecordFile
       ) {

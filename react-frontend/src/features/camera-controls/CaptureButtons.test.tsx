@@ -42,7 +42,7 @@ test.each(SOCKET_USER_SCENARIOS)(
     ] as any;
     const activeCamera = allCameras[1];
     const recorderHeartbeatData = {
-      recording: "true",
+      isRecording: true,
       camera: "Cam 1",
       filename: "rec-file-001",
     } as any;

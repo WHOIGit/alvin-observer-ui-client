@@ -44,6 +44,13 @@ export {
 export type { ObserverSide, ObserverSideInput, ObserverInfo } from "./protocol";
 
 export type {
+  CamHeartbeat,
+  RecorderHeartbeat,
+  RecorderHeartbeatObserver,
+  RecorderHeartbeatPilot,
+} from "./telemetry";
+
+export type {
   ConnectionStatus,
   ConnectionStatusEvent,
   SentCommand,
