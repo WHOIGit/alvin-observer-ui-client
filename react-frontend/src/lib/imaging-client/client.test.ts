@@ -6,6 +6,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
+import { emitTo, stationConnected } from "../../../tests/imaging-test-utils";
 import { createImagingClient } from "./index";
 import type { ImagingClient, Station } from "./index";
 import { buildCameraCommand, normalizeObserverSide } from "./protocol";
@@ -26,28 +27,6 @@ afterEach(() => {
     client.close();
   }
 });
-
-/** Emit a server → client event on a specific Socket.IO namespace. */
-function emitTo(h: any, namespace: string, event: string, ...args: any[]) {
-  // The harness signature takes an event name, but the underlying binding
-  // also accepts an {event, namespace} envelope as the first argument.
-  h.emit({ event, namespace }, ...args);
-}
-
-/** Resolves once the station's namespace connection is established. */
-function stationConnected(station: Station): Promise<void> {
-  return new Promise((resolve) => {
-    const unsubscribe = station.onConnectionStatus(({ status }) => {
-      if (status === "connected") {
-        // Defer so the unsubscribe doesn't run inside the callback loop.
-        queueMicrotask(() => {
-          unsubscribe();
-          resolve();
-        });
-      }
-    });
-  });
-}
 
 describe("protocol helpers", () => {
   test("normalizes side aliases", () => {

@@ -33,14 +33,7 @@ export type {
   ZoomControl,
 } from "./domain";
 
-export {
-  coerceObserverSide,
-  getObserverInfo,
-  normalizeObserverSide,
-  observerSideToCommand,
-  observerSideToNamespace,
-  observerSideToNamespacePath,
-} from "./protocol";
+export { getObserverInfo } from "./protocol";
 export type { ObserverSide, ObserverSideInput, ObserverInfo } from "./protocol";
 
 export type {

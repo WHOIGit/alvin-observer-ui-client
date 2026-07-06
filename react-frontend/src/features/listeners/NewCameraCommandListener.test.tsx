@@ -1,41 +1,15 @@
 import { afterEach, expect, test, vi } from "vitest";
 import React from "react";
 import { cleanup } from "@testing-library/react";
-import { configureStore } from "@reduxjs/toolkit";
-import cameraControlsReducer from "../camera-controls/cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
+import {
+  emitTo,
+  makeCameraControlsStore,
+  stationConnected,
+} from "../../../tests/imaging-test-utils";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
 import { getSharedImagingClient } from "../../lib/imaging-client";
 import NewCameraCommandListener from "./NewCameraCommandListener.jsx";
-
-type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
-
-function makeStore(overrides: Partial<CameraControlsState> = {}) {
-  const baseState = cameraControlsReducer(undefined, { type: "@@INIT" } as any);
-  return configureStore({
-    reducer: { cameraControls: cameraControlsReducer },
-    preloadedState: { cameraControls: { ...baseState, ...overrides } },
-  });
-}
-
-function emitTo(h: any, namespace: string, event: string, ...args: any[]) {
-  h.emit({ event, namespace }, ...args);
-}
-
-function stationConnected(side: string): Promise<void> {
-  return new Promise((resolve) => {
-    const unsubscribe = getSharedImagingClient()
-      .station(side)
-      .onConnectionStatus(({ status }) => {
-        if (status === "connected") {
-          queueMicrotask(() => {
-            unsubscribe();
-            resolve();
-          });
-        }
-      });
-  });
-}
 
 afterEach(() => {
   cleanup();
@@ -52,13 +26,13 @@ test("routes configuration broadcasts and receipts into Redux", async () => {
     command: "COVP",
     action: { name: "ISO", value: "400" },
   };
-  const store = makeStore({
+  const store = makeCameraControlsStore({
     observerSide: "P",
     commandsQueue: [queuedCommand] as any,
   });
   renderWithProviders(<NewCameraCommandListener />, { store });
 
-  await stationConnected("P");
+  await stationConnected(getSharedImagingClient().station("P"));
 
   const cameraArray = [{ camera: "c1", cam_name: "Brow", owner: "port" }];
   const inputArray = [{ label: "Brow", value: "input1" }];
@@ -95,7 +69,7 @@ test("routes configuration broadcasts and receipts into Redux", async () => {
 
 test("an error receipt flags the failure and clears the queue", async () => {
   const h = createSocketIoHarness();
-  const store = makeStore({
+  const store = makeCameraControlsStore({
     observerSide: "S",
     commandsQueue: [
       { eventId: "evt-9", action: { name: "SHU", value: "1/60" } },
@@ -104,7 +78,7 @@ test("an error receipt flags the failure and clears the queue", async () => {
   });
   renderWithProviders(<NewCameraCommandListener />, { store });
 
-  await stationConnected("S");
+  await stationConnected(getSharedImagingClient().station("S"));
   emitTo(h, "/stbd", "newCameraCommand", {
     eventId: "evt-9",
     receipt: { command: "COVS", status: "ERR" },

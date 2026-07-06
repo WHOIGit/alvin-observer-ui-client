@@ -530,11 +530,8 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
     },
   };
 
-  clientPools.set(client, pool);
   return client;
 }
-
-const clientPools = new WeakMap<ImagingClient, ConnectionPool>();
 
 let sharedClient: ImagingClient | null = null;
 

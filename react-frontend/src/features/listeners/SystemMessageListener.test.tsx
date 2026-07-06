@@ -6,6 +6,7 @@ import systemMessagesReducer, {
   selectSystemMessages,
 } from "../system-messages/systemMessagesSlice";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
+import { emitTo } from "../../../tests/imaging-test-utils";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
 import { getSharedImagingClient } from "../../lib/imaging-client";
 import SystemMessageListener from "./SystemMessageListener.jsx";
@@ -14,10 +15,6 @@ function makeStore() {
   return configureStore({
     reducer: { systemMessages: systemMessagesReducer },
   });
-}
-
-function emitTo(h: any, namespace: string, event: string, ...args: any[]) {
-  h.emit({ event, namespace }, ...args);
 }
 
 afterEach(() => {

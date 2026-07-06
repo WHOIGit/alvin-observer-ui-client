@@ -6,7 +6,7 @@ import {
   selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
 
-export default function RecorderHeartbeatListener({ isEnabled = true }) {
+export default function RecorderHeartbeatListener() {
   const dispatch = useDispatch();
   const observerSide = useSelector(selectObserverSide);
 
