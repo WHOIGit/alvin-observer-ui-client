@@ -19,7 +19,6 @@ export default function ObserverUI({
 }) {
   const dispatch = useDispatch();
 
-  // camera commands go out on the user's own station
   const observerSide = useSelector(selectObserverSide);
   const station = useImagingStation(observerSide);
 

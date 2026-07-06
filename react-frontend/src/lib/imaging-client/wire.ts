@@ -5,11 +5,9 @@
  * These mirror the backend's Pydantic formalization in
  * suboptica/src/suboptica/api/v1/icstypes.py. Many fields are strings,
  * including those conveying boolean or numeric values, and some use custom
- * null sentinels like 'NULL_PORT_ISO'. Incoming messages currently pass
- * through the client's channels unnormalized (consumers see exactly what
- * the wire carries); translating them into clean domain shapes is the next
- * planned step, after which a protocol v2 only ever touches this module and
- * its translation layer.
+ * null sentinels like 'NULL_PORT_ISO'. telemetry.ts translates incoming
+ * messages into the normalized shapes consumers see, so a protocol v2 only
+ * ever touches this module and that translation layer.
  */
 
 /** Station identity as it appears in wire payloads. */

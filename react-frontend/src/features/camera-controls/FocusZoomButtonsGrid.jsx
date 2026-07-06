@@ -4,7 +4,6 @@ import { Grid, Typography } from "@mui/material";
 import { FOCUS_CONTROLS, ZOOM_CONTROLS } from "../../lib/imaging-client";
 import FocusZoomButton from "./FocusZoomButton";
 
-// Continuous zoom drive speed for held buttons.
 const ZOOM_SPEED = 3;
 
 const useStyles = makeStyles((theme) => ({

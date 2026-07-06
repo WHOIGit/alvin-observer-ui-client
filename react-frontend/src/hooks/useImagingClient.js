@@ -28,7 +28,7 @@ export function useImagingStation(observerSide) {
 }
 
 // Keeps the latest callback in a ref so subscriptions survive re-renders
-// without re-subscribing (mirrors the old useSocketListener behavior).
+// without re-subscribing.
 function useStableHandler(callback) {
   const callbackRef = useRef(callback);
   useEffect(() => {

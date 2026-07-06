@@ -48,7 +48,6 @@ export default function Joystick() {
   }, []);
 
   const sendPanTiltCommand = (commandValue) => {
-    // the library stamps the action with a debug timestamp
     camera.panTilt(commandValue);
   };
 

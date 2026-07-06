@@ -178,7 +178,6 @@ export default function RestartButton() {
     if (firedRef.current) return;
     firedRef.current = true;
     setProgress(1);
-    // Fire-and-forget restart, then refresh regardless of the result.
     getSharedImagingClient()
       .restartServer()
       .catch(() => {})

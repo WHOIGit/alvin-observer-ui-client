@@ -47,7 +47,6 @@ const FocusModeButton = () => {
       setLoading(false);
     }, 1000);
 
-    // Toggle between autofocus and manual focus
     const nextFocusMode =
       camSettings.focus_mode === FOCUS_MODES.AUTOFOCUS
         ? FOCUS_MODES.MANUAL
