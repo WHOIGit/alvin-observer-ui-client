@@ -71,7 +71,7 @@ export default function SelectIrisMode() {
         <Select
           labelId="shutter-select-label"
           id="shutter-select"
-          value={isEnabled ? camSettings.iris : ""}
+          value={isEnabled ? camSettings.iris ?? "" : ""}
           onChange={handleSendMessage}
           disabled={!isEnabled}
         >

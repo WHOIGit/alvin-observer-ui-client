@@ -71,7 +71,7 @@ export default function CameraControlContainer() {
   }, [activeCamera, dispatch, station, initialCamHeartbeat]);
 
   const renderDynamicGridBox = () => {
-    if (camSettings?.focus_mode === "ERR") return <ErrorCard />;
+    if (camSettings?.hasFault) return <ErrorCard />;
     if (camSettings?.isControllable && isOwner) {
       return (
         <List>

@@ -73,7 +73,7 @@ export default function SelectIsoMode() {
         <Select
           labelId="iso-select-label"
           id="iso-select"
-          value={isEnabled ? camSettings.iso : ""}
+          value={isEnabled ? camSettings.iso ?? "" : ""}
           onChange={handleSendMessage}
           disabled={!isEnabled}
         >

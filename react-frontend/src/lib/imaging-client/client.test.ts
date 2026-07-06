@@ -389,6 +389,86 @@ describe("station subscriptions", () => {
     });
   });
 
+  test("null sentinels normalize to null; fault strings raise hasFault", async () => {
+    const h = createSocketIoHarness();
+
+    const client = makeClient();
+    const station = client.station("P");
+
+    const camSeen: any[] = [];
+    station.onCamHeartbeat((msg) => camSeen.push(msg));
+
+    await stationConnected(station);
+
+    emitTo(h, "/port", "CamHeartbeat", {
+      camera: "port_brow_4k",
+      iso: "NULL_PORT_ISO",
+      shutter: "null",
+      iris: "F2.8",
+      exposure: "AUTO",
+      focus_mode: "MF",
+    });
+    emitTo(h, "/port", "CamHeartbeat", {
+      camera: "port_brow_4k",
+      iso: "100",
+      focus_mode: "Driver Recv Socket timed out!",
+      exposure: "ERR",
+    });
+
+    await vi.waitFor(() => expect(camSeen).toHaveLength(2));
+    expect(camSeen[0]).toMatchObject({
+      iso: null,
+      shutter: null,
+      iris: "F2.8",
+      exposure: "AUTO",
+      focus_mode: "MF",
+      hasFault: false,
+    });
+    // A missing-because-absent setting is not a fault; a driver error is.
+    expect(camSeen[1]).toMatchObject({
+      iso: "100",
+      focus_mode: null,
+      exposure: null,
+      hasFault: true,
+    });
+  });
+
+  test("camera settings arrive with normalized current values", async () => {
+    const h = createSocketIoHarness();
+
+    const client = makeClient();
+    const station = client.station("P");
+
+    const settings: any[] = [];
+    station.onCameraSettings((msg) => settings.push(msg));
+
+    await stationConnected(station);
+
+    emitTo(h, "/port", "newCameraCommand", {
+      ISO: ["100", "400"],
+      SHU: ["1/30"],
+      current_settings: {
+        iso: "NULL_PORT_ISO",
+        shu: "1/30",
+        focus_mode: "AF",
+        exposure: "null",
+      },
+    });
+
+    await vi.waitFor(() => expect(settings).toHaveLength(1));
+    expect(settings[0]).toMatchObject({
+      ISO: ["100", "400"],
+      SHU: ["1/30"],
+      hasFault: false,
+      current_settings: {
+        iso: null,
+        shu: "1/30",
+        focus_mode: "AF",
+        exposure: null,
+      },
+    });
+  });
+
   test("splits incoming newCameraCommand messages by shape", async () => {
     const h = createSocketIoHarness();
 
@@ -420,7 +500,21 @@ describe("station subscriptions", () => {
     expect(cameras).toEqual([cameraArray]);
     expect(inputs).toEqual([inputArray]);
     expect(outputs).toEqual([outputArray]);
-    expect(settings).toEqual([settingsMsg]);
+    // Settings arrive normalized: unreported fields become null.
+    expect(settings).toEqual([
+      {
+        ISO: ["100"],
+        hasFault: false,
+        current_settings: {
+          iso: "100",
+          shu: null,
+          irs: null,
+          focus_mode: null,
+          exposure: null,
+          white_balance: null,
+        },
+      },
+    ]);
   });
 
   test("the last release sends the historical good-bye for the namespace", async () => {

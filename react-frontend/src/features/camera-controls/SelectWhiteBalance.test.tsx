@@ -93,3 +93,19 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
   },
 );
+
+test("renders with an empty selection when the camera reports no white balance", () => {
+  const store = makeStore({
+    observerSide: "PL",
+    camHeartbeatData: { white_balance: null },
+  });
+
+  const { getByRole, queryByText } = renderWithProviders(
+    <SelectWhiteBalance showLabel={true} />,
+    { store },
+  );
+
+  expect(getByRole("combobox")).toBeTruthy();
+  // The one-push trigger only appears for ONE_PUSH modes.
+  expect(queryByText("WB One Push")).toBe(null);
+});

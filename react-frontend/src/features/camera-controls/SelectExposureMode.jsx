@@ -77,7 +77,7 @@ export default function SelectExposureMode({ showLabel }) {
   if (
     !camSettings?.isControllable ||
     !isOwner ||
-    camSettings?.exposure === "ERR"
+    camSettings?.hasFault
   ) {
     return null;
   }
@@ -94,7 +94,7 @@ export default function SelectExposureMode({ showLabel }) {
         <FormControl variant="standard" className={classes.formControl}>
           <Select
             id="exposure-select"
-            value={camSettings.exposure}
+            value={camSettings.exposure ?? ""}
             label={labelText}
             onChange={handleSendMessage}
             displayEmpty={displayEmpty}

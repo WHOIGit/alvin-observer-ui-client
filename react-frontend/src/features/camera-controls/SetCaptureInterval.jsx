@@ -58,7 +58,7 @@ export default function SelectCaptureInterval() {
     // only set value from camSettings if null so we can update the select field without
     // changing the current value, needs to wait for button push
     if (value === null) {
-      camSettings && setValue(camSettings.capture_interval);
+      camSettings && setValue(camSettings.capture_interval ?? "");
     }
   }, [camSettings, value]);
 

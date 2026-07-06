@@ -72,7 +72,7 @@ export default function SelectWhiteBalance({ showLabel }) {
         <FormControl variant="standard" className={classes.formControl}>
           <Select
             id="exposure-select"
-            value={camSettings.white_balance}
+            value={camSettings.white_balance ?? ""}
             label={labelText}
             onChange={handleSendMessage}
             displayEmpty={displayEmpty}
@@ -87,7 +87,7 @@ export default function SelectWhiteBalance({ showLabel }) {
       </Grid>
 
       <Grid item xs={12}>
-        {camSettings.white_balance.includes("ONE_PUSH") && (
+        {camSettings.white_balance?.includes("ONE_PUSH") && (
           <div className={classes.onePushBtn}>
             <Button
               variant="contained"

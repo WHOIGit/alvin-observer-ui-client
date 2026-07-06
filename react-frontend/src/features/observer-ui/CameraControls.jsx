@@ -41,7 +41,7 @@ export default function CameraControls({ showFullCameraControls }) {
     >
       <Grid container spacing={2} sx={{ mt: -3 }}>
         <Grid item xs={9}>
-          {camHeartbeat?.focus_mode === "ERR" ? (
+          {camHeartbeat?.hasFault ? (
             <ErrorCard />
           ) : (
             <LargeVideo />

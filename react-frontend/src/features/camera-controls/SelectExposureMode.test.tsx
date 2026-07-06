@@ -67,3 +67,25 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
   },
 );
+
+test("hides the control when the camera reports a driver fault", () => {
+  const store = makeStore({
+    observerSide: "P",
+    camHeartbeatData: {
+      exposure: null,
+      isControllable: true,
+      camera: "cam-1",
+      owner: "port",
+      hasFault: true,
+    },
+    allCameras: [{ camera: "cam-1", cam_name: "Cam 1" }],
+    activeCamera: { camera: "cam-1", cam_name: "Cam 1" } as any,
+  });
+
+  const { container } = renderWithProviders(
+    <SelectExposureMode showLabel="horizontal" />,
+    { store },
+  );
+
+  expect(container.firstChild).toBe(null);
+});

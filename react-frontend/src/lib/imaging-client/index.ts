@@ -41,6 +41,7 @@ export type { ObserverSide, ObserverSideInput, ObserverInfo } from "./protocol";
 
 export type {
   CamHeartbeat,
+  CameraSettings,
   RecorderHeartbeat,
   RecorderHeartbeatObserver,
   RecorderHeartbeatPilot,

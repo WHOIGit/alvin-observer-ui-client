@@ -45,8 +45,16 @@ import type {
   SensorHeartbeat,
   SystemMessage,
 } from "./wire";
-import { normalizeCamHeartbeat, normalizeRecorderHeartbeat } from "./telemetry";
-import type { CamHeartbeat, RecorderHeartbeat } from "./telemetry";
+import {
+  normalizeCamHeartbeat,
+  normalizeCameraSettings,
+  normalizeRecorderHeartbeat,
+} from "./telemetry";
+import type {
+  CamHeartbeat,
+  CameraSettings,
+  RecorderHeartbeat,
+} from "./telemetry";
 
 const V1 = "1";
 const V1_5 = "1.5";
@@ -121,7 +129,7 @@ export interface Station {
   onCameraList(cb: (cameras: CameraArrayEntry[]) => void): Unsubscribe;
   onRouterInputs(cb: (inputs: RouterPortEntry[]) => void): Unsubscribe;
   onRouterOutputs(cb: (outputs: RouterPortEntry[]) => void): Unsubscribe;
-  onCameraSettings(cb: (msg: CameraSettingsPayload) => void): Unsubscribe;
+  onCameraSettings(cb: (msg: CameraSettings) => void): Unsubscribe;
   /**
    * Fires once per settled command — the same outcome that resolves or
    * rejects the command's promise. This is the single feed for shared-state
@@ -513,7 +521,10 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       },
 
       onCameraSettings(cb) {
-        return onCommandMessage((msg) => "current_settings" in msg, cb);
+        return onCommandMessage(
+          (msg) => "current_settings" in msg,
+          (msg) => cb(normalizeCameraSettings(msg))
+        );
       },
 
       onCommandResult(cb) {

@@ -18,11 +18,14 @@ export default function FocusModeDisplayChip() {
   const classes = useStyles();
   const camData = useSelector(selectCurrentCamData);
 
-  if (camData === null) {
+  // Nothing to show until settings arrive, or when the camera doesn't
+  // report a focus mode (normalized to null by the imaging-client).
+  const focusMode = camData?.currentSettings?.focus_mode;
+  if (focusMode == null) {
     return null;
   }
 
-  const focusLabel = `FOCUS: ${camData.currentSettings.focus_mode}`;
+  const focusLabel = `FOCUS: ${focusMode}`;
 
   return (
     <Chip

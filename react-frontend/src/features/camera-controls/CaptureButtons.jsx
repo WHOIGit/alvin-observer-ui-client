@@ -153,7 +153,7 @@ export default function CaptureButtons() {
   };
 
   // check to make sure camera has controls, current Observer matches Cam Owner, camera is available
-  if (camSettings === null || camSettings?.focus_mode === "ERR") {
+  if (camSettings === null || camSettings?.hasFault) {
     return null;
   }
 
