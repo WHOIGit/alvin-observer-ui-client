@@ -10,7 +10,11 @@ import {
   selectCamHeartbeatData,
   selectObserverSide,
 } from "./cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
+import {
+  FOCUS_CONTROLS,
+  FOCUS_MODES,
+  ZOOM_CONTROLS,
+} from "../../lib/imaging-client";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -31,13 +35,13 @@ const useStyles = makeStyles((theme) => ({
 
 export default function FocusZoomButton({
   id,
-  buttonFunction,
+  buttonFunction, // "focus" | "zoom" — selects the drive this button operates
   label,
-  commandStringControl,
-  commandStringOneStop,
-  commandStringContinuous,
+  controlOneStop, // FOCUS_CONTROLS / ZOOM_CONTROLS value for a single click
+  controlContinuous, // FOCUS_CONTROLS / ZOOM_CONTROLS value while held
+  continuousSpeed, // optional drive speed for the continuous control
   activeFocusZoomButton,
-  sendActiveFocusZoomButtonToParent,  
+  sendActiveFocusZoomButtonToParent,
 }) {
   const classes = useStyles();
   const timerRef = useRef(false);
@@ -62,26 +66,21 @@ export default function FocusZoomButton({
   const activeCameraId = useSelector(selectActiveCamera);
   const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
 
-  const handleZoomHold = (commandName, commandValue) => {
-    handleSendMessage(commandName, commandValue); 
+  const handleZoomHold = () => {
+    drive(controlContinuous, continuousSpeed);
     //// Set a Timeout to resend command every 1 sec //removed - 08oct2024 - mjs
-    //timerRef.current = setTimeout(
-    //  handleZoomHold,
-    //  1000,
-    //  commandName,
-    //  commandValue
-    //);
   };
 
-  const handleStop = (commandName) => {
+  const handleStop = () => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
+    const stopControl =
+      buttonFunction === "zoom" ? ZOOM_CONTROLS.STOP : FOCUS_CONTROLS.STOP;
     // delay Stop message sending to avoid collisions with last button actions
-    //setTimeout(handleSendMessage, 100, commandName, COMMAND_STRINGS.focusStop); 
     setTimeout(() => { //changed to allow console.log 24oct2024 - mjs
-      //console.log(new Date().toISOString(), "FocusZoomButton - onStop - handleSendMessage - buttonID:", id, activeButton.current); //test only 24oct2024 - mjs
-      handleSendMessage(commandName, COMMAND_STRINGS.focusStop);
+      //console.log(new Date().toISOString(), "FocusZoomButton - onStop - buttonID:", id, activeButton.current); //test only 24oct2024 - mjs
+      drive(stopControl);
     }, 10); //was 100 - 28oct2024-mjs
 
     
@@ -112,35 +111,35 @@ export default function FocusZoomButton({
       handleActiveButton(id, id); //24oct2024 - mjs
       //console.log(new Date().toISOString(), "FocusZoomButton - onClick - buttonID:", id, activeButton.current); //test only 24oct2024 - mjs
        
-      handleSendMessage(commandStringControl, commandStringOneStop) 
+      drive(controlOneStop)
     },
-    
+
     onLongPress: () => {
-    
+
       buttonClickEvent.current = true; //29oct2024 - mjs
       loadingTime.current = 500; //30oct2024 - mjs
-    
+
       handleActiveButton(id, id); //24oct2024 - mjs
       //console.log(new Date().toISOString(), "FocusZoomButton - onLongPress - buttonID:", id, activeButton.current); //test only 24oct2024 - mjs
-    
-      handleZoomHold(commandStringControl, commandStringContinuous)
+
+      handleZoomHold()
     },
-    
-    onStop: () => {    
-      
+
+    onStop: () => {
+
       if (buttonClickEvent.current) { //29oct2024 - mjs
-        handleStop(commandStringControl)
+        handleStop()
       }
-      
-      
+
+
     },
   });
 
-  const handleSendMessage = (commandName, commandValue = "UND") => {
-    if (commandName === COMMAND_STRINGS.zoomControlCommand) {
-      camera.zoom(commandValue);
+  const drive = (control, speed) => {
+    if (buttonFunction === "zoom") {
+      camera.zoom(control, speed);
     } else {
-      camera.focus(commandValue);
+      camera.focus(control);
     }
   };
 
@@ -150,7 +149,7 @@ export default function FocusZoomButton({
     
     if (
       camSettings &&
-      camSettings.focus_mode === "AF" &&
+      camSettings.focus_mode === FOCUS_MODES.AUTOFOCUS &&
       buttonFunction === "focus"
     ) {
       setIsEnabled(false);      
@@ -172,7 +171,7 @@ export default function FocusZoomButton({
     
        handleActiveButton(null, null);  
               
-       if ((camSettings.focus_mode === "MF" && buttonFunction === "focus") || (buttonFunction === "zoom")) {
+       if ((camSettings.focus_mode === FOCUS_MODES.MANUAL && buttonFunction === "focus") || (buttonFunction === "zoom")) {
          setIsEnabled(true);      
        }
     

@@ -7,6 +7,7 @@ import cameraControlsReducer from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
+import { FOCUS_CONTROLS } from "../../lib/imaging-client";
 import FocusZoomButton from "./FocusZoomButton.jsx";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
 
@@ -42,9 +43,8 @@ test.each(SOCKET_USER_SCENARIOS)(
         id={1}
         buttonFunction="focus"
         label="Focus Near"
-        commandStringControl={COMMAND_STRINGS.focusControlCommand}
-        commandStringOneStop={COMMAND_STRINGS.focusNearOneStop}
-        commandStringContinuous={COMMAND_STRINGS.focusNearContinuos}
+        controlOneStop={FOCUS_CONTROLS.NEAR_ONE_STOP}
+        controlContinuous={FOCUS_CONTROLS.NEAR_CONTINUOUS}
         activeFocusZoomButton={null}
         sendActiveFocusZoomButtonToParent={() => null}
       />,
@@ -87,9 +87,8 @@ test.each(SOCKET_USER_SCENARIOS)(
         id={2}
         buttonFunction="focus"
         label="Focus Near Hold"
-        commandStringControl={COMMAND_STRINGS.focusControlCommand}
-        commandStringOneStop={COMMAND_STRINGS.focusNearOneStop}
-        commandStringContinuous={COMMAND_STRINGS.focusNearContinuos}
+        controlOneStop={FOCUS_CONTROLS.NEAR_ONE_STOP}
+        controlContinuous={FOCUS_CONTROLS.NEAR_CONTINUOUS}
         activeFocusZoomButton={null}
         sendActiveFocusZoomButtonToParent={() => null}
       />,

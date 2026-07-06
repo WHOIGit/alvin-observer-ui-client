@@ -13,7 +13,7 @@ import {
 } from "./cameraControlsSlice";
 import { useDispatch } from "react-redux";
 import { useImagingStation } from "../../hooks/useImagingClient";
-import { COMMAND_STRINGS } from "../../config.js";
+import { EXPOSURE_MODES } from "../../lib/imaging-client";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,8 +49,8 @@ export default function SelectShutterMode() {
     // list of exposure modes that disable this function
     // AUTO, IP
     const disabledExposureModes = [
-      COMMAND_STRINGS.exposureModeOptions[0],
-      COMMAND_STRINGS.exposureModeOptions[3],
+      EXPOSURE_MODES.AUTO,
+      EXPOSURE_MODES.IRIS_PRIORITY,
     ];
     // disable if an Exposure mode changes is currently processing
     if (!controlEnabled) {

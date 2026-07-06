@@ -16,7 +16,7 @@ import {
   selectCamHeartbeatData,
   selectObserverSide,
 } from "./cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
+import { WHITE_BALANCE_MODES } from "../../lib/imaging-client";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -47,7 +47,7 @@ export default function SelectWhiteBalance({ showLabel }) {
   };
 
   const handleOnePushMessage = () => {
-    camera.setWhiteBalance(COMMAND_STRINGS.whiteBalanceOnePushCommandValue);
+    camera.triggerOnePushWhiteBalance();
   };
 
   // set up label options
@@ -77,7 +77,7 @@ export default function SelectWhiteBalance({ showLabel }) {
             onChange={handleSendMessage}
             displayEmpty={displayEmpty}
           >
-            {COMMAND_STRINGS.whiteBalanceOptions.map((item) => (
+            {Object.values(WHITE_BALANCE_MODES).map((item) => (
               <MenuItem value={item} key={item}>
                 {item}
               </MenuItem>

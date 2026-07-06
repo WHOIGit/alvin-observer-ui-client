@@ -15,7 +15,6 @@ import {
   setRecorderError,
   setVideoSourceEnabled,
 } from "./cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   ctrlButton: {
@@ -91,31 +90,28 @@ export default function CaptureButtons() {
     currentRecordFile,
   ]);
 
-  const handleSendMessage = (commandName, commandValue) => {
-    // If a RECORD SOURCE action, need to send the previous Recording camera name
-    if (commandName === COMMAND_STRINGS.recordSourceCommand) {
-      // get the camera ID of the currently recording camera
-      const oldCamera = getCameraConfigFromName(
-        recorderHeartbeatData.camera,
-        allCameras
-      );
-      station.record(commandValue, { previousCamera: oldCamera.camera });
-      return;
-    }
+  const startRecording = () => {
+    // The record command must carry the previously recording camera's ID,
+    // which the heartbeat reports by display name.
+    const oldCamera = getCameraConfigFromName(
+      recorderHeartbeatData.camera,
+      allCameras
+    );
+    station.record(activeCamera.camera, { previousCamera: oldCamera.camera });
+  };
 
-    if (commandName === COMMAND_STRINGS.stillImageCaptureCommand) {
-      station.camera(activeCamera?.camera ?? null).captureStill({
-        interval: commandValue,
-        imgTransferChecked: false,
-      });
-    }
+  const captureStillImage = () => {
+    station.camera(activeCamera?.camera ?? null).captureStill({
+      interval: 0,
+      imgTransferChecked: false,
+    });
   };
 
   const handleRecordAction = async () => {
     setLoading(true);
     // save the current RECORDER_HEARTBEAT filename so we can check if it changes on new actions
     setCurrentRecordFile(recorderHeartbeatData.filename);
-    handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
+    startRecording();
     // set Video Source menu to be disabled
     console.log("disabling video source");
     const payloadVideoSrc = false;
@@ -144,7 +140,7 @@ export default function CaptureButtons() {
 
   const handleImgCapture = () => {
     setLoadingImgCapture(true);
-    handleSendMessage(COMMAND_STRINGS.stillImageCaptureCommand, 0);
+    captureStillImage();
     // set Video Source menu to be disabled
     console.log("disabling video source");
     dispatch(setVideoSourceEnabled(false));

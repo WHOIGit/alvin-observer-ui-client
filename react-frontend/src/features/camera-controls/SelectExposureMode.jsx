@@ -17,7 +17,7 @@ import {
 } from "./cameraControlsSlice";
 import { useImagingStation } from "../../hooks/useImagingClient";
 import useIsOwner from "../../hooks/useIsOwner";
-import { COMMAND_STRINGS } from "../../config.js";
+import { EXPOSURE_MODES } from "../../lib/imaging-client";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -100,16 +100,16 @@ export default function SelectExposureMode({ showLabel }) {
             onChange={handleSendMessage}
             displayEmpty={displayEmpty}
           >
-            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[0]}>
+            <MenuItem value={EXPOSURE_MODES.AUTO}>
               Auto
             </MenuItem>
-            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[1]}>
+            <MenuItem value={EXPOSURE_MODES.MANUAL}>
               Manual
             </MenuItem>
-            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[2]}>
+            <MenuItem value={EXPOSURE_MODES.SHUTTER_PRIORITY}>
               Shutter Priority
             </MenuItem>
-            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[3]}>
+            <MenuItem value={EXPOSURE_MODES.IRIS_PRIORITY}>
               Iris Priority
             </MenuItem>
           </Select>

@@ -7,7 +7,7 @@ import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 // local
 import { useImagingStation } from "../../hooks/useImagingClient";
 import { selectCamHeartbeatData } from "./cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
+import { FOCUS_MODES } from "../../lib/imaging-client";
 import { selectActiveCamera, selectObserverSide } from "./cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
@@ -47,14 +47,13 @@ const FocusModeButton = () => {
       setLoading(false);
     }, 1000);
 
-    let commandValue;
-    if (camSettings.focus_mode === COMMAND_STRINGS.focusAF) {
-      commandValue = COMMAND_STRINGS.focusMF;
-    } else {
-      commandValue = COMMAND_STRINGS.focusAF;
-    }
+    // Toggle between autofocus and manual focus
+    const nextFocusMode =
+      camSettings.focus_mode === FOCUS_MODES.AUTOFOCUS
+        ? FOCUS_MODES.MANUAL
+        : FOCUS_MODES.AUTOFOCUS;
 
-    camera.setFocusMode(commandValue);
+    camera.setFocusMode(nextFocusMode);
   };
 
   return (

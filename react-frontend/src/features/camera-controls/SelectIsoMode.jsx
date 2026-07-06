@@ -10,7 +10,7 @@ import {
   selectExposureControlsEnabled,
   selectObserverSide,
 } from "./cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
+import { EXPOSURE_MODES } from "../../lib/imaging-client";
 import { useSelector } from "react-redux";
 import { useImagingStation } from "../../hooks/useImagingClient";
 
@@ -44,9 +44,9 @@ export default function SelectIsoMode() {
     // list of exposure modes that disable this function
     // AUTO, SP, IP
     const disabledExposureModes = [
-      COMMAND_STRINGS.exposureModeOptions[0],
-      COMMAND_STRINGS.exposureModeOptions[2],
-      COMMAND_STRINGS.exposureModeOptions[3],
+      EXPOSURE_MODES.AUTO,
+      EXPOSURE_MODES.SHUTTER_PRIORITY,
+      EXPOSURE_MODES.IRIS_PRIORITY,
     ];
 
     // disable if an Exposure mode changes is currently processing

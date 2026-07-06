@@ -12,7 +12,7 @@ import {
   selectObserverSide,
 } from "./cameraControlsSlice";
 import { useImagingStation } from "../../hooks/useImagingClient";
-import { COMMAND_STRINGS } from "../../config.js";
+import { EXPOSURE_MODES } from "../../lib/imaging-client";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,8 +44,8 @@ export default function SelectIrisMode() {
     // list of exposure modes that disable this function
     // AUTO, SP
     const disabledExposureModes = [
-      COMMAND_STRINGS.exposureModeOptions[0],
-      COMMAND_STRINGS.exposureModeOptions[2],
+      EXPOSURE_MODES.AUTO,
+      EXPOSURE_MODES.SHUTTER_PRIORITY,
     ];
 
     // disable if an Exposure mode changes is currently processing
