@@ -72,6 +72,7 @@ export const useRouterInputs = makeStationChannelHook("onRouterInputs");
 export const useRouterOutputs = makeStationChannelHook("onRouterOutputs");
 export const useCameraSettings = makeStationChannelHook("onCameraSettings");
 export const useCommandReceipt = makeStationChannelHook("onCommandReceipt");
+export const useCommandResult = makeStationChannelHook("onCommandResult");
 export const useCommandSent = makeStationChannelHook("onCommandSent");
 
 // Vehicle-wide channels

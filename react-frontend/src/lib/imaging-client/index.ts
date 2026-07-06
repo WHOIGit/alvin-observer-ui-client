@@ -18,6 +18,9 @@ export type {
   Station,
 } from "./client";
 
+export { COMMAND_KINDS, CommandFailedError } from "./commands";
+export type { CommandKind } from "./commands";
+
 export {
   EXPOSURE_MODES,
   FOCUS_CONTROLS,
@@ -44,6 +47,7 @@ export type {
 } from "./telemetry";
 
 export type {
+  CommandResult,
   ConnectionStatus,
   ConnectionStatusEvent,
   SentCommand,

@@ -7,7 +7,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import { emitTo, stationConnected } from "../../../tests/imaging-test-utils";
-import { createImagingClient } from "./index";
+import { CommandFailedError, createImagingClient } from "./index";
 import type { ImagingClient, Station } from "./index";
 import { buildCameraCommand, normalizeObserverSide } from "./protocol";
 
@@ -174,7 +174,7 @@ describe("station commands", () => {
     expect(args[0].action).toEqual({ name: "SHU", value: "1/60" });
   });
 
-  test("ack resolves with the receipt matching the command's eventId", async () => {
+  test("commands settle with the receipt matching their eventId", async () => {
     const h = createSocketIoHarness((h, expectEmit) => {
       h.gotCmd1 = expectEmit("newCameraCommand");
       h.gotCmd2 = expectEmit("newCameraCommand");
@@ -189,25 +189,135 @@ describe("station commands", () => {
 
     const first = station.camera(null).setIso("100");
     const second = station.camera(null).setIso("400");
+    // payload and eventId are available synchronously on the promise.
+    expect(first.eventId).toBe(first.payload.eventId);
+    expect(second.payload.action).toEqual({ name: "ISO", value: "400" });
     await h.gotCmd1;
     await h.gotCmd2;
 
     // Acknowledge in reverse order to prove correlation is by eventId.
     emitTo(h, "/port", "newCameraCommand", {
-      eventId: second.payload.eventId,
+      eventId: second.eventId,
       receipt: { command: "COVP", status: "OK" },
     });
     emitTo(h, "/port", "newCameraCommand", {
-      eventId: first.payload.eventId,
+      eventId: first.eventId,
       receipt: { command: "COVP", status: "ERR" },
     });
 
-    await expect(second.ack).resolves.toMatchObject({
-      receipt: { status: "OK" },
+    await expect(second).resolves.toMatchObject({
+      kind: "setIso",
+      value: "400",
+      isOk: true,
     });
-    await expect(first.ack).resolves.toMatchObject({
-      receipt: { status: "ERR" },
+    await expect(first).rejects.toThrow(CommandFailedError);
+    await expect(first).rejects.toMatchObject({
+      result: { kind: "setIso", value: "100", isOk: false },
     });
+  });
+
+  test("onCommandResult delivers each settled command exactly once", async () => {
+    const h = createSocketIoHarness((h, expectEmit) => {
+      h.gotCmd = expectEmit("newCameraCommand");
+    });
+
+    const client = makeClient();
+    const station = client.station("P");
+    station.acquire();
+    await stationConnected(station);
+
+    const results: any[] = [];
+    station.onCommandResult((result) => results.push(result));
+
+    const cmd = station.camera("port_brow_4k").setIso("400");
+    await h.gotCmd;
+
+    emitTo(h, "/port", "newCameraCommand", {
+      eventId: cmd.eventId,
+      receipt: { command: "COVP", status: "OK" },
+    });
+    await vi.waitFor(() => expect(results).toHaveLength(1));
+    expect(results[0]).toMatchObject({
+      kind: "setIso",
+      value: "400",
+      isOk: true,
+      eventId: cmd.eventId,
+    });
+
+    // A duplicate (now unmatched) receipt produces nothing further.
+    emitTo(h, "/port", "newCameraCommand", {
+      eventId: cmd.eventId,
+      receipt: { command: "COVP", status: "OK" },
+    });
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(results).toHaveLength(1);
+  });
+
+  test("failed receipts report isOk false without unhandled rejections", async () => {
+    const h = createSocketIoHarness((h, expectEmit) => {
+      h.gotCmd = expectEmit("newCameraCommand");
+    });
+
+    const client = makeClient();
+    const station = client.station("P");
+    station.acquire();
+    await stationConnected(station);
+
+    const results: any[] = [];
+    station.onCommandResult((result) => results.push(result));
+
+    // Deliberately not awaited: the library pre-observes the rejection, so a
+    // BUSY receipt for a fire-and-forget command must not fail this test run
+    // with an unhandled rejection.
+    const cmd = station.camera(null).setShutter("1/60");
+    await h.gotCmd;
+
+    emitTo(h, "/port", "newCameraCommand", {
+      eventId: cmd.eventId,
+      receipt: { command: "COVP", status: "BUSY" },
+    });
+    await vi.waitFor(() => expect(results).toHaveLength(1));
+    expect(results[0]).toMatchObject({ kind: "setShutter", isOk: false });
+  });
+
+  test("kinds identify the issuing method; the escape hatch carries null", async () => {
+    const h = createSocketIoHarness((h, expectEmit) => {
+      h.gotCmd1 = expectEmit("newCameraCommand");
+      h.gotCmd2 = expectEmit("newCameraCommand");
+    });
+
+    const client = makeClient();
+    const station = client.station("P");
+    station.acquire();
+    await stationConnected(station);
+
+    const unsubscribed: any[] = [];
+    const stop = station.onCommandResult((result) => unsubscribed.push(result));
+    const delivered: any[] = [];
+    station.onCommandResult((result) => delivered.push(result));
+    stop();
+
+    const select = station.selectCamera("c2");
+    const generic = station.send({ action: { name: "QCV", value: null } });
+    await h.gotCmd1;
+    await h.gotCmd2;
+
+    emitTo(h, "/port", "newCameraCommand", {
+      eventId: select.eventId,
+      receipt: { command: "COVP", status: "OK" },
+    });
+    emitTo(h, "/port", "newCameraCommand", {
+      eventId: generic.eventId,
+      receipt: { command: "COVP", status: "OK" },
+    });
+
+    await vi.waitFor(() => expect(delivered).toHaveLength(2));
+    expect(delivered.map((result) => result.kind)).toEqual([
+      "selectCamera",
+      null,
+    ]);
+    // The callback that unsubscribed before the sends received nothing.
+    expect(unsubscribed).toHaveLength(0);
   });
 });
 

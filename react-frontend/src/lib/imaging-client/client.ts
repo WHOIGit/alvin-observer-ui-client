@@ -24,9 +24,12 @@ import {
   buildCameraCommand,
   getObserverInfo,
 } from "./protocol";
+import { COMMAND_KINDS, CommandFailedError } from "./commands";
+import type { CommandKind } from "./commands";
 import type { ObserverSide, ObserverSideInput } from "./protocol";
 import type { FocusControl, ZoomControl } from "./domain";
 import type {
+  CommandResult,
   ConnectionStatusEvent,
   SentCommand,
   Unsubscribe,
@@ -127,6 +130,15 @@ export interface Station {
    * of the command.
    */
   onCommandSent(cb: (payload: SentCommand["payload"]) => void): Unsubscribe;
+  /**
+   * Fires once per settled command — the same outcome that resolves or
+   * rejects the command's promise. This is the single feed for shared-state
+   * mirrors (promises are for call-site-local flow). Subscribing does not
+   * pin the station's connection; delivery rides the command send path.
+   * Commands evicted past the pending cap (256 outstanding) never produce
+   * a result.
+   */
+  onCommandResult(cb: (result: CommandResult) => void): Unsubscribe;
 }
 
 export interface ImagingClientOptions {
@@ -226,7 +238,15 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
     const namespacePath = info.namespacePath;
 
     const commandSentCallbacks = new Set<(payload: SentCommand["payload"]) => void>();
-    const pendingAcks = new Map<string, (receipt: CommandReceipt) => void>();
+    const commandResultCallbacks = new Set<(result: CommandResult) => void>();
+
+    interface PendingCommand {
+      kind: CommandKind | null;
+      payload: SentCommand["payload"];
+      resolve: (result: CommandResult) => void;
+      reject: (error: Error) => void;
+    }
+    const pendingAcks = new Map<string, PendingCommand>();
 
     // The socket most recently used for sending. After the station's last
     // reference is released and its connection torn down, stray sends (e.g.
@@ -245,29 +265,36 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       ackListenerAttached.add(socket);
       socket.on(EVENTS.newCameraCommand, (msg: unknown) => {
         if (!msg || typeof msg !== "object" || isBroadcastShape(msg)) return;
-        const eventId = (msg as CommandReceipt).eventId;
-        if (typeof eventId !== "string") return;
-        const resolve = pendingAcks.get(eventId);
-        if (resolve) {
-          pendingAcks.delete(eventId);
-          resolve(msg as CommandReceipt);
+        const receipt = msg as CommandReceipt;
+        if (typeof receipt.eventId !== "string") return;
+        const pending = pendingAcks.get(receipt.eventId);
+        if (!pending) return;
+        pendingAcks.delete(receipt.eventId);
+
+        const result: CommandResult = {
+          kind: pending.kind,
+          value: pending.payload.action?.value,
+          isOk: receipt.receipt?.status === "OK",
+          eventId: receipt.eventId,
+          payload: pending.payload,
+          receipt,
+        };
+        if (result.isOk) {
+          pending.resolve(result);
+        } else {
+          pending.reject(new CommandFailedError(result));
+        }
+        for (const cb of commandResultCallbacks) {
+          cb(result);
         }
       });
     }
 
-    function registerAck(eventId: string): Promise<CommandReceipt> {
-      return new Promise<CommandReceipt>((resolve) => {
-        if (pendingAcks.size >= MAX_PENDING_ACKS) {
-          // Drop the oldest unacknowledged command; its ack simply never
-          // resolves, which callers are told to expect.
-          const oldest = pendingAcks.keys().next().value;
-          if (oldest !== undefined) pendingAcks.delete(oldest);
-        }
-        pendingAcks.set(eventId, resolve);
-      });
-    }
-
-    function send(body: CameraCommandBody, context: CommandContext = {}): SentCommand {
+    function sendCommand(
+      kind: CommandKind | null,
+      body: CameraCommandBody,
+      context: CommandContext = {}
+    ): SentCommand {
       const payload = buildCameraCommand({
         side,
         activeCamera: context.activeCamera,
@@ -282,16 +309,37 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         cb(copyPayload(payload));
       }
 
+      let resolve!: (result: CommandResult) => void;
+      let reject!: (error: Error) => void;
+      const promise = new Promise<CommandResult>((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
+      // Commands are routinely fired and forgotten; pre-observe rejections
+      // so an ERR receipt for an unawaited command never surfaces as an
+      // unhandled rejection, while awaiting callers still get throws.
+      promise.catch(() => {});
+
+      if (pendingAcks.size >= MAX_PENDING_ACKS) {
+        // Drop the oldest unacknowledged command; its promise simply never
+        // settles, which callers are told to expect.
+        const oldest = pendingAcks.keys().next().value;
+        if (oldest !== undefined) pendingAcks.delete(oldest);
+      }
+      pendingAcks.set(payload.eventId, { kind, payload, resolve, reject });
+
       const socket =
         pool.peek(namespacePath, V1) ??
         lastSendSocket ??
         pool.get(namespacePath, V1);
       lastSendSocket = socket;
       ensureAckListener(socket);
-      const ack = registerAck(payload.eventId);
       socket.emit(EVENTS.newCameraCommand, payload);
 
-      return { payload, ack };
+      return Object.assign(promise, {
+        payload,
+        eventId: payload.eventId,
+      }) as SentCommand;
     }
 
     function onCommandMessage(
@@ -305,19 +353,26 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
 
     function camera(id: string | null): CameraHandle {
       const context: CommandContext = { activeCamera: id };
-      const setting = (name: string) => (value: string) =>
-        send({ action: { name, value } }, context);
+      const setting = (kind: CommandKind, name: string) => (value: string) =>
+        sendCommand(kind, { action: { name, value } }, context);
 
       return {
         id,
-        setIso: setting(ACTIONS.iso),
-        setShutter: setting(ACTIONS.shutter),
-        setIris: setting(ACTIONS.iris),
-        setExposureMode: setting(ACTIONS.exposureMode),
-        setFocusMode: setting(ACTIONS.focusMode),
-        setWhiteBalance: setting(ACTIONS.whiteBalance),
+        setIso: setting(COMMAND_KINDS.SET_ISO, ACTIONS.iso),
+        setShutter: setting(COMMAND_KINDS.SET_SHUTTER, ACTIONS.shutter),
+        setIris: setting(COMMAND_KINDS.SET_IRIS, ACTIONS.iris),
+        setExposureMode: setting(
+          COMMAND_KINDS.SET_EXPOSURE_MODE,
+          ACTIONS.exposureMode
+        ),
+        setFocusMode: setting(COMMAND_KINDS.SET_FOCUS_MODE, ACTIONS.focusMode),
+        setWhiteBalance: setting(
+          COMMAND_KINDS.SET_WHITE_BALANCE,
+          ACTIONS.whiteBalance
+        ),
         triggerOnePushWhiteBalance: () =>
-          send(
+          sendCommand(
+            COMMAND_KINDS.TRIGGER_ONE_PUSH_WHITE_BALANCE,
             {
               action: {
                 name: ACTIONS.whiteBalance,
@@ -327,9 +382,14 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
             context
           ),
         focus: (control) =>
-          send({ action: { name: ACTIONS.focusControl, value: control } }, context),
+          sendCommand(
+            COMMAND_KINDS.FOCUS,
+            { action: { name: ACTIONS.focusControl, value: control } },
+            context
+          ),
         zoom: (control, speed) =>
-          send(
+          sendCommand(
+            COMMAND_KINDS.ZOOM,
             {
               action: {
                 name: ACTIONS.zoomControl,
@@ -339,7 +399,8 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
             context
           ),
         panTilt: (value) =>
-          send(
+          sendCommand(
+            COMMAND_KINDS.PAN_TILT,
             {
               action: {
                 name: ACTIONS.panTilt,
@@ -352,7 +413,11 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
             context
           ),
         captureStill: (value) =>
-          send({ action: { name: ACTIONS.stillImageCapture, value } }, context),
+          sendCommand(
+            COMMAND_KINDS.CAPTURE_STILL,
+            { action: { name: ACTIONS.stillImageCapture, value } },
+            context
+          ),
       };
     }
 
@@ -365,10 +430,17 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       },
 
       camera,
-      send,
+
+      send(body, context) {
+        return sendCommand(null, body, context);
+      },
 
       selectCamera(cameraId, context) {
-        return send({ action: { name: ACTIONS.videoSource, value: cameraId } }, context);
+        return sendCommand(
+          COMMAND_KINDS.SELECT_CAMERA,
+          { action: { name: ACTIONS.videoSource, value: cameraId } },
+          context
+        );
       },
 
       record(cameraId, options = {}) {
@@ -381,7 +453,9 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         if (options.as !== undefined) {
           body.observerSideOverride = options.as;
         }
-        return send(body, { activeCamera: options.activeCamera });
+        return sendCommand(COMMAND_KINDS.RECORD, body, {
+          activeCamera: options.activeCamera,
+        });
       },
 
       stopRecording(options = {}) {
@@ -391,11 +465,17 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         if (options.as !== undefined) {
           body.observerSideOverride = options.as;
         }
-        return send(body, { activeCamera: options.activeCamera });
+        return sendCommand(COMMAND_KINDS.STOP_RECORDING, body, {
+          activeCamera: options.activeCamera,
+        });
       },
 
       takeRoute(input, output, context) {
-        return send({ action: { name: ACTIONS.router, value: { input, output } } }, context);
+        return sendCommand(
+          COMMAND_KINDS.TAKE_ROUTE,
+          { action: { name: ACTIONS.router, value: { input, output } } },
+          context
+        );
       },
 
       onCamHeartbeat(cb) {
@@ -469,6 +549,13 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         commandSentCallbacks.add(cb);
         return () => {
           commandSentCallbacks.delete(cb);
+        };
+      },
+
+      onCommandResult(cb) {
+        commandResultCallbacks.add(cb);
+        return () => {
+          commandResultCallbacks.delete(cb);
         };
       },
     };
