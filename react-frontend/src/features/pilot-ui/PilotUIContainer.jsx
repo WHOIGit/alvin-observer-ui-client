@@ -10,7 +10,6 @@ import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
 // local
 import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
-import CommandStateListener from "../listeners/CommandStateListener";
 import NewCameraCommandListener from "../listeners/NewCameraCommandListener";
 import RecorderHeartbeatListener from "../listeners/RecorderHeartbeatListener";
 import ConnectionStatusListener from "../listeners/ConnectionStatusListener";
@@ -109,7 +108,6 @@ export default function SimpleTabs() {
   return (
     <>
       <CamHeartbeatListener />
-      <CommandStateListener />
       <CamHeartbeatListener
         namespaceOverride={`/${WS_SERVER_NAMESPACE_PORT}`}
       />

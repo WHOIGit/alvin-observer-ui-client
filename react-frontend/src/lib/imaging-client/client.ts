@@ -122,14 +122,6 @@ export interface Station {
   onRouterInputs(cb: (inputs: RouterPortEntry[]) => void): Unsubscribe;
   onRouterOutputs(cb: (outputs: RouterPortEntry[]) => void): Unsubscribe;
   onCameraSettings(cb: (msg: CameraSettingsPayload) => void): Unsubscribe;
-  onCommandReceipt(cb: (msg: CommandReceipt) => void): Unsubscribe;
-  /**
-   * Fires synchronously with a copy of every outgoing command payload,
-   * BEFORE it is emitted on the wire. State mirrors (e.g. Redux) rely on
-   * this ordering so a fast acknowledgment can never race the local record
-   * of the command.
-   */
-  onCommandSent(cb: (payload: SentCommand["payload"]) => void): Unsubscribe;
   /**
    * Fires once per settled command — the same outcome that resolves or
    * rejects the command's promise. This is the single feed for shared-state
@@ -193,16 +185,6 @@ function isBroadcastShape(msg: object): boolean {
   );
 }
 
-function copyPayload(payload: SentCommand["payload"]): SentCommand["payload"] {
-  // Consumers may mutate what they receive (a known quirk of the Redux
-  // store's setLastCommand); hand each of them their own shallow copy so the
-  // wire payload stays pristine.
-  return {
-    ...payload,
-    action: payload.action ? { ...payload.action } : payload.action,
-  };
-}
-
 export function createImagingClient(options: ImagingClientOptions = {}): ImagingClient {
   const getEndpoints =
     typeof options.endpoints === "function"
@@ -237,7 +219,6 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
     const info = getObserverInfo(side);
     const namespacePath = info.namespacePath;
 
-    const commandSentCallbacks = new Set<(payload: SentCommand["payload"]) => void>();
     const commandResultCallbacks = new Set<(result: CommandResult) => void>();
 
     interface PendingCommand {
@@ -302,12 +283,6 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         uuid,
         now,
       });
-
-      // Local mirrors first, then the wire: an acknowledgment must never
-      // arrive before the command has been recorded locally.
-      for (const cb of commandSentCallbacks) {
-        cb(copyPayload(payload));
-      }
 
       let resolve!: (result: CommandResult) => void;
       let reject!: (error: Error) => void;
@@ -539,17 +514,6 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
 
       onCameraSettings(cb) {
         return onCommandMessage((msg) => "current_settings" in msg, cb);
-      },
-
-      onCommandReceipt(cb) {
-        return onCommandMessage((msg) => !isBroadcastShape(msg), cb);
-      },
-
-      onCommandSent(cb) {
-        commandSentCallbacks.add(cb);
-        return () => {
-          commandSentCallbacks.delete(cb);
-        };
       },
 
       onCommandResult(cb) {

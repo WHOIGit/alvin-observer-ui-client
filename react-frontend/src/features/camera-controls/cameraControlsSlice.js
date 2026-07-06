@@ -1,7 +1,8 @@
 import { createSlice, original } from "@reduxjs/toolkit";
 import { isEqual } from "lodash";
 import { createSelector } from "reselect";
-import { COMMAND_STRINGS, VIDEO_STREAM_CONFIG } from "../../config.js";
+import { VIDEO_STREAM_CONFIG } from "../../config.js";
+import { COMMAND_KINDS } from "../../lib/imaging-client";
 
 // set default settings
 const defaultObserverVideoSrc =
@@ -22,15 +23,11 @@ const initialState = {
   camHeartbeatDataStbd: null, // observer specific heartbeat data for Pilot UI
   recorderHeartbeatData: null,
   currentCamData: null,
-  lastCommand: null,
   joystickStatus: null,
   recorderResponseError: false,
   videoSourceEnabled: true,
   exposureControlsEnabled: true,
   recordControlsEnabled: true,
-  errorCameraChange: false,
-  // array of commands
-  commandsQueue: [],
   allCameras: [],
   routerOutputs: [],
   routerInputs: [],
@@ -67,66 +64,39 @@ export const cameraControlsSlice = createSlice({
       );
       state.activeCamera = activeCamera;
     },
-    setLastCommand: (state, action) => {
-      state.lastCommand = action.payload;
-      state.lastCommand.action.name = action.payload.action.name;
-      state.lastCommand.action.value = action.payload.action.value;
-      state.lastCommand.status = "PENDING";
-    },
-    addCommandQueue: (state, action) => {
-      state.commandsQueue = state.commandsQueue.concat(action.payload);
-    },
-    changeCameraSettings: (state, action) => {
-      // need to check confirmation of successful command from WebSocket
-      state.commandsQueue.forEach((element) => {
-        if (action.payload.eventId === element.eventId) {
-          // If websocket receipt returns OK, update the live settings
-          if (action.payload.receipt.status === "OK") {
-            state.errorCameraChange = false;
-            // change the camera settings
-            switch (element.action.name) {
-              // change observer camera
-              case COMMAND_STRINGS.cameraChangeCommand:
-                const activeCamera = getCameraConfig(
-                  element.action.value,
-                  state.allCameras
-                );
-                state.activeCamera = activeCamera;
-                break;
-              // change focus mode
-              case COMMAND_STRINGS.focusModeCommand:
-                state.currentCamData.currentSettings.focus_mode =
-                  element.action.value;
-                break;
-              // change shutter mode
-              case COMMAND_STRINGS.shutterModeCommand:
-                state.currentCamData.currentSettings.SHU = element.action.value;
-                break;
-              // change iris mode
-              case COMMAND_STRINGS.irisModeCommand:
-                state.currentCamData.currentSettings.IRS = element.action.value;
-                break;
-              // change iso mode
-              case COMMAND_STRINGS.isoModeCommand:
-                state.currentCamData.currentSettings.ISO = element.action.value;
-                break;
-              // change exposure mode
-              case COMMAND_STRINGS.exposureModeCommand:
-                state.currentCamData.currentSettings.exposure_mode =
-                  element.action.value;
-                break;
-              default:
-            }
-          } else {
-            console.log("ERROR Received from AIS");
-            state.errorCameraChange = true;
-          }
-        }
-        // remove command from queue
-        state.commandsQueue = state.commandsQueue.filter(
-          (item) => item.eventId !== action.payload.eventId
-        );
-      });
+    // Applies a settled command's outcome to the live camera state. The
+    // imaging-client correlates receipts to commands and reports them by
+    // semantic kind; failed commands leave state untouched.
+    applyCommandResult: (state, action) => {
+      const { kind, value, isOk } = action.payload;
+      if (!isOk) {
+        console.log("ERROR Received from AIS");
+        return;
+      }
+      // A result can beat the first settings broadcast, in which case there
+      // is no currentSettings object to update yet.
+      const currentSettings = state.currentCamData?.currentSettings;
+      switch (kind) {
+        case COMMAND_KINDS.SELECT_CAMERA:
+          state.activeCamera = getCameraConfig(value, state.allCameras);
+          break;
+        case COMMAND_KINDS.SET_FOCUS_MODE:
+          if (currentSettings) currentSettings.focus_mode = value;
+          break;
+        case COMMAND_KINDS.SET_SHUTTER:
+          if (currentSettings) currentSettings.SHU = value;
+          break;
+        case COMMAND_KINDS.SET_IRIS:
+          if (currentSettings) currentSettings.IRS = value;
+          break;
+        case COMMAND_KINDS.SET_ISO:
+          if (currentSettings) currentSettings.ISO = value;
+          break;
+        case COMMAND_KINDS.SET_EXPOSURE_MODE:
+          if (currentSettings) currentSettings.exposure_mode = value;
+          break;
+        default:
+      }
     },
     changeCamHeartbeat: (state, action) => {
       if (state.initialCamHeartbeat === null) {
@@ -202,9 +172,6 @@ export const cameraControlsSlice = createSlice({
     setRecordControlsEnabled: (state, action) => {
       state.recordControlsEnabled = action.payload;
     },
-    setErrorCameraChange: (state, action) => {
-      state.errorCameraChange = action.payload;
-    },
     setAllCameras: (state, action) => {
       state.allCameras = action.payload;
     },
@@ -220,21 +187,18 @@ export const cameraControlsSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const {
   changeActiveCamera,
-  changeCameraSettings,
+  applyCommandResult,
   changeCamHeartbeat,
   changeCamHeartbeatPort,
   changeCamHeartbeatStbd,
   changeRecorderHeartbeat,
   changeCurrentCamData,
-  setLastCommand,
   setObserverSide,
   setJoystickStatus,
   setRecorderError,
   setVideoSourceEnabled,
-  addCommandQueue,
   setExposureControlsEnabled,
   setRecordControlsEnabled,
-  setErrorCameraChange,
   setAllCameras,
   setRouterOutputs,
   setRouterInputs,
@@ -313,10 +277,6 @@ export const selectExposureControlsEnabled = (state) =>
 export const selectRecordControlsEnabled = (state) =>
   state.cameraControls.recordControlsEnabled;
 
-// return error disable
-export const selectErrorCameraChange = (state) =>
-  state.cameraControls.errorCameraChange;
-
 // return initial camera config values supplied by AIS
 export const selectAllCameras = createSelector(
   (state) => state.cameraControls.allCameras,
@@ -338,4 +298,3 @@ export const selectRouterInputs = createSelector(
 // return socket error status
 
 // return last command
-export const selectLastCommand = (state) => state.cameraControls.lastCommand;

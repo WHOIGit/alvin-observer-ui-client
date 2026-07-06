@@ -9,7 +9,6 @@ import {
   selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
 import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
-import CommandStateListener from "../listeners/CommandStateListener";
 import NewCameraCommandListener from "../listeners/NewCameraCommandListener";
 import RecorderHeartbeatListener from "../listeners/RecorderHeartbeatListener";
 import ConnectionStatusListener from "../listeners/ConnectionStatusListener";
@@ -50,7 +49,6 @@ export default function ObserverUI({
   return (
     <>
       <CamHeartbeatListener />
-      <CommandStateListener />
       <NewCameraCommandListener />
       <RecorderHeartbeatListener />
       <ConnectionStatusListener />

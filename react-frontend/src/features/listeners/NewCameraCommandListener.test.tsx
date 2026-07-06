@@ -16,20 +16,9 @@ afterEach(() => {
   getSharedImagingClient().close();
 });
 
-test("routes configuration broadcasts and receipts into Redux", async () => {
+test("routes configuration broadcasts into Redux", async () => {
   const h = createSocketIoHarness();
-
-  // A pending ISO change, as CommandStateListener would have queued it.
-  const queuedCommand = {
-    eventId: "evt-1",
-    camera: "port_brow_4k",
-    command: "COVP",
-    action: { name: "ISO", value: "400" },
-  };
-  const store = makeCameraControlsStore({
-    observerSide: "P",
-    commandsQueue: [queuedCommand] as any,
-  });
+  const store = makeCameraControlsStore({ observerSide: "P" });
   renderWithProviders(<NewCameraCommandListener />, { store });
 
   await stationConnected(getSharedImagingClient().station("P"));
@@ -47,45 +36,82 @@ test("routes configuration broadcasts and receipts into Redux", async () => {
     IRS: ["F2.8"],
     current_settings: { ISO: "100" },
   });
-  // The receipt for the queued command arrives last and resolves it.
-  emitTo(h, "/port", "newCameraCommand", {
-    eventId: "evt-1",
-    receipt: { command: "COVP", status: "OK" },
-  });
 
   await vi.waitFor(() =>
-    expect(store.getState().cameraControls.commandsQueue).toHaveLength(0)
+    expect(store.getState().cameraControls.currentCamData?.ISO).toEqual([
+      "100",
+      "400",
+    ])
   );
-
   const state = store.getState().cameraControls;
   expect(state.allCameras).toEqual(cameraArray);
   expect(state.routerInputs).toEqual(inputArray);
   expect(state.routerOutputs).toEqual(outputArray);
-  expect(state.currentCamData.ISO).toEqual(["100", "400"]);
-  // The OK receipt applied the queued ISO value to the live settings.
-  expect(state.currentCamData.currentSettings.ISO).toBe("400");
-  expect(state.errorCameraChange).toBe(false);
 });
 
-test("an error receipt flags the failure and clears the queue", async () => {
-  const h = createSocketIoHarness();
+test("successful command results apply to the live camera state", async () => {
+  const h = createSocketIoHarness((h, expectEmit) => {
+    h.gotSelect = expectEmit("newCameraCommand");
+    h.gotIso = expectEmit("newCameraCommand");
+  });
+
+  const cameraArray = [{ camera: "c1", cam_name: "Brow", owner: "port" }];
   const store = makeCameraControlsStore({
-    observerSide: "S",
-    commandsQueue: [
-      { eventId: "evt-9", action: { name: "SHU", value: "1/60" } },
-    ] as any,
-    currentCamData: { currentSettings: {} } as any,
+    observerSide: "P",
+    allCameras: cameraArray as any,
+    currentCamData: { currentSettings: { ISO: "100" } } as any,
   });
   renderWithProviders(<NewCameraCommandListener />, { store });
 
-  await stationConnected(getSharedImagingClient().station("S"));
-  emitTo(h, "/stbd", "newCameraCommand", {
-    eventId: "evt-9",
-    receipt: { command: "COVS", status: "ERR" },
+  const station = getSharedImagingClient().station("P");
+  await stationConnected(station);
+
+  const select = station.selectCamera("c1");
+  const iso = station.camera("c1").setIso("400");
+  await h.gotSelect;
+  await h.gotIso;
+
+  emitTo(h, "/port", "newCameraCommand", {
+    eventId: select.eventId,
+    receipt: { command: "COVP", status: "OK" },
+  });
+  emitTo(h, "/port", "newCameraCommand", {
+    eventId: iso.eventId,
+    receipt: { command: "COVP", status: "OK" },
   });
 
   await vi.waitFor(() =>
-    expect(store.getState().cameraControls.commandsQueue).toHaveLength(0)
+    expect(
+      store.getState().cameraControls.currentCamData.currentSettings.ISO
+    ).toBe("400")
   );
-  expect(store.getState().cameraControls.errorCameraChange).toBe(true);
+  expect(store.getState().cameraControls.activeCamera).toEqual(cameraArray[0]);
+});
+
+test("a failed command result leaves state untouched", async () => {
+  const h = createSocketIoHarness((h, expectEmit) => {
+    h.gotCmd = expectEmit("newCameraCommand");
+  });
+
+  const store = makeCameraControlsStore({
+    observerSide: "S",
+    currentCamData: { currentSettings: { SHU: "1/30" } } as any,
+  });
+  renderWithProviders(<NewCameraCommandListener />, { store });
+
+  const station = getSharedImagingClient().station("S");
+  await stationConnected(station);
+
+  const shutter = station.camera(null).setShutter("1/60");
+  await h.gotCmd;
+
+  emitTo(h, "/stbd", "newCameraCommand", {
+    eventId: shutter.eventId,
+    receipt: { command: "COVS", status: "ERR" },
+  });
+
+  await expect(shutter).rejects.toThrow();
+  expect(
+    store.getState().cameraControls.currentCamData.currentSettings.SHU
+  ).toBe("1/30");
 });

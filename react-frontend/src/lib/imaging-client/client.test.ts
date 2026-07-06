@@ -150,30 +150,6 @@ describe("station commands", () => {
     });
   });
 
-  test("onCommandSent fires synchronously with a defensive copy", async () => {
-    const h = createSocketIoHarness((h, expectEmit) => {
-      h.gotCmd = expectEmit("newCameraCommand");
-    });
-
-    const client = makeClient();
-    const station = client.station("P");
-
-    const seen: any[] = [];
-    station.onCommandSent((payload) => {
-      seen.push(payload);
-      // A consumer mutating its copy must not corrupt the wire payload.
-      payload.action.name = "CORRUPTED";
-    });
-
-    const { payload } = station.camera("port_brow_4k").setShutter("1/60");
-    expect(seen).toHaveLength(1); // synchronous, before any wire round-trip
-    expect(seen[0].eventId).toBe(payload.eventId);
-
-    await h.connected;
-    const { args } = await h.gotCmd;
-    expect(args[0].action).toEqual({ name: "SHU", value: "1/60" });
-  });
-
   test("commands settle with the receipt matching their eventId", async () => {
     const h = createSocketIoHarness((h, expectEmit) => {
       h.gotCmd1 = expectEmit("newCameraCommand");
@@ -423,12 +399,10 @@ describe("station subscriptions", () => {
     const inputs: any[] = [];
     const outputs: any[] = [];
     const settings: any[] = [];
-    const receipts: any[] = [];
     station.onCameraList((msg) => cameras.push(msg));
     station.onRouterInputs((msg) => inputs.push(msg));
     station.onRouterOutputs((msg) => outputs.push(msg));
     station.onCameraSettings((msg) => settings.push(msg));
-    station.onCommandReceipt((msg) => receipts.push(msg));
 
     await stationConnected(station);
 
@@ -436,20 +410,17 @@ describe("station subscriptions", () => {
     const inputArray = [{ label: "Brow", value: "input1" }];
     const outputArray = [{ label: "Port Rec", value: "output1" }];
     const settingsMsg = { ISO: ["100"], current_settings: { iso: "100" } };
-    const receiptMsg = { eventId: "e-1", receipt: { command: "COVP", status: "OK" } };
 
     emitTo(h, "/port", "newCameraCommand", { camera_array: cameraArray });
     emitTo(h, "/port", "newCameraCommand", { router_input_array: inputArray });
     emitTo(h, "/port", "newCameraCommand", { router_output_array: outputArray });
     emitTo(h, "/port", "newCameraCommand", settingsMsg);
-    emitTo(h, "/port", "newCameraCommand", receiptMsg);
 
-    await vi.waitFor(() => expect(receipts).toHaveLength(1));
+    await vi.waitFor(() => expect(settings).toHaveLength(1));
     expect(cameras).toEqual([cameraArray]);
     expect(inputs).toEqual([inputArray]);
     expect(outputs).toEqual([outputArray]);
     expect(settings).toEqual([settingsMsg]);
-    expect(receipts).toEqual([receiptMsg]);
   });
 
   test("the last release sends the historical good-bye for the namespace", async () => {
