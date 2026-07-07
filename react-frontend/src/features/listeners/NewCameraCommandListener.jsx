@@ -13,24 +13,24 @@ import {
   setAllCameras,
   setRouterOutputs,
   setRouterInputs,
-  selectObserverSide,
+  selectOwnStationId,
 } from "../camera-controls/cameraControlsSlice";
 
 // Feeds the server's newCameraCommand traffic into Redux. The library splits
 // the event into typed channels: configuration broadcasts (camera list,
 // router topology, settings options) and settled command results, which the
 // library has already correlated to their receipts by eventId.
-export default function NewCameraCommandListener({ namespaceOverride = null }) {
+export default function NewCameraCommandListener({ station = null }) {
   const dispatch = useDispatch();
-  const observerSide = useSelector(selectObserverSide);
-  const side = namespaceOverride || observerSide;
+  const ownStationId = useSelector(selectOwnStationId);
+  const stationId = station || ownStationId;
 
-  useCameraSettings(side, (message) => dispatch(changeCurrentCamData(message)));
-  useCameraList(side, (cameras) => dispatch(setAllCameras(cameras)));
-  useRouterOutputs(side, (outputs) => dispatch(setRouterOutputs(outputs)));
-  useRouterInputs(side, (inputs) => dispatch(setRouterInputs(inputs)));
+  useCameraSettings(stationId, (message) => dispatch(changeCurrentCamData(message)));
+  useCameraList(stationId, (cameras) => dispatch(setAllCameras(cameras)));
+  useRouterOutputs(stationId, (outputs) => dispatch(setRouterOutputs(outputs)));
+  useRouterInputs(stationId, (inputs) => dispatch(setRouterInputs(inputs)));
   useCommandResult(
-    side,
+    stationId,
     (result) => dispatch(applyCommandResult(result)),
     commandResultAppliesToState
   );

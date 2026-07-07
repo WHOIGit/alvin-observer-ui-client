@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRecorderHeartbeat } from "../../hooks/useImagingClient";
 import {
   changeRecorderHeartbeat,
-  selectObserverSide,
+  selectOwnStationId,
 } from "../camera-controls/cameraControlsSlice";
 
 export default function RecorderHeartbeatListener() {
   const dispatch = useDispatch();
-  const observerSide = useSelector(selectObserverSide);
+  const ownStationId = useSelector(selectOwnStationId);
 
   const handleMessage = useCallback(
     (message) => {
@@ -17,7 +17,7 @@ export default function RecorderHeartbeatListener() {
     [dispatch]
   );
 
-  useRecorderHeartbeat(observerSide, handleMessage);
+  useRecorderHeartbeat(ownStationId, handleMessage);
 
   return null;
 }

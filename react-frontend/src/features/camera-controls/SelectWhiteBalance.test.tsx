@@ -23,8 +23,8 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
-      camHeartbeatData: { white_balance: "INDOOR" },
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { white_balance: "INDOOR" } },
     });
 
     const { getByRole, getByText } = renderWithProviders(
@@ -59,8 +59,8 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
-      camHeartbeatData: { white_balance: "ONE_PUSH_WB" },
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { white_balance: "ONE_PUSH_WB" } },
     });
 
     const { getByText } = renderWithProviders(
@@ -90,8 +90,8 @@ test.each(SOCKET_USER_SCENARIOS)(
 
 test("renders with an empty selection when the camera reports no white balance", () => {
   const store = makeCameraControlsStore({
-    observerSide: "PL",
-    camHeartbeatData: { white_balance: null },
+    ownStationId: "PL",
+    camHeartbeats: { PL: { white_balance: null } },
   });
 
   const { getByRole, queryByText } = renderWithProviders(

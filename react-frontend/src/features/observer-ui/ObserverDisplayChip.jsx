@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import { Chip } from "@mui/material";
 // local
-import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
+import { selectOwnStationId } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles(theme => ({
   chip: {
@@ -15,13 +15,13 @@ const useStyles = makeStyles(theme => ({
 
 export default function ObserverDisplayChip() {
   const classes = useStyles();
-  const observerSide = useSelector(selectObserverSide);
+  const ownStationId = useSelector(selectOwnStationId);
   let label;
-  if (observerSide === null) {
+  if (ownStationId === null) {
     return null;
-  } else if (observerSide === "P") {
+  } else if (ownStationId === "P") {
     label = "PORT OBSERVER";
-  } else if (observerSide === "S") {
+  } else if (ownStationId === "S") {
     label = "STBD OBSERVER";
   }
 

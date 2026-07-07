@@ -10,7 +10,7 @@ import GrowOverlay from "./GrowOverlay";
 import ObserverSideSelect from "./ObserverSideSelect";
 import ObserverUI from "./ObserverUI";
 import { ObservedCameraProvider } from "../camera-controls/ObservedCameraProvider";
-import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
+import { selectOwnStationId } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ObserverUIContainer() {
   const classes = useStyles();
-  const observerSide = useSelector(selectObserverSide);
+  const ownStationId = useSelector(selectOwnStationId);
   const [showTopControls, setShowTopControls] = useState(false);
   const [showFullCameraControls, setShowFullCameraControls] = useState(false);
   console.log("OBERSERV UI comp.");
@@ -70,7 +70,7 @@ export default function ObserverUIContainer() {
         }`}
       >
         {/* force user to choose ObserverSide if not set */}
-        {!observerSide ? (
+        {!ownStationId ? (
           <>
             <ObserverSideSelect />
           </>
@@ -95,7 +95,7 @@ export default function ObserverUIContainer() {
         </Fab>
       </div>
       <CameraControls showFullCameraControls={showFullCameraControls} />
-      {observerSide && <GrowOverlay active={showFullCameraControls} />}
+      {ownStationId && <GrowOverlay active={showFullCameraControls} />}
     </ObservedCameraProvider>
   );
 }

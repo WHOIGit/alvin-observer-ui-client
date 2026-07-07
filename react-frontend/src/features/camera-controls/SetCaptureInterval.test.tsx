@@ -31,8 +31,8 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
-      camHeartbeatData: { capture_interval: "0" },
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { capture_interval: "0" } },
     });
 
     const { getByRole, getByText } = renderWithProviders(
@@ -71,8 +71,8 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
-      camHeartbeatData: { capture_interval: "20" },
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { capture_interval: "20" } },
     });
 
     const { getByText } = renderWithProviders(

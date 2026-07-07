@@ -5,10 +5,7 @@ import { Button, CircularProgress } from "@mui/material";
 import { green } from "@mui/material/colors";
 // local imports
 import { useObservedStation } from "./ObservedCameraProvider";
-import {
-  selectCamHeartbeatDataPort,
-  selectCamHeartbeatDataStbd,
-} from "./cameraControlsSlice";
+import { selectCamHeartbeatFor } from "./cameraControlsSlice";
 import { WS_SERVER_NAMESPACE_STARBOARD } from "../../config";
 
 const useStyles = makeStyles((theme) => ({
@@ -28,19 +25,17 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PilotRecordButton({ observerSide }) {
   const classes = useStyles();
-  const activeCameraPort = useSelector(selectCamHeartbeatDataPort);
-  const activeCameraStbd = useSelector(selectCamHeartbeatDataStbd);
+  const stationId =
+    observerSide === WS_SERVER_NAMESPACE_STARBOARD ? "S" : "P";
+  const activeCamera = useSelector((state) =>
+    selectCamHeartbeatFor(state, stationId)
+  );
   const [loading, setLoading] = useState(false);
 
   const station = useObservedStation();
 
-  let activeCamera = activeCameraPort;
-  if (observerSide === WS_SERVER_NAMESPACE_STARBOARD) {
-    activeCamera = activeCameraStbd;
-  }
-
   const handleSendMessage = () => {
-    station.record(activeCamera.camera, { as: observerSide });
+    station.record(activeCamera.camera, { as: stationId });
   };
 
   const handleRecordAction = () => {

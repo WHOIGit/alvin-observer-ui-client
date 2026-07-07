@@ -4,7 +4,7 @@ import { cleanup, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import {
-  changeCamHeartbeat,
+  storeCamHeartbeat,
 } from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
@@ -38,13 +38,18 @@ test.each(SOCKET_USER_SCENARIOS)(
     } as any;
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
+      ownStationId: scenario.stationId,
       allCameras,
       activeCamera,
       recorderHeartbeatData,
     });
 
-    store.dispatch(changeCamHeartbeat({ focus_mode: "AF" } as any));
+    store.dispatch(
+      storeCamHeartbeat({
+        stationId: scenario.stationId,
+        heartbeat: { focus_mode: "AF" },
+      } as any),
+    );
 
     const { getByText } = render(
       <Provider store={store}>
@@ -82,9 +87,14 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
+      ownStationId: scenario.stationId,
     });
-    store.dispatch(changeCamHeartbeat({ focus_mode: "AF" } as any));
+    store.dispatch(
+      storeCamHeartbeat({
+        stationId: scenario.stationId,
+        heartbeat: { focus_mode: "AF" },
+      } as any),
+    );
 
     const { getByText } = render(
       <Provider store={store}>

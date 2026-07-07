@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useImagingClient } from "../../hooks/useImagingClient";
-import { selectActiveCamera, selectObserverSide } from "./cameraControlsSlice";
+import { selectActiveCamera, selectOwnStationId } from "./cameraControlsSlice";
 
 // Ambient identity for the camera-control tree: which station commands are
 // issued on, and a command handle for the currently observed camera. Identity
@@ -10,14 +10,14 @@ import { selectActiveCamera, selectObserverSide } from "./cameraControlsSlice";
 const ObservedCameraContext = createContext(undefined);
 
 export function ObservedCameraProvider({ children }) {
-  const observerSide = useSelector(selectObserverSide);
+  const ownStationId = useSelector(selectOwnStationId);
   const activeCameraId = useSelector(selectActiveCamera);
   const client = useImagingClient();
 
   // Until the user picks a side there is no station to talk to (and no
   // connection to pin). Controls render nothing before telemetry arrives,
   // so a null handle is never dereferenced in a handler.
-  const station = observerSide ? client.station(observerSide) : null;
+  const station = ownStationId ? client.station(ownStationId) : null;
 
   useEffect(() => station?.acquire(), [station]);
 

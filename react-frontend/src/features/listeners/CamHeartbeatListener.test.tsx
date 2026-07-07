@@ -16,9 +16,9 @@ afterEach(() => {
   getSharedImagingClient().close();
 });
 
-test("feeds the observer's own heartbeat into the main reducer", async () => {
+test("feeds the observer's own heartbeat into its station's slot", async () => {
   const h = createSocketIoHarness();
-  const store = makeCameraControlsStore({ observerSide: "P" });
+  const store = makeCameraControlsStore({ ownStationId: "P" });
   renderWithProviders(<CamHeartbeatListener />, { store });
 
   await stationConnected(getSharedImagingClient().station("P"));
@@ -28,7 +28,7 @@ test("feeds the observer's own heartbeat into the main reducer", async () => {
   });
 
   await vi.waitFor(() =>
-    expect(store.getState().cameraControls.camHeartbeatData).toMatchObject({
+    expect(store.getState().cameraControls.camHeartbeats.P).toMatchObject({
       camera: "port_brow_4k",
       focus_mode: "MF",
     })
@@ -36,29 +36,26 @@ test("feeds the observer's own heartbeat into the main reducer", async () => {
 });
 
 test.each([
-  ["/port", "camHeartbeatDataPort"],
-  ["/stbd", "camHeartbeatDataStbd"],
+  ["P", "/port"],
+  ["S", "/stbd"],
 ])(
-  "pilot override %s routes into %s",
-  async (namespaceOverride, stateField) => {
+  "pilot mirror of station %s routes into its slot",
+  async (stationId, namespace) => {
     const h = createSocketIoHarness();
-    const store = makeCameraControlsStore({ observerSide: "PL" });
-    renderWithProviders(
-      <CamHeartbeatListener namespaceOverride={namespaceOverride} />,
-      { store }
-    );
+    const store = makeCameraControlsStore({ ownStationId: "PL" });
+    renderWithProviders(<CamHeartbeatListener station={stationId} />, {
+      store,
+    });
 
-    await stationConnected(
-      getSharedImagingClient().station(namespaceOverride)
-    );
-    emitTo(h, namespaceOverride, "CamHeartbeat", { camera: "some_cam" });
+    await stationConnected(getSharedImagingClient().station(stationId));
+    emitTo(h, namespace, "CamHeartbeat", { camera: "some_cam" });
 
     await vi.waitFor(() =>
       expect(
-        (store.getState().cameraControls as any)[stateField]
+        store.getState().cameraControls.camHeartbeats[stationId]
       ).toMatchObject({ camera: "some_cam" })
     );
-    // The pilot's own heartbeat slot is untouched by override traffic.
-    expect(store.getState().cameraControls.camHeartbeatData).toBe(null);
+    // The pilot's own slot is untouched by mirror traffic.
+    expect(store.getState().cameraControls.camHeartbeats.PL).toBeUndefined();
   }
 );

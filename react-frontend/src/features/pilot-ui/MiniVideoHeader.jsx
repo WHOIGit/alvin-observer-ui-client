@@ -7,11 +7,10 @@ import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 // local import
 import {
-  selectCamHeartbeatData,
-  selectCamHeartbeatDataPort,
-  selectCamHeartbeatDataStbd,
   selectAllCameras,
+  selectCamHeartbeatFor,
 } from "../camera-controls/cameraControlsSlice";
+import { getStationInfo } from "../../lib/imaging-client";
 import { useRecorderHeartbeat } from "../../hooks/useImagingClient";
 import { getCameraConfigFromId } from "../../utils/getCamConfigFromId";
 
@@ -51,10 +50,11 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
 
   useRecorderHeartbeat(observerSide, handleMessage);
 
+  const stationId = getStationInfo(observerSide).stationId;
   const allCameras = useSelector(selectAllCameras);
-  const activeCameraPilot = useSelector(selectCamHeartbeatData);
-  const activeCameraPort = useSelector(selectCamHeartbeatDataPort);
-  const activeCameraStbd = useSelector(selectCamHeartbeatDataStbd);
+  const stationHeartbeat = useSelector((state) =>
+    selectCamHeartbeatFor(state, stationId)
+  );
 
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
@@ -67,36 +67,16 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
         setCameraName(lastMessage.camera);
         setIsRecording(lastMessage.isRecording);
       } else if (videoType === "OBS" || videoType === "PILOT") {
-        if (observerSide === "port" && activeCameraPort) {
+        if (stationHeartbeat) {
           const camera = getCameraConfigFromId(
-            activeCameraPort.camera,
-            allCameras
-          );
-          setCameraName(camera.cam_name);
-        } else if (observerSide === "stbd" && activeCameraStbd) {
-          const camera = getCameraConfigFromId(
-            activeCameraStbd.camera,
-            allCameras
-          );
-          setCameraName(camera.cam_name);
-        } else if (observerSide === "pilot" && activeCameraPilot) {
-          const camera = getCameraConfigFromId(
-            activeCameraPilot.camera,
+            stationHeartbeat.camera,
             allCameras
           );
           camera && setCameraName(camera.cam_name);
         }
       }
     }
-  }, [
-    activeCameraPilot,
-    activeCameraPort,
-    activeCameraStbd,
-    allCameras,
-    lastMessage,
-    observerSide,
-    videoType,
-  ]);
+  }, [stationHeartbeat, allCameras, lastMessage, videoType]);
 
   let title = videoType + ": " + cameraName;
 

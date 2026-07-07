@@ -23,12 +23,14 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
-      camHeartbeatData: {
-        exposure: COMMAND_STRINGS.exposureModeOptions[0],
-        isControllable: true,
-        camera: "cam-1",
-        owner: scenario.namespace.replace(/^\//, ""),
+      ownStationId: scenario.stationId,
+      camHeartbeats: {
+        [scenario.stationId]: {
+          exposure: COMMAND_STRINGS.exposureModeOptions[0],
+          isControllable: true,
+          camera: "cam-1",
+          owner: scenario.namespace.replace(/^\//, ""),
+        },
       },
       allCameras: [{ camera: "cam-1", cam_name: "Cam 1" }],
       activeCamera: { camera: "cam-1", cam_name: "Cam 1" } as any,
@@ -62,13 +64,15 @@ test.each(SOCKET_USER_SCENARIOS)(
 
 test("hides the control when the camera reports a driver fault", () => {
   const store = makeCameraControlsStore({
-    observerSide: "P",
-    camHeartbeatData: {
-      exposure: null,
-      isControllable: true,
-      camera: "cam-1",
-      owner: "port",
-      hasFault: true,
+    ownStationId: "P",
+    camHeartbeats: {
+      P: {
+        exposure: null,
+        isControllable: true,
+        camera: "cam-1",
+        owner: "port",
+        hasFault: true,
+      },
     },
     allCameras: [{ camera: "cam-1", cam_name: "Cam 1" }],
     activeCamera: { camera: "cam-1", cam_name: "Cam 1" } as any,

@@ -2,7 +2,7 @@ import { useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useConnectionStatus } from "../../hooks/useImagingClient";
 import { getStationInfo } from "../../lib/imaging-client";
-import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
+import { selectOwnStationId } from "../camera-controls/cameraControlsSlice";
 import {
   addSystemMessage,
   dismissSystemMessage,
@@ -18,12 +18,12 @@ const STATION_LABELS = {
 // the global system-notifications store. A dropped link therefore surfaces
 // in the same notification bell as v1.5 SystemMessage alerts, instead of
 // failing silently. Renders nothing.
-export default function ConnectionStatusListener({ namespaceOverride = null }) {
+export default function ConnectionStatusListener({ station = null }) {
   const dispatch = useDispatch();
-  const observerSide = useSelector(selectObserverSide);
+  const ownStationId = useSelector(selectOwnStationId);
   const stationInfo = useMemo(
-    () => getStationInfo(namespaceOverride || observerSide),
-    [namespaceOverride, observerSide]
+    () => getStationInfo(station || ownStationId),
+    [station, ownStationId]
   );
   const namespacePath = stationInfo.namespacePath;
 
@@ -34,7 +34,7 @@ export default function ConnectionStatusListener({ namespaceOverride = null }) {
   const lossActiveRef = useRef(false);
   const everConnectedRef = useRef(false);
 
-  useConnectionStatus(namespaceOverride || observerSide, ({ status }) => {
+  useConnectionStatus(station || ownStationId, ({ status }) => {
     const label =
       STATION_LABELS[stationInfo.stationId] || stationInfo.stationId;
     const lossId = `connection-loss:${namespacePath}`;

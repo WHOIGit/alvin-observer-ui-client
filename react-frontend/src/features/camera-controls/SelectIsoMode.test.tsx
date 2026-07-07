@@ -23,9 +23,9 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
+      ownStationId: scenario.stationId,
       currentCamData: { ISO: ["100", "200", "400"] },
-      camHeartbeatData: { exposure: "MAN", iso: "100" },
+      camHeartbeats: { [scenario.stationId]: { exposure: "MAN", iso: "100" } },
       exposureControlsEnabled: true,
     });
 

@@ -28,12 +28,14 @@ test.each(SOCKET_USER_SCENARIOS)(
     ] as any;
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
+      ownStationId: scenario.stationId,
       allCameras,
       activeCamera: allCameras[0],
-      camHeartbeatData: {
-        camera: "cam-1",
-        owner: scenario.namespace,
+      camHeartbeats: {
+        [scenario.stationId]: {
+          camera: "cam-1",
+          owner: scenario.namespace,
+        },
       },
       videoSourceEnabled: true,
     });

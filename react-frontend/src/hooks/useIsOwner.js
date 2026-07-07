@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import {
   selectCamHeartbeatData,
-  selectObserverSide,
+  selectOwnStationId,
   selectActiveCamera,
 } from "../features/camera-controls/cameraControlsSlice";
 
@@ -13,7 +13,7 @@ import {
 
 export default function useIsOwner() {
   const camSettings = useSelector(selectCamHeartbeatData);
-  const currentObserver = useSelector(selectObserverSide);
+  const currentObserver = useSelector(selectOwnStationId);
   const activeCamera = useSelector(selectActiveCamera);
 
   let isOwner = false;

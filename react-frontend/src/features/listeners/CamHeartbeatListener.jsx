@@ -3,37 +3,26 @@ import { useDispatch, useSelector } from "react-redux";
 import { useCamHeartbeat } from "../../hooks/useImagingClient";
 import { getStationInfo } from "../../lib/imaging-client";
 import {
-  changeCamHeartbeat,
-  changeCamHeartbeatPort,
-  changeCamHeartbeatStbd,
-  selectObserverSide,
+  selectOwnStationId,
+  storeCamHeartbeat,
 } from "../camera-controls/cameraControlsSlice";
 
-export default function CamHeartbeatListener({ namespaceOverride = null }) {
+// Ingests one station's CamHeartbeat into the station-keyed Redux map.
+// Defaults to the console's own station; the pilot mounts extra instances
+// for the observer stations it mirrors.
+export default function CamHeartbeatListener({ station = null }) {
   const dispatch = useDispatch();
-  const observerSide = useSelector(selectObserverSide);
-
-  // The pilot UI mounts extra instances with a namespaceOverride to mirror
-  // each observer's heartbeat into a side-specific slot; the observer UI runs
-  // one instance for its own side.
-  const overrideStationId = namespaceOverride
-    ? getStationInfo(namespaceOverride).stationId
-    : null;
+  const ownStationId = useSelector(selectOwnStationId);
+  const stationId = getStationInfo(station || ownStationId).stationId;
 
   const handleMessage = useCallback(
-    (message) => {
-      if (!namespaceOverride) {
-        dispatch(changeCamHeartbeat(message));
-      } else if (overrideStationId === "P") {
-        dispatch(changeCamHeartbeatPort(message));
-      } else if (overrideStationId === "S") {
-        dispatch(changeCamHeartbeatStbd(message));
-      }
+    (heartbeat) => {
+      dispatch(storeCamHeartbeat({ stationId, heartbeat }));
     },
-    [namespaceOverride, overrideStationId, dispatch]
+    [dispatch, stationId]
   );
 
-  useCamHeartbeat(namespaceOverride || observerSide, handleMessage);
+  useCamHeartbeat(stationId, handleMessage);
 
   return null;
 }

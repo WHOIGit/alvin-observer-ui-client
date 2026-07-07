@@ -24,8 +24,8 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
-      camHeartbeatData: { focus_mode: "MF" },
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { focus_mode: "MF" } },
     });
 
     const { getByText } = renderWithProviders(
@@ -70,8 +70,8 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
-      camHeartbeatData: { focus_mode: "MF" },
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { focus_mode: "MF" } },
     });
 
     const { getByText } = renderWithProviders(

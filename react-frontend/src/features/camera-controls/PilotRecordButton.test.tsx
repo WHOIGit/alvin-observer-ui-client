@@ -42,9 +42,11 @@ test.each([
     });
 
     const store = makeCameraControlsStore({
-      observerSide: "PL",
-      camHeartbeatDataPort: { camera: "cam-port" },
-      camHeartbeatDataStbd: { camera: "cam-stbd" },
+      ownStationId: "PL",
+      camHeartbeats: {
+        P: { camera: "cam-port" },
+        S: { camera: "cam-stbd" },
+      },
     });
 
     const { getByText } = renderWithProviders(

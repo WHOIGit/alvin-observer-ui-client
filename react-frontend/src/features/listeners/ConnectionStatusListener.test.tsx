@@ -46,7 +46,7 @@ describe("ConnectionStatusListener", () => {
   test("posts a CRITICAL alert when the connection drops", () => {
     const store = makeStore();
     renderWithProviders(
-      <ConnectionStatusListener namespaceOverride="/stbd" />,
+      <ConnectionStatusListener station="S" />,
       { store }
     );
 
@@ -67,7 +67,7 @@ describe("ConnectionStatusListener", () => {
   test("does not duplicate the alert while the outage continues", () => {
     const store = makeStore();
     renderWithProviders(
-      <ConnectionStatusListener namespaceOverride="/stbd" />,
+      <ConnectionStatusListener station="S" />,
       { store }
     );
 
@@ -87,7 +87,7 @@ describe("ConnectionStatusListener", () => {
   test("clears the alert and posts a recovery notice on reconnect", () => {
     const store = makeStore();
     renderWithProviders(
-      <ConnectionStatusListener namespaceOverride="/stbd" />,
+      <ConnectionStatusListener station="S" />,
       { store }
     );
 
@@ -103,7 +103,7 @@ describe("ConnectionStatusListener", () => {
   test("stays silent on a clean first connect", () => {
     const store = makeStore();
     renderWithProviders(
-      <ConnectionStatusListener namespaceOverride="/stbd" />,
+      <ConnectionStatusListener station="S" />,
       { store }
     );
 

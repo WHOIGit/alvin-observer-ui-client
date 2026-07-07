@@ -2,7 +2,7 @@ import { createSlice, original } from "@reduxjs/toolkit";
 import { isEqual } from "lodash";
 import { createSelector } from "reselect";
 import { VIDEO_STREAM_CONFIG } from "../../config.js";
-import { COMMAND_KINDS } from "../../lib/imaging-client";
+import { COMMAND_KINDS, STATIONS } from "../../lib/imaging-client";
 
 // set default settings
 const defaultObserverVideoSrc =
@@ -13,14 +13,14 @@ const defaultRecordVideoSrc =
   window.PILOT_MODE === true ? null : VIDEO_STREAM_CONFIG.portRecordVideo;
 
 const initialState = {
-  observerSide: window.PILOT_MODE === true ? "PL" : null, // P = Port, S = Starboard, PL = Pilot
+  ownStationId: window.PILOT_MODE === true ? STATIONS.PILOT : null,
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
-  initialCamHeartbeat: null,
+  // CamHeartbeats keyed by StationId. An observer console fills only its own
+  // entry; the pilot fills all three.
+  initialCamHeartbeats: {},
+  camHeartbeats: {},
   activeCamera: null,
-  camHeartbeatData: null,
-  camHeartbeatDataPort: null, // observer specific heartbeat data for Pilot UI
-  camHeartbeatDataStbd: null, // observer specific heartbeat data for Pilot UI
   recorderHeartbeatData: null,
   currentCamData: null,
   joystickStatus: null,
@@ -60,15 +60,15 @@ export const cameraControlsSlice = createSlice({
   name: "cameraControls",
   initialState: initialState,
   reducers: {
-    setObserverSide: (state, action) => {
-      state.observerSide = action.payload;
-      if (action.payload === "P") {
+    setOwnStationId: (state, action) => {
+      state.ownStationId = action.payload;
+      if (action.payload === STATIONS.PORT) {
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
         if (window.PILOT_MODE !== true) {
           state.recordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo; //mjs-added-19apr2022
         }
       }
-      if (action.payload === "S") {
+      if (action.payload === STATIONS.STARBOARD) {
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.stbdObserverVideo;
         if (window.PILOT_MODE !== true) {
           state.recordVideoSrc = VIDEO_STREAM_CONFIG.stbdRecordVideo; //mjs-added-19apr2022
@@ -116,46 +116,22 @@ export const cameraControlsSlice = createSlice({
         default:
       }
     },
-    changeCamHeartbeat: (state, action) => {
-      if (state.initialCamHeartbeat === null) {
-        state.initialCamHeartbeat = action.payload;
+    // Stores a station's latest heartbeat. eventId/timestamp churn on every
+    // message, so they're stripped before the change check.
+    storeCamHeartbeat: (state, action) => {
+      const { stationId, heartbeat } = action.payload;
+      delete heartbeat.eventId;
+      delete heartbeat.timestamp;
+
+      if (!state.initialCamHeartbeats[stationId]) {
+        state.initialCamHeartbeats[stationId] = heartbeat;
       }
 
-      // get the original state to check Heartbeat data
       const currentState = original(state);
-      const camHeartbeatData = action.payload;
-      delete camHeartbeatData.eventId;
-      delete camHeartbeatData.timestamp;
-
-      if (isEqual(currentState.camHeartbeatData, camHeartbeatData)) {
+      if (isEqual(currentState.camHeartbeats[stationId], heartbeat)) {
         return state;
       }
-
-      state.camHeartbeatData = action.payload;
-    },
-    changeCamHeartbeatPort: (state, action) => {
-      // get the original state to check Heartbeat data
-      const currentState = original(state);
-      const camHeartbeatDataPort = action.payload;
-      delete camHeartbeatDataPort.eventId;
-      delete camHeartbeatDataPort.timestamp;
-
-      if (isEqual(currentState.camHeartbeatDataPort, camHeartbeatDataPort)) {
-        return state;
-      }
-      state.camHeartbeatDataPort = action.payload;
-    },
-    changeCamHeartbeatStbd: (state, action) => {
-      // get the original state to check Heartbeat data
-      const currentState = original(state);
-      const camHeartbeatDataStbd = action.payload;
-      delete camHeartbeatDataStbd.eventId;
-      delete camHeartbeatDataStbd.timestamp;
-
-      if (isEqual(currentState.camHeartbeatDataStbd, camHeartbeatDataStbd)) {
-        return state;
-      }
-      state.camHeartbeatDataStbd = action.payload;
+      state.camHeartbeats[stationId] = heartbeat;
     },
     changeRecorderHeartbeat: (state, action) => {
       // get the original state to check Heartbeat data
@@ -206,12 +182,10 @@ export const cameraControlsSlice = createSlice({
 export const {
   changeActiveCamera,
   applyCommandResult,
-  changeCamHeartbeat,
-  changeCamHeartbeatPort,
-  changeCamHeartbeatStbd,
+  storeCamHeartbeat,
   changeRecorderHeartbeat,
   changeCurrentCamData,
-  setObserverSide,
+  setOwnStationId,
   setJoystickStatus,
   setRecorderError,
   setVideoSourceEnabled,
@@ -238,27 +212,22 @@ export const selectActiveCamera = (state) => {
 export const selectActiveCameraConfig = (state) =>
   state.cameraControls.activeCamera;
 
-// return the current Observer Side
-export const selectObserverSide = (state) => state.cameraControls.observerSide;
+// return this console's own StationId
+export const selectOwnStationId = (state) => state.cameraControls.ownStationId;
 
-// use createSelector to create memoized selector
-// return the current CamHeartbeat data
-export const selectCamHeartbeatData = createSelector(
-  (state) => state.cameraControls.camHeartbeatData,
-  (item) => item
-);
+// return a specific station's latest CamHeartbeat (null before one arrives)
+export const selectCamHeartbeatFor = (state, stationId) =>
+  state.cameraControls.camHeartbeats[stationId] ?? null;
 
-// return the Port CamHeartbeat data
-export const selectCamHeartbeatDataPort = (state) =>
-  state.cameraControls.camHeartbeatDataPort;
+// return the own station's current CamHeartbeat data
+export const selectCamHeartbeatData = (state) =>
+  selectCamHeartbeatFor(state, state.cameraControls.ownStationId);
 
-// return the Starboard CamHeartbeat data
-export const selectCamHeartbeatDataStbd = (state) =>
-  state.cameraControls.camHeartbeatDataStbd;
-
-// return the initial cached CamHeartbeat data
+// return the initial cached CamHeartbeat for the own station
 export const selectInitialCamHeartbeatData = (state) =>
-  state.cameraControls.initialCamHeartbeat;
+  state.cameraControls.initialCamHeartbeats[
+    state.cameraControls.ownStationId
+  ] ?? null;
 
 // return the current RecorderHeartbeat data
 //export const selectRecorderHeartbeatData = (state) =>

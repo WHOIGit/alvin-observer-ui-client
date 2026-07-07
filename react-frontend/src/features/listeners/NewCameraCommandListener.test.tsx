@@ -18,7 +18,7 @@ afterEach(() => {
 
 test("routes configuration broadcasts into Redux", async () => {
   const h = createSocketIoHarness();
-  const store = makeCameraControlsStore({ observerSide: "P" });
+  const store = makeCameraControlsStore({ ownStationId: "P" });
   renderWithProviders(<NewCameraCommandListener />, { store });
 
   await stationConnected(getSharedImagingClient().station("P"));
@@ -57,7 +57,7 @@ test("successful command results apply to the live camera state", async () => {
 
   const cameraArray = [{ camera: "c1", cam_name: "Brow", owner: "port" }];
   const store = makeCameraControlsStore({
-    observerSide: "P",
+    ownStationId: "P",
     allCameras: cameraArray as any,
     currentCamData: { currentSettings: { iso: "100" } } as any,
   });
@@ -94,7 +94,7 @@ test("a failed command result leaves state untouched", async () => {
   });
 
   const store = makeCameraControlsStore({
-    observerSide: "S",
+    ownStationId: "S",
     currentCamData: { currentSettings: { shu: "1/30" } } as any,
   });
   renderWithProviders(<NewCameraCommandListener />, { store });

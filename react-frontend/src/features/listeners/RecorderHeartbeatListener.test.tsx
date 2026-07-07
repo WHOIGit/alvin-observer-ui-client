@@ -18,7 +18,7 @@ afterEach(() => {
 
 test("stores recorder heartbeats for the observer's own side", async () => {
   const h = createSocketIoHarness();
-  const store = makeCameraControlsStore({ observerSide: "S" });
+  const store = makeCameraControlsStore({ ownStationId: "S" });
   renderWithProviders(<RecorderHeartbeatListener />, { store });
 
   await stationConnected(getSharedImagingClient().station("S"));

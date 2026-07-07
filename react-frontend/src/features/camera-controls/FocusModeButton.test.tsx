@@ -3,7 +3,7 @@ import React from "react";
 import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
-  changeCamHeartbeat,
+  storeCamHeartbeat,
 } from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
@@ -26,10 +26,13 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
+      ownStationId: scenario.stationId,
     });
     store.dispatch(
-      changeCamHeartbeat({ focus_mode: COMMAND_STRINGS.focusAF } as any),
+      storeCamHeartbeat({
+        stationId: scenario.stationId,
+        heartbeat: { focus_mode: COMMAND_STRINGS.focusAF },
+      } as any),
     );
 
     const { getByText } = renderWithProviders(
@@ -66,10 +69,13 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const store = makeCameraControlsStore({
-      observerSide: scenario.stationId,
+      ownStationId: scenario.stationId,
     });
     store.dispatch(
-      changeCamHeartbeat({ focus_mode: COMMAND_STRINGS.focusMF } as any),
+      storeCamHeartbeat({
+        stationId: scenario.stationId,
+        heartbeat: { focus_mode: COMMAND_STRINGS.focusMF },
+      } as any),
     );
 
     const { getByText } = renderWithProviders(
