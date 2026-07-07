@@ -9,6 +9,7 @@ import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import { FOCUS_CONTROLS } from "../../lib/imaging-client";
 import FocusZoomButton from "./FocusZoomButton.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
 
 type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
@@ -39,15 +40,17 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const { getByText } = renderWithProviders(
-      <FocusZoomButton
-        id={1}
-        buttonFunction="focus"
-        label="Focus Near"
-        controlOneStop={FOCUS_CONTROLS.NEAR_ONE_STOP}
-        controlContinuous={FOCUS_CONTROLS.NEAR_CONTINUOUS}
-        activeFocusZoomButton={null}
-        sendActiveFocusZoomButtonToParent={() => null}
-      />,
+      <ObservedCameraProvider>
+        <FocusZoomButton
+          id={1}
+          buttonFunction="focus"
+          label="Focus Near"
+          controlOneStop={FOCUS_CONTROLS.NEAR_ONE_STOP}
+          controlContinuous={FOCUS_CONTROLS.NEAR_CONTINUOUS}
+          activeFocusZoomButton={null}
+          sendActiveFocusZoomButtonToParent={() => null}
+        />
+      </ObservedCameraProvider>,
       { store },
     );
 
@@ -83,15 +86,17 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const { getByText } = renderWithProviders(
-      <FocusZoomButton
-        id={2}
-        buttonFunction="focus"
-        label="Focus Near Hold"
-        controlOneStop={FOCUS_CONTROLS.NEAR_ONE_STOP}
-        controlContinuous={FOCUS_CONTROLS.NEAR_CONTINUOUS}
-        activeFocusZoomButton={null}
-        sendActiveFocusZoomButtonToParent={() => null}
-      />,
+      <ObservedCameraProvider>
+        <FocusZoomButton
+          id={2}
+          buttonFunction="focus"
+          label="Focus Near Hold"
+          controlOneStop={FOCUS_CONTROLS.NEAR_ONE_STOP}
+          controlContinuous={FOCUS_CONTROLS.NEAR_CONTINUOUS}
+          activeFocusZoomButton={null}
+          sendActiveFocusZoomButtonToParent={() => null}
+        />
+      </ObservedCameraProvider>,
       { store },
     );
 

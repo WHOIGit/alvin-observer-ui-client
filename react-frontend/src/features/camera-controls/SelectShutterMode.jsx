@@ -5,14 +5,12 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import {
-  selectActiveCamera,
   selectCamHeartbeatData,
   selectCurrentCamData,
   selectExposureControlsEnabled,
-  selectObserverSide,
 } from "./cameraControlsSlice";
 import { useDispatch } from "react-redux";
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedCamera } from "./ObservedCameraProvider";
 import { EXPOSURE_MODES } from "../../lib/imaging-client";
 
 const useStyles = makeStyles((theme) => ({
@@ -37,9 +35,7 @@ export default function SelectShutterMode() {
   const dispatch = useDispatch();
   const [isEnabled, setIsEnabled] = useState(true);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
+  const camera = useObservedCamera();
 
   const handleSendMessage = (event) => {
     camera.setShutter(event.target.value);

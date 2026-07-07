@@ -10,12 +10,10 @@ import {
 } from "@mui/material";
 // local imports
 import {
-  selectActiveCamera,
   selectCamHeartbeatData,
-  selectObserverSide,
   setExposureControlsEnabled,
 } from "./cameraControlsSlice";
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedCamera } from "./ObservedCameraProvider";
 import useIsOwner from "../../hooks/useIsOwner";
 import { EXPOSURE_MODES } from "../../lib/imaging-client";
 
@@ -39,9 +37,7 @@ export default function SelectExposureMode({ showLabel }) {
   const labelText = "EXP MODE:";
   //console.log(camSettings);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
+  const camera = useObservedCamera();
 
   const handleSendMessage = (event) => {
     console.log("TARGET VALUE:", event.target.value);

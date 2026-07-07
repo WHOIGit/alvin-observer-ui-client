@@ -10,12 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 // local imports
-import {
-  selectActiveCamera,
-  selectCamHeartbeatData,
-  selectObserverSide,
- } from "./cameraControlsSlice";
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
+import { useObservedCamera } from "./ObservedCameraProvider";
 import { COMMAND_STRINGS } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
@@ -41,9 +37,7 @@ export default function SelectCaptureInterval() {
   const [value, setValue] = useState(null);
   const [captureEnabled, setCaptureEnabled] = useState(true);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
+  const camera = useObservedCamera();
 
   const handleValueChange = (event) => {
     setValue(event.target.value);

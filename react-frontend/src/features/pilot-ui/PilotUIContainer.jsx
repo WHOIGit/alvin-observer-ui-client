@@ -19,6 +19,7 @@ import {
   WS_SERVER_NAMESPACE_STARBOARD,
 } from "../../config";
 import { useWarmStreams } from "../camera-controls/WebRtcProvider";
+import { ObservedCameraProvider } from "../camera-controls/ObservedCameraProvider";
 import RouterControlContainer from "./RouterControlContainer";
 import CameraControlContainer from "./CameraControlContainer";
 import MetaDataDisplay from "./MetaDataDisplay";
@@ -106,7 +107,7 @@ export default function SimpleTabs() {
   };
 
   return (
-    <>
+    <ObservedCameraProvider>
       <CamHeartbeatListener />
       <CamHeartbeatListener
         namespaceOverride={`/${WS_SERVER_NAMESPACE_PORT}`}
@@ -169,6 +170,6 @@ export default function SimpleTabs() {
           <SystemMessagesPanel maxHeight={520} />
         </TabPanel>
       </div>
-    </>
+    </ObservedCameraProvider>
   );
 }

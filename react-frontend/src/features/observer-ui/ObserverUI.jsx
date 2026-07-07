@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import TopControlPanel from "./TopControlPanel";
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedStation } from "../camera-controls/ObservedCameraProvider";
 import {
   changeActiveCamera,
   selectActiveCamera,
   selectInitialCamHeartbeatData,
-  selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
 import CamHeartbeatListener from "../listeners/CamHeartbeatListener";
 import NewCameraCommandListener from "../listeners/NewCameraCommandListener";
@@ -19,8 +18,7 @@ export default function ObserverUI({
 }) {
   const dispatch = useDispatch();
 
-  const observerSide = useSelector(selectObserverSide);
-  const station = useImagingStation(observerSide);
+  const station = useObservedStation();
 
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
@@ -43,7 +41,7 @@ export default function ObserverUI({
         setInitialCamera();
       }
     }
-  }, [activeCamera, dispatch, initialCamHeartbeat]);
+  }, [activeCamera, dispatch, station, initialCamHeartbeat]);
 
   return (
     <>

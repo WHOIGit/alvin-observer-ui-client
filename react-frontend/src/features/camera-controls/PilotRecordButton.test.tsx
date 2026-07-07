@@ -13,6 +13,7 @@ import {
   WS_SERVER_NAMESPACE_STARBOARD,
 } from "../../config.js";
 import PilotRecordButton from "./PilotRecordButton.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 
@@ -58,7 +59,9 @@ test.each([
     });
 
     const { getByText } = renderWithProviders(
-      <PilotRecordButton observerSide={side} />,
+      <ObservedCameraProvider>
+        <PilotRecordButton observerSide={side} />
+      </ObservedCameraProvider>,
       { store },
     );
 

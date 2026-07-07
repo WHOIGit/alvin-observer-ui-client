@@ -11,6 +11,7 @@ import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import CaptureButtons from "./CaptureButtons.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 
 type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
 
@@ -58,7 +59,9 @@ test.each(SOCKET_USER_SCENARIOS)(
 
     const { getByText } = render(
       <Provider store={store}>
-        <CaptureButtons />
+        <ObservedCameraProvider>
+          <CaptureButtons />
+        </ObservedCameraProvider>
       </Provider>,
     );
 
@@ -96,7 +99,9 @@ test.each(SOCKET_USER_SCENARIOS)(
 
     const { getByText } = render(
       <Provider store={store}>
-        <CaptureButtons />
+        <ObservedCameraProvider>
+          <CaptureButtons />
+        </ObservedCameraProvider>
       </Provider>,
     );
 
@@ -128,7 +133,9 @@ test("does not render if camera is not initialized", async () => {
 
   const { getByText } = render(
     <Provider store={store}>
-      <CaptureButtons />
+      <ObservedCameraProvider>
+        <CaptureButtons />
+      </ObservedCameraProvider>
     </Provider>,
   );
 

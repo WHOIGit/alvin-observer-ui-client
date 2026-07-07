@@ -5,10 +5,9 @@ import { Button, CircularProgress } from "@mui/material";
 import { green } from "@mui/material/colors";
 import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 // local
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedCamera } from "./ObservedCameraProvider";
 import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import { FOCUS_MODES } from "../../lib/imaging-client";
-import { selectActiveCamera, selectObserverSide } from "./cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   buttonWrapper: {
@@ -30,9 +29,7 @@ const FocusModeButton = () => {
   const [currentFocusMode, setCurrentFocusMode] = useState("AF");
   const [loading, setLoading] = useState(false);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
+  const camera = useObservedCamera();
 
   useEffect(() => {
     if (camSettings !== null) {

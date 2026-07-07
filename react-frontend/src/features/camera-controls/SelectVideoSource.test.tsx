@@ -8,6 +8,7 @@ import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import SelectVideoSource from "./SelectVideoSource.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
 
 type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
@@ -49,7 +50,9 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const { getByRole, getByText } = renderWithProviders(
-      <SelectVideoSource />,
+      <ObservedCameraProvider>
+        <SelectVideoSource />
+      </ObservedCameraProvider>,
       {
         store,
       },

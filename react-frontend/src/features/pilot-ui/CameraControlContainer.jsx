@@ -14,7 +14,7 @@ import FocusModeButton from "../camera-controls/FocusModeButton";
 import FocusZoomButtonsGrid from "../camera-controls/FocusZoomButtonsGrid";
 import Joystick from "../camera-controls/Joystick";
 import SetCaptureInterval from "../camera-controls/SetCaptureInterval";
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedStation } from "../camera-controls/ObservedCameraProvider";
 import useIsOwner from "../../hooks/useIsOwner";
 import RecordingStatusChip from "./RecordingStatusChip";
 import ErrorCard from "../camera-controls/ErrorCard";
@@ -23,7 +23,6 @@ import {
   selectActiveCamera,
   selectCamHeartbeatData,
   selectInitialCamHeartbeatData,
-  selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
 
 import { CAM_HEARTBEAT } from "../../config";
@@ -42,8 +41,7 @@ export default function CameraControlContainer() {
   const dispatch = useDispatch();
   const { isOwner } = useIsOwner();
 
-  const observerSide = useSelector(selectObserverSide);
-  const station = useImagingStation(observerSide);
+  const station = useObservedStation();
 
   const activeCamera = useSelector(selectActiveCamera);
   const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);

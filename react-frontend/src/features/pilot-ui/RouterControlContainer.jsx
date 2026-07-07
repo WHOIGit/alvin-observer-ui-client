@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import { Grid, Button, Box, CircularProgress } from "@mui/material";
 import { green, red } from "@mui/material/colors";
 // local
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedCamera, useObservedStation } from "../camera-controls/ObservedCameraProvider";
 import RouterControls from "./RouterControls";
 import MiniVideo from "../camera-controls/MiniVideo";
 import MiniVideoHeader from "./MiniVideoHeader";
@@ -16,7 +15,6 @@ import {
   WS_SERVER_NAMESPACE_PILOT,
 } from "../../config.js";
 import PilotRecordButton from "../camera-controls/PilotRecordButton";
-import { selectActiveCamera, selectObserverSide } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -47,13 +45,12 @@ export default function RouterControlContainer() {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const station = useImagingStation(observerSide);
+  const station = useObservedStation();
+  const camera = useObservedCamera();
 
   const handleStopRecord = () => {
     setLoading(true);
-    station.stopRecording({ activeCamera: activeCameraId });
+    station.stopRecording({ activeCamera: camera.id });
 
     // add a "fake" delay to UI to show users that image capture is processing
     setTimeout(() => {

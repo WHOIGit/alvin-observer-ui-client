@@ -10,23 +10,6 @@ export function useImagingClient() {
   return getSharedImagingClient();
 }
 
-/**
- * The station for an observer side ("P", "S", "PL", or a namespace-ish alias
- * like "port"). The station's connection is held open for the lifetime of
- * the calling component, so commands issued from event handlers reuse it.
- */
-export function useImagingStation(observerSide) {
-  const client = useImagingClient();
-  const station = useMemo(
-    () => client.station(observerSide),
-    [client, observerSide]
-  );
-
-  useEffect(() => station.acquire(), [station]);
-
-  return station;
-}
-
 // Keeps the latest callback in a ref so subscriptions survive re-renders
 // without re-subscribing.
 function useStableHandler(callback) {

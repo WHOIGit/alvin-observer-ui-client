@@ -8,6 +8,7 @@ import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import SelectExposureMode from "./SelectExposureMode.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
 
 type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
@@ -45,7 +46,9 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const { getByRole, getByText } = renderWithProviders(
-      <SelectExposureMode showLabel="horizontal" />,
+      <ObservedCameraProvider>
+        <SelectExposureMode showLabel="horizontal" />
+      </ObservedCameraProvider>,
       { store },
     );
 
@@ -83,7 +86,9 @@ test("hides the control when the camera reports a driver fault", () => {
   });
 
   const { container } = renderWithProviders(
-    <SelectExposureMode showLabel="horizontal" />,
+    <ObservedCameraProvider>
+      <SelectExposureMode showLabel="horizontal" />
+    </ObservedCameraProvider>,
     { store },
   );
 

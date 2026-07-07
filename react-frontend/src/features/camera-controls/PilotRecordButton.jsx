@@ -4,11 +4,10 @@ import makeStyles from '@mui/styles/makeStyles';
 import { Button, CircularProgress } from "@mui/material";
 import { green } from "@mui/material/colors";
 // local imports
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedStation } from "./ObservedCameraProvider";
 import {
   selectCamHeartbeatDataPort,
   selectCamHeartbeatDataStbd,
-  selectObserverSide,
 } from "./cameraControlsSlice";
 import { WS_SERVER_NAMESPACE_STARBOARD } from "../../config";
 
@@ -33,8 +32,7 @@ export default function PilotRecordButton({ observerSide }) {
   const activeCameraStbd = useSelector(selectCamHeartbeatDataStbd);
   const [loading, setLoading] = useState(false);
 
-  const globalObserverSide = useSelector(selectObserverSide);
-  const station = useImagingStation(globalObserverSide);
+  const station = useObservedStation();
 
   let activeCamera = activeCameraPort;
   if (observerSide === WS_SERVER_NAMESPACE_STARBOARD) {

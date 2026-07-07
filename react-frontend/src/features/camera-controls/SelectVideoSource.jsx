@@ -11,12 +11,11 @@ import {
 import {
   selectActiveCamera,
   selectAllCameras,
-  selectObserverSide,
   selectVideoSourceEnabled,
   setRecordControlsEnabled,
   setVideoSourceEnabled,
 } from "./cameraControlsSlice";
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedStation } from "./ObservedCameraProvider";
 import useIsOwner from "../../hooks/useIsOwner";
 
 const useStyles = makeStyles((theme) => ({
@@ -40,8 +39,7 @@ export default function SelectVideoSource({ showLabel }) {
   const { isOwner } = useIsOwner();
   const labelText = "SOURCE:";
 
-  const observerSide = useSelector(selectObserverSide);
-  const station = useImagingStation(observerSide);
+  const station = useObservedStation();
 
   useEffect(() => {
     if (requestedSource === activeCamera || requestedSource === null) {

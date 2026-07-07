@@ -8,6 +8,7 @@ import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import SetCaptureInterval from "./SetCaptureInterval.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
 
 type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
@@ -46,7 +47,9 @@ test.each(SOCKET_USER_SCENARIOS)(
     });
 
     const { getByRole, getByText } = renderWithProviders(
-      <SetCaptureInterval />,
+      <ObservedCameraProvider>
+        <SetCaptureInterval />
+      </ObservedCameraProvider>,
       {
         store,
       },
@@ -83,7 +86,11 @@ test.each(SOCKET_USER_SCENARIOS)(
       camHeartbeatData: { capture_interval: "20" },
     });
 
-    const { getByText } = renderWithProviders(<SetCaptureInterval />, {
+    const { getByText } = renderWithProviders(
+      <ObservedCameraProvider>
+        <SetCaptureInterval />
+      </ObservedCameraProvider>,
+      {
       store,
     });
 

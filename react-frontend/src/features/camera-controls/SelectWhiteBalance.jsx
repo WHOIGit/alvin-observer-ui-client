@@ -10,12 +10,8 @@ import {
   Button,
 } from "@mui/material";
 // local imports
-import { useImagingStation } from "../../hooks/useImagingClient";
-import {
-  selectActiveCamera,
-  selectCamHeartbeatData,
-  selectObserverSide,
-} from "./cameraControlsSlice";
+import { useObservedCamera } from "./ObservedCameraProvider";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import { WHITE_BALANCE_MODES } from "../../lib/imaging-client";
 
 const useStyles = makeStyles((theme) => ({
@@ -38,9 +34,7 @@ export default function SelectWhiteBalance({ showLabel }) {
   const camSettings = useSelector(selectCamHeartbeatData);
   const labelText = "WHITE BALANCE:";
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
+  const camera = useObservedCamera();
 
   const handleSendMessage = (event) => {
     camera.setWhiteBalance(event.target.value);

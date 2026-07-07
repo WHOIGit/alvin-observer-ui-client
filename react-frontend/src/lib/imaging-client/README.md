@@ -20,15 +20,15 @@ server, not the imaging-control protocol.
 
 ## Quick start
 
-Issuing commands from a component:
+Issuing commands from a component (the ambient station and observed camera
+come from the app's `ObservedCameraProvider` — see [React hooks](#react-hooks)):
 
 ```jsx
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedCamera } from "../../features/camera-controls/ObservedCameraProvider";
 import { FOCUS_MODES } from "../../lib/imaging-client";
 
-function FocusToggle({ observerSide, activeCamera }) {
-  const station = useImagingStation(observerSide);
-  const camera = station.camera(activeCamera);
+function FocusToggle() {
+  const camera = useObservedCamera();
   return <button onClick={() => camera.setFocusMode(FOCUS_MODES.AUTOFOCUS)} />;
 }
 ```
@@ -164,8 +164,9 @@ interface Station {
 A station's connection is reference-counted. `acquire()` pins it open and
 returns the release function; every channel subscription pins it too (with
 one exception, below). Hold an `acquire()` for the lifetime of any UI that
-issues commands — `useImagingStation` does this — so the connection doesn't
-churn between button presses. When the last reference is released, the
+issues commands — the app's `ObservedCameraProvider` does this — so the
+connection doesn't churn between button presses. When the last reference is
+released, the
 station sends the protocol's good-bye message and disconnects. Commands sent
 after teardown are silently swallowed (matching the legacy behavior), so a
 debounced stop firing after unmount is harmless.
@@ -418,8 +419,19 @@ The hooks live in `src/hooks/useImagingClient.js` (outside the library, which
 is React-free) and are the way components should consume this API.
 
 ```js
-useImagingClient()             // the shared ImagingClient
-useImagingStation(observerSide) // station, connection pinned for the component's lifetime
+useImagingClient() // the shared ImagingClient
+```
+
+Components that drive the observed camera don't derive their target
+themselves. `ObservedCameraProvider`
+(`src/features/camera-controls/ObservedCameraProvider.jsx`), mounted at each
+UI root, reads the observer side and selected camera from Redux, pins the
+station's connection, and provides a memoized identity that changes only
+when the station or camera selection changes — never at telemetry frequency:
+
+```js
+useObservedStation() // the Station commands are issued on; null until a side is chosen
+useObservedCamera()  // CameraHandle for the observed camera; null until a side is chosen
 ```
 
 Channel hooks subscribe on mount and unsubscribe on unmount. The latest

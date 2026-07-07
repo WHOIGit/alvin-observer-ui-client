@@ -3,12 +3,10 @@ import { useSelector, useDispatch } from "react-redux";
 import ReactNipple from "react-nipple";
 import makeStyles from '@mui/styles/makeStyles';
 import { Box, Typography } from "@mui/material";
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedCamera } from "./ObservedCameraProvider";
 import {
-  selectActiveCamera,
   selectCamHeartbeatData,
   selectJoystickStatus,
-  selectObserverSide,
   setJoystickStatus,
 } from "./cameraControlsSlice";
 
@@ -27,9 +25,7 @@ export default function Joystick() {
   const [isEnabled, setIsEnabled] = useState(true);
   const [showJoystick, setShowJoystick] = useState(false);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
+  const camera = useObservedCamera();
 
   useEffect(() => {
     // disable joystick if camera has no pan/tilt controls

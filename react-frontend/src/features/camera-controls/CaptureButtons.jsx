@@ -3,13 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import { Grid, Button, CircularProgress, Checkbox } from "@mui/material";
 import { green } from "@mui/material/colors";
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedCamera, useObservedStation } from "./ObservedCameraProvider";
 import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
 import {
   selectActiveCameraConfig,
   selectAllCameras,
   selectCamHeartbeatData,
-  selectObserverSide,
   selectRecordControlsEnabled,
   selectRecorderHeartbeatData,
   setRecorderError,
@@ -45,8 +44,8 @@ export default function CaptureButtons() {
   const camSettings = useSelector(selectCamHeartbeatData);
   const allCameras = useSelector(selectAllCameras);
 
-  const observerSide = useSelector(selectObserverSide);
-  const station = useImagingStation(observerSide);
+  const station = useObservedStation();
+  const camera = useObservedCamera();
 
   const [recordTimer, setRecordTimer] = useState(null);
   const [currentRecordFile, setCurrentRecordFile] = useState(null);
@@ -101,7 +100,7 @@ export default function CaptureButtons() {
   };
 
   const captureStillImage = () => {
-    station.camera(activeCamera?.camera ?? null).captureStill({
+    camera.captureStill({
       interval: 0,
       imgTransferChecked: false,
     });

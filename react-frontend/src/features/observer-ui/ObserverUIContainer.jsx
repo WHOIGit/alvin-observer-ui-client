@@ -9,6 +9,7 @@ import CameraControls from "./CameraControls";
 import GrowOverlay from "./GrowOverlay";
 import ObserverSideSelect from "./ObserverSideSelect";
 import ObserverUI from "./ObserverUI";
+import { ObservedCameraProvider } from "../camera-controls/ObservedCameraProvider";
 import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
@@ -62,7 +63,7 @@ export default function ObserverUIContainer() {
   };
 
   return (
-    <>
+    <ObservedCameraProvider>
       <div
         className={`${classes.root} ${
           showTopControls ? "active" : classes.rootCollapse
@@ -95,6 +96,6 @@ export default function ObserverUIContainer() {
       </div>
       <CameraControls showFullCameraControls={showFullCameraControls} />
       {observerSide && <GrowOverlay active={showFullCameraControls} />}
-    </>
+    </ObservedCameraProvider>
   );
 }

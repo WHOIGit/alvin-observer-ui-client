@@ -10,6 +10,7 @@ import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import FocusModeButton from "./FocusModeButton.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
 
 type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
@@ -41,7 +42,12 @@ test.each(SOCKET_USER_SCENARIOS)(
       changeCamHeartbeat({ focus_mode: COMMAND_STRINGS.focusAF } as any),
     );
 
-    const { getByText } = renderWithProviders(<FocusModeButton />, { store });
+    const { getByText } = renderWithProviders(
+      <ObservedCameraProvider>
+        <FocusModeButton />
+      </ObservedCameraProvider>,
+      { store },
+    );
 
     await h.connected;
     await user.click(getByText(/Focus/i));
@@ -76,7 +82,12 @@ test.each(SOCKET_USER_SCENARIOS)(
       changeCamHeartbeat({ focus_mode: COMMAND_STRINGS.focusMF } as any),
     );
 
-    const { getByText } = renderWithProviders(<FocusModeButton />, { store });
+    const { getByText } = renderWithProviders(
+      <ObservedCameraProvider>
+        <FocusModeButton />
+      </ObservedCameraProvider>,
+      { store },
+    );
 
     await h.connected;
     await user.click(getByText(/Focus/i));

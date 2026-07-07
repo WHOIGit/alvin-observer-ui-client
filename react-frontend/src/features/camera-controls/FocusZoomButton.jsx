@@ -3,13 +3,9 @@ import { useSelector } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import { Button, CircularProgress } from "@mui/material";
 import { green } from "@mui/material/colors";
-import { useImagingStation } from "../../hooks/useImagingClient";
+import { useObservedCamera } from "./ObservedCameraProvider";
 import useLongPress from "../../hooks/useLongPress";
-import {
-  selectActiveCamera,
-  selectCamHeartbeatData,
-  selectObserverSide,
-} from "./cameraControlsSlice";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import {
   FOCUS_CONTROLS,
   FOCUS_MODES,
@@ -62,9 +58,7 @@ export default function FocusZoomButton({
     activeButtonPriority.current = priority;   
   };
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const camera = useImagingStation(observerSide).camera(activeCameraId ?? null);
+  const camera = useObservedCamera();
 
   const handleZoomHold = () => {
     drive(controlContinuous, continuousSpeed);
