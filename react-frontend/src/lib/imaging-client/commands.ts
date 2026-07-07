@@ -21,6 +21,7 @@ export const COMMAND_KINDS = {
   ZOOM: "zoom",
   PAN_TILT: "panTilt",
   CAPTURE_STILL: "captureStill",
+  SET_CAPTURE_INTERVAL: "setCaptureInterval",
   RECORD: "record",
   STOP_RECORDING: "stopRecording",
   TAKE_ROUTE: "takeRoute",

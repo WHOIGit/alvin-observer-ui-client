@@ -44,8 +44,8 @@ export default function SelectCaptureInterval() {
   };
 
   const handleSendMessage = () => {
-    // stop capture interval by sending 0 string to the AIS
-    camera.captureStill(captureEnabled ? value : "0");
+    // "0" stops the recurring capture; otherwise send the selected interval.
+    camera.setCaptureInterval(captureEnabled ? value : "0");
   };
 
   useEffect(() => {

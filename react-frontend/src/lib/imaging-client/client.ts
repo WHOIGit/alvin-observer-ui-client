@@ -98,10 +98,15 @@ export interface CameraHandle {
   /** Joystick pan/tilt; `value` is the nipplejs-shaped move descriptor. */
   panTilt(value: unknown): SentCommand;
   /**
-   * Trigger a still capture. Observers send
-   * `{interval, imgTransferChecked}`; the pilot sends a numeric string.
+   * Trigger a single still capture now. `transferImage` requests the image
+   * be transferred off the vehicle.
    */
-  captureStill(value: unknown): SentCommand;
+  captureStill(options?: { transferImage?: boolean }): SentCommand;
+  /**
+   * Set the recurring still-capture interval, in seconds as a string
+   * (e.g. "20"); "0" stops the recurring capture.
+   */
+  setCaptureInterval(seconds: string): SentCommand;
 }
 
 export interface Station {
@@ -395,10 +400,24 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
             },
             context
           ),
-        captureStill: (value) =>
+        captureStill: (options) =>
           sendCommand(
             COMMAND_KINDS.CAPTURE_STILL,
-            { action: { name: ACTIONS.stillImageCapture, value } },
+            {
+              action: {
+                name: ACTIONS.stillImageCapture,
+                value: {
+                  interval: 0,
+                  imgTransferChecked: options?.transferImage ?? false,
+                },
+              },
+            },
+            context
+          ),
+        setCaptureInterval: (seconds) =>
+          sendCommand(
+            COMMAND_KINDS.SET_CAPTURE_INTERVAL,
+            { action: { name: ACTIONS.stillImageCapture, value: seconds } },
             context
           ),
       };

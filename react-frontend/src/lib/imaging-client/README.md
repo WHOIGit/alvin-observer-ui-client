@@ -219,7 +219,8 @@ interface CameraHandle {
   focus(control: FocusControl | string): SentCommand;
   zoom(control: ZoomControl | string, speed?: number): SentCommand;
   panTilt(value: unknown): SentCommand;           // nipplejs-shaped move descriptor
-  captureStill(value: unknown): SentCommand;
+  captureStill(options?: { transferImage?: boolean }): SentCommand;
+  setCaptureInterval(seconds: string): SentCommand; // "0" stops
 }
 ```
 
@@ -231,8 +232,9 @@ interface CameraHandle {
 - One-push white balance is a two-step gesture: arm it with
   `setWhiteBalance(WHITE_BALANCE_MODES.ONE_PUSH)`, fire it with
   `triggerOnePushWhiteBalance()`.
-- `captureStill`'s value differs by station: observers send
-  `{ interval, imgTransferChecked }`, the pilot sends a numeric string.
+- `captureStill()` triggers a single capture now; `setCaptureInterval(seconds)`
+  sets the recurring interval (`"0"` stops it). Both ride the same `SIC` wire
+  action, differing only in the value shape the library builds.
 
 ## Commands
 

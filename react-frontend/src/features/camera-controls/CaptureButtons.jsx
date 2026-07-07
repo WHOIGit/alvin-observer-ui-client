@@ -111,10 +111,7 @@ export default function CaptureButtons() {
   };
 
   const captureStillImage = () => {
-    camera.captureStill({
-      interval: 0,
-      imgTransferChecked: false,
-    });
+    camera.captureStill();
   };
 
   const handleRecordAction = async () => {
