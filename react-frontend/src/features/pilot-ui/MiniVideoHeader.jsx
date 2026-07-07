@@ -10,8 +10,8 @@ import {
   selectAllCameras,
   selectCamHeartbeatFor,
 } from "../camera-controls/cameraControlsSlice";
-import { getStationInfo } from "../../lib/imaging-client";
 import { useRecorderHeartbeat } from "../../hooks/useImagingClient";
+import { useObservedStation } from "../camera-controls/ObservedCameraProvider";
 import { getCameraConfigFromId } from "../../utils/getCamConfigFromId";
 
 
@@ -38,8 +38,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MiniVideoHeader({ observerSide, videoType }) {
+export default function MiniVideoHeader({ videoType }) {
   const classes = useStyles();
+  const stationId = useObservedStation().id;
   const [cameraName, setCameraName] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [lastMessage, setLastMessage] = useState(null);
@@ -48,9 +49,8 @@ export default function MiniVideoHeader({ observerSide, videoType }) {
     setLastMessage(message);
   }, []);
 
-  useRecorderHeartbeat(observerSide, handleMessage);
+  useRecorderHeartbeat(stationId, handleMessage);
 
-  const stationId = getStationInfo(observerSide).stationId;
   const allCameras = useSelector(selectAllCameras);
   const stationHeartbeat = useSelector((state) =>
     selectCamHeartbeatFor(state, stationId)

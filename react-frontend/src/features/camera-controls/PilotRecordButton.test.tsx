@@ -8,9 +8,8 @@ import {
   COMMAND_STRINGS,
   NEW_CAMERA_COMMAND_EVENT,
   WS_SERVER_NAMESPACE_PILOT,
-  WS_SERVER_NAMESPACE_PORT,
-  WS_SERVER_NAMESPACE_STARBOARD,
 } from "../../config.js";
+import { getSharedImagingClient } from "../../lib/imaging-client";
 import PilotRecordButton from "./PilotRecordButton.jsx";
 import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
@@ -18,24 +17,29 @@ import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 
 afterEach(() => {
   cleanup();
+  // This file pins station connections through the shared client; tear them
+  // down so the next test's harness observes fresh connections.
+  getSharedImagingClient().close();
 });
 
 test.each([
   {
-    side: WS_SERVER_NAMESPACE_PORT,
+    station: "P",
+    override: "port",
     label: /Record port Source/i,
     expected: "cam-port",
     command: "COVP",
   },
   {
-    side: WS_SERVER_NAMESPACE_STARBOARD,
+    station: "S",
+    override: "stbd",
     label: /Record stbd Source/i,
     expected: "cam-stbd",
     command: "COVS",
   },
 ])(
   "emits REC payload with observerSideOverride %s",
-  async ({ side, label, expected, command }) => {
+  async ({ station, override, label, expected, command }) => {
     const user = userEvent.setup();
     const h = createSocketIoHarness((h, expectEmit) => {
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
@@ -50,8 +54,8 @@ test.each([
     });
 
     const { getByText } = renderWithProviders(
-      <ObservedCameraProvider>
-        <PilotRecordButton observerSide={side} />
+      <ObservedCameraProvider station={station}>
+        <PilotRecordButton />
       </ObservedCameraProvider>,
       { store },
     );
@@ -66,7 +70,7 @@ test.each([
       timestamp: expect.any(String),
       camera: null,
       command: command,
-      observerSideOverride: side,
+      observerSideOverride: override,
       action: {
         name: COMMAND_STRINGS.recordSourceCommand,
         value: expected,

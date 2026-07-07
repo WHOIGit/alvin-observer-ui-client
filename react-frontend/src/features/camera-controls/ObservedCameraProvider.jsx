@@ -81,11 +81,14 @@ export function useObservedCamera() {
 /**
  * The console's own station, independent of any surrounding provider. This
  * is the station delegated operations must be issued on (the pilot records
- * an observer's camera via ownStation.record(cam, { as })). Does not pin
- * the connection; the UI root's provider holds it open.
+ * an observer's camera via ownStation.record(cam, { as })). Pins the
+ * connection while mounted, per the library's contract for command-issuing
+ * UIs — a mirror provider only pins its own station's namespace.
  */
 export function useOwnStation() {
   const ownStationId = useSelector(selectOwnStationId);
   const client = useImagingClient();
-  return ownStationId ? client.station(ownStationId) : null;
+  const station = ownStationId ? client.station(ownStationId) : null;
+  useEffect(() => station?.acquire(), [station]);
+  return station;
 }

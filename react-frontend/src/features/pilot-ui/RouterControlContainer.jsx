@@ -3,7 +3,12 @@ import makeStyles from '@mui/styles/makeStyles';
 import { Grid, Button, Box, CircularProgress } from "@mui/material";
 import { green, red } from "@mui/material/colors";
 // local
-import { useObservedCamera, useObservedStation } from "../camera-controls/ObservedCameraProvider";
+import {
+  ObservedCameraProvider,
+  useObservedCamera,
+  useObservedStation,
+} from "../camera-controls/ObservedCameraProvider";
+import { STATIONS } from "../../lib/imaging-client";
 import RouterControls from "./RouterControls";
 import MiniVideo from "../camera-controls/MiniVideo";
 import MiniVideoHeader from "./MiniVideoHeader";
@@ -61,89 +66,70 @@ export default function RouterControlContainer() {
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item xs>
-          <MiniVideo
-            videoSrc={VIDEO_STREAM_CONFIG.portRecordVideo}
-            videoType="REC"
-            id={`REC-${WS_SERVER_NAMESPACE_PORT}-minivideo`}
-            header={
-              <MiniVideoHeader
-                observerSide={WS_SERVER_NAMESPACE_PORT}
-                videoType="REC"
-              />
-            }
-            key="video1"
-          />
-          <EncoderActions name={VIDEO_STREAM_CONFIG.portRecordVideo} />
-        </Grid>
-        <Grid item xs>
-          <MiniVideo
-            videoSrc={VIDEO_STREAM_CONFIG.portObserverVideo}
-            videoType="OBS"
-            id={`OBS-${WS_SERVER_NAMESPACE_PORT}-minivideo`}
-            header={
-              <MiniVideoHeader
-                observerSide={WS_SERVER_NAMESPACE_PORT}
-                videoType="OBS"
-              />
-            }
-            key="video0"
-          />
-          <EncoderActions name={VIDEO_STREAM_CONFIG.portObserverVideo} />
-        </Grid>
+        <ObservedCameraProvider station={STATIONS.PORT}>
+          <Grid item xs>
+            <MiniVideo
+              videoSrc={VIDEO_STREAM_CONFIG.portRecordVideo}
+              videoType="REC"
+              id={`REC-${WS_SERVER_NAMESPACE_PORT}-minivideo`}
+              header={<MiniVideoHeader videoType="REC" />}
+              key="video1"
+            />
+            <EncoderActions name={VIDEO_STREAM_CONFIG.portRecordVideo} />
+          </Grid>
+          <Grid item xs>
+            <MiniVideo
+              videoSrc={VIDEO_STREAM_CONFIG.portObserverVideo}
+              videoType="OBS"
+              id={`OBS-${WS_SERVER_NAMESPACE_PORT}-minivideo`}
+              header={<MiniVideoHeader videoType="OBS" />}
+              key="video0"
+            />
+            <EncoderActions name={VIDEO_STREAM_CONFIG.portObserverVideo} />
+          </Grid>
+        </ObservedCameraProvider>
 
         <Grid item xs>
           <MiniVideo
             videoSrc={VIDEO_STREAM_CONFIG.pilotVideo}
             videoType="PILOT"
             id={`PILOT-${WS_SERVER_NAMESPACE_PILOT}-minivideo`}
-            header={
-              <MiniVideoHeader
-                observerSide={WS_SERVER_NAMESPACE_PILOT}
-                videoType="PILOT"
-              />
-            }
+            header={<MiniVideoHeader videoType="PILOT" />}
             key="video2"
           />
           <EncoderActions name={VIDEO_STREAM_CONFIG.pilotVideo} />
         </Grid>
 
-        <Grid item xs>
-          <MiniVideo
-            videoSrc={VIDEO_STREAM_CONFIG.stbdObserverVideo}
-            videoType="OBS"
-            id={`OBS-${WS_SERVER_NAMESPACE_STARBOARD}-minivideo`}
-            header={
-              <MiniVideoHeader
-                observerSide={WS_SERVER_NAMESPACE_STARBOARD}
-                videoType="OBS"
-              />
-            }
-            key="video3"
-          />
-          <EncoderActions name={VIDEO_STREAM_CONFIG.stbdObserverVideo} />
-        </Grid>
-        <Grid item xs>
-          <MiniVideo
-            videoSrc={VIDEO_STREAM_CONFIG.stbdRecordVideo}
-            videoType="REC"
-            id={`REC-${WS_SERVER_NAMESPACE_STARBOARD}-minivideo`}
-            header={
-              <MiniVideoHeader
-                observerSide={WS_SERVER_NAMESPACE_STARBOARD}
-                videoType="REC"
-              />
-            }
-            key="video4"
-          />
-          <EncoderActions name={VIDEO_STREAM_CONFIG.stbdRecordVideo} />
-        </Grid>
+        <ObservedCameraProvider station={STATIONS.STARBOARD}>
+          <Grid item xs>
+            <MiniVideo
+              videoSrc={VIDEO_STREAM_CONFIG.stbdObserverVideo}
+              videoType="OBS"
+              id={`OBS-${WS_SERVER_NAMESPACE_STARBOARD}-minivideo`}
+              header={<MiniVideoHeader videoType="OBS" />}
+              key="video3"
+            />
+            <EncoderActions name={VIDEO_STREAM_CONFIG.stbdObserverVideo} />
+          </Grid>
+          <Grid item xs>
+            <MiniVideo
+              videoSrc={VIDEO_STREAM_CONFIG.stbdRecordVideo}
+              videoType="REC"
+              id={`REC-${WS_SERVER_NAMESPACE_STARBOARD}-minivideo`}
+              header={<MiniVideoHeader videoType="REC" />}
+              key="video4"
+            />
+            <EncoderActions name={VIDEO_STREAM_CONFIG.stbdRecordVideo} />
+          </Grid>
+        </ObservedCameraProvider>
       </Grid>
 
       <Box mt={1.5}>
         <Grid container justifyContent="center" spacing={2}>
           <Grid item xs>
-            <PilotRecordButton observerSide={WS_SERVER_NAMESPACE_PORT} />
+            <ObservedCameraProvider station={STATIONS.PORT}>
+              <PilotRecordButton />
+            </ObservedCameraProvider>
           </Grid>
 
           <Grid item xs display="flex" justifyContent="center">
@@ -167,7 +153,9 @@ export default function RouterControlContainer() {
           </Grid>
 
           <Grid item xs className={classes.rightAlign}>
-            <PilotRecordButton observerSide={WS_SERVER_NAMESPACE_STARBOARD} />
+            <ObservedCameraProvider station={STATIONS.STARBOARD}>
+              <PilotRecordButton />
+            </ObservedCameraProvider>
           </Grid>
         </Grid>
       </Box>
