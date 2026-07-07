@@ -312,7 +312,3 @@ export const selectRouterInputs = createSelector(
   (state) => state.cameraControls.routerInputs,
   (item) => item
 );
-
-// return socket error status
-
-// return last command

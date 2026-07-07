@@ -10,10 +10,6 @@ export const WS_SERVER_NAMESPACE_PILOT = "pilot";
 export const SEALOG_URL = envSettings.SEALOG_URL;
 // Web socket event names
 export const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
-export const NAV_HEARTBEAT = "NavHeartbeat";
-export const CAM_HEARTBEAT = "CamHeartbeat";
-export const SENSOR_HEARTBEAT = "SensorHeartbeat";
-export const RECORDER_HEARTBEAT = "RecorderHeartbeat";
 
 // Camera definitions
 //export const CAMERAS = envSettings.CAMERAS;

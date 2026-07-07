@@ -1,7 +1,7 @@
 import { useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useConnectionStatus } from "../../hooks/useImagingClient";
-import { getObserverInfo } from "../../utils/observerSide";
+import { getObserverInfo } from "../../lib/imaging-client";
 import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
 import {
   addSystemMessage,

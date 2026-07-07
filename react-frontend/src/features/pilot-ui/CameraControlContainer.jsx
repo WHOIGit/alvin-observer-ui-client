@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
+import { useSelector } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import { Grid, List, ListItem } from "@mui/material";
 // local
@@ -15,17 +15,11 @@ import FocusZoomButtonsGrid from "../camera-controls/FocusZoomButtonsGrid";
 import Joystick from "../camera-controls/Joystick";
 import SetCaptureInterval from "../camera-controls/SetCaptureInterval";
 import { useObservedStation } from "../camera-controls/ObservedCameraProvider";
+import { useInitialCameraSelection } from "../camera-controls/useInitialCameraSelection";
 import useIsOwner from "../../hooks/useIsOwner";
 import RecordingStatusChip from "./RecordingStatusChip";
 import ErrorCard from "../camera-controls/ErrorCard";
-import {
-  changeActiveCamera,
-  selectActiveCamera,
-  selectCamHeartbeatData,
-  selectInitialCamHeartbeatData,
-} from "../camera-controls/cameraControlsSlice";
-
-import { CAM_HEARTBEAT } from "../../config";
+import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   joystickBox: {
@@ -38,35 +32,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CameraControlContainer() {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { isOwner } = useIsOwner();
 
   const station = useObservedStation();
+  useInitialCameraSelection(station);
 
-  const activeCamera = useSelector(selectActiveCamera);
-  const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
   const camSettings = useSelector(selectCamHeartbeatData);
-
-  // use CAM_HEARTBEAT parameters only on initial app load to set activeCamera
-  // keep camera params in local state otherwise
-  useEffect(() => {
-    const setInitialCamera = () => {
-      dispatch(changeActiveCamera(initialCamHeartbeat));
-
-      // send camera change command to set available settings options
-      station.selectCamera(initialCamHeartbeat.camera, {
-        activeCamera: initialCamHeartbeat.camera,
-      });
-    };
-
-    // set initial camera state only if activeCamera is undefined
-    if (activeCamera === null) {
-      console.log(initialCamHeartbeat);
-      if (initialCamHeartbeat !== null) {
-        setInitialCamera();
-      }
-    }
-  }, [activeCamera, dispatch, station, initialCamHeartbeat]);
 
   const renderDynamicGridBox = () => {
     if (camSettings?.hasFault) return <ErrorCard />;

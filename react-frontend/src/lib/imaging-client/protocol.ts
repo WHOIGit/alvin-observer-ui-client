@@ -109,23 +109,11 @@ export function getObserverInfo(rawSide: ObserverSideInput): ObserverInfo {
   };
 }
 
-export function observerSideToNamespace(rawSide: ObserverSideInput): string {
-  return getObserverInfo(rawSide).namespace;
-}
-
-export function observerSideToNamespacePath(rawSide: ObserverSideInput): string {
-  return getObserverInfo(rawSide).namespacePath;
-}
-
 export function observerSideToCommand(rawSide: ObserverSideInput): string | undefined {
   if (rawSide === undefined || rawSide === null || rawSide === "") {
     return undefined;
   }
   return getObserverInfo(rawSide).command;
-}
-
-export function coerceObserverSide(rawSide: ObserverSideInput): ObserverSide {
-  return getObserverInfo(rawSide).observerSide;
 }
 
 export interface BuildCameraCommandOptions {
