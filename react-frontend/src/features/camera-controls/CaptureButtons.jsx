@@ -96,7 +96,18 @@ export default function CaptureButtons() {
       recorderHeartbeatData.camera,
       allCameras
     );
+    if (!oldCamera) {
+      // The recorder's reported source isn't in this station's camera list
+      // yet (e.g. the camera list hasn't arrived after a reconnect); don't
+      // send a malformed record command.
+      console.warn(
+        "Cannot start recording: unknown recorder source",
+        recorderHeartbeatData.camera
+      );
+      return false;
+    }
     station.record(activeCamera.camera, { previousCamera: oldCamera.camera });
+    return true;
   };
 
   const captureStillImage = () => {
@@ -110,7 +121,10 @@ export default function CaptureButtons() {
     setLoading(true);
     // save the current RECORDER_HEARTBEAT filename so we can check if it changes on new actions
     setCurrentRecordFile(recorderHeartbeatData.filename);
-    startRecording();
+    if (!startRecording()) {
+      setLoading(false);
+      return;
+    }
     // set Video Source menu to be disabled
     console.log("disabling video source");
     const payloadVideoSrc = false;
