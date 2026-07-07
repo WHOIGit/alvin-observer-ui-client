@@ -1,42 +1,36 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useCamHeartbeat } from "../../hooks/useImagingClient";
-import {
-  WS_SERVER_NAMESPACE_PORT,
-  WS_SERVER_NAMESPACE_STARBOARD,
-} from "../../config";
+import { getObserverInfo } from "../../lib/imaging-client";
 import {
   changeCamHeartbeat,
   changeCamHeartbeatPort,
   changeCamHeartbeatStbd,
   selectObserverSide,
 } from "../camera-controls/cameraControlsSlice";
-import { getObserverInfo } from "../../utils/observerSide";
 
 export default function CamHeartbeatListener({ namespaceOverride = null }) {
   const dispatch = useDispatch();
   const observerSide = useSelector(selectObserverSide);
-  const namespaceInfo = useMemo(
-    () => getObserverInfo(namespaceOverride || observerSide),
-    [namespaceOverride, observerSide]
-  );
+
+  // The pilot UI mounts extra instances with a namespaceOverride to mirror
+  // each observer's heartbeat into a side-specific slot; the observer UI runs
+  // one instance for its own side.
+  const overrideSide = namespaceOverride
+    ? getObserverInfo(namespaceOverride).observerSide
+    : null;
 
   const handleMessage = useCallback(
     (message) => {
-      // If namespaceOverride is provided (Pilot UI listening to observers),
-      // use observer-specific reducers. Otherwise use main reducer.
-      if (namespaceOverride) {
-        if (namespaceInfo.namespace === WS_SERVER_NAMESPACE_PORT) {
-          dispatch(changeCamHeartbeatPort(message));
-        } else if (namespaceInfo.namespace === WS_SERVER_NAMESPACE_STARBOARD) {
-          dispatch(changeCamHeartbeatStbd(message));
-        }
-      } else {
-        // Regular observer UI - always use main reducer
+      if (!namespaceOverride) {
         dispatch(changeCamHeartbeat(message));
+      } else if (overrideSide === "P") {
+        dispatch(changeCamHeartbeatPort(message));
+      } else if (overrideSide === "S") {
+        dispatch(changeCamHeartbeatStbd(message));
       }
     },
-    [namespaceOverride, namespaceInfo, dispatch]
+    [namespaceOverride, overrideSide, dispatch]
   );
 
   useCamHeartbeat(namespaceOverride || observerSide, handleMessage);
