@@ -3,26 +3,15 @@ import React from "react";
 import { cleanup, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
-import cameraControlsReducer, {
+import {
   changeCamHeartbeat,
 } from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
+import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
 import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import CaptureButtons from "./CaptureButtons.jsx";
 import { ObservedCameraProvider } from "./ObservedCameraProvider";
-
-type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
-
-// Helper to create a Redux store with the cameraControls slice
-function makeStore(overrides: Partial<CameraControlsState> = {}) {
-  const baseState = cameraControlsReducer(undefined, { type: "@@INIT" } as any);
-  return configureStore({
-    reducer: { cameraControls: cameraControlsReducer },
-    preloadedState: { cameraControls: { ...baseState, ...overrides } },
-  });
-}
 
 afterEach(() => {
   // Unmount React trees created with render()
@@ -48,8 +37,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       filename: "rec-file-001",
     } as any;
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
+    const store = makeCameraControlsStore({
+      observerSide: scenario.stationId,
       allCameras,
       activeCamera,
       recorderHeartbeatData,
@@ -92,8 +81,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
+    const store = makeCameraControlsStore({
+      observerSide: scenario.stationId,
     });
     store.dispatch(changeCamHeartbeat({ focus_mode: "AF" } as any));
 
@@ -129,7 +118,7 @@ test.each(SOCKET_USER_SCENARIOS)(
 test("does not render if camera is not initialized", async () => {
   // Initialize the Redux store but we do NOT set the focus mode, so the camera
   // should remain in an 'uninitialized' state.
-  const store = makeStore({});
+  const store = makeCameraControlsStore({});
 
   const { getByText } = render(
     <Provider store={store}>

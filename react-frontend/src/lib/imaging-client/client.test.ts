@@ -58,7 +58,7 @@ describe("station commands", () => {
       });
 
       const client = makeClient();
-      client.station(scenario.observerSide).camera(null).setIso("200");
+      client.station(scenario.stationId).camera(null).setIso("200");
 
       await h.connected;
       const { namespace, args } = await h.gotCmd;

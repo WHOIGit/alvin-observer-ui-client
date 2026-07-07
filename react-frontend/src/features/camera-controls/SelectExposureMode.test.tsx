@@ -2,24 +2,13 @@ import { afterEach, expect, test } from "vitest";
 import React from "react";
 import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { configureStore } from "@reduxjs/toolkit";
-import cameraControlsReducer from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
+import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
 import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import SelectExposureMode from "./SelectExposureMode.jsx";
 import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
-
-type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
-
-function makeStore(overrides: Partial<CameraControlsState> = {}) {
-  const baseState = cameraControlsReducer(undefined, { type: "@@INIT" } as any);
-  return configureStore({
-    reducer: { cameraControls: cameraControlsReducer },
-    preloadedState: { cameraControls: { ...baseState, ...overrides } },
-  });
-}
 
 afterEach(() => {
   cleanup();
@@ -33,8 +22,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
+    const store = makeCameraControlsStore({
+      observerSide: scenario.stationId,
       camHeartbeatData: {
         exposure: COMMAND_STRINGS.exposureModeOptions[0],
         isControllable: true,
@@ -72,7 +61,7 @@ test.each(SOCKET_USER_SCENARIOS)(
 );
 
 test("hides the control when the camera reports a driver fault", () => {
-  const store = makeStore({
+  const store = makeCameraControlsStore({
     observerSide: "P",
     camHeartbeatData: {
       exposure: null,
