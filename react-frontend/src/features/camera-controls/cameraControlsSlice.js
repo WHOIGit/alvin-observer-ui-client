@@ -84,16 +84,16 @@ export const cameraControlsSlice = createSlice({
           if (currentSettings) currentSettings.focus_mode = value;
           break;
         case COMMAND_KINDS.SET_SHUTTER:
-          if (currentSettings) currentSettings.SHU = value;
+          if (currentSettings) currentSettings.shu = value;
           break;
         case COMMAND_KINDS.SET_IRIS:
-          if (currentSettings) currentSettings.IRS = value;
+          if (currentSettings) currentSettings.irs = value;
           break;
         case COMMAND_KINDS.SET_ISO:
-          if (currentSettings) currentSettings.ISO = value;
+          if (currentSettings) currentSettings.iso = value;
           break;
         case COMMAND_KINDS.SET_EXPOSURE_MODE:
-          if (currentSettings) currentSettings.exposure_mode = value;
+          if (currentSettings) currentSettings.exposure = value;
           break;
         default:
       }

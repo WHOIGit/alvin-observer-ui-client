@@ -59,7 +59,7 @@ test("successful command results apply to the live camera state", async () => {
   const store = makeCameraControlsStore({
     observerSide: "P",
     allCameras: cameraArray as any,
-    currentCamData: { currentSettings: { ISO: "100" } } as any,
+    currentCamData: { currentSettings: { iso: "100" } } as any,
   });
   renderWithProviders(<NewCameraCommandListener />, { store });
 
@@ -82,7 +82,7 @@ test("successful command results apply to the live camera state", async () => {
 
   await vi.waitFor(() =>
     expect(
-      store.getState().cameraControls.currentCamData.currentSettings.ISO
+      store.getState().cameraControls.currentCamData.currentSettings.iso
     ).toBe("400")
   );
   expect(store.getState().cameraControls.activeCamera).toEqual(cameraArray[0]);
@@ -95,7 +95,7 @@ test("a failed command result leaves state untouched", async () => {
 
   const store = makeCameraControlsStore({
     observerSide: "S",
-    currentCamData: { currentSettings: { SHU: "1/30" } } as any,
+    currentCamData: { currentSettings: { shu: "1/30" } } as any,
   });
   renderWithProviders(<NewCameraCommandListener />, { store });
 
@@ -112,6 +112,6 @@ test("a failed command result leaves state untouched", async () => {
 
   await expect(shutter).rejects.toThrow();
   expect(
-    store.getState().cameraControls.currentCamData.currentSettings.SHU
+    store.getState().cameraControls.currentCamData.currentSettings.shu
   ).toBe("1/30");
 });
