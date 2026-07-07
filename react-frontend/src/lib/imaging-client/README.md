@@ -429,15 +429,25 @@ useImagingClient() // the shared ImagingClient
 
 Components that drive the observed camera don't derive their target
 themselves. `ObservedCameraProvider`
-(`src/features/camera-controls/ObservedCameraProvider.jsx`), mounted at each
-UI root, reads the observer side and selected camera from Redux, pins the
-station's connection, and provides a memoized identity that changes only
-when the station or camera selection changes — never at telemetry frequency:
+(`src/features/camera-controls/ObservedCameraProvider.jsx`) scopes a subtree
+to one station: with no props it observes the console's own station (from
+Redux, currying the interactive camera selection); with
+`station={STATIONS.PORT}` it
+observes a mirrored station, currying that station's heartbeat-reported
+camera. It pins the station's connection and provides a memoized identity
+that changes only when the station or camera selection changes — never at
+telemetry frequency:
 
 ```js
-useObservedStation() // the Station commands are issued on; null until a side is chosen
-useObservedCamera()  // CameraHandle for the observed camera; null until a side is chosen
+useObservedStation() // the Station this subtree observes; null until a station is set
+useObservedCamera()  // CameraHandle for the observed camera; null until a station is set
+useOwnStation()      // the console's own station, for delegated operations
 ```
+
+Commands issued through the observed context act on that station directly.
+The pilot's delegated operations (record with `as`) must use
+`useOwnStation()` so the command travels on the pilot's own namespace, as
+the wire protocol requires.
 
 Channel hooks subscribe on mount and unsubscribe on unmount. The latest
 callback is kept in a ref, so a new callback identity on each render does

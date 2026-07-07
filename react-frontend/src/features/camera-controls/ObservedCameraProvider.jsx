@@ -1,32 +1,54 @@
 import React, { createContext, useContext, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useImagingClient } from "../../hooks/useImagingClient";
-import { selectActiveCamera, selectOwnStationId } from "./cameraControlsSlice";
+import {
+  selectActiveCamera,
+  selectCamHeartbeatFor,
+  selectOwnStationId,
+} from "./cameraControlsSlice";
 
-// Ambient identity for the camera-control tree: which station commands are
-// issued on, and a command handle for the currently observed camera. Identity
+// Ambient identity for a camera-control subtree: which station the subtree
+// observes, and a command handle for that station's current camera. Identity
 // only — telemetry stays in Redux, so consumers don't re-render at heartbeat
 // frequency.
+//
+// Commands issued through this context act on the observed station directly.
+// Operations the pilot delegates to an observer station (record with `as`)
+// must instead use useOwnStation(), so the command travels on the console's
+// own namespace as the wire protocol requires.
 const ObservedCameraContext = createContext(undefined);
 
-export function ObservedCameraProvider({ children }) {
+export function ObservedCameraProvider({ station = null, children }) {
   const ownStationId = useSelector(selectOwnStationId);
   const activeCameraId = useSelector(selectActiveCamera);
   const client = useImagingClient();
 
-  // Until the user picks a side there is no station to talk to (and no
+  // Until the user picks a station there is no one to talk to (and no
   // connection to pin). Controls render nothing before telemetry arrives,
   // so a null handle is never dereferenced in a handler.
-  const station = ownStationId ? client.station(ownStationId) : null;
+  const stationInput = station ?? ownStationId;
+  const stationHandle = stationInput ? client.station(stationInput) : null;
+  const isOwnStation =
+    stationHandle !== null && stationHandle.id === ownStationId;
 
-  useEffect(() => station?.acquire(), [station]);
+  useEffect(() => stationHandle?.acquire(), [stationHandle]);
+
+  // The own station's camera is the interactive selection (optimistic,
+  // receipt-confirmed); a mirrored station's camera is whatever its
+  // heartbeat last reported — all we can know about another console.
+  const mirrorCameraId = useSelector((state) =>
+    stationHandle && !isOwnStation
+      ? selectCamHeartbeatFor(state, stationHandle.id)?.camera ?? null
+      : null
+  );
+  const cameraId = isOwnStation ? activeCameraId : mirrorCameraId;
 
   const value = useMemo(
     () => ({
-      station,
-      camera: station ? station.camera(activeCameraId ?? null) : null,
+      station: stationHandle,
+      camera: stationHandle ? stationHandle.camera(cameraId ?? null) : null,
     }),
-    [station, activeCameraId]
+    [stationHandle, cameraId]
   );
 
   return (
@@ -46,12 +68,24 @@ function useObservedCameraContext() {
   return context;
 }
 
-/** The station commands are issued on; null until an observer side is set. */
+/** The station this subtree observes; null until a station is set. */
 export function useObservedStation() {
   return useObservedCameraContext().station;
 }
 
-/** Command handle for the observed camera; null until an observer side is set. */
+/** Command handle for the observed camera; null until a station is set. */
 export function useObservedCamera() {
   return useObservedCameraContext().camera;
+}
+
+/**
+ * The console's own station, independent of any surrounding provider. This
+ * is the station delegated operations must be issued on (the pilot records
+ * an observer's camera via ownStation.record(cam, { as })). Does not pin
+ * the connection; the UI root's provider holds it open.
+ */
+export function useOwnStation() {
+  const ownStationId = useSelector(selectOwnStationId);
+  const client = useImagingClient();
+  return ownStationId ? client.station(ownStationId) : null;
 }
