@@ -81,7 +81,7 @@ describe("station commands", () => {
     const client = makeClient();
     client.station("PL").record("stbd_sci_4k", {
       previousCamera: "stbd_brow_4k",
-      as: "stbd",
+      as: "S",
     });
 
     await h.connected;

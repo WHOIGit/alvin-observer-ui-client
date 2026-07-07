@@ -187,7 +187,7 @@ commands can be sent at all.
   recording. `options.previousCamera` must carry the previously recording
   camera (the `camera` field of the latest recorder heartbeat — a display
   name); the protocol requires it on record-source commands.
-  `options.as: "port" | "stbd"` is pilot-only delegation: the command is
+  `options.as` (a `StationId`, e.g. `STATIONS.PORT`) is pilot-only delegation: the command is
   issued against the observer station's resources while still traveling over
   the pilot's connection.
 - `stopRecording(options)` — stop the recorder; accepts `as` but not

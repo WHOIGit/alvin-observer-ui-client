@@ -74,8 +74,11 @@ export interface RecordOptions extends CommandContext {
    * heartbeat); the legacy protocol requires it on record-source commands.
    */
   previousCamera?: string | null;
-  /** Pilot only: delegate the recording to an observer station. */
-  as?: "port" | "stbd";
+  /**
+   * Pilot only: delegate the recording to an observer station. The library
+   * doesn't police the target; the backend honors only observer stations.
+   */
+  as?: StationId;
 }
 
 export interface CameraHandle {
@@ -204,6 +207,11 @@ function isBroadcastShape(msg: object): boolean {
     "router_output_array" in msg ||
     "router_input_array" in msg
   );
+}
+
+/** The wire's observerSideOverride field speaks namespace names. */
+function delegationTarget(station: StationId): "port" | "stbd" {
+  return getStationInfo(station).namespace as "port" | "stbd";
 }
 
 export function createImagingClient(options: ImagingClientOptions = {}): ImagingClient {
@@ -466,7 +474,7 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
           body.oldCamera = options.previousCamera;
         }
         if (options.as !== undefined) {
-          body.observerSideOverride = options.as;
+          body.observerSideOverride = delegationTarget(options.as);
         }
         return sendCommand(COMMAND_KINDS.RECORD, body, {
           activeCamera: options.activeCamera,
@@ -478,7 +486,7 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
           action: { name: ACTIONS.recordSource, value: RECORD_STOP },
         };
         if (options.as !== undefined) {
-          body.observerSideOverride = options.as;
+          body.observerSideOverride = delegationTarget(options.as);
         }
         return sendCommand(COMMAND_KINDS.STOP_RECORDING, body, {
           activeCamera: options.activeCamera,
