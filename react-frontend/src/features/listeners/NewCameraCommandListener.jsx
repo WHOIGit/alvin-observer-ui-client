@@ -8,6 +8,7 @@ import {
 } from "../../hooks/useImagingClient";
 import {
   applyCommandResult,
+  commandResultAppliesToState,
   changeCurrentCamData,
   setAllCameras,
   setRouterOutputs,
@@ -28,7 +29,11 @@ export default function NewCameraCommandListener({ namespaceOverride = null }) {
   useCameraList(side, (cameras) => dispatch(setAllCameras(cameras)));
   useRouterOutputs(side, (outputs) => dispatch(setRouterOutputs(outputs)));
   useRouterInputs(side, (inputs) => dispatch(setRouterInputs(inputs)));
-  useCommandResult(side, (result) => dispatch(applyCommandResult(result)));
+  useCommandResult(
+    side,
+    (result) => dispatch(applyCommandResult(result)),
+    commandResultAppliesToState
+  );
 
   return null;
 }

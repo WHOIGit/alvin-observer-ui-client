@@ -54,7 +54,18 @@ export const useCameraList = makeStationChannelHook("onCameraList");
 export const useRouterInputs = makeStationChannelHook("onRouterInputs");
 export const useRouterOutputs = makeStationChannelHook("onRouterOutputs");
 export const useCameraSettings = makeStationChannelHook("onCameraSettings");
-export const useCommandResult = makeStationChannelHook("onCommandResult");
+
+// Like the other station-channel hooks, but with an optional stable predicate
+// that filters results at the source (see Station.onCommandResult). Pass a
+// module-level predicate so the subscription identity stays stable.
+export function useCommandResult(observerSide, callback, shouldDeliver) {
+  const client = useImagingClient();
+  const handler = useStableHandler(callback);
+  useEffect(
+    () => client.station(observerSide).onCommandResult(handler, shouldDeliver),
+    [client, observerSide, handler, shouldDeliver]
+  );
+}
 
 // Vehicle-wide channels
 export const useNavHeartbeat = makeClientChannelHook("onNavHeartbeat");

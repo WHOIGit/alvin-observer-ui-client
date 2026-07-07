@@ -142,8 +142,16 @@ export interface Station {
    * pin the station's connection; delivery rides the command send path.
    * Commands evicted past the pending cap (256 outstanding) never produce
    * a result.
+   *
+   * `shouldDeliver`, if given, filters at the source: results for which it
+   * returns false are dropped before `cb` runs. A subscriber that only
+   * mirrors a few command kinds can skip the high-frequency ones (pan/tilt
+   * at 10 Hz, focus, zoom) entirely rather than being invoked and no-op'ing.
    */
-  onCommandResult(cb: (result: CommandResult) => void): Unsubscribe;
+  onCommandResult(
+    cb: (result: CommandResult) => void,
+    shouldDeliver?: (result: CommandResult) => boolean
+  ): Unsubscribe;
 }
 
 export interface ImagingClientOptions {
@@ -232,7 +240,11 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
     const info = getObserverInfo(side);
     const namespacePath = info.namespacePath;
 
-    const commandResultCallbacks = new Set<(result: CommandResult) => void>();
+    interface CommandResultSubscriber {
+      cb: (result: CommandResult) => void;
+      shouldDeliver?: (result: CommandResult) => boolean;
+    }
+    const commandResultCallbacks = new Set<CommandResultSubscriber>();
 
     interface PendingCommand {
       kind: CommandKind | null;
@@ -278,7 +290,8 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         } else {
           pending.reject(new CommandFailedError(result));
         }
-        for (const cb of commandResultCallbacks) {
+        for (const { cb, shouldDeliver } of commandResultCallbacks) {
+          if (shouldDeliver && !shouldDeliver(result)) continue;
           cb(result);
         }
       });
@@ -546,10 +559,11 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         );
       },
 
-      onCommandResult(cb) {
-        commandResultCallbacks.add(cb);
+      onCommandResult(cb, shouldDeliver) {
+        const subscriber = { cb, shouldDeliver };
+        commandResultCallbacks.add(subscriber);
         return () => {
-          commandResultCallbacks.delete(cb);
+          commandResultCallbacks.delete(subscriber);
         };
       },
     };

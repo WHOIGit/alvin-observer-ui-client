@@ -38,6 +38,24 @@ const getCameraConfig = (cameraId, cameras) => {
   return cameraConfig;
 };
 
+// The command kinds applyCommandResult mirrors into state. Used to filter the
+// onCommandResult subscription so the kinds the reducer ignores — pan/tilt
+// (10 Hz), focus, zoom, still capture — never reach the store at all. Keep in
+// sync with the applyCommandResult switch below.
+const MIRRORED_COMMAND_KINDS = new Set([
+  COMMAND_KINDS.SELECT_CAMERA,
+  COMMAND_KINDS.SET_FOCUS_MODE,
+  COMMAND_KINDS.SET_SHUTTER,
+  COMMAND_KINDS.SET_IRIS,
+  COMMAND_KINDS.SET_ISO,
+  COMMAND_KINDS.SET_EXPOSURE_MODE,
+]);
+
+// Predicate for Station.onCommandResult: only settled commands whose outcome
+// applyCommandResult actually applies are worth dispatching.
+export const commandResultAppliesToState = (result) =>
+  MIRRORED_COMMAND_KINDS.has(result?.kind);
+
 export const cameraControlsSlice = createSlice({
   name: "cameraControls",
   initialState: initialState,
