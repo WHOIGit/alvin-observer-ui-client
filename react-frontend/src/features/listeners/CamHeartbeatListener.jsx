@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useCamHeartbeat } from "../../hooks/useImagingClient";
-import { getObserverInfo } from "../../lib/imaging-client";
+import { getStationInfo } from "../../lib/imaging-client";
 import {
   changeCamHeartbeat,
   changeCamHeartbeatPort,
@@ -16,21 +16,21 @@ export default function CamHeartbeatListener({ namespaceOverride = null }) {
   // The pilot UI mounts extra instances with a namespaceOverride to mirror
   // each observer's heartbeat into a side-specific slot; the observer UI runs
   // one instance for its own side.
-  const overrideSide = namespaceOverride
-    ? getObserverInfo(namespaceOverride).observerSide
+  const overrideStationId = namespaceOverride
+    ? getStationInfo(namespaceOverride).stationId
     : null;
 
   const handleMessage = useCallback(
     (message) => {
       if (!namespaceOverride) {
         dispatch(changeCamHeartbeat(message));
-      } else if (overrideSide === "P") {
+      } else if (overrideStationId === "P") {
         dispatch(changeCamHeartbeatPort(message));
-      } else if (overrideSide === "S") {
+      } else if (overrideStationId === "S") {
         dispatch(changeCamHeartbeatStbd(message));
       }
     },
-    [namespaceOverride, overrideSide, dispatch]
+    [namespaceOverride, overrideStationId, dispatch]
   );
 
   useCamHeartbeat(namespaceOverride || observerSide, handleMessage);

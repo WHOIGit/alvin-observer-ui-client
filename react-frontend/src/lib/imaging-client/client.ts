@@ -22,11 +22,11 @@ import {
   RECORD_STOP,
   WHITE_BALANCE_ONE_PUSH_TRIGGER,
   buildCameraCommand,
-  getObserverInfo,
+  getStationInfo,
 } from "./protocol";
 import { COMMAND_KINDS, CommandFailedError } from "./commands";
 import type { CommandKind } from "./commands";
-import type { ObserverSide, ObserverSideInput } from "./protocol";
+import type { StationId, StationIdInput } from "./protocol";
 import type { FocusControl, ZoomControl } from "./domain";
 import type {
   CommandResult,
@@ -110,7 +110,7 @@ export interface CameraHandle {
 }
 
 export interface Station {
-  readonly side: ObserverSide;
+  readonly id: StationId;
   /**
    * Pin this station's connection open. Every subscription pins it too;
    * hold an acquire() for the lifetime of a UI that issues commands so the
@@ -163,7 +163,7 @@ export interface ImagingClientOptions {
 }
 
 export interface ImagingClient {
-  station(side: ObserverSideInput): Station;
+  station(stationId: StationIdInput): Station;
 
   // Vehicle-wide channels
   onNavHeartbeat(cb: (msg: NavHeartbeat) => void): Unsubscribe;
@@ -236,8 +236,8 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
     };
   }
 
-  function createStation(side: ObserverSide): Station {
-    const info = getObserverInfo(side);
+  function createStation(id: StationId): Station {
+    const info = getStationInfo(id);
     const namespacePath = info.namespacePath;
 
     interface CommandResultSubscriber {
@@ -303,7 +303,7 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       context: CommandContext = {}
     ): SentCommand {
       const payload = buildCameraCommand({
-        side,
+        station: id,
         activeCamera: context.activeCamera,
         body,
         uuid,
@@ -437,7 +437,7 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
     }
 
     return {
-      side,
+      id,
 
       acquire() {
         const { release } = pool.acquire(namespacePath, V1);
@@ -569,7 +569,7 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
     };
   }
 
-  const stations = new Map<ObserverSide, Station>();
+  const stations = new Map<StationId, Station>();
 
   async function encoderAction(name: string, action: string): Promise<void> {
     const endpoint = getEndpoints()?.[V1_5];
@@ -583,12 +583,12 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
   }
 
   const client: ImagingClient = {
-    station(sideInput) {
-      const side = getObserverInfo(sideInput).observerSide;
-      let station = stations.get(side);
+    station(stationId) {
+      const id = getStationInfo(stationId).stationId;
+      let station = stations.get(id);
       if (!station) {
-        station = createStation(side);
-        stations.set(side, station);
+        station = createStation(id);
+        stations.set(id, station);
       }
       return station;
     },

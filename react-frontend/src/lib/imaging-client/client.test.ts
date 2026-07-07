@@ -9,7 +9,7 @@ import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import { emitTo, stationConnected } from "../../../tests/imaging-test-utils";
 import { CommandFailedError, createImagingClient } from "./index";
 import type { ImagingClient, Station } from "./index";
-import { buildCameraCommand, normalizeObserverSide } from "./protocol";
+import { buildCameraCommand, normalizeStationId } from "./protocol";
 
 // Sockets that outlive their test keep the shared Engine.IO transport open,
 // so the next test's harness would never observe a fresh connection. Tear
@@ -30,17 +30,17 @@ afterEach(() => {
 
 describe("protocol helpers", () => {
   test("normalizes side aliases", () => {
-    expect(normalizeObserverSide("port")).toBe("P");
-    expect(normalizeObserverSide("/stbd")).toBe("S");
-    expect(normalizeObserverSide("STARBOARD")).toBe("S");
-    expect(normalizeObserverSide("pilot")).toBe("PL");
-    expect(normalizeObserverSide("nonsense")).toBe(null);
-    expect(normalizeObserverSide(null)).toBe(null);
+    expect(normalizeStationId("port")).toBe("P");
+    expect(normalizeStationId("/stbd")).toBe("S");
+    expect(normalizeStationId("STARBOARD")).toBe("S");
+    expect(normalizeStationId("pilot")).toBe("PL");
+    expect(normalizeStationId("nonsense")).toBe(null);
+    expect(normalizeStationId(null)).toBe(null);
   });
 
-  test("omits the command field when the side is unknown", () => {
+  test("omits the command field when the station is unknown", () => {
     const payload = buildCameraCommand({
-      side: null,
+      station: null,
       body: { action: { name: "ISO", value: "100" } },
       uuid: () => "u",
       now: () => new Date(0),
@@ -608,6 +608,6 @@ describe("station identity", () => {
     const client = makeClient();
     expect(client.station("port")).toBe(client.station("P"));
     expect(client.station("/stbd")).toBe(client.station("S"));
-    expect(client.station("PL").side).toBe("PL");
+    expect(client.station("PL").id).toBe("PL");
   });
 });

@@ -8,25 +8,32 @@
 import formatISO from "date-fns/formatISO";
 import type { CameraCommandBody, CameraCommandPayload } from "./wire";
 
-/** Normalized station side identifiers used throughout the app. */
-export type ObserverSide = "P" | "S" | "PL";
+/** The imaging system's stations, by their normalized identifiers. */
+export const STATIONS = {
+  PORT: "P",
+  STARBOARD: "S",
+  PILOT: "PL",
+} as const;
 
-/** Anything accepted where a side is expected: "P", "port", "/stbd", ... */
-export type ObserverSideInput = ObserverSide | string | null | undefined;
+/** Normalized station identifiers used throughout the app. */
+export type StationId = (typeof STATIONS)[keyof typeof STATIONS];
+
+/** Anything accepted where a station is expected: "P", "port", "/stbd", ... */
+export type StationIdInput = StationId | string | null | undefined;
 
 export const NAMESPACE_ROOT = "/";
 export const NAMESPACE_SYSTEM = "/system";
 
-const SIDE_TO_NAMESPACE: Record<ObserverSide, string> = {
-  P: "port",
-  S: "stbd",
-  PL: "pilot",
+const STATION_TO_NAMESPACE: Record<StationId, string> = {
+  [STATIONS.PORT]: "port",
+  [STATIONS.STARBOARD]: "stbd",
+  [STATIONS.PILOT]: "pilot",
 };
 
-const SIDE_TO_COMMAND: Record<ObserverSide, string> = {
-  P: "COVP",
-  S: "COVS",
-  PL: "COPL",
+const STATION_TO_COMMAND: Record<StationId, string> = {
+  [STATIONS.PORT]: "COVP",
+  [STATIONS.STARBOARD]: "COVS",
+  [STATIONS.PILOT]: "COPL",
 };
 
 /** Socket.IO event names (server and client side). */
@@ -68,56 +75,56 @@ export const RECORD_STOP = "ST";
  */
 export const WHITE_BALANCE_ONE_PUSH_TRIGGER = "ONE_PUSH_TRIGGER";
 
-export function normalizeObserverSide(rawSide: ObserverSideInput): ObserverSide | null {
-  if (!rawSide) return null;
-  const value = `${rawSide}`.trim();
+export function normalizeStationId(rawStation: StationIdInput): StationId | null {
+  if (!rawStation) return null;
+  const value = `${rawStation}`.trim();
   if (!value) return null;
   const withoutSlash = value.startsWith("/") ? value.slice(1) : value;
   const upperValue = withoutSlash.toUpperCase();
 
   if (upperValue === "P" || upperValue === "PORT") {
-    return "P";
+    return STATIONS.PORT;
   }
   if (upperValue === "S" || upperValue === "STBD" || upperValue === "STARBOARD") {
-    return "S";
+    return STATIONS.STARBOARD;
   }
   if (upperValue === "PL" || upperValue === "PILOT") {
-    return "PL";
+    return STATIONS.PILOT;
   }
 
   return null;
 }
 
-export interface ObserverInfo {
-  observerSide: ObserverSide;
+export interface StationInfo {
+  stationId: StationId;
   namespace: string;
   namespacePath: string;
   command: string;
 }
 
 /** Unrecognized input coerces to the pilot, matching historical behavior. */
-export function getObserverInfo(rawSide: ObserverSideInput): ObserverInfo {
-  const observerSide = normalizeObserverSide(rawSide) ?? "PL";
-  const namespace = SIDE_TO_NAMESPACE[observerSide];
-  const command = SIDE_TO_COMMAND[observerSide];
+export function getStationInfo(rawStation: StationIdInput): StationInfo {
+  const stationId = normalizeStationId(rawStation) ?? STATIONS.PILOT;
+  const namespace = STATION_TO_NAMESPACE[stationId];
+  const command = STATION_TO_COMMAND[stationId];
 
   return {
-    observerSide,
+    stationId,
     namespace,
     namespacePath: `/${namespace}`,
     command,
   };
 }
 
-export function observerSideToCommand(rawSide: ObserverSideInput): string | undefined {
-  if (rawSide === undefined || rawSide === null || rawSide === "") {
+export function stationToCommand(rawStation: StationIdInput): string | undefined {
+  if (rawStation === undefined || rawStation === null || rawStation === "") {
     return undefined;
   }
-  return getObserverInfo(rawSide).command;
+  return getStationInfo(rawStation).command;
 }
 
 export interface BuildCameraCommandOptions {
-  side: ObserverSideInput;
+  station: StationIdInput;
   /** The station's active camera; becomes the payload's `camera` field. */
   activeCamera?: string | null;
   body: CameraCommandBody;
@@ -129,10 +136,10 @@ export interface BuildCameraCommandOptions {
  * Builds a `newCameraCommand` payload exactly as the historical emitter did:
  * a record-source body's `oldCamera` overrides the `camera` field, an
  * `observerSideOverride` swaps the command prefix, and the `command` key is
- * omitted entirely when the side is unknown.
+ * omitted entirely when the station is unknown.
  */
 export function buildCameraCommand({
-  side,
+  station,
   activeCamera,
   body,
   uuid,
@@ -143,7 +150,7 @@ export function buildCameraCommand({
     camera = body.oldCamera ?? null;
   }
 
-  const command = observerSideToCommand(body.observerSideOverride ?? side);
+  const command = stationToCommand(body.observerSideOverride ?? station);
 
   const payload: CameraCommandPayload = {
     eventId: uuid(),

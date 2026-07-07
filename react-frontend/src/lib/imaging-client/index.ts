@@ -36,8 +36,8 @@ export type {
   ZoomControl,
 } from "./domain";
 
-export { getObserverInfo } from "./protocol";
-export type { ObserverSide, ObserverSideInput, ObserverInfo } from "./protocol";
+export { STATIONS, getStationInfo } from "./protocol";
+export type { StationId, StationIdInput, StationInfo } from "./protocol";
 
 export type {
   CamHeartbeat,

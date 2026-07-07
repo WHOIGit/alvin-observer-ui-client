@@ -86,7 +86,7 @@ type WsEndpoint = { server: string; path: string };
 
 ```ts
 interface ImagingClient {
-  station(side: ObserverSideInput): Station;
+  station(stationId: StationIdInput): Station;
 
   // Vehicle-wide channels (v1 root namespace; system messages on v1.5 /system)
   onNavHeartbeat(cb: (msg: NavHeartbeat) => void): Unsubscribe;
@@ -102,8 +102,8 @@ interface ImagingClient {
 }
 ```
 
-- `station(side)` accepts any [side input](#observer-sides) and returns the
-  (cached) station for it; the same side always yields the same object.
+- `station(stationId)` accepts any [station identifier](#station-identifiers) and returns the
+  (cached) station for it; the same station always yields the same object.
 - `onSystemMessage` connects to the v1.5 `/system` namespace; the server
   replays buffered alerts on connect, so late subscribers still see active
   alerts.
@@ -136,7 +136,7 @@ interface SystemMessage {
 
 ```ts
 interface Station {
-  readonly side: ObserverSide;
+  readonly id: StationId;
   acquire(): Unsubscribe;
   camera(id: string | null): CameraHandle;
 
@@ -396,24 +396,27 @@ pass them, never assume their wire meaning.
 Each constant has a matching union type (`ExposureMode`, `FocusMode`,
 `FocusControl`, `ZoomControl`, `WhiteBalanceMode`).
 
-## Observer sides
+## Station identifiers
 
 ```ts
-type ObserverSide = "P" | "S" | "PL";
-type ObserverSideInput = ObserverSide | string | null | undefined;
+const STATIONS = { PORT: "P", STARBOARD: "S", PILOT: "PL" } as const;
+type StationId = (typeof STATIONS)[keyof typeof STATIONS]; // "P" | "S" | "PL"
+type StationIdInput = StationId | string | null | undefined;
 
-getObserverInfo(rawSide: ObserverSideInput): ObserverInfo
-interface ObserverInfo {
-  observerSide: ObserverSide;
+getStationInfo(station: StationIdInput): StationInfo
+interface StationInfo {
+  stationId: StationId;
   namespace: string;      // "port" | "stbd" | "pilot"
   namespacePath: string;  // "/port" | "/stbd" | "/pilot"
   command: string;        // COVP | COVS | COPL
 }
 ```
 
-Everywhere a side is expected (`client.station(...)`, the hooks), flexible
-input is accepted: `"P"`, `"port"`, `"/stbd"`, etc. Unrecognized input
-coerces to the pilot, matching historical behavior.
+Name stations with `STATIONS.PORT` / `STATIONS.STARBOARD` / `STATIONS.PILOT`
+rather than writing the identifier strings. Everywhere a station is expected
+(`client.station(...)`, the hooks), flexible input is also accepted: `"P"`,
+`"port"`, `"/stbd"`, etc. Unrecognized input coerces to the pilot, matching
+historical behavior.
 
 ## React hooks
 
@@ -440,7 +443,7 @@ Channel hooks subscribe on mount and unsubscribe on unmount. The latest
 callback is kept in a ref, so a new callback identity on each render does
 **not** re-subscribe:
 
-| Station-scoped (side, cb) | Vehicle-wide (cb) |
+| Station-scoped (stationId, cb) | Vehicle-wide (cb) |
 |---|---|
 | `useCamHeartbeat` | `useNavHeartbeat` |
 | `useRecorderHeartbeat` | `useSensorHeartbeat` |

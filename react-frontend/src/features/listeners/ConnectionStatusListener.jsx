@@ -1,14 +1,14 @@
 import { useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useConnectionStatus } from "../../hooks/useImagingClient";
-import { getObserverInfo } from "../../lib/imaging-client";
+import { getStationInfo } from "../../lib/imaging-client";
 import { selectObserverSide } from "../camera-controls/cameraControlsSlice";
 import {
   addSystemMessage,
   dismissSystemMessage,
 } from "../system-messages/systemMessagesSlice";
 
-const SIDE_LABELS = {
+const STATION_LABELS = {
   P: "Port",
   S: "Starboard",
   PL: "Pilot",
@@ -21,11 +21,11 @@ const SIDE_LABELS = {
 export default function ConnectionStatusListener({ namespaceOverride = null }) {
   const dispatch = useDispatch();
   const observerSide = useSelector(selectObserverSide);
-  const namespaceInfo = useMemo(
-    () => getObserverInfo(namespaceOverride || observerSide),
+  const stationInfo = useMemo(
+    () => getStationInfo(namespaceOverride || observerSide),
     [namespaceOverride, observerSide]
   );
-  const namespacePath = namespaceInfo.namespacePath;
+  const namespacePath = stationInfo.namespacePath;
 
   // Refs so the handler can track transitions without re-subscribing: only
   // post a "lost connection" once per outage, and only post a recovery
@@ -36,7 +36,7 @@ export default function ConnectionStatusListener({ namespaceOverride = null }) {
 
   useConnectionStatus(namespaceOverride || observerSide, ({ status }) => {
     const label =
-      SIDE_LABELS[namespaceInfo.observerSide] || namespaceInfo.observerSide;
+      STATION_LABELS[stationInfo.stationId] || stationInfo.stationId;
     const lossId = `connection-loss:${namespacePath}`;
 
     if (status === "connected") {
