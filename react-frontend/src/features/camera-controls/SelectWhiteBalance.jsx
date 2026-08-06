@@ -81,7 +81,7 @@ export default function SelectWhiteBalance({ showLabel }) {
       </Grid>
 
       <Grid item xs={12}>
-        {camSettings.white_balance?.includes("ONE_PUSH") && (
+        {camSettings.white_balance === WHITE_BALANCE_MODES.ONE_PUSH && (
           <div className={classes.onePushBtn}>
             <Button
               variant="contained"
