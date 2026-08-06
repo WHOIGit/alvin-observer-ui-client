@@ -36,7 +36,7 @@ export type {
   ZoomControl,
 } from "./domain";
 
-export { STATIONS, getStationInfo } from "./protocol";
+export { STATIONS, getStationInfo, normalizeStationId } from "./protocol";
 export type { StationId, StationIdInput, StationInfo } from "./protocol";
 
 export type {
