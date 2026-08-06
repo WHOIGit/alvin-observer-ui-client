@@ -62,6 +62,18 @@ const V1_5 = "1.5";
 /** Upper bound on unacknowledged commands tracked per station. */
 const MAX_PENDING_ACKS = 256;
 
+/**
+ * Command kinds safe to drop first when the pending-ack table overflows:
+ * high-rate fire-and-forget drives whose individual receipts nobody waits
+ * on. Evicting these first means a pan/tilt burst can never orphan a
+ * still-pending meaningful receipt (camera select, record).
+ */
+const EVICTABLE_COMMAND_KINDS: ReadonlySet<CommandKind> = new Set([
+  COMMAND_KINDS.PAN_TILT,
+  COMMAND_KINDS.FOCUS,
+  COMMAND_KINDS.ZOOM,
+]);
+
 /** Context shared by station-level commands. */
 export interface CommandContext {
   /** The station's active camera; becomes the payload's `camera` field. */
@@ -336,10 +348,18 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       promise.catch(() => {});
 
       if (pendingAcks.size >= MAX_PENDING_ACKS) {
-        // Drop the oldest unacknowledged command; its promise simply never
-        // settles, which callers are told to expect.
-        const oldest = pendingAcks.keys().next().value;
-        if (oldest !== undefined) pendingAcks.delete(oldest);
+        // Drop the oldest high-rate command first, falling back to the
+        // oldest entry; the evicted promise simply never settles, which
+        // callers are told to expect.
+        let evicted: string | undefined;
+        for (const [eventId, pending] of pendingAcks) {
+          if (pending.kind !== null && EVICTABLE_COMMAND_KINDS.has(pending.kind)) {
+            evicted = eventId;
+            break;
+          }
+        }
+        evicted ??= pendingAcks.keys().next().value;
+        if (evicted !== undefined) pendingAcks.delete(evicted);
       }
       pendingAcks.set(payload.eventId, { kind, payload, resolve, reject });
 
