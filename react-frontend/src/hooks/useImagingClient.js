@@ -51,6 +51,7 @@ function makeClientChannelHook(channelName) {
 // Station-scoped channels
 export const useCamHeartbeat = makeStationChannelHook("onCamHeartbeat");
 export const useRecorderHeartbeat = makeStationChannelHook("onRecorderHeartbeat");
+export const useRecordingStarted = makeStationChannelHook("onRecordingStarted");
 export const useConnectionStatus = makeStationChannelHook("onConnectionStatus");
 export const useCameraList = makeStationChannelHook("onCameraList");
 export const useRouterInputs = makeStationChannelHook("onRouterInputs");

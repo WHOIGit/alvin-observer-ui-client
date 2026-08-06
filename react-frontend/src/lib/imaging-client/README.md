@@ -150,6 +150,10 @@ interface Station {
   // Channels; each returns an unsubscribe function
   onCamHeartbeat(cb: (msg: CamHeartbeat) => void): Unsubscribe;
   onRecorderHeartbeat(cb: (msg: RecorderHeartbeat) => void): Unsubscribe;
+  // Fires once per new clip with the recorded camera's display name. The
+  // first heartbeat after subscribing only sets the baseline, so a
+  // recording already in progress does not fire.
+  onRecordingStarted(cb: (camera: string) => void): Unsubscribe;
   onConnectionStatus(cb: (event: ConnectionStatusEvent) => void): Unsubscribe;
   onCameraList(cb: (cameras: CameraArrayEntry[]) => void): Unsubscribe;
   onRouterInputs(cb: (inputs: RouterPortEntry[]) => void): Unsubscribe;
@@ -468,6 +472,7 @@ callback is kept in a ref, so a new callback identity on each render does
 |---|---|
 | `useCamHeartbeat` | `useNavHeartbeat` |
 | `useRecorderHeartbeat` | `useSensorHeartbeat` |
+| `useRecordingStarted` | |
 | `useConnectionStatus` | `useSystemMessage` |
 | `useCameraList` | |
 | `useRouterInputs` / `useRouterOutputs` | |

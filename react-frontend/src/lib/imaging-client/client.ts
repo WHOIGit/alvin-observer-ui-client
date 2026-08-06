@@ -152,6 +152,15 @@ export interface Station {
   // Incoming channels; each returns an unsubscribe function.
   onCamHeartbeat(cb: (msg: CamHeartbeat) => void): Unsubscribe;
   onRecorderHeartbeat(cb: (msg: RecorderHeartbeat) => void): Unsubscribe;
+  /**
+   * Fires when the station's recorder starts a new clip, with the recorded
+   * camera's display name as the recorder reports it. Detection rides the
+   * recorder heartbeat (a new filename while recording); the first
+   * heartbeat after subscribing only establishes the baseline, so a
+   * recording already in progress does not fire. The pilot's own recorder
+   * heartbeat carries no per-clip filename, so this never fires for it.
+   */
+  onRecordingStarted(cb: (camera: string) => void): Unsubscribe;
   onConnectionStatus(cb: (event: ConnectionStatusEvent) => void): Unsubscribe;
   onCameraList(cb: (cameras: CameraArrayEntry[]) => void): Unsubscribe;
   onRouterInputs(cb: (inputs: RouterPortEntry[]) => void): Unsubscribe;
@@ -555,6 +564,22 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         return subscribe(namespacePath, V1, EVENTS.recorderHeartbeat, (msg) =>
           cb(normalizeRecorderHeartbeat(msg))
         );
+      },
+
+      onRecordingStarted(cb) {
+        // New-clip detection as the legacy UI did it: a heartbeat reports a
+        // filename different from the last one seen, while recording.
+        let lastFilename: string | undefined;
+        return subscribe(namespacePath, V1, EVENTS.recorderHeartbeat, (msg) => {
+          const heartbeat = normalizeRecorderHeartbeat(msg);
+          // The pilot-shaped heartbeat carries no per-clip filename.
+          if (!("isRecording" in heartbeat)) return;
+          const previous = lastFilename;
+          lastFilename = heartbeat.filename;
+          if (!heartbeat.isRecording || heartbeat.filename === "none") return;
+          if (previous === undefined || previous === heartbeat.filename) return;
+          cb(heartbeat.camera);
+        });
       },
 
       onConnectionStatus(cb) {

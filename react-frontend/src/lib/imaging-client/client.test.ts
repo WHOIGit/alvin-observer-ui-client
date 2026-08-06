@@ -389,6 +389,50 @@ describe("station subscriptions", () => {
     });
   });
 
+  test("onRecordingStarted fires once per new clip", async () => {
+    const h = createSocketIoHarness();
+
+    const client = makeClient();
+    const station = client.station("P");
+
+    const clips: string[] = [];
+    station.onRecordingStarted((camera) => clips.push(camera));
+
+    await stationConnected(station);
+
+    const beat = (camera: string, recording: string, filename: string) =>
+      emitTo(h, "/port", "RecorderHeartbeat", {
+        command: "SRVP",
+        camera,
+        recording,
+        filename,
+      });
+
+    // First heartbeat only establishes the baseline, even mid-recording.
+    beat("Port Brow", "true", "clip_0001.mov");
+    // Same clip continuing: no event.
+    beat("Port Brow", "true", "clip_0001.mov");
+    // New filename while recording: one event.
+    beat("Port Brow", "true", "clip_0002.mov");
+    // Recorder goes idle: no event.
+    beat("Port Brow", "false", "none");
+    // A new clip after idle fires again.
+    beat("Sci Cam", "true", "clip_0003.mov");
+    // The pilot-shaped heartbeat never fires.
+    emitTo(h, "/port", "RecorderHeartbeat", {
+      command: "SRPL",
+      port_camera: "Port Brow",
+      stbd_camera: "Stbd Brow",
+      port_recording: "true",
+      stbd_recording: "false",
+      filename: "none",
+      processing_complete: "false",
+    });
+
+    await vi.waitFor(() => expect(clips).toHaveLength(2));
+    expect(clips).toEqual(["Port Brow", "Sci Cam"]);
+  });
+
   test("null sentinels normalize to null; fault strings raise hasFault", async () => {
     const h = createSocketIoHarness();
 
