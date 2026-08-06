@@ -115,6 +115,13 @@ export default function CaptureButtons() {
   };
 
   const handleRecordAction = async () => {
+    if (!recorderHeartbeatData || !activeCamera) {
+      // No recorder heartbeat yet (recorder down or still starting) or no
+      // active camera selected; without them there is no record command to
+      // build. Bail before setLoading so the button can't wedge.
+      console.warn("Cannot start recording: recorder state not ready");
+      return;
+    }
     setLoading(true);
     // save the current RECORDER_HEARTBEAT filename so we can check if it changes on new actions
     setCurrentRecordFile(recorderHeartbeatData.filename);
