@@ -5,15 +5,13 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import {
-  selectActiveCamera,
   selectCamHeartbeatData,
   selectCurrentCamData,
   selectExposureControlsEnabled,
-  selectObserverSide,
 } from "./cameraControlsSlice";
 import { useDispatch } from "react-redux";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
-import { COMMAND_STRINGS } from "../../config.js";
+import { useObservedCamera } from "./ObservedCameraProvider";
+import { EXPOSURE_MODES } from "../../lib/imaging-client";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,28 +35,18 @@ export default function SelectShutterMode() {
   const dispatch = useDispatch();
   const [isEnabled, setIsEnabled] = useState(true);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useObservedCamera();
 
   const handleSendMessage = (event) => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.shutterModeCommand,
-        value: event.target.value,
-      },
-    });
+    camera.setShutter(event.target.value);
   };
 
   useEffect(() => {
     // list of exposure modes that disable this function
     // AUTO, IP
     const disabledExposureModes = [
-      COMMAND_STRINGS.exposureModeOptions[0],
-      COMMAND_STRINGS.exposureModeOptions[3],
+      EXPOSURE_MODES.AUTO,
+      EXPOSURE_MODES.IRIS_PRIORITY,
     ];
     // disable if an Exposure mode changes is currently processing
     if (!controlEnabled) {
@@ -84,7 +72,7 @@ export default function SelectShutterMode() {
         <Select
           labelId="shutter-select-label"
           id="shutter-select"
-          value={isEnabled ? camSettings.shutter : ""}
+          value={isEnabled ? camSettings.shutter ?? "" : ""}
           onChange={handleSendMessage}
           disabled={!isEnabled}
         >

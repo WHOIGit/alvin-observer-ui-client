@@ -13,7 +13,7 @@ export default function TopCameraCommandsList() {
   const { isOwner } = useIsOwner();
 
   // check to make sure camera has controls and current Observer matches Cam Owner
-  if (camSettings === null || camSettings?.camctrl === "n" || !isOwner) {
+  if (!camSettings?.isControllable || !isOwner) {
     return null;
   }
 

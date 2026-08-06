@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
+import { useSelector } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import { Grid, List, ListItem } from "@mui/material";
 // local
@@ -14,22 +14,12 @@ import FocusModeButton from "../camera-controls/FocusModeButton";
 import FocusZoomButtonsGrid from "../camera-controls/FocusZoomButtonsGrid";
 import Joystick from "../camera-controls/Joystick";
 import SetCaptureInterval from "../camera-controls/SetCaptureInterval";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useObservedStation } from "../camera-controls/ObservedCameraProvider";
+import { useInitialCameraSelection } from "../camera-controls/useInitialCameraSelection";
 import useIsOwner from "../../hooks/useIsOwner";
 import RecordingStatusChip from "./RecordingStatusChip";
 import ErrorCard from "../camera-controls/ErrorCard";
-import {
-  changeActiveCamera,
-  selectActiveCamera,
-  selectCamHeartbeatData,
-  selectInitialCamHeartbeatData,
-  selectObserverSide,
-} from "../camera-controls/cameraControlsSlice";
-
-import {
-  CAM_HEARTBEAT,
-  COMMAND_STRINGS,
-} from "../../config";
+import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   joystickBox: {
@@ -42,46 +32,16 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CameraControlContainer() {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { isOwner } = useIsOwner();
 
-  const observerSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter({
-    observerSide,
-  });
+  const station = useObservedStation();
+  useInitialCameraSelection(station);
 
-  const activeCamera = useSelector(selectActiveCamera);
-  const initialCamHeartbeat = useSelector(selectInitialCamHeartbeatData);
   const camSettings = useSelector(selectCamHeartbeatData);
 
-  // use CAM_HEARTBEAT parameters only on initial app load to set activeCamera
-  // keep camera params in local state otherwise
-  useEffect(() => {
-    const setInitialCamera = () => {
-      dispatch(changeActiveCamera(initialCamHeartbeat));
-
-      // send camera change command to set available settings options
-      void emit({
-        camera: initialCamHeartbeat.camera,
-        action: {
-          name: COMMAND_STRINGS.cameraChangeCommand,
-          value: initialCamHeartbeat.camera,
-        },
-      });
-    };
-
-    // set initial camera state only if activeCamera is undefined
-    if (activeCamera === null) {
-      console.log(initialCamHeartbeat);
-      if (initialCamHeartbeat !== null) {
-        setInitialCamera();
-      }
-    }
-  }, [activeCamera, dispatch, emit, initialCamHeartbeat]);
-
   const renderDynamicGridBox = () => {
-    if (camSettings?.focus_mode === "ERR") return <ErrorCard />;
-    if (camSettings?.camctrl === "y" && isOwner) {
+    if (camSettings?.faults?.focus_mode) return <ErrorCard />;
+    if (camSettings?.isControllable && isOwner) {
       return (
         <List>
           <ListItem>
@@ -132,17 +92,17 @@ export default function CameraControlContainer() {
 
         <>
           <Grid item xs>
-            {camSettings?.camctrl === "y" && isOwner && <FocusModeButton />}
+            {camSettings?.isControllable && isOwner && <FocusModeButton />}
           </Grid>
           <Grid item xs>
-            {camSettings?.camctrl === "y" && isOwner && (
+            {camSettings?.isControllable && isOwner && (
               <FocusZoomButtonsGrid />
             )}
           </Grid>
         </>
 
         <Grid item xs>
-          {camSettings?.pantilt === "y" && isOwner && (
+          {camSettings?.hasPanTilt && isOwner && (
             <div className={classes.joystickBox}>
               <Joystick />
             </div>

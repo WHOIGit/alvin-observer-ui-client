@@ -1,33 +1,32 @@
-import React, { useCallback, useMemo } from "react";
+import { useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSocketListener } from "../../hooks/useSocket";
-import { RECORDER_HEARTBEAT } from "../../config";
+import { isEqual } from "lodash";
+import { useRecorderHeartbeat } from "../../hooks/useImagingClient";
 import {
   changeRecorderHeartbeat,
-  selectObserverSide,
+  selectOwnStationId,
 } from "../camera-controls/cameraControlsSlice";
-import { getObserverInfo } from "../../utils/observerSide";
 
-export default function RecorderHeartbeatListener({ isEnabled = true }) {
+export default function RecorderHeartbeatListener() {
   const dispatch = useDispatch();
-  const observerSide = useSelector(selectObserverSide);
-  const namespaceInfo = useMemo(
-    () => getObserverInfo(observerSide),
-    [observerSide]
-  );
+  const ownStationId = useSelector(selectOwnStationId);
+
+  // The store ignores the per-message eventId, so skip the dispatch when
+  // nothing else changed — a no-op dispatch still re-runs every subscribed
+  // selector at heartbeat rate.
+  const lastHeartbeatRef = useRef(null);
 
   const handleMessage = useCallback(
     (message) => {
+      const { eventId, ...comparable } = message;
+      if (isEqual(lastHeartbeatRef.current, comparable)) return;
+      lastHeartbeatRef.current = comparable;
       dispatch(changeRecorderHeartbeat(message));
     },
     [dispatch]
   );
 
-  useSocketListener(
-    namespaceInfo.namespacePath,
-    RECORDER_HEARTBEAT,
-    handleMessage
-  );
+  useRecorderHeartbeat(ownStationId, handleMessage);
 
   return null;
 }

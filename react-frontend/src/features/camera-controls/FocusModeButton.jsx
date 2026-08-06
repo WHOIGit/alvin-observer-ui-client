@@ -5,10 +5,9 @@ import { Button, CircularProgress } from "@mui/material";
 import { green } from "@mui/material/colors";
 import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 // local
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useObservedCamera } from "./ObservedCameraProvider";
 import { selectCamHeartbeatData } from "./cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
-import { selectActiveCamera, selectObserverSide } from "./cameraControlsSlice";
+import { FOCUS_MODES } from "../../lib/imaging-client";
 
 const useStyles = makeStyles((theme) => ({
   buttonWrapper: {
@@ -30,12 +29,7 @@ const FocusModeButton = () => {
   const [currentFocusMode, setCurrentFocusMode] = useState("AF");
   const [loading, setLoading] = useState(false);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useObservedCamera();
 
   useEffect(() => {
     if (camSettings !== null) {
@@ -43,26 +37,19 @@ const FocusModeButton = () => {
     }
   }, [camSettings]);
 
-  const handleSendMessage = (commandName) => {
+  const handleSendMessage = () => {
     // add a "fake" delay to UI to show users that image capture is processing
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 1000);
 
-    let commandValue;
-    if (camSettings.focus_mode === COMMAND_STRINGS.focusAF) {
-      commandValue = COMMAND_STRINGS.focusMF;
-    } else {
-      commandValue = COMMAND_STRINGS.focusAF;
-    }
+    const nextFocusMode =
+      camSettings.focus_mode === FOCUS_MODES.AUTOFOCUS
+        ? FOCUS_MODES.MANUAL
+        : FOCUS_MODES.AUTOFOCUS;
 
-    void emit({
-      action: {
-        name: commandName,
-        value: commandValue,
-      },
-    });
+    camera.setFocusMode(nextFocusMode);
   };
 
   return (
@@ -73,7 +60,7 @@ const FocusModeButton = () => {
         size="small"
         startIcon={<CenterFocusStrongIcon />}
         disabled={loading}
-        onClick={() => handleSendMessage(COMMAND_STRINGS.focusModeCommand)}
+        onClick={() => handleSendMessage()}
       >
         Focus {currentFocusMode}
       </Button>

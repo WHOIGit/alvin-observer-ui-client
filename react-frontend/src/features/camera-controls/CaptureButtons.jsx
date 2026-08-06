@@ -1,21 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import makeStyles from '@mui/styles/makeStyles';
 import { Grid, Button, CircularProgress, Checkbox } from "@mui/material";
 import { green } from "@mui/material/colors";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
-import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
+import { useObservedCamera, useObservedStation } from "./ObservedCameraProvider";
+import { useRecordingStarted } from "../../hooks/useImagingClient";
 import {
   selectActiveCameraConfig,
-  selectAllCameras,
   selectCamHeartbeatData,
-  selectObserverSide,
   selectRecordControlsEnabled,
-  selectRecorderHeartbeatData,
   setRecorderError,
   setVideoSourceEnabled,
 } from "./cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
 
 const useStyles = makeStyles((theme) => ({
   ctrlButton: {
@@ -42,20 +38,17 @@ export default function CaptureButtons() {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCameraConfig);
   const recordControlsEnabled = useSelector(selectRecordControlsEnabled);
-  const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
   const camSettings = useSelector(selectCamHeartbeatData);
-  const allCameras = useSelector(selectAllCameras);
 
-  const observerSide = useSelector(selectObserverSide);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCamera?.camera,
-    observerSide,
-  });
+  const station = useObservedStation();
+  const camera = useObservedCamera();
 
-  const [recordTimer, setRecordTimer] = useState(null);
-  const [currentRecordFile, setCurrentRecordFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingImgCapture, setLoadingImgCapture] = useState(false);
+
+  // The record command awaiting confirmation: its failure timer and the
+  // camera it asked the recorder to switch to.
+  const pendingRecordRef = useRef(null);
 
   const dispatch = useDispatch();
 
@@ -69,92 +62,58 @@ export default function CaptureButtons() {
     }
   }, [recordControlsEnabled]);
 
-  useEffect(() => {
-    // get current Recording camera ID from RECORDER_HEARTBEAT
-    // also check if RECORDER_HEARTBEAT filename has changed, indicates new recording for same camera
-    if (recorderHeartbeatData && recordTimer) {
-      if (
-        recorderHeartbeatData.recording === "true" &&
-        activeCamera.cam_name === recorderHeartbeatData.camera &&
-        recorderHeartbeatData.filename !== currentRecordFile
-      ) {
-        clearInterval(recordTimer);
-        setRecordTimer(null);
-        setLoading(false);
-        // reenable Video Source menu
-        const payloadVideoSrc = true;
-        dispatch(setVideoSourceEnabled(payloadVideoSrc));
-      }
-    }
-  }, [
-    recorderHeartbeatData,
-    recordTimer,
-    activeCamera,
-    dispatch,
-    currentRecordFile,
-  ]);
+  // The recorder confirms a record command by starting a new clip on the
+  // requested camera (the library detects new clips from its heartbeat).
+  useRecordingStarted(station?.id, (camera) => {
+    const pending = pendingRecordRef.current;
+    if (!pending || camera !== pending.cameraName) return;
+    clearTimeout(pending.timerId);
+    pendingRecordRef.current = null;
+    setLoading(false);
+    dispatch(setVideoSourceEnabled(true));
+  });
 
-  const handleSendMessage = (commandName, commandValue) => {
-    // If a RECORD SOURCE action, need to send the previous Recording camera name
-    if (commandName === COMMAND_STRINGS.recordSourceCommand) {
-      // get the camera ID of the currently recording camera
-      const oldCamera = getCameraConfigFromName(
-        recorderHeartbeatData.camera,
-        allCameras
-      );
-      return void emit({
-        action: {
-          name: commandName,
-          value: commandValue,
-        },
-        oldCamera: oldCamera.camera,
-      });
-    }
+  // Don't leave the failure timer running past unmount.
+  useEffect(
+    () => () => {
+      if (pendingRecordRef.current) clearTimeout(pendingRecordRef.current.timerId);
+    },
+    []
+  );
 
-    if (commandName === COMMAND_STRINGS.stillImageCaptureCommand) {
-      return void emit({
-        action: {
-          name: commandName,
-          value: { interval: commandValue, imgTransferChecked: false },
-        },
-      });
-    }
+  const captureStillImage = () => {
+    camera.captureStill();
   };
 
   const handleRecordAction = async () => {
+    if (!activeCamera) {
+      // No active camera selected yet; there is nothing to record. Bail
+      // before setLoading so the button can't wedge.
+      console.warn("Cannot start recording: no active camera");
+      return;
+    }
     setLoading(true);
-    // save the current RECORDER_HEARTBEAT filename so we can check if it changes on new actions
-    setCurrentRecordFile(recorderHeartbeatData.filename);
-    handleSendMessage(COMMAND_STRINGS.recordSourceCommand, activeCamera.camera);
-    // set Video Source menu to be disabled
-    console.log("disabling video source");
-    const payloadVideoSrc = false;
-    dispatch(setVideoSourceEnabled(payloadVideoSrc));
-    // reset error status in Redux
-    console.log("reset recording error");
-    const payload = false;
-    console.log("disabling video source");
-    dispatch(setRecorderError(payload));
+    // The library resolves the legacy previousCamera requirement from the
+    // recorder's own telemetry.
+    station.record(activeCamera.camera);
+    dispatch(setVideoSourceEnabled(false));
+    dispatch(setRecorderError(false));
 
-    // This is the maximum time the spinner will display
-    // Cancel this timer if we get a OK response from socket message in useEffect above
-    // OK response can take up to 10 seconds
-    const timer = setTimeout(() => {
+    // Maximum time the spinner shows; the onRecordingStarted subscription
+    // above cancels it when the recorder confirms, which can take up to 10
+    // seconds.
+    const timerId = setTimeout(() => {
+      pendingRecordRef.current = null;
       setLoading(false);
-      // save error status in Redux
-      const payloadRecError = true;
-      dispatch(setRecorderError(payloadRecError));
-      // reenable Video Source menu
-      console.log("enabling video source");
-      const payloadVideoSrc = true;
-      dispatch(setVideoSourceEnabled(payloadVideoSrc));
+      dispatch(setRecorderError(true));
+      dispatch(setVideoSourceEnabled(true));
     }, 12000);
-    setRecordTimer(timer);
+    pendingRecordRef.current = { timerId, cameraName: activeCamera.cam_name };
   };
 
   const handleImgCapture = () => {
     setLoadingImgCapture(true);
-    handleSendMessage(COMMAND_STRINGS.stillImageCaptureCommand, 0);
+    captureStillImage();
     // set Video Source menu to be disabled
     console.log("disabling video source");
     dispatch(setVideoSourceEnabled(false));
@@ -167,7 +126,7 @@ export default function CaptureButtons() {
   };
 
   // check to make sure camera has controls, current Observer matches Cam Owner, camera is available
-  if (camSettings === null || camSettings?.focus_mode === "ERR") {
+  if (camSettings === null || camSettings?.faults?.focus_mode) {
     return null;
   }
 

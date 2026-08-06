@@ -53,9 +53,9 @@ export default function MiniVideoHeader({ videoType }) {
   useEffect(() => {
     if (videoType === "REC" && recorderHeartbeatData) {
       setCameraName(recorderHeartbeatData.camera);
-      setIsRecording(recorderHeartbeatData.recording === "true");
+      setIsRecording(recorderHeartbeatData.isRecording);
       // only check Recorder error status if RECORDER_HEARTBEAT recording status is false
-      if (recorderHeartbeatData.recording !== "true") {
+      if (!recorderHeartbeatData.isRecording) {
         if (recorderResponseError) {
           setErrorMessage("Connection Error!");
         } else {

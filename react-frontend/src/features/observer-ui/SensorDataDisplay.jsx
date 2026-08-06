@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from "react";
 import { Grid } from "@mui/material";
 // local
-import { useSocketListener } from "../../hooks/useSocket";
-import { SENSOR_HEARTBEAT } from "../../config.js";
+import { useSensorHeartbeat } from "../../hooks/useImagingClient";
+
 
 export default function SensorDataDisplay() {
   const [lastMessage, setLastMessage] = useState(null);
@@ -11,7 +11,7 @@ export default function SensorDataDisplay() {
     setLastMessage(message);
   }, []);
 
-  useSocketListener("/", SENSOR_HEARTBEAT, handleMessage);
+  useSensorHeartbeat(handleMessage);
 
   return (
     <Grid container spacing={1} justifyContent="center" alignItems="center">

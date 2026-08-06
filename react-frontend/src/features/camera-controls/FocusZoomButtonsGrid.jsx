@@ -1,8 +1,10 @@
 import React from "react";
 import makeStyles from '@mui/styles/makeStyles';
 import { Grid, Typography } from "@mui/material";
-import { COMMAND_STRINGS } from "../../config.js";
+import { FOCUS_CONTROLS, ZOOM_CONTROLS } from "../../lib/imaging-client";
 import FocusZoomButton from "./FocusZoomButton";
+
+const ZOOM_SPEED = 3;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,13 +44,12 @@ export default function FocusZoomButtons() {
   return (
     <Grid container spacing={1} className={classes.root}>
       <Grid item xs={6}>
-        <FocusZoomButton 
+        <FocusZoomButton
           id="focusNear"
           buttonFunction="focus"
           label="Near"
-          commandStringControl={COMMAND_STRINGS.focusControlCommand}
-          commandStringOneStop={COMMAND_STRINGS.focusNearOneStop}
-          commandStringContinuous={COMMAND_STRINGS.focusNearContinuos}
+          controlOneStop={FOCUS_CONTROLS.NEAR_ONE_STOP}
+          controlContinuous={FOCUS_CONTROLS.NEAR_CONTINUOUS}
           activeFocusZoomButton={activeFocusZoomButton} //25oct2024-mjs
           sendActiveFocusZoomButtonToParent={handleActiveFocusZoomButton} //25oct2024-mjs
         />
@@ -58,9 +59,9 @@ export default function FocusZoomButtons() {
           id="zoomTele"
           buttonFunction="zoom"
           label="Tele"
-          commandStringControl={COMMAND_STRINGS.zoomControlCommand}
-          commandStringOneStop={COMMAND_STRINGS.zoomNearOneStop}
-          commandStringContinuous={COMMAND_STRINGS.zoomNearContinuos + ":" + "3"}
+          controlOneStop={ZOOM_CONTROLS.TELEPHOTO_ONE_STOP}
+          controlContinuous={ZOOM_CONTROLS.TELEPHOTO_CONTINUOUS}
+          continuousSpeed={ZOOM_SPEED}
           activeFocusZoomButton={activeFocusZoomButton} //25oct2024-mjs
           sendActiveFocusZoomButtonToParent={handleActiveFocusZoomButton} //25oct2024-mjs
         />
@@ -80,9 +81,8 @@ export default function FocusZoomButtons() {
           id="focusFar"
           buttonFunction="focus"
           label="Far"
-          commandStringControl={COMMAND_STRINGS.focusControlCommand}
-          commandStringOneStop={COMMAND_STRINGS.focusFarOneStop}
-          commandStringContinuous={COMMAND_STRINGS.focusFarContinuos}
+          controlOneStop={FOCUS_CONTROLS.FAR_ONE_STOP}
+          controlContinuous={FOCUS_CONTROLS.FAR_CONTINUOUS}
           activeFocusZoomButton={activeFocusZoomButton} //25oct2024-mjs
           sendActiveFocusZoomButtonToParent={handleActiveFocusZoomButton} //25oct2024-mjs
         />
@@ -92,9 +92,9 @@ export default function FocusZoomButtons() {
           id="zoomWide"
           buttonFunction="zoom"
           label="Wide"
-          commandStringControl={COMMAND_STRINGS.zoomControlCommand}
-          commandStringOneStop={COMMAND_STRINGS.zoomFarOneStop}
-          commandStringContinuous={COMMAND_STRINGS.zoomFarContinuos + ":" + "3"}
+          controlOneStop={ZOOM_CONTROLS.WIDE_ONE_STOP}
+          controlContinuous={ZOOM_CONTROLS.WIDE_CONTINUOUS}
+          continuousSpeed={ZOOM_SPEED}
           activeFocusZoomButton={activeFocusZoomButton} //25oct2024-mjs
           sendActiveFocusZoomButtonToParent={handleActiveFocusZoomButton} //25oct2024-mjs
         />

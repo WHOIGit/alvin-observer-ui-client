@@ -2,63 +2,60 @@ import { afterEach, expect, test } from "vitest";
 import React from "react";
 import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { configureStore } from "@reduxjs/toolkit";
-import cameraControlsReducer from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
+import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
 import {
-  COMMAND_STRINGS,
   NEW_CAMERA_COMMAND_EVENT,
   WS_SERVER_NAMESPACE_PILOT,
-  WS_SERVER_NAMESPACE_PORT,
-  WS_SERVER_NAMESPACE_STARBOARD,
 } from "../../config.js";
+import { ACTIONS, getSharedImagingClient } from "../../lib/imaging-client";
 import PilotRecordButton from "./PilotRecordButton.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 
-type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
-
-function makeStore(overrides: Partial<CameraControlsState> = {}) {
-  const baseState = cameraControlsReducer(undefined, { type: "@@INIT" } as any);
-  return configureStore({
-    reducer: { cameraControls: cameraControlsReducer },
-    preloadedState: { cameraControls: { ...baseState, ...overrides } },
-  });
-}
-
 afterEach(() => {
   cleanup();
+  // This file pins station connections through the shared client; tear them
+  // down so the next test's harness observes fresh connections.
+  getSharedImagingClient().close();
 });
 
 test.each([
   {
-    side: WS_SERVER_NAMESPACE_PORT,
+    station: "P",
+    override: "port",
     label: /Record port Source/i,
     expected: "cam-port",
     command: "COVP",
   },
   {
-    side: WS_SERVER_NAMESPACE_STARBOARD,
+    station: "S",
+    override: "stbd",
     label: /Record stbd Source/i,
     expected: "cam-stbd",
     command: "COVS",
   },
 ])(
   "emits REC payload with observerSideOverride %s",
-  async ({ side, label, expected, command }) => {
+  async ({ station, override, label, expected, command }) => {
     const user = userEvent.setup();
     const h = createSocketIoHarness((h, expectEmit) => {
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: "PL",
-      camHeartbeatDataPort: { camera: "cam-port" },
-      camHeartbeatDataStbd: { camera: "cam-stbd" },
+    const store = makeCameraControlsStore({
+      ownStationId: "PL",
+      camHeartbeats: {
+        P: { camera: "cam-port" },
+        S: { camera: "cam-stbd" },
+      },
     });
 
     const { getByText } = renderWithProviders(
-      <PilotRecordButton observerSide={side} />,
+      <ObservedCameraProvider station={station}>
+        <PilotRecordButton />
+      </ObservedCameraProvider>,
       { store },
     );
 
@@ -72,9 +69,9 @@ test.each([
       timestamp: expect.any(String),
       camera: null,
       command: command,
-      observerSideOverride: side,
+      observerSideOverride: override,
       action: {
-        name: COMMAND_STRINGS.recordSourceCommand,
+        name: ACTIONS.recordSource,
         value: expected,
       },
     });

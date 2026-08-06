@@ -13,11 +13,7 @@ import MetaDataDisplay from "./MetaDataDisplay";
 import SelectVideoSource from "../camera-controls/SelectVideoSource";
 import SelectExposureMode from "../camera-controls/SelectExposureMode";
 import ErrorCard from "../camera-controls/ErrorCard";
-import {
-  selectCamHeartbeatData,
-  selectSocketError,
-} from "../camera-controls/cameraControlsSlice";
-import SocketErrorChip from "./SocketErrorChip";
+import { selectCamHeartbeatData } from "../camera-controls/cameraControlsSlice";
 import SystemNotificationsBadge from "../system-messages/SystemNotificationsBadge";
 
 //import './obs_mini_vid_style.css'; //Testing only - added for gamepad style support - 29may2024 - mjs
@@ -84,11 +80,10 @@ export default function TopControlPanel({
   );
 
   const camHeartbeat = useSelector(selectCamHeartbeatData);
-  const socketError = useSelector(selectSocketError);
   
    
   const renderDynamicGridBox = () => {
-    if (camHeartbeat?.focus_mode === "ERR") return <ErrorCard />;
+    if (camHeartbeat?.faults?.focus_mode) return <ErrorCard />;
       
     return (
       <>
@@ -148,7 +143,7 @@ export default function TopControlPanel({
           <Box mb={1}>
             <Stack direction="row" spacing={1} alignItems="center">
               <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                {socketError ? <SocketErrorChip /> : <ObserverDisplayChip />}
+                <ObserverDisplayChip />
               </Box>
               <SystemNotificationsBadge />
             </Stack>

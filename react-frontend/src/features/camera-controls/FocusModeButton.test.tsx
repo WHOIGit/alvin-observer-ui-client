@@ -2,25 +2,17 @@ import { afterEach, expect, test } from "vitest";
 import React from "react";
 import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { configureStore } from "@reduxjs/toolkit";
-import cameraControlsReducer, {
-  changeCamHeartbeat,
+import {
+  storeCamHeartbeat,
 } from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { ACTIONS, FOCUS_MODES } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import FocusModeButton from "./FocusModeButton.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
-
-type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
-
-function makeStore(overrides: Partial<CameraControlsState> = {}) {
-  const baseState = cameraControlsReducer(undefined, { type: "@@INIT" } as any);
-  return configureStore({
-    reducer: { cameraControls: cameraControlsReducer },
-    preloadedState: { cameraControls: { ...baseState, ...overrides } },
-  });
-}
 
 afterEach(() => {
   cleanup();
@@ -34,14 +26,22 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
+    const store = makeCameraControlsStore({
+      ownStationId: scenario.stationId,
     });
     store.dispatch(
-      changeCamHeartbeat({ focus_mode: COMMAND_STRINGS.focusAF } as any),
+      storeCamHeartbeat({
+        stationId: scenario.stationId,
+        heartbeat: { focus_mode: FOCUS_MODES.AUTOFOCUS },
+      } as any),
     );
 
-    const { getByText } = renderWithProviders(<FocusModeButton />, { store });
+    const { getByText } = renderWithProviders(
+      <ObservedCameraProvider>
+        <FocusModeButton />
+      </ObservedCameraProvider>,
+      { store },
+    );
 
     await h.connected;
     await user.click(getByText(/Focus/i));
@@ -54,8 +54,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.focusModeCommand,
-        value: COMMAND_STRINGS.focusMF,
+        name: ACTIONS.focusMode,
+        value: FOCUS_MODES.MANUAL,
       },
     });
   },
@@ -69,14 +69,22 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
+    const store = makeCameraControlsStore({
+      ownStationId: scenario.stationId,
     });
     store.dispatch(
-      changeCamHeartbeat({ focus_mode: COMMAND_STRINGS.focusMF } as any),
+      storeCamHeartbeat({
+        stationId: scenario.stationId,
+        heartbeat: { focus_mode: FOCUS_MODES.MANUAL },
+      } as any),
     );
 
-    const { getByText } = renderWithProviders(<FocusModeButton />, { store });
+    const { getByText } = renderWithProviders(
+      <ObservedCameraProvider>
+        <FocusModeButton />
+      </ObservedCameraProvider>,
+      { store },
+    );
 
     await h.connected;
     await user.click(getByText(/Focus/i));
@@ -89,8 +97,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.focusModeCommand,
-        value: COMMAND_STRINGS.focusAF,
+        name: ACTIONS.focusMode,
+        value: FOCUS_MODES.AUTOFOCUS,
       },
     });
   },

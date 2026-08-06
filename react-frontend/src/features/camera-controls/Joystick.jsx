@@ -1,17 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import ReactNipple from "react-nipple";
 import makeStyles from '@mui/styles/makeStyles';
 import { Box, Typography } from "@mui/material";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
-import {
-  selectActiveCamera,
-  selectCamHeartbeatData,
-  selectJoystickStatus,
-  selectObserverSide,
-  setJoystickStatus,
-} from "./cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
+import { useObservedCamera } from "./ObservedCameraProvider";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,27 +15,15 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Joystick() {
   const classes = useStyles();
-  const dispatch = useDispatch();
-  const joystickStatus = useSelector(selectJoystickStatus);
   const camSettings = useSelector(selectCamHeartbeatData);
   const [isEnabled, setIsEnabled] = useState(true);
   const [showJoystick, setShowJoystick] = useState(false);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useObservedCamera();
 
   useEffect(() => {
     // disable joystick if camera has no pan/tilt controls
-    // pantilt = "n/N"
-    if (
-      camSettings &&
-      camSettings.pantilt &&
-      camSettings.pantilt.trim().toUpperCase() === "N"
-    ) {
+    if (camSettings && !camSettings.hasPanTilt) {
       setIsEnabled(false);
     } else {
       setIsEnabled(true);
@@ -56,68 +37,21 @@ export default function Joystick() {
     }, 100); //was 800 - changed to be closer to zoom/focus load 07oct2024-mjs
   }, []);
 
-  const sendPanTiltCommand = (commandValue) => {
-    // add timestamp to command sent to imaging server for debug
-    const timestamp = new Date().toISOString();
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.panTiltCommand,
-        value: commandValue,
-        timestamp: timestamp,
-      },
-    });
-  };
+  // The in-flight drive; the library owns the keepalive that re-sends the
+  // latest move until the gesture ends.
+  const driveRef = useRef(null);
 
-  // the joystickSpitter is a ref object that tracks the state of the timer
-  // created during a Joystick interaction
-  const joystickSpitter = useRef({
-    intervalId: null,
-    lastMove: null,
-  });
-
-  const startSpitter = () => {
-    if (joystickSpitter.current.intervalId) {
-      return;
-    }
-    console.log("START SPITTER FUNC");
-    joystickSpitter.current.intervalId = setInterval(() => {
-      // continuously spit out the last move message
-      if (joystickSpitter.current.lastMove) {
-        sendPanTiltCommand(joystickSpitter.current.lastMove);
-      }
-    }, 100);
-  };
-
-  const stopSpitter = () => {
-    clearInterval(joystickSpitter.current.intervalId);
-    joystickSpitter.current.intervalId = null;
-  };
-
-  // Unnmount this component here
-  useEffect(() => {
-    return () => {
-      // stop the spitter when we unmount this component
-      stopSpitter();
-      // clear out Redux joystickStatus queue as well
-      const payload = null;
-      dispatch(setJoystickStatus(payload));
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!joystickStatus) {
-      // no op
-    } else if (joystickStatus.actionType === "move") {
-      // enqueue this move for the spitter timer
-      joystickSpitter.current.lastMove = joystickStatus;
-    } else if (joystickStatus.actionType === "end") {
-      stopSpitter();
-      sendPanTiltCommand(joystickStatus);
-    }
-  }, [joystickStatus]);
+  // Stop the keepalive if we unmount mid-gesture (without sending an end).
+  useEffect(
+    () => () => {
+      driveRef.current?.cancel();
+      driveRef.current = null;
+    },
+    []
+  );
 
   const handleJoystickEvents = (evt, data) => {
-    const payload = {
+    const move = {
       actionType: evt.type,
       position: data.position,
       distance: data.distance,
@@ -125,17 +59,14 @@ export default function Joystick() {
       direction: data.direction,
     };
     if (evt.type === "start") {
-      sendPanTiltCommand(payload);
-      startSpitter();
-      // enqueue a fake "move" event for the spitter
-      // note: angle and direction will be undefined
-      joystickSpitter.current.lastMove = {
-        ...payload,
-        distance: 0,
-        actionType: "move",
-      };
+      driveRef.current?.cancel();
+      driveRef.current = camera.startPanTilt(move);
+    } else if (evt.type === "move") {
+      driveRef.current?.update(move);
+    } else if (evt.type === "end") {
+      driveRef.current?.end(move);
+      driveRef.current = null;
     }
-    dispatch(setJoystickStatus(payload));
   };
 
   if (!showJoystick || !isEnabled) {

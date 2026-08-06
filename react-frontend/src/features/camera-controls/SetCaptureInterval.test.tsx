@@ -2,23 +2,14 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import React from "react";
 import { cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { configureStore } from "@reduxjs/toolkit";
-import cameraControlsReducer from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { ACTIONS } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import SetCaptureInterval from "./SetCaptureInterval.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
-
-type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
-
-function makeStore(overrides: Partial<CameraControlsState> = {}) {
-  const baseState = cameraControlsReducer(undefined, { type: "@@INIT" } as any);
-  return configureStore({
-    reducer: { cameraControls: cameraControlsReducer },
-    preloadedState: { cameraControls: { ...baseState, ...overrides } },
-  });
-}
 
 afterEach(() => {
   cleanup();
@@ -40,13 +31,15 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
-      camHeartbeatData: { capture_interval: "0" },
+    const store = makeCameraControlsStore({
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { capture_interval: "0" } },
     });
 
     const { getByRole, getByText } = renderWithProviders(
-      <SetCaptureInterval />,
+      <ObservedCameraProvider>
+        <SetCaptureInterval />
+      </ObservedCameraProvider>,
       {
         store,
       },
@@ -65,7 +58,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       timestamp: expect.any(String),
       camera: null,
       command: scenario.cameraCommand,
-      action: { name: COMMAND_STRINGS.captureIntervalCommand, value: "20" },
+      action: { name: ACTIONS.stillImageCapture, value: "20" },
     });
   },
 );
@@ -78,12 +71,16 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
-      camHeartbeatData: { capture_interval: "20" },
+    const store = makeCameraControlsStore({
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { capture_interval: "20" } },
     });
 
-    const { getByText } = renderWithProviders(<SetCaptureInterval />, {
+    const { getByText } = renderWithProviders(
+      <ObservedCameraProvider>
+        <SetCaptureInterval />
+      </ObservedCameraProvider>,
+      {
       store,
     });
 
@@ -97,7 +94,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       timestamp: expect.any(String),
       camera: null,
       command: scenario.cameraCommand,
-      action: { name: COMMAND_STRINGS.captureIntervalCommand, value: "0" },
+      action: { name: ACTIONS.stillImageCapture, value: "0" },
     });
   },
 );

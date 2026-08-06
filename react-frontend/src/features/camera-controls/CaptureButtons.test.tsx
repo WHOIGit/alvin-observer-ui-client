@@ -3,25 +3,16 @@ import React from "react";
 import { cleanup, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
-import cameraControlsReducer, {
-  changeCamHeartbeat,
+import {
+  storeCamHeartbeat,
 } from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { emitTo, makeCameraControlsStore } from "../../../tests/imaging-test-utils";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { ACTIONS } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import CaptureButtons from "./CaptureButtons.jsx";
-
-type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
-
-// Helper to create a Redux store with the cameraControls slice
-function makeStore(overrides: Partial<CameraControlsState> = {}) {
-  const baseState = cameraControlsReducer(undefined, { type: "@@INIT" } as any);
-  return configureStore({
-    reducer: { cameraControls: cameraControlsReducer },
-    preloadedState: { cameraControls: { ...baseState, ...overrides } },
-  });
-}
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 
 afterEach(() => {
   // Unmount React trees created with render()
@@ -42,27 +33,44 @@ test.each(SOCKET_USER_SCENARIOS)(
     ] as any;
     const activeCamera = allCameras[1];
     const recorderHeartbeatData = {
-      recording: "true",
+      isRecording: true,
       camera: "Cam 1",
       filename: "rec-file-001",
     } as any;
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
+    const store = makeCameraControlsStore({
+      ownStationId: scenario.stationId,
       allCameras,
       activeCamera,
       recorderHeartbeatData,
     });
 
-    store.dispatch(changeCamHeartbeat({ focus_mode: "AF" } as any));
+    store.dispatch(
+      storeCamHeartbeat({
+        stationId: scenario.stationId,
+        heartbeat: { focus_mode: "AF" },
+      } as any),
+    );
 
     const { getByText } = render(
       <Provider store={store}>
-        <CaptureButtons />
+        <ObservedCameraProvider>
+          <CaptureButtons />
+        </ObservedCameraProvider>
       </Provider>,
     );
 
     await h.connected;
+    // The library resolves the record command's previousCamera from the
+    // recorder heartbeat (display name) and the camera list.
+    emitTo(h, scenario.namespace, "RecorderHeartbeat", {
+      camera: "Cam 1",
+      recording: "true",
+      filename: "rec-file-001",
+    });
+    emitTo(h, scenario.namespace, NEW_CAMERA_COMMAND_EVENT, {
+      camera_array: allCameras,
+    });
     await user.click(getByText("Record Source"));
 
     const { namespace, args } = await h.gotCmd;
@@ -74,7 +82,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       command: scenario.cameraCommand,
       oldCamera: "cam-1",
       action: {
-        name: COMMAND_STRINGS.recordSourceCommand,
+        name: ACTIONS.recordSource,
         value: activeCamera.camera,
       },
     });
@@ -89,14 +97,21 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
+    const store = makeCameraControlsStore({
+      ownStationId: scenario.stationId,
     });
-    store.dispatch(changeCamHeartbeat({ focus_mode: "AF" } as any));
+    store.dispatch(
+      storeCamHeartbeat({
+        stationId: scenario.stationId,
+        heartbeat: { focus_mode: "AF" },
+      } as any),
+    );
 
     const { getByText } = render(
       <Provider store={store}>
-        <CaptureButtons />
+        <ObservedCameraProvider>
+          <CaptureButtons />
+        </ObservedCameraProvider>
       </Provider>,
     );
 
@@ -111,7 +126,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.stillImageCaptureCommand,
+        name: ACTIONS.stillImageCapture,
         value: {
           imgTransferChecked: false,
           interval: 0,
@@ -124,11 +139,13 @@ test.each(SOCKET_USER_SCENARIOS)(
 test("does not render if camera is not initialized", async () => {
   // Initialize the Redux store but we do NOT set the focus mode, so the camera
   // should remain in an 'uninitialized' state.
-  const store = makeStore({});
+  const store = makeCameraControlsStore({});
 
   const { getByText } = render(
     <Provider store={store}>
-      <CaptureButtons />
+      <ObservedCameraProvider>
+        <CaptureButtons />
+      </ObservedCameraProvider>
     </Provider>,
   );
 

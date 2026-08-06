@@ -10,13 +10,12 @@ import {
   Typography,
 } from "@mui/material";
 // local imports
-import {
-  selectActiveCamera,
-  selectCamHeartbeatData,
-  selectObserverSide,
- } from "./cameraControlsSlice";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
-import { COMMAND_STRINGS } from "../../config.js";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
+import { useObservedCamera } from "./ObservedCameraProvider";
+
+// Choices offered for the recurring still-capture interval, in seconds;
+// "0" stops the recurring capture.
+const CAPTURE_INTERVAL_OPTIONS = ["0", "20", "30", "40", "50", "60"];
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,32 +40,22 @@ export default function SelectCaptureInterval() {
   const [value, setValue] = useState(null);
   const [captureEnabled, setCaptureEnabled] = useState(true);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useObservedCamera();
 
   const handleValueChange = (event) => {
     setValue(event.target.value);
   };
 
   const handleSendMessage = () => {
-    // stop capture interval by sending 0 string to the AIS
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.captureIntervalCommand,
-        value: captureEnabled ? value : "0",
-      },
-    });
+    // "0" stops the recurring capture; otherwise send the selected interval.
+    camera.setCaptureInterval(captureEnabled ? value : "0");
   };
 
   useEffect(() => {
     // only set value from camSettings if null so we can update the select field without
     // changing the current value, needs to wait for button push
     if (value === null) {
-      camSettings && setValue(camSettings.capture_interval);
+      camSettings && setValue(camSettings.capture_interval ?? "");
     }
   }, [camSettings, value]);
 
@@ -92,7 +81,7 @@ export default function SelectCaptureInterval() {
               value={value}
               disabled={!captureEnabled}
             >
-              {COMMAND_STRINGS.captureIntervalOptions.map((item) => (
+              {CAPTURE_INTERVAL_OPTIONS.map((item) => (
                 <MenuItem value={item} key={item}>
                   {item} secs
                 </MenuItem>

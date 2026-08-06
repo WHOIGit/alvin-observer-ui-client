@@ -5,14 +5,12 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import {
-  selectActiveCamera,
   selectCamHeartbeatData,
   selectCurrentCamData,
   selectExposureControlsEnabled,
-  selectObserverSide,
 } from "./cameraControlsSlice";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
-import { COMMAND_STRINGS } from "../../config.js";
+import { useObservedCamera } from "./ObservedCameraProvider";
+import { EXPOSURE_MODES } from "../../lib/imaging-client";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,28 +30,18 @@ export default function SelectIrisMode() {
   const controlEnabled = useSelector(selectExposureControlsEnabled);
   const [isEnabled, setIsEnabled] = useState(true);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useObservedCamera();
 
   const handleSendMessage = (event) => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.irisModeCommand,
-        value: event.target.value,
-      },
-    });
+    camera.setIris(event.target.value);
   };
 
   useEffect(() => {
     // list of exposure modes that disable this function
     // AUTO, SP
     const disabledExposureModes = [
-      COMMAND_STRINGS.exposureModeOptions[0],
-      COMMAND_STRINGS.exposureModeOptions[2],
+      EXPOSURE_MODES.AUTO,
+      EXPOSURE_MODES.SHUTTER_PRIORITY,
     ];
 
     // disable if an Exposure mode changes is currently processing
@@ -79,7 +67,7 @@ export default function SelectIrisMode() {
         <Select
           labelId="shutter-select-label"
           id="shutter-select"
-          value={isEnabled ? camSettings.iris : ""}
+          value={isEnabled ? camSettings.iris ?? "" : ""}
           onChange={handleSendMessage}
           disabled={!isEnabled}
         >

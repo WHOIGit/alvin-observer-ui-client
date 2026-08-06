@@ -2,23 +2,14 @@ import { afterEach, expect, test } from "vitest";
 import React from "react";
 import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { configureStore } from "@reduxjs/toolkit";
-import cameraControlsReducer from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { ACTIONS, EXPOSURE_MODES } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import SelectExposureMode from "./SelectExposureMode.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
-
-type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
-
-function makeStore(overrides: Partial<CameraControlsState> = {}) {
-  const baseState = cameraControlsReducer(undefined, { type: "@@INIT" } as any);
-  return configureStore({
-    reducer: { cameraControls: cameraControlsReducer },
-    preloadedState: { cameraControls: { ...baseState, ...overrides } },
-  });
-}
 
 afterEach(() => {
   cleanup();
@@ -32,20 +23,24 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
-      camHeartbeatData: {
-        exposure: COMMAND_STRINGS.exposureModeOptions[0],
-        camctrl: "y",
-        camera: "cam-1",
-        owner: scenario.namespace.replace(/^\//, ""),
+    const store = makeCameraControlsStore({
+      ownStationId: scenario.stationId,
+      camHeartbeats: {
+        [scenario.stationId]: {
+          exposure: EXPOSURE_MODES.AUTO,
+          isControllable: true,
+          camera: "cam-1",
+          owner: scenario.namespace.replace(/^\//, ""),
+        },
       },
       allCameras: [{ camera: "cam-1", cam_name: "Cam 1" }],
       activeCamera: { camera: "cam-1", cam_name: "Cam 1" } as any,
     });
 
     const { getByRole, getByText } = renderWithProviders(
-      <SelectExposureMode showLabel="horizontal" />,
+      <ObservedCameraProvider>
+        <SelectExposureMode showLabel="horizontal" />
+      </ObservedCameraProvider>,
       { store },
     );
 
@@ -61,9 +56,35 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: "cam-1",
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.exposureModeCommand,
-        value: COMMAND_STRINGS.exposureModeOptions[1],
+        name: ACTIONS.exposureMode,
+        value: EXPOSURE_MODES.MANUAL,
       },
     });
   },
 );
+
+test("hides the control when the camera reports a driver fault", () => {
+  const store = makeCameraControlsStore({
+    ownStationId: "P",
+    camHeartbeats: {
+      P: {
+        exposure: null,
+        isControllable: true,
+        camera: "cam-1",
+        owner: "port",
+        faults: { exposure: true },
+      },
+    },
+    allCameras: [{ camera: "cam-1", cam_name: "Cam 1" }],
+    activeCamera: { camera: "cam-1", cam_name: "Cam 1" } as any,
+  });
+
+  const { container } = renderWithProviders(
+    <ObservedCameraProvider>
+      <SelectExposureMode showLabel="horizontal" />
+    </ObservedCameraProvider>,
+    { store },
+  );
+
+  expect(container.firstChild).toBe(null);
+});

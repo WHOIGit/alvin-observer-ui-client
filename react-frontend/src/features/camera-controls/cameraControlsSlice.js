@@ -1,7 +1,8 @@
 import { createSlice, original } from "@reduxjs/toolkit";
 import { isEqual } from "lodash";
 import { createSelector } from "reselect";
-import { COMMAND_STRINGS, VIDEO_STREAM_CONFIG } from "../../config.js";
+import { VIDEO_STREAM_CONFIG } from "../../config.js";
+import { COMMAND_KINDS, STATIONS } from "../../lib/imaging-client";
 
 // set default settings
 const defaultObserverVideoSrc =
@@ -12,29 +13,23 @@ const defaultRecordVideoSrc =
   window.PILOT_MODE === true ? null : VIDEO_STREAM_CONFIG.portRecordVideo;
 
 const initialState = {
-  observerSide: window.PILOT_MODE === true ? "PL" : null, // P = Port, S = Starboard, PL = Pilot
+  ownStationId: window.PILOT_MODE === true ? STATIONS.PILOT : null,
   observerVideoSrc: defaultObserverVideoSrc,
   recordVideoSrc: defaultRecordVideoSrc,
-  initialCamHeartbeat: null,
+  // CamHeartbeats keyed by StationId. An observer console fills only its own
+  // entry; the pilot fills all three.
+  initialCamHeartbeats: {},
+  camHeartbeats: {},
   activeCamera: null,
-  camHeartbeatData: null,
-  camHeartbeatDataPort: null, // observer specific heartbeat data for Pilot UI
-  camHeartbeatDataStbd: null, // observer specific heartbeat data for Pilot UI
   recorderHeartbeatData: null,
   currentCamData: null,
-  lastCommand: null,
-  joystickStatus: null,
   recorderResponseError: false,
   videoSourceEnabled: true,
   exposureControlsEnabled: true,
   recordControlsEnabled: true,
-  errorCameraChange: false,
-  // array of commands
-  commandsQueue: [],
   allCameras: [],
   routerOutputs: [],
   routerInputs: [],
-  socketError: false,
 };
 
 const getCameraConfig = (cameraId, cameras) => {
@@ -42,19 +37,43 @@ const getCameraConfig = (cameraId, cameras) => {
   return cameraConfig;
 };
 
+// The currentSettings field each mirrored settings kind writes when its
+// receipt confirms. applyCommandResult and the delivery filter both derive
+// from this map, so a kind is mirrored exactly when it has an entry here
+// (SELECT_CAMERA is the one non-settings mirrored kind).
+const SETTINGS_FIELD_BY_KIND = {
+  [COMMAND_KINDS.SET_FOCUS_MODE]: "focus_mode",
+  [COMMAND_KINDS.SET_SHUTTER]: "shu",
+  [COMMAND_KINDS.SET_IRIS]: "irs",
+  [COMMAND_KINDS.SET_ISO]: "iso",
+  [COMMAND_KINDS.SET_EXPOSURE_MODE]: "exposure",
+};
+
+const MIRRORED_COMMAND_KINDS = new Set([
+  COMMAND_KINDS.SELECT_CAMERA,
+  ...Object.keys(SETTINGS_FIELD_BY_KIND),
+]);
+
+// Predicate for Station.onCommandResult: deliver the outcomes the reducer
+// mirrors into state, plus every failure so it gets logged. Successful
+// high-frequency receipts — pan/tilt (10 Hz), focus, zoom, still capture —
+// never reach the store at all.
+export const commandResultAppliesToState = (result) =>
+  MIRRORED_COMMAND_KINDS.has(result?.kind) || result?.isOk === false;
+
 export const cameraControlsSlice = createSlice({
   name: "cameraControls",
   initialState: initialState,
   reducers: {
-    setObserverSide: (state, action) => {
-      state.observerSide = action.payload;
-      if (action.payload === "P") {
+    setOwnStationId: (state, action) => {
+      state.ownStationId = action.payload;
+      if (action.payload === STATIONS.PORT) {
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;
         if (window.PILOT_MODE !== true) {
           state.recordVideoSrc = VIDEO_STREAM_CONFIG.portRecordVideo; //mjs-added-19apr2022
         }
       }
-      if (action.payload === "S") {
+      if (action.payload === STATIONS.STARBOARD) {
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.stbdObserverVideo;
         if (window.PILOT_MODE !== true) {
           state.recordVideoSrc = VIDEO_STREAM_CONFIG.stbdRecordVideo; //mjs-added-19apr2022
@@ -68,114 +87,52 @@ export const cameraControlsSlice = createSlice({
       );
       state.activeCamera = activeCamera;
     },
-    setLastCommand: (state, action) => {
-      state.lastCommand = action.payload;
-      state.lastCommand.action.name = action.payload.action.name;
-      state.lastCommand.action.value = action.payload.action.value;
-      state.lastCommand.status = "PENDING";
+    // Applies a settled command's outcome to the live camera state. The
+    // imaging-client correlates receipts to commands and reports them by
+    // semantic kind; failed commands leave state untouched.
+    applyCommandResult: (state, action) => {
+      const { kind, value, isOk } = action.payload;
+      if (!isOk) {
+        console.log("ERROR Received from AIS", kind, action.payload.receipt);
+        return;
+      }
+      if (kind === COMMAND_KINDS.SELECT_CAMERA) {
+        // The result can beat the camera_array broadcast; keep the previous
+        // active camera rather than clobbering it with undefined.
+        const activeCamera = getCameraConfig(value, state.allCameras);
+        if (activeCamera) state.activeCamera = activeCamera;
+        return;
+      }
+      // A result can beat the first settings broadcast, in which case there
+      // is no currentSettings object to update yet.
+      const field = SETTINGS_FIELD_BY_KIND[kind];
+      const currentSettings = state.currentCamData?.currentSettings;
+      if (field && currentSettings) {
+        currentSettings[field] = value;
+      }
     },
-    addCommandQueue: (state, action) => {
-      state.commandsQueue = state.commandsQueue.concat(action.payload);
-    },
-    changeCameraSettings: (state, action) => {
-      // need to check confirmation of successful command from WebSocket
-      state.commandsQueue.forEach((element) => {
-        if (action.payload.eventId === element.eventId) {
-          // If websocket receipt returns OK, update the live settings
-          if (action.payload.receipt.status === "OK") {
-            state.errorCameraChange = false;
-            // change the camera settings
-            switch (element.action.name) {
-              // change observer camera
-              case COMMAND_STRINGS.cameraChangeCommand:
-                const activeCamera = getCameraConfig(
-                  element.action.value,
-                  state.allCameras
-                );
-                state.activeCamera = activeCamera;
-                break;
-              // change focus mode
-              case COMMAND_STRINGS.focusModeCommand:
-                state.currentCamData.currentSettings.focus_mode =
-                  element.action.value;
-                break;
-              // change shutter mode
-              case COMMAND_STRINGS.shutterModeCommand:
-                state.currentCamData.currentSettings.SHU = element.action.value;
-                break;
-              // change iris mode
-              case COMMAND_STRINGS.irisModeCommand:
-                state.currentCamData.currentSettings.IRS = element.action.value;
-                break;
-              // change iso mode
-              case COMMAND_STRINGS.isoModeCommand:
-                state.currentCamData.currentSettings.ISO = element.action.value;
-                break;
-              // change exposure mode
-              case COMMAND_STRINGS.exposureModeCommand:
-                state.currentCamData.currentSettings.exposure_mode =
-                  element.action.value;
-                break;
-              default:
-            }
-          } else {
-            console.log("ERROR Received from AIS");
-            state.errorCameraChange = true;
-          }
-        }
-        // remove command from queue
-        state.commandsQueue = state.commandsQueue.filter(
-          (item) => item.eventId !== action.payload.eventId
-        );
-      });
-    },
-    changeCamHeartbeat: (state, action) => {
-      if (state.initialCamHeartbeat === null) {
-        state.initialCamHeartbeat = action.payload;
+    // Stores a station's latest heartbeat. eventId/timestamp churn on every
+    // message, so they're stripped — without mutating the action, which
+    // Immer does not draft — before the change check.
+    storeCamHeartbeat: (state, action) => {
+      const { stationId } = action.payload;
+      const { eventId, timestamp, ...heartbeat } = action.payload.heartbeat;
+
+      if (!state.initialCamHeartbeats[stationId]) {
+        state.initialCamHeartbeats[stationId] = heartbeat;
       }
 
-      // get the original state to check Heartbeat data
       const currentState = original(state);
-      const camHeartbeatData = action.payload;
-      delete camHeartbeatData.eventId;
-      delete camHeartbeatData.timestamp;
-
-      if (isEqual(currentState.camHeartbeatData, camHeartbeatData)) {
+      if (isEqual(currentState.camHeartbeats[stationId], heartbeat)) {
         return state;
       }
-
-      state.camHeartbeatData = action.payload;
-    },
-    changeCamHeartbeatPort: (state, action) => {
-      // get the original state to check Heartbeat data
-      const currentState = original(state);
-      const camHeartbeatDataPort = action.payload;
-      delete camHeartbeatDataPort.eventId;
-      delete camHeartbeatDataPort.timestamp;
-
-      if (isEqual(currentState.camHeartbeatDataPort, camHeartbeatDataPort)) {
-        return state;
-      }
-      state.camHeartbeatDataPort = action.payload;
-    },
-    changeCamHeartbeatStbd: (state, action) => {
-      // get the original state to check Heartbeat data
-      const currentState = original(state);
-      const camHeartbeatDataStbd = action.payload;
-      delete camHeartbeatDataStbd.eventId;
-      delete camHeartbeatDataStbd.timestamp;
-
-      if (isEqual(currentState.camHeartbeatDataStbd, camHeartbeatDataStbd)) {
-        return state;
-      }
-      state.camHeartbeatDataStbd = action.payload;
+      state.camHeartbeats[stationId] = heartbeat;
     },
     changeRecorderHeartbeat: (state, action) => {
       // get the original state to check Heartbeat data
       const currentState = original(state);
-      const data = action.payload;
-      delete data.eventId;
-      //delete data.timestamp;
+      // Strip the per-message eventId without mutating the action.
+      const { eventId, ...data } = action.payload;
       if (isEqual(currentState.recorderHeartbeatData, data)) {
         return state;
       }
@@ -187,9 +144,6 @@ export const cameraControlsSlice = createSlice({
       state.currentCamData.ISO = action.payload.ISO;
       state.currentCamData.SHU = action.payload.SHU;
       state.currentCamData.currentSettings = action.payload.current_settings;
-    },
-    setJoystickStatus: (state, action) => {
-      state.joystickStatus = action.payload;
     },
     setRecorderError: (state, action) => {
       state.recorderResponseError = action.payload;
@@ -203,9 +157,6 @@ export const cameraControlsSlice = createSlice({
     setRecordControlsEnabled: (state, action) => {
       state.recordControlsEnabled = action.payload;
     },
-    setErrorCameraChange: (state, action) => {
-      state.errorCameraChange = action.payload;
-    },
     setAllCameras: (state, action) => {
       state.allCameras = action.payload;
     },
@@ -215,34 +166,24 @@ export const cameraControlsSlice = createSlice({
     setRouterInputs: (state, action) => {
       state.routerInputs = action.payload;
     },
-    setSocketError: (state, action) => {
-      state.socketError = action.payload;
-    },
   },
 });
 
 // Action creators are generated for each case reducer function
 export const {
   changeActiveCamera,
-  changeCameraSettings,
-  changeCamHeartbeat,
-  changeCamHeartbeatPort,
-  changeCamHeartbeatStbd,
+  applyCommandResult,
+  storeCamHeartbeat,
   changeRecorderHeartbeat,
   changeCurrentCamData,
-  setLastCommand,
-  setObserverSide,
-  setJoystickStatus,
+  setOwnStationId,
   setRecorderError,
   setVideoSourceEnabled,
-  addCommandQueue,
   setExposureControlsEnabled,
   setRecordControlsEnabled,
-  setErrorCameraChange,
   setAllCameras,
   setRouterOutputs,
   setRouterInputs,
-  setSocketError,
 } = cameraControlsSlice.actions;
 
 export default cameraControlsSlice.reducer;
@@ -261,27 +202,22 @@ export const selectActiveCamera = (state) => {
 export const selectActiveCameraConfig = (state) =>
   state.cameraControls.activeCamera;
 
-// return the current Observer Side
-export const selectObserverSide = (state) => state.cameraControls.observerSide;
+// return this console's own StationId
+export const selectOwnStationId = (state) => state.cameraControls.ownStationId;
 
-// use createSelector to create memoized selector
-// return the current CamHeartbeat data
-export const selectCamHeartbeatData = createSelector(
-  (state) => state.cameraControls.camHeartbeatData,
-  (item) => item
-);
+// return a specific station's latest CamHeartbeat (null before one arrives)
+export const selectCamHeartbeatFor = (state, stationId) =>
+  state.cameraControls.camHeartbeats[stationId] ?? null;
 
-// return the Port CamHeartbeat data
-export const selectCamHeartbeatDataPort = (state) =>
-  state.cameraControls.camHeartbeatDataPort;
+// return the own station's current CamHeartbeat data
+export const selectCamHeartbeatData = (state) =>
+  selectCamHeartbeatFor(state, state.cameraControls.ownStationId);
 
-// return the Starboard CamHeartbeat data
-export const selectCamHeartbeatDataStbd = (state) =>
-  state.cameraControls.camHeartbeatDataStbd;
-
-// return the initial cached CamHeartbeat data
+// return the initial cached CamHeartbeat for the own station
 export const selectInitialCamHeartbeatData = (state) =>
-  state.cameraControls.initialCamHeartbeat;
+  state.cameraControls.initialCamHeartbeats[
+    state.cameraControls.ownStationId
+  ] ?? null;
 
 // return the current RecorderHeartbeat data
 //export const selectRecorderHeartbeatData = (state) =>
@@ -298,10 +234,6 @@ export const selectRecorderHeartbeatData = createSelector(
 export const selectCurrentCamData = (state) =>
   state.cameraControls.currentCamData;
 
-// return the current joystick status
-export const selectJoystickStatus = (state) =>
-  state.cameraControls.joystickStatus;
-
 // return the error status of last Recorder response
 export const selectRecorderResponseError = (state) =>
   state.cameraControls.recorderResponseError;
@@ -317,10 +249,6 @@ export const selectExposureControlsEnabled = (state) =>
 // return if Record Button should be enabled/disabled
 export const selectRecordControlsEnabled = (state) =>
   state.cameraControls.recordControlsEnabled;
-
-// return error disable
-export const selectErrorCameraChange = (state) =>
-  state.cameraControls.errorCameraChange;
 
 // return initial camera config values supplied by AIS
 export const selectAllCameras = createSelector(
@@ -339,9 +267,3 @@ export const selectRouterInputs = createSelector(
   (state) => state.cameraControls.routerInputs,
   (item) => item
 );
-
-// return socket error status
-export const selectSocketError = (state) => state.cameraControls.socketError;
-
-// return last command
-export const selectLastCommand = (state) => state.cameraControls.lastCommand;

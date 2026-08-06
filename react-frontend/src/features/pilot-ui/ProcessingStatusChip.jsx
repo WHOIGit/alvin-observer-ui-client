@@ -39,7 +39,7 @@ export default function ProcessingStatusChip() {
   });
 
   useEffect(() => {
-    if (lastMessage?.processing_complete === "true") {
+    if (lastMessage?.isProcessingComplete) {
       setIsProcessingComplete(true);
     } else {
       setIsProcessingComplete(false);

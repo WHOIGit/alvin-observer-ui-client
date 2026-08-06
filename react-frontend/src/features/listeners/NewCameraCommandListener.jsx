@@ -1,46 +1,38 @@
-import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSocketListener } from "../../hooks/useSocket";
-import { NEW_CAMERA_COMMAND_EVENT } from "../../config";
 import {
+  useCameraList,
+  useCameraSettings,
+  useCommandResult,
+  useRouterInputs,
+  useRouterOutputs,
+} from "../../hooks/useImagingClient";
+import {
+  applyCommandResult,
+  commandResultAppliesToState,
   changeCurrentCamData,
   setAllCameras,
   setRouterOutputs,
   setRouterInputs,
-  changeCameraSettings,
-  selectObserverSide,
+  selectOwnStationId,
 } from "../camera-controls/cameraControlsSlice";
-import { getObserverInfo } from "../../utils/observerSide";
 
-export default function NewCameraCommandListener({ namespaceOverride = null }) {
+// Feeds the server's newCameraCommand traffic into Redux. The library splits
+// the event into typed channels: configuration broadcasts (camera list,
+// router topology, settings options) and settled command results, which the
+// library has already correlated to their receipts by eventId.
+export default function NewCameraCommandListener({ station = null }) {
   const dispatch = useDispatch();
-  const observerSide = useSelector(selectObserverSide);
-  const namespaceInfo = useMemo(
-    () => getObserverInfo(namespaceOverride || observerSide),
-    [namespaceOverride, observerSide]
-  );
+  const ownStationId = useSelector(selectOwnStationId);
+  const stationId = station || ownStationId;
 
-  const handleMessage = useCallback(
-    (message) => {
-      if ("current_settings" in message) {
-        dispatch(changeCurrentCamData(message));
-      } else if ("camera_array" in message) {
-        dispatch(setAllCameras(message.camera_array));
-      } else if ("router_output_array" in message) {
-        dispatch(setRouterOutputs(message.router_output_array));
-      } else if ("router_input_array" in message) {
-        dispatch(setRouterInputs(message.router_input_array));
-      } else {
-        dispatch(changeCameraSettings(message));
-      }
-    },
-    [dispatch]
-  );
-
-  useSocketListener(
-    namespaceInfo.namespacePath,
-    NEW_CAMERA_COMMAND_EVENT,
-    handleMessage
+  useCameraSettings(stationId, (message) => dispatch(changeCurrentCamData(message)));
+  useCameraList(stationId, (cameras) => dispatch(setAllCameras(cameras)));
+  useRouterOutputs(stationId, (outputs) => dispatch(setRouterOutputs(outputs)));
+  useRouterInputs(stationId, (inputs) => dispatch(setRouterInputs(inputs)));
+  useCommandResult(
+    stationId,
+    (result) => dispatch(applyCommandResult(result)),
+    commandResultAppliesToState
   );
 
   return null;

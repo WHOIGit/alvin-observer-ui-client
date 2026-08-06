@@ -10,13 +10,9 @@ import {
   Button,
 } from "@mui/material";
 // local imports
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
-import {
-  selectActiveCamera,
-  selectCamHeartbeatData,
-  selectObserverSide,
-} from "./cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
+import { useObservedCamera } from "./ObservedCameraProvider";
+import { selectCamHeartbeatData } from "./cameraControlsSlice";
+import { WHITE_BALANCE_MODES } from "../../lib/imaging-client";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -38,29 +34,14 @@ export default function SelectWhiteBalance({ showLabel }) {
   const camSettings = useSelector(selectCamHeartbeatData);
   const labelText = "WHITE BALANCE:";
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useObservedCamera();
 
   const handleSendMessage = (event) => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.whiteBalanceCommand,
-        value: event.target.value,
-      },
-    });
+    camera.setWhiteBalance(event.target.value);
   };
 
   const handleOnePushMessage = () => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.whiteBalanceCommand,
-        value: COMMAND_STRINGS.whiteBalanceOnePushCommandValue,
-      },
-    });
+    camera.triggerOnePushWhiteBalance();
   };
 
   // set up label options
@@ -85,12 +66,12 @@ export default function SelectWhiteBalance({ showLabel }) {
         <FormControl variant="standard" className={classes.formControl}>
           <Select
             id="exposure-select"
-            value={camSettings.white_balance}
+            value={camSettings.white_balance ?? ""}
             label={labelText}
             onChange={handleSendMessage}
             displayEmpty={displayEmpty}
           >
-            {COMMAND_STRINGS.whiteBalanceOptions.map((item) => (
+            {Object.values(WHITE_BALANCE_MODES).map((item) => (
               <MenuItem value={item} key={item}>
                 {item}
               </MenuItem>
@@ -100,7 +81,7 @@ export default function SelectWhiteBalance({ showLabel }) {
       </Grid>
 
       <Grid item xs={12}>
-        {camSettings.white_balance.includes("ONE_PUSH") && (
+        {camSettings.white_balance === WHITE_BALANCE_MODES.ONE_PUSH && (
           <div className={classes.onePushBtn}>
             <Button
               variant="contained"

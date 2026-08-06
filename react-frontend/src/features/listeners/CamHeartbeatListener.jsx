@@ -1,46 +1,37 @@
-import React, { useCallback, useMemo } from "react";
+import { useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSocketListener } from "../../hooks/useSocket";
+import { isEqual } from "lodash";
+import { useCamHeartbeat } from "../../hooks/useImagingClient";
+import { getStationInfo } from "../../lib/imaging-client";
 import {
-  CAM_HEARTBEAT,
-  WS_SERVER_NAMESPACE_PORT,
-  WS_SERVER_NAMESPACE_STARBOARD,
-} from "../../config";
-import {
-  changeCamHeartbeat,
-  changeCamHeartbeatPort,
-  changeCamHeartbeatStbd,
-  selectObserverSide,
+  selectOwnStationId,
+  storeCamHeartbeat,
 } from "../camera-controls/cameraControlsSlice";
-import { getObserverInfo } from "../../utils/observerSide";
 
-export default function CamHeartbeatListener({ namespaceOverride = null }) {
+// Ingests one station's CamHeartbeat into the station-keyed Redux map.
+// Defaults to the console's own station; the pilot mounts extra instances
+// for the observer stations it mirrors.
+export default function CamHeartbeatListener({ station = null }) {
   const dispatch = useDispatch();
-  const observerSide = useSelector(selectObserverSide);
-  const namespaceInfo = useMemo(
-    () => getObserverInfo(namespaceOverride || observerSide),
-    [namespaceOverride, observerSide]
-  );
+  const ownStationId = useSelector(selectOwnStationId);
+  const stationId = getStationInfo(station || ownStationId).stationId;
+
+  // The store ignores eventId/timestamp churn, so skip the dispatch entirely
+  // when nothing else changed — a no-op dispatch still re-runs every
+  // subscribed selector at heartbeat rate.
+  const lastHeartbeatRef = useRef(null);
 
   const handleMessage = useCallback(
-    (message) => {
-      // If namespaceOverride is provided (Pilot UI listening to observers),
-      // use observer-specific reducers. Otherwise use main reducer.
-      if (namespaceOverride) {
-        if (namespaceInfo.namespace === WS_SERVER_NAMESPACE_PORT) {
-          dispatch(changeCamHeartbeatPort(message));
-        } else if (namespaceInfo.namespace === WS_SERVER_NAMESPACE_STARBOARD) {
-          dispatch(changeCamHeartbeatStbd(message));
-        }
-      } else {
-        // Regular observer UI - always use main reducer
-        dispatch(changeCamHeartbeat(message));
-      }
+    (heartbeat) => {
+      const { eventId, timestamp, ...comparable } = heartbeat;
+      if (isEqual(lastHeartbeatRef.current, comparable)) return;
+      lastHeartbeatRef.current = comparable;
+      dispatch(storeCamHeartbeat({ stationId, heartbeat }));
     },
-    [namespaceOverride, namespaceInfo, dispatch]
+    [dispatch, stationId]
   );
 
-  useSocketListener(namespaceInfo.namespacePath, CAM_HEARTBEAT, handleMessage);
+  useCamHeartbeat(stationId, handleMessage);
 
   return null;
 }

@@ -2,23 +2,14 @@ import { afterEach, expect, test, vi } from "vitest";
 import React from "react";
 import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { configureStore } from "@reduxjs/toolkit";
-import cameraControlsReducer from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
+import { ACTIONS, FOCUS_CONTROLS } from "../../lib/imaging-client";
 import FocusZoomButton from "./FocusZoomButton.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
-
-type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
-
-function makeStore(overrides: Partial<CameraControlsState> = {}) {
-  const baseState = cameraControlsReducer(undefined, { type: "@@INIT" } as any);
-  return configureStore({
-    reducer: { cameraControls: cameraControlsReducer },
-    preloadedState: { cameraControls: { ...baseState, ...overrides } },
-  });
-}
 
 afterEach(() => {
   cleanup();
@@ -32,22 +23,23 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.step = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
-      camHeartbeatData: { focus_mode: "MF" },
+    const store = makeCameraControlsStore({
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { focus_mode: "MF" } },
     });
 
     const { getByText } = renderWithProviders(
-      <FocusZoomButton
-        id={1}
-        buttonFunction="focus"
-        label="Focus Near"
-        commandStringControl={COMMAND_STRINGS.focusControlCommand}
-        commandStringOneStop={COMMAND_STRINGS.focusNearOneStop}
-        commandStringContinuous={COMMAND_STRINGS.focusNearContinuos}
-        activeFocusZoomButton={null}
-        sendActiveFocusZoomButtonToParent={() => null}
-      />,
+      <ObservedCameraProvider>
+        <FocusZoomButton
+          id={1}
+          buttonFunction="focus"
+          label="Focus Near"
+          controlOneStop={FOCUS_CONTROLS.NEAR_ONE_STOP}
+          controlContinuous={FOCUS_CONTROLS.NEAR_CONTINUOUS}
+          activeFocusZoomButton={null}
+          sendActiveFocusZoomButtonToParent={() => null}
+        />
+      </ObservedCameraProvider>,
       { store },
     );
 
@@ -62,8 +54,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.focusControlCommand,
-        value: COMMAND_STRINGS.focusNearOneStop,
+        name: ACTIONS.focusControl,
+        value: FOCUS_CONTROLS.NEAR_ONE_STOP,
       },
     });
   },
@@ -77,22 +69,23 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.stop = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
-      camHeartbeatData: { focus_mode: "MF" },
+    const store = makeCameraControlsStore({
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { focus_mode: "MF" } },
     });
 
     const { getByText } = renderWithProviders(
-      <FocusZoomButton
-        id={2}
-        buttonFunction="focus"
-        label="Focus Near Hold"
-        commandStringControl={COMMAND_STRINGS.focusControlCommand}
-        commandStringOneStop={COMMAND_STRINGS.focusNearOneStop}
-        commandStringContinuous={COMMAND_STRINGS.focusNearContinuos}
-        activeFocusZoomButton={null}
-        sendActiveFocusZoomButtonToParent={() => null}
-      />,
+      <ObservedCameraProvider>
+        <FocusZoomButton
+          id={2}
+          buttonFunction="focus"
+          label="Focus Near Hold"
+          controlOneStop={FOCUS_CONTROLS.NEAR_ONE_STOP}
+          controlContinuous={FOCUS_CONTROLS.NEAR_CONTINUOUS}
+          activeFocusZoomButton={null}
+          sendActiveFocusZoomButtonToParent={() => null}
+        />
+      </ObservedCameraProvider>,
       { store },
     );
 
@@ -111,8 +104,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.focusControlCommand,
-        value: COMMAND_STRINGS.focusNearContinuos,
+        name: ACTIONS.focusControl,
+        value: FOCUS_CONTROLS.NEAR_CONTINUOUS,
       },
     });
 
@@ -126,8 +119,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.focusControlCommand,
-        value: COMMAND_STRINGS.focusStop,
+        name: ACTIONS.focusControl,
+        value: FOCUS_CONTROLS.STOP,
       },
     });
   },

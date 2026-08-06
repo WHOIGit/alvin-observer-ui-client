@@ -1,3 +1,5 @@
+import { STATIONS } from "../src/lib/imaging-client";
+import type { StationId } from "../src/lib/imaging-client";
 import {
   WS_SERVER_NAMESPACE_PORT,
   WS_SERVER_NAMESPACE_STARBOARD,
@@ -6,7 +8,7 @@ import {
 
 export type SocketUserScenario = {
   name: string;
-  observerSide: "P" | "S" | "PL";
+  stationId: StationId;
   namespace: string; // always begins with "/"
   cameraCommand: string;
 };
@@ -14,19 +16,19 @@ export type SocketUserScenario = {
 export const SOCKET_USER_SCENARIOS: SocketUserScenario[] = [
   {
     name: "port observer",
-    observerSide: "P",
+    stationId: STATIONS.PORT,
     namespace: `/${WS_SERVER_NAMESPACE_PORT}`,
     cameraCommand: "COVP",
   },
   {
     name: "starboard observer",
-    observerSide: "S",
+    stationId: STATIONS.STARBOARD,
     namespace: `/${WS_SERVER_NAMESPACE_STARBOARD}`,
     cameraCommand: "COVS",
   },
   {
     name: "pilot",
-    observerSide: "PL",
+    stationId: STATIONS.PILOT,
     namespace: `/${WS_SERVER_NAMESPACE_PILOT}`,
     cameraCommand: "COPL",
   },

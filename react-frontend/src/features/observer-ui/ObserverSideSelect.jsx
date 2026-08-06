@@ -5,7 +5,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import { setObserverSide } from "../camera-controls/cameraControlsSlice";
+import { setOwnStationId } from "../camera-controls/cameraControlsSlice";
 
 export default function ObserverSideSelect() {
   const [value, setValue] = useState(null);
@@ -13,7 +13,7 @@ export default function ObserverSideSelect() {
 
   const handleChange = event => {
     setValue(event.target.value);
-    dispatch(setObserverSide(event.target.value));
+    dispatch(setOwnStationId(event.target.value));
   };
 
   return (

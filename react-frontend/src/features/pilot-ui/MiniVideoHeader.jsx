@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import clsx from "clsx";
 import makeStyles from '@mui/styles/makeStyles';
@@ -7,14 +7,13 @@ import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 // local import
 import {
-  selectCamHeartbeatData,
-  selectCamHeartbeatDataPort,
-  selectCamHeartbeatDataStbd,
   selectAllCameras,
+  selectCamHeartbeatFor,
 } from "../camera-controls/cameraControlsSlice";
-import { useSocketListener } from "../../hooks/useSocket";
+import { useRecorderHeartbeat } from "../../hooks/useImagingClient";
+import { useObservedStation } from "../camera-controls/ObservedCameraProvider";
 import { getCameraConfigFromId } from "../../utils/getCamConfigFromId";
-import { RECORDER_HEARTBEAT } from "../../config.js";
+
 
 const useStyles = makeStyles((theme) => ({
   headerRoot: {
@@ -39,64 +38,49 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MiniVideoHeader({ observerSide, videoType }) {
+export default function MiniVideoHeader({ videoType }) {
   const classes = useStyles();
-  const [cameraName, setCameraName] = useState(null);
-  const [isRecording, setIsRecording] = useState(false);
+  const stationId = useObservedStation().id;
+  const isRecHeader = videoType === "REC";
   const [lastMessage, setLastMessage] = useState(null);
 
   const handleMessage = useCallback((message) => {
-    setLastMessage(message);
+    // Only re-render when the fields this header displays change.
+    setLastMessage((previous) =>
+      previous &&
+      previous.camera === message.camera &&
+      previous.isRecording === message.isRecording
+        ? previous
+        : message
+    );
   }, []);
 
-  useSocketListener(`/${observerSide}`, RECORDER_HEARTBEAT, handleMessage);
+  // Only REC headers display recorder state; the others skip the
+  // subscription entirely.
+  useRecorderHeartbeat(isRecHeader ? stationId : null, handleMessage);
 
   const allCameras = useSelector(selectAllCameras);
-  const activeCameraPilot = useSelector(selectCamHeartbeatData);
-  const activeCameraPort = useSelector(selectCamHeartbeatDataPort);
-  const activeCameraStbd = useSelector(selectCamHeartbeatDataStbd);
+  const stationHeartbeat = useSelector((state) =>
+    selectCamHeartbeatFor(state, stationId)
+  );
+
+  // Derived directly from the latest messages; no state mirroring.
+  let cameraName = null;
+  let isRecording = false;
+  if (allCameras.length) {
+    if (isRecHeader && lastMessage) {
+      cameraName = lastMessage.camera;
+      isRecording = lastMessage.isRecording;
+    } else if (!isRecHeader && stationHeartbeat) {
+      const camera = getCameraConfigFromId(stationHeartbeat.camera, allCameras);
+      if (camera) cameraName = camera.cam_name;
+    }
+  }
 
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
-    [classes.headerRecording]: lastMessage && isRecording, //only when condition === true
+    [classes.headerRecording]: isRecording, //only when condition === true
   });
-
-  useEffect(() => {
-    if (allCameras.length) {
-      if (videoType === "REC" && lastMessage) {
-        setCameraName(lastMessage.camera);
-        setIsRecording(lastMessage.recording === "true");
-      } else if (videoType === "OBS" || videoType === "PILOT") {
-        if (observerSide === "port" && activeCameraPort) {
-          const camera = getCameraConfigFromId(
-            activeCameraPort.camera,
-            allCameras
-          );
-          setCameraName(camera.cam_name);
-        } else if (observerSide === "stbd" && activeCameraStbd) {
-          const camera = getCameraConfigFromId(
-            activeCameraStbd.camera,
-            allCameras
-          );
-          setCameraName(camera.cam_name);
-        } else if (observerSide === "pilot" && activeCameraPilot) {
-          const camera = getCameraConfigFromId(
-            activeCameraPilot.camera,
-            allCameras
-          );
-          camera && setCameraName(camera.cam_name);
-        }
-      }
-    }
-  }, [
-    activeCameraPilot,
-    activeCameraPort,
-    activeCameraStbd,
-    allCameras,
-    lastMessage,
-    observerSide,
-    videoType,
-  ]);
 
   let title = videoType + ": " + cameraName;
 

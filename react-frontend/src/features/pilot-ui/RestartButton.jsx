@@ -1,6 +1,7 @@
 import React from "react";
 import makeStyles from "@mui/styles/makeStyles";
 import bombIcon from "../../images/bomb.png";
+import { getSharedImagingClient } from "../../lib/imaging-client";
 
 // How long the button must be held before the restart fires.
 const HOLD_MS = 5000;
@@ -19,7 +20,7 @@ const SPARKS_AT_MS = 7000;
 // Red wash never goes fully opaque — peak and trough alpha.
 const RED_MAX = 0.85;
 const RED_MIN = 0.14;
-const RESTART_URL = `https://${window.location.hostname}/restart`;
+
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -177,8 +178,8 @@ export default function RestartButton() {
     if (firedRef.current) return;
     firedRef.current = true;
     setProgress(1);
-    // Fire-and-forget GET, then refresh regardless of the result.
-    fetch(RESTART_URL, { method: "GET", mode: "no-cors" })
+    getSharedImagingClient()
+      .restartServer()
       .catch(() => {})
       .finally(() => {
         window.location.reload();

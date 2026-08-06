@@ -10,14 +10,12 @@ import {
 } from "@mui/material";
 // local imports
 import {
-  selectActiveCamera,
   selectCamHeartbeatData,
-  selectObserverSide,
   setExposureControlsEnabled,
 } from "./cameraControlsSlice";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useObservedCamera } from "./ObservedCameraProvider";
 import useIsOwner from "../../hooks/useIsOwner";
-import { COMMAND_STRINGS } from "../../config.js";
+import { EXPOSURE_MODES } from "../../lib/imaging-client";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -39,21 +37,11 @@ export default function SelectExposureMode({ showLabel }) {
   const labelText = "EXP MODE:";
   //console.log(camSettings);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useObservedCamera();
 
   const handleSendMessage = (event) => {
     console.log("TARGET VALUE:", event.target.value);
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.exposureModeCommand,
-        value: event.target.value,
-      },
-    });
+    camera.setExposureMode(event.target.value);
     setExpModeRequested(event.target.value);
   };
 
@@ -83,10 +71,9 @@ export default function SelectExposureMode({ showLabel }) {
 
   // check to make sure camera has controls, current Observer matches Cam Owner, camera is available
   if (
-    camSettings === null ||
-    camSettings?.camctrl === "n" ||
+    !camSettings?.isControllable ||
     !isOwner ||
-    camSettings?.exposure === "ERR"
+    camSettings?.faults?.exposure
   ) {
     return null;
   }
@@ -103,21 +90,21 @@ export default function SelectExposureMode({ showLabel }) {
         <FormControl variant="standard" className={classes.formControl}>
           <Select
             id="exposure-select"
-            value={camSettings.exposure}
+            value={camSettings.exposure ?? ""}
             label={labelText}
             onChange={handleSendMessage}
             displayEmpty={displayEmpty}
           >
-            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[0]}>
+            <MenuItem value={EXPOSURE_MODES.AUTO}>
               Auto
             </MenuItem>
-            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[1]}>
+            <MenuItem value={EXPOSURE_MODES.MANUAL}>
               Manual
             </MenuItem>
-            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[2]}>
+            <MenuItem value={EXPOSURE_MODES.SHUTTER_PRIORITY}>
               Shutter Priority
             </MenuItem>
-            <MenuItem value={COMMAND_STRINGS.exposureModeOptions[3]}>
+            <MenuItem value={EXPOSURE_MODES.IRIS_PRIORITY}>
               Iris Priority
             </MenuItem>
           </Select>

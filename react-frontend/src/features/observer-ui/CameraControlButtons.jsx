@@ -29,7 +29,7 @@ export default function CameraControlButtons() {
   if (
     camSettings === null ||
     !isOwner ||
-    camSettings?.exposure === "ERR" ||
+    camSettings?.faults?.exposure ||
     !recordControlsEnabled
   ) {
     return null;
@@ -37,7 +37,7 @@ export default function CameraControlButtons() {
 
   return (
     <div className={classes.root}>
-      {camSettings?.camctrl === "y" && (
+      {camSettings?.isControllable && (
         <>
           <Box my={1}>
             <FocusModeButton />
@@ -50,7 +50,7 @@ export default function CameraControlButtons() {
       )}
 
       <Divider />
-      {camSettings?.pantilt === "y" && <Joystick />}
+      {camSettings?.hasPanTilt && <Joystick />}
     </div>
   );
 }

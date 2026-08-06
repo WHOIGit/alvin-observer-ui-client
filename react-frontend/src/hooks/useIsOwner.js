@@ -1,7 +1,8 @@
 import { useSelector } from "react-redux";
+import { normalizeStationId, STATIONS } from "../lib/imaging-client";
 import {
   selectCamHeartbeatData,
-  selectObserverSide,
+  selectOwnStationId,
   selectActiveCamera,
 } from "../features/camera-controls/cameraControlsSlice";
 
@@ -13,24 +14,20 @@ import {
 
 export default function useIsOwner() {
   const camSettings = useSelector(selectCamHeartbeatData);
-  const currentObserver = useSelector(selectObserverSide);
+  const currentObserver = useSelector(selectOwnStationId);
   const activeCamera = useSelector(selectActiveCamera);
 
   let isOwner = false;
 
   // check the activeCamera match first
   if (camSettings?.camera === activeCamera) {
-    // then check Observer
-    if (camSettings?.owner === "port" && currentObserver === "P") {
-      isOwner = true;
-    }
-
-    if (camSettings?.owner === "stbd" && currentObserver === "S") {
-      isOwner = true;
-    }
-
-    // Pilot observer "PL" is always owner
-    if (currentObserver === "PL") {
+    // The pilot always owns; otherwise the heartbeat's owner station must
+    // be this console's station. normalizeStationId owns the wire-name to
+    // station-id mapping, so no wire vocabulary leaks into this hook.
+    if (
+      currentObserver === STATIONS.PILOT ||
+      normalizeStationId(camSettings?.owner) === currentObserver
+    ) {
       isOwner = true;
     }
   }

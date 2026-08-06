@@ -10,9 +10,9 @@ import {
   Grid,
 } from "@mui/material";
 // local
-import { useSocketListener } from "../../hooks/useSocket";
+import { useNavHeartbeat } from "../../hooks/useImagingClient";
 import SensorDataDisplay from "./SensorDataDisplay";
-import { NAV_HEARTBEAT } from "../../config.js";
+
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -28,7 +28,7 @@ export default function NavDataDisplay() {
     setLastMessage(message);
   }, []);
 
-  useSocketListener("/", NAV_HEARTBEAT, handleMessage);
+  useNavHeartbeat(handleMessage);
 
   return (
     <div>

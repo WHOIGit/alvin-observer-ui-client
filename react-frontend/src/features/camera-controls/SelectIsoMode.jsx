@@ -4,15 +4,13 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import {
-  selectActiveCamera,
   selectCamHeartbeatData,
   selectCurrentCamData,
   selectExposureControlsEnabled,
-  selectObserverSide,
 } from "./cameraControlsSlice";
-import { COMMAND_STRINGS } from "../../config.js";
+import { EXPOSURE_MODES } from "../../lib/imaging-client";
 import { useSelector } from "react-redux";
-import { useCameraCommandEmitter } from "../../hooks/useCameraCommandEmitter";
+import { useObservedCamera } from "./ObservedCameraProvider";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,29 +30,19 @@ export default function SelectIsoMode() {
   const controlEnabled = useSelector(selectExposureControlsEnabled);
   const [isEnabled, setIsEnabled] = useState(true);
 
-  const observerSide = useSelector(selectObserverSide);
-  const activeCameraId = useSelector(selectActiveCamera);
-  const { emit } = useCameraCommandEmitter({
-    activeCamera: activeCameraId,
-    observerSide,
-  });
+  const camera = useObservedCamera();
 
   const handleSendMessage = (event) => {
-    void emit({
-      action: {
-        name: COMMAND_STRINGS.isoModeCommand,
-        value: event.target.value,
-      },
-    });
+    camera.setIso(event.target.value);
   };
 
   useEffect(() => {
     // list of exposure modes that disable this function
     // AUTO, SP, IP
     const disabledExposureModes = [
-      COMMAND_STRINGS.exposureModeOptions[0],
-      COMMAND_STRINGS.exposureModeOptions[2],
-      COMMAND_STRINGS.exposureModeOptions[3],
+      EXPOSURE_MODES.AUTO,
+      EXPOSURE_MODES.SHUTTER_PRIORITY,
+      EXPOSURE_MODES.IRIS_PRIORITY,
     ];
 
     // disable if an Exposure mode changes is currently processing
@@ -81,7 +69,7 @@ export default function SelectIsoMode() {
         <Select
           labelId="iso-select-label"
           id="iso-select"
-          value={isEnabled ? camSettings.iso : ""}
+          value={isEnabled ? camSettings.iso ?? "" : ""}
           onChange={handleSendMessage}
           disabled={!isEnabled}
         >

@@ -1,15 +1,13 @@
-import React, { useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useSocketListener } from "../../hooks/useSocket";
+import { useSystemMessage } from "../../hooks/useImagingClient";
 import {
   addSystemMessage,
   removeExpiredSystemMessages,
 } from "../system-messages/systemMessagesSlice";
 
-const SYSTEM_MESSAGE_EVENT = "SystemMessage";
-
-// Holds open a socket to the v1.5 /system namespace and stores every
-// incoming SystemMessage for the global notification bar. Renders nothing.
+// Holds open the v1.5 system channel and stores every incoming SystemMessage
+// for the global notification bar. Renders nothing.
 export default function SystemMessageListener() {
   const dispatch = useDispatch();
 
@@ -26,9 +24,7 @@ export default function SystemMessageListener() {
     return () => window.clearInterval(intervalId);
   }, [dispatch]);
 
-  useSocketListener("/system", SYSTEM_MESSAGE_EVENT, handleMessage, {
-    apiVersion: "1.5",
-  });
+  useSystemMessage(handleMessage);
 
   return null;
 }

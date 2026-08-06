@@ -2,23 +2,14 @@ import { afterEach, expect, test } from "vitest";
 import React from "react";
 import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { configureStore } from "@reduxjs/toolkit";
-import cameraControlsReducer from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { ACTIONS, WHITE_BALANCE_ONE_PUSH_TRIGGER } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import SelectWhiteBalance from "./SelectWhiteBalance.jsx";
+import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
-
-type CameraControlsState = ReturnType<typeof cameraControlsReducer>;
-
-function makeStore(overrides: Partial<CameraControlsState> = {}) {
-  const baseState = cameraControlsReducer(undefined, { type: "@@INIT" } as any);
-  return configureStore({
-    reducer: { cameraControls: cameraControlsReducer },
-    preloadedState: { cameraControls: { ...baseState, ...overrides } },
-  });
-}
 
 afterEach(() => {
   cleanup();
@@ -32,13 +23,15 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
-      camHeartbeatData: { white_balance: "INDOOR" },
+    const store = makeCameraControlsStore({
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { white_balance: "INDOOR" } },
     });
 
     const { getByRole, getByText } = renderWithProviders(
-      <SelectWhiteBalance showLabel={true} />,
+      <ObservedCameraProvider>
+        <SelectWhiteBalance showLabel={true} />
+      </ObservedCameraProvider>,
       { store },
     );
 
@@ -53,7 +46,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       timestamp: expect.any(String),
       camera: null,
       command: scenario.cameraCommand,
-      action: { name: COMMAND_STRINGS.whiteBalanceCommand, value: "AUTO" },
+      action: { name: ACTIONS.whiteBalance, value: "AUTO" },
     });
   },
 );
@@ -66,13 +59,15 @@ test.each(SOCKET_USER_SCENARIOS)(
       h.gotCmd = expectEmit(NEW_CAMERA_COMMAND_EVENT);
     });
 
-    const store = makeStore({
-      observerSide: scenario.observerSide,
-      camHeartbeatData: { white_balance: "ONE_PUSH_WB" },
+    const store = makeCameraControlsStore({
+      ownStationId: scenario.stationId,
+      camHeartbeats: { [scenario.stationId]: { white_balance: "ONE_PUSH_WB" } },
     });
 
     const { getByText } = renderWithProviders(
-      <SelectWhiteBalance showLabel={true} />,
+      <ObservedCameraProvider>
+        <SelectWhiteBalance showLabel={true} />
+      </ObservedCameraProvider>,
       { store },
     );
 
@@ -87,9 +82,27 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.whiteBalanceCommand,
-        value: COMMAND_STRINGS.whiteBalanceOnePushCommandValue,
+        name: ACTIONS.whiteBalance,
+        value: WHITE_BALANCE_ONE_PUSH_TRIGGER,
       },
     });
   },
 );
+
+test("renders with an empty selection when the camera reports no white balance", () => {
+  const store = makeCameraControlsStore({
+    ownStationId: "PL",
+    camHeartbeats: { PL: { white_balance: null } },
+  });
+
+  const { getByRole, queryByText } = renderWithProviders(
+    <ObservedCameraProvider>
+      <SelectWhiteBalance showLabel={true} />
+    </ObservedCameraProvider>,
+    { store },
+  );
+
+  expect(getByRole("combobox")).toBeTruthy();
+  // The one-push trigger only appears for ONE_PUSH modes.
+  expect(queryByText("WB One Push")).toBe(null);
+});

@@ -5,7 +5,7 @@ import makeStyles from '@mui/styles/makeStyles';
 // local imports
 import { useStream, useStreamStatus } from "./WebRtcProvider";
 import VideoStatusOverlay from "./VideoStatusOverlay";
-import { selectObserverSide } from "./cameraControlsSlice";
+import { selectOwnStationId } from "./cameraControlsSlice";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,9 +26,9 @@ export default function LargeVideo() {
   const observerVideoSrc = useSelector(
     (state) => state.cameraControls.observerVideoSrc
   );
-  const observerSide = useSelector(selectObserverSide);
+  const ownStationId = useSelector(selectOwnStationId);
   // Wait until a side (and therefore a real source) is chosen before connecting.
-  const src = observerSide ? observerVideoSrc : null;
+  const src = ownStationId ? observerVideoSrc : null;
   const stream = useStream(src);
   const status = useStreamStatus(src);
 
