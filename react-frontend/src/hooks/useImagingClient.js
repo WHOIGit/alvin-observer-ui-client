@@ -31,10 +31,12 @@ function makeStationChannelHook(channelName) {
   return function useStationChannel(observerSide, callback) {
     const client = useImagingClient();
     const handler = useStableHandler(callback);
-    useEffect(
-      () => client.station(observerSide)[channelName](handler),
-      [client, observerSide, handler]
-    );
+    useEffect(() => {
+      // null/undefined means "no station" — subscribe nowhere rather than
+      // letting the station lookup coerce it to the pilot.
+      if (observerSide == null) return undefined;
+      return client.station(observerSide)[channelName](handler);
+    }, [client, observerSide, handler]);
   };
 }
 
@@ -61,10 +63,10 @@ export const useCameraSettings = makeStationChannelHook("onCameraSettings");
 export function useCommandResult(observerSide, callback, shouldDeliver) {
   const client = useImagingClient();
   const handler = useStableHandler(callback);
-  useEffect(
-    () => client.station(observerSide).onCommandResult(handler, shouldDeliver),
-    [client, observerSide, handler, shouldDeliver]
-  );
+  useEffect(() => {
+    if (observerSide == null) return undefined;
+    return client.station(observerSide).onCommandResult(handler, shouldDeliver);
+  }, [client, observerSide, handler, shouldDeliver]);
 }
 
 // Vehicle-wide channels

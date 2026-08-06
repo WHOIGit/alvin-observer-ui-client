@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import clsx from "clsx";
 import makeStyles from '@mui/styles/makeStyles';
@@ -41,42 +41,46 @@ const useStyles = makeStyles((theme) => ({
 export default function MiniVideoHeader({ videoType }) {
   const classes = useStyles();
   const stationId = useObservedStation().id;
-  const [cameraName, setCameraName] = useState(null);
-  const [isRecording, setIsRecording] = useState(false);
+  const isRecHeader = videoType === "REC";
   const [lastMessage, setLastMessage] = useState(null);
 
   const handleMessage = useCallback((message) => {
-    setLastMessage(message);
+    // Only re-render when the fields this header displays change.
+    setLastMessage((previous) =>
+      previous &&
+      previous.camera === message.camera &&
+      previous.isRecording === message.isRecording
+        ? previous
+        : message
+    );
   }, []);
 
-  useRecorderHeartbeat(stationId, handleMessage);
+  // Only REC headers display recorder state; the others skip the
+  // subscription entirely.
+  useRecorderHeartbeat(isRecHeader ? stationId : null, handleMessage);
 
   const allCameras = useSelector(selectAllCameras);
   const stationHeartbeat = useSelector((state) =>
     selectCamHeartbeatFor(state, stationId)
   );
 
+  // Derived directly from the latest messages; no state mirroring.
+  let cameraName = null;
+  let isRecording = false;
+  if (allCameras.length) {
+    if (isRecHeader && lastMessage) {
+      cameraName = lastMessage.camera;
+      isRecording = lastMessage.isRecording;
+    } else if (!isRecHeader && stationHeartbeat) {
+      const camera = getCameraConfigFromId(stationHeartbeat.camera, allCameras);
+      if (camera) cameraName = camera.cam_name;
+    }
+  }
+
   const cardHeaderStyle = clsx({
     [classes.headerRoot]: true, //always applies
-    [classes.headerRecording]: lastMessage && isRecording, //only when condition === true
+    [classes.headerRecording]: isRecording, //only when condition === true
   });
-
-  useEffect(() => {
-    if (allCameras.length) {
-      if (videoType === "REC" && lastMessage) {
-        setCameraName(lastMessage.camera);
-        setIsRecording(lastMessage.isRecording);
-      } else if (videoType === "OBS" || videoType === "PILOT") {
-        if (stationHeartbeat) {
-          const camera = getCameraConfigFromId(
-            stationHeartbeat.camera,
-            allCameras
-          );
-          camera && setCameraName(camera.cam_name);
-        }
-      }
-    }
-  }, [stationHeartbeat, allCameras, lastMessage, videoType]);
 
   let title = videoType + ": " + cameraName;
 
