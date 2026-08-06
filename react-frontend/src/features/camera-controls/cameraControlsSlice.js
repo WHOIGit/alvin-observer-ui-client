@@ -38,17 +38,21 @@ const getCameraConfig = (cameraId, cameras) => {
   return cameraConfig;
 };
 
-// The command kinds applyCommandResult mirrors into state. Used to filter the
-// onCommandResult subscription so the kinds the reducer ignores — pan/tilt
-// (10 Hz), focus, zoom, still capture — never reach the store at all. Keep in
-// sync with the applyCommandResult switch below.
+// The currentSettings field each mirrored settings kind writes when its
+// receipt confirms. applyCommandResult and the delivery filter both derive
+// from this map, so a kind is mirrored exactly when it has an entry here
+// (SELECT_CAMERA is the one non-settings mirrored kind).
+const SETTINGS_FIELD_BY_KIND = {
+  [COMMAND_KINDS.SET_FOCUS_MODE]: "focus_mode",
+  [COMMAND_KINDS.SET_SHUTTER]: "shu",
+  [COMMAND_KINDS.SET_IRIS]: "irs",
+  [COMMAND_KINDS.SET_ISO]: "iso",
+  [COMMAND_KINDS.SET_EXPOSURE_MODE]: "exposure",
+};
+
 const MIRRORED_COMMAND_KINDS = new Set([
   COMMAND_KINDS.SELECT_CAMERA,
-  COMMAND_KINDS.SET_FOCUS_MODE,
-  COMMAND_KINDS.SET_SHUTTER,
-  COMMAND_KINDS.SET_IRIS,
-  COMMAND_KINDS.SET_ISO,
-  COMMAND_KINDS.SET_EXPOSURE_MODE,
+  ...Object.keys(SETTINGS_FIELD_BY_KIND),
 ]);
 
 // Predicate for Station.onCommandResult: deliver the outcomes the reducer
@@ -93,33 +97,19 @@ export const cameraControlsSlice = createSlice({
         console.log("ERROR Received from AIS", kind, action.payload.receipt);
         return;
       }
+      if (kind === COMMAND_KINDS.SELECT_CAMERA) {
+        // The result can beat the camera_array broadcast; keep the previous
+        // active camera rather than clobbering it with undefined.
+        const activeCamera = getCameraConfig(value, state.allCameras);
+        if (activeCamera) state.activeCamera = activeCamera;
+        return;
+      }
       // A result can beat the first settings broadcast, in which case there
       // is no currentSettings object to update yet.
+      const field = SETTINGS_FIELD_BY_KIND[kind];
       const currentSettings = state.currentCamData?.currentSettings;
-      switch (kind) {
-        case COMMAND_KINDS.SELECT_CAMERA: {
-          // The result can beat the camera_array broadcast; keep the
-          // previous active camera rather than clobbering it with undefined.
-          const activeCamera = getCameraConfig(value, state.allCameras);
-          if (activeCamera) state.activeCamera = activeCamera;
-          break;
-        }
-        case COMMAND_KINDS.SET_FOCUS_MODE:
-          if (currentSettings) currentSettings.focus_mode = value;
-          break;
-        case COMMAND_KINDS.SET_SHUTTER:
-          if (currentSettings) currentSettings.shu = value;
-          break;
-        case COMMAND_KINDS.SET_IRIS:
-          if (currentSettings) currentSettings.irs = value;
-          break;
-        case COMMAND_KINDS.SET_ISO:
-          if (currentSettings) currentSettings.iso = value;
-          break;
-        case COMMAND_KINDS.SET_EXPOSURE_MODE:
-          if (currentSettings) currentSettings.exposure = value;
-          break;
-        default:
+      if (field && currentSettings) {
+        currentSettings[field] = value;
       }
     },
     // Stores a station's latest heartbeat. eventId/timestamp churn on every
