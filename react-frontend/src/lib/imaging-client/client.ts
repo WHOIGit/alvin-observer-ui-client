@@ -324,8 +324,14 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
           pending.reject(new CommandFailedError(result));
         }
         for (const { cb, shouldDeliver } of commandResultCallbacks) {
-          if (shouldDeliver && !shouldDeliver(result)) continue;
-          cb(result);
+          try {
+            if (shouldDeliver && !shouldDeliver(result)) continue;
+            cb(result);
+          } catch (err) {
+            // One subscriber's failure must not starve the others or
+            // propagate into the socket's event dispatch.
+            console.error("onCommandResult subscriber threw", err);
+          }
         }
       });
     }
