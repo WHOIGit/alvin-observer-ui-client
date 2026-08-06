@@ -95,9 +95,13 @@ export const cameraControlsSlice = createSlice({
       // is no currentSettings object to update yet.
       const currentSettings = state.currentCamData?.currentSettings;
       switch (kind) {
-        case COMMAND_KINDS.SELECT_CAMERA:
-          state.activeCamera = getCameraConfig(value, state.allCameras);
+        case COMMAND_KINDS.SELECT_CAMERA: {
+          // The result can beat the camera_array broadcast; keep the
+          // previous active camera rather than clobbering it with undefined.
+          const activeCamera = getCameraConfig(value, state.allCameras);
+          if (activeCamera) state.activeCamera = activeCamera;
           break;
+        }
         case COMMAND_KINDS.SET_FOCUS_MODE:
           if (currentSettings) currentSettings.focus_mode = value;
           break;
