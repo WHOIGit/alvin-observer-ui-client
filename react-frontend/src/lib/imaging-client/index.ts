@@ -16,6 +16,8 @@ export type {
   DriveKind,
   ImagingClient,
   ImagingClientOptions,
+  PanTiltDrive,
+  PanTiltMove,
   RecordOptions,
   Station,
 } from "./client";

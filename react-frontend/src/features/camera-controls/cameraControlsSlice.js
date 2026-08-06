@@ -23,7 +23,6 @@ const initialState = {
   activeCamera: null,
   recorderHeartbeatData: null,
   currentCamData: null,
-  joystickStatus: null,
   recorderResponseError: false,
   videoSourceEnabled: true,
   exposureControlsEnabled: true,
@@ -146,9 +145,6 @@ export const cameraControlsSlice = createSlice({
       state.currentCamData.SHU = action.payload.SHU;
       state.currentCamData.currentSettings = action.payload.current_settings;
     },
-    setJoystickStatus: (state, action) => {
-      state.joystickStatus = action.payload;
-    },
     setRecorderError: (state, action) => {
       state.recorderResponseError = action.payload;
     },
@@ -181,7 +177,6 @@ export const {
   changeRecorderHeartbeat,
   changeCurrentCamData,
   setOwnStationId,
-  setJoystickStatus,
   setRecorderError,
   setVideoSourceEnabled,
   setExposureControlsEnabled,
@@ -238,10 +233,6 @@ export const selectRecorderHeartbeatData = createSelector(
 // return the current Camera data the socket returns on a camera change
 export const selectCurrentCamData = (state) =>
   state.cameraControls.currentCamData;
-
-// return the current joystick status
-export const selectJoystickStatus = (state) =>
-  state.cameraControls.joystickStatus;
 
 // return the error status of last Recorder response
 export const selectRecorderResponseError = (state) =>

@@ -88,6 +88,12 @@ const SEND_CONNECTION_LINGER_MS = 30_000;
  */
 const DRIVE_STOP_DELAY_MS = 10;
 
+/**
+ * Keepalive cadence for a continuous pan/tilt move: the wire expects the
+ * latest move to be re-sent at this interval for as long as it is held.
+ */
+const PAN_TILT_RESEND_MS = 100;
+
 /** Context shared by station-level commands. */
 export interface CommandContext {
   /** The station's active camera; becomes the payload's `camera` field. */
@@ -106,6 +112,27 @@ export interface RecordOptions extends CommandContext {
    * doesn't police the target; the backend honors only observer stations.
    */
   as?: StationId;
+}
+
+/**
+ * Joystick move descriptor (nipplejs-shaped). The library treats it as
+ * opaque except for actionType/distance, which the keepalive rewrites on
+ * the synthetic hold-still move.
+ */
+export interface PanTiltMove {
+  actionType?: string;
+  distance?: number;
+  [key: string]: unknown;
+}
+
+/** A continuous pan/tilt move in progress; see CameraHandle.startPanTilt. */
+export interface PanTiltDrive {
+  /** Replace the move re-sent on each keepalive tick. */
+  update(move: PanTiltMove): void;
+  /** Send the final move and stop the keepalive. */
+  end(move: PanTiltMove): void;
+  /** Stop the keepalive without sending anything (e.g. UI teardown). */
+  cancel(): void;
 }
 
 export type DriveKind = "focus" | "zoom";
@@ -150,6 +177,13 @@ export interface CameraHandle {
   drive(kind: DriveKind): CameraDrive;
   /** Joystick pan/tilt; `value` is the nipplejs-shaped move descriptor. */
   panTilt(value: unknown): SentCommand;
+  /**
+   * Begin a continuous joystick move. The wire has no keepalive of its
+   * own: the latest move is re-sent every 100 ms until end() or cancel();
+   * until the first update, the start position is re-sent as a distance-0
+   * move, matching the historical spitter.
+   */
+  startPanTilt(move: PanTiltMove): PanTiltDrive;
   /**
    * Trigger a single still capture now. `transferImage` requests the image
    * be transferred off the vehicle.
@@ -505,6 +539,20 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
           },
           context
         );
+      const panTilt = (value: unknown) =>
+        sendCommand(
+          COMMAND_KINDS.PAN_TILT,
+          {
+            action: {
+              name: ACTIONS.panTilt,
+              value,
+              // Historical debugging aid: pan/tilt actions carry their own
+              // wall-clock timestamp inside the action.
+              timestamp: now().toISOString(),
+            },
+          },
+          context
+        );
 
       return {
         id,
@@ -546,20 +594,37 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
             }, DRIVE_STOP_DELAY_MS);
           },
         }),
-        panTilt: (value) =>
-          sendCommand(
-            COMMAND_KINDS.PAN_TILT,
-            {
-              action: {
-                name: ACTIONS.panTilt,
-                value,
-                // Historical debugging aid: pan/tilt actions carry their own
-                // wall-clock timestamp inside the action.
-                timestamp: now().toISOString(),
-              },
+        panTilt,
+        startPanTilt: (move) => {
+          panTilt(move);
+          // Until the first update arrives, hold-still re-sends the start
+          // position as a distance-0 move (angle/direction may be absent).
+          let lastMove: PanTiltMove = {
+            ...move,
+            distance: 0,
+            actionType: "move",
+          };
+          const interval = setInterval(
+            () => panTilt(lastMove),
+            PAN_TILT_RESEND_MS
+          );
+          let isDone = false;
+          const finish = () => {
+            if (isDone) return;
+            isDone = true;
+            clearInterval(interval);
+          };
+          return {
+            update(next) {
+              if (!isDone) lastMove = next;
             },
-            context
-          ),
+            end(finalMove) {
+              finish();
+              panTilt(finalMove);
+            },
+            cancel: finish,
+          };
+        },
         captureStill: (options) =>
           sendCommand(
             COMMAND_KINDS.CAPTURE_STILL,
