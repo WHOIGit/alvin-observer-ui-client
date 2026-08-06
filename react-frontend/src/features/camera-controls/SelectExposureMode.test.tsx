@@ -4,7 +4,8 @@ import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { ACTIONS, EXPOSURE_MODES } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import SelectExposureMode from "./SelectExposureMode.jsx";
 import { ObservedCameraProvider } from "./ObservedCameraProvider";
@@ -26,7 +27,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       ownStationId: scenario.stationId,
       camHeartbeats: {
         [scenario.stationId]: {
-          exposure: COMMAND_STRINGS.exposureModeOptions[0],
+          exposure: EXPOSURE_MODES.AUTO,
           isControllable: true,
           camera: "cam-1",
           owner: scenario.namespace.replace(/^\//, ""),
@@ -55,8 +56,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: "cam-1",
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.exposureModeCommand,
-        value: COMMAND_STRINGS.exposureModeOptions[1],
+        name: ACTIONS.exposureMode,
+        value: EXPOSURE_MODES.MANUAL,
       },
     });
   },

@@ -8,7 +8,8 @@ import {
 } from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { ACTIONS } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import CaptureButtons from "./CaptureButtons.jsx";
 import { ObservedCameraProvider } from "./ObservedCameraProvider";
@@ -71,7 +72,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       command: scenario.cameraCommand,
       oldCamera: "cam-1",
       action: {
-        name: COMMAND_STRINGS.recordSourceCommand,
+        name: ACTIONS.recordSource,
         value: activeCamera.camera,
       },
     });
@@ -115,7 +116,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.stillImageCaptureCommand,
+        name: ACTIONS.stillImageCapture,
         value: {
           imgTransferChecked: false,
           interval: 0,

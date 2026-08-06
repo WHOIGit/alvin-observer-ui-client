@@ -7,7 +7,8 @@ import {
 } from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { ACTIONS, FOCUS_MODES } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import FocusModeButton from "./FocusModeButton.jsx";
 import { ObservedCameraProvider } from "./ObservedCameraProvider";
@@ -31,7 +32,7 @@ test.each(SOCKET_USER_SCENARIOS)(
     store.dispatch(
       storeCamHeartbeat({
         stationId: scenario.stationId,
-        heartbeat: { focus_mode: COMMAND_STRINGS.focusAF },
+        heartbeat: { focus_mode: FOCUS_MODES.AUTOFOCUS },
       } as any),
     );
 
@@ -53,8 +54,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.focusModeCommand,
-        value: COMMAND_STRINGS.focusMF,
+        name: ACTIONS.focusMode,
+        value: FOCUS_MODES.MANUAL,
       },
     });
   },
@@ -74,7 +75,7 @@ test.each(SOCKET_USER_SCENARIOS)(
     store.dispatch(
       storeCamHeartbeat({
         stationId: scenario.stationId,
-        heartbeat: { focus_mode: COMMAND_STRINGS.focusMF },
+        heartbeat: { focus_mode: FOCUS_MODES.MANUAL },
       } as any),
     );
 
@@ -96,8 +97,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.focusModeCommand,
-        value: COMMAND_STRINGS.focusAF,
+        name: ACTIONS.focusMode,
+        value: FOCUS_MODES.AUTOFOCUS,
       },
     });
   },

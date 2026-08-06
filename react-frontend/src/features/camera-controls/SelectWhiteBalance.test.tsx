@@ -4,7 +4,8 @@ import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { ACTIONS, WHITE_BALANCE_ONE_PUSH_TRIGGER } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import SelectWhiteBalance from "./SelectWhiteBalance.jsx";
 import { ObservedCameraProvider } from "./ObservedCameraProvider";
@@ -45,7 +46,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       timestamp: expect.any(String),
       camera: null,
       command: scenario.cameraCommand,
-      action: { name: COMMAND_STRINGS.whiteBalanceCommand, value: "AUTO" },
+      action: { name: ACTIONS.whiteBalance, value: "AUTO" },
     });
   },
 );
@@ -81,8 +82,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.whiteBalanceCommand,
-        value: COMMAND_STRINGS.whiteBalanceOnePushCommandValue,
+        name: ACTIONS.whiteBalance,
+        value: WHITE_BALANCE_ONE_PUSH_TRIGGER,
       },
     });
   },

@@ -4,7 +4,8 @@ import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { ACTIONS } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import SelectVideoSource from "./SelectVideoSource.jsx";
 import { ObservedCameraProvider } from "./ObservedCameraProvider";
@@ -60,7 +61,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       timestamp: expect.any(String),
       camera: "cam-1",
       command: scenario.cameraCommand,
-      action: { name: COMMAND_STRINGS.cameraChangeCommand, value: "cam-2" },
+      action: { name: ACTIONS.videoSource, value: "cam-2" },
     });
   },
 );

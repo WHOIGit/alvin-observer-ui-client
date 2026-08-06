@@ -36,7 +36,13 @@ export type {
   ZoomControl,
 } from "./domain";
 
-export { STATIONS, getStationInfo, normalizeStationId } from "./protocol";
+export {
+  ACTIONS,
+  STATIONS,
+  WHITE_BALANCE_ONE_PUSH_TRIGGER,
+  getStationInfo,
+  normalizeStationId,
+} from "./protocol";
 export type { StationId, StationIdInput, StationInfo } from "./protocol";
 
 export type {

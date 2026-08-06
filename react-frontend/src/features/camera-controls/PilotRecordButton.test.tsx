@@ -5,11 +5,10 @@ import userEvent from "@testing-library/user-event";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
 import {
-  COMMAND_STRINGS,
   NEW_CAMERA_COMMAND_EVENT,
   WS_SERVER_NAMESPACE_PILOT,
 } from "../../config.js";
-import { getSharedImagingClient } from "../../lib/imaging-client";
+import { ACTIONS, getSharedImagingClient } from "../../lib/imaging-client";
 import PilotRecordButton from "./PilotRecordButton.jsx";
 import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
@@ -72,7 +71,7 @@ test.each([
       command: command,
       observerSideOverride: override,
       action: {
-        name: COMMAND_STRINGS.recordSourceCommand,
+        name: ACTIONS.recordSource,
         value: expected,
       },
     });

@@ -4,7 +4,8 @@ import { cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
+import { ACTIONS } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
 import SetCaptureInterval from "./SetCaptureInterval.jsx";
 import { ObservedCameraProvider } from "./ObservedCameraProvider";
@@ -57,7 +58,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       timestamp: expect.any(String),
       camera: null,
       command: scenario.cameraCommand,
-      action: { name: COMMAND_STRINGS.captureIntervalCommand, value: "20" },
+      action: { name: ACTIONS.stillImageCapture, value: "20" },
     });
   },
 );
@@ -93,7 +94,7 @@ test.each(SOCKET_USER_SCENARIOS)(
       timestamp: expect.any(String),
       camera: null,
       command: scenario.cameraCommand,
-      action: { name: COMMAND_STRINGS.captureIntervalCommand, value: "0" },
+      action: { name: ACTIONS.stillImageCapture, value: "0" },
     });
   },
 );

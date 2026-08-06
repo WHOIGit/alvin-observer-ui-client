@@ -4,9 +4,9 @@ import { cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
 import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
-import { NEW_CAMERA_COMMAND_EVENT, COMMAND_STRINGS } from "../../config.js";
+import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
-import { FOCUS_CONTROLS } from "../../lib/imaging-client";
+import { ACTIONS, FOCUS_CONTROLS } from "../../lib/imaging-client";
 import FocusZoomButton from "./FocusZoomButton.jsx";
 import { ObservedCameraProvider } from "./ObservedCameraProvider";
 import { renderWithProviders } from "../../../tests/renderWithProviders";
@@ -54,8 +54,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.focusControlCommand,
-        value: COMMAND_STRINGS.focusNearOneStop,
+        name: ACTIONS.focusControl,
+        value: FOCUS_CONTROLS.NEAR_ONE_STOP,
       },
     });
   },
@@ -104,8 +104,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.focusControlCommand,
-        value: COMMAND_STRINGS.focusNearContinuos,
+        name: ACTIONS.focusControl,
+        value: FOCUS_CONTROLS.NEAR_CONTINUOUS,
       },
     });
 
@@ -119,8 +119,8 @@ test.each(SOCKET_USER_SCENARIOS)(
       camera: null,
       command: scenario.cameraCommand,
       action: {
-        name: COMMAND_STRINGS.focusControlCommand,
-        value: COMMAND_STRINGS.focusStop,
+        name: ACTIONS.focusControl,
+        value: FOCUS_CONTROLS.STOP,
       },
     });
   },

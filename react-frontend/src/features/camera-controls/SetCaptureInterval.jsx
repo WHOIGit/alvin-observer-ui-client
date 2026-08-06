@@ -12,7 +12,10 @@ import {
 // local imports
 import { selectCamHeartbeatData } from "./cameraControlsSlice";
 import { useObservedCamera } from "./ObservedCameraProvider";
-import { COMMAND_STRINGS } from "../../config.js";
+
+// Choices offered for the recurring still-capture interval, in seconds;
+// "0" stops the recurring capture.
+const CAPTURE_INTERVAL_OPTIONS = ["0", "20", "30", "40", "50", "60"];
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -78,7 +81,7 @@ export default function SelectCaptureInterval() {
               value={value}
               disabled={!captureEnabled}
             >
-              {COMMAND_STRINGS.captureIntervalOptions.map((item) => (
+              {CAPTURE_INTERVAL_OPTIONS.map((item) => (
                 <MenuItem value={item} key={item}>
                   {item} secs
                 </MenuItem>

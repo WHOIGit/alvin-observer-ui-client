@@ -14,53 +14,6 @@ export const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
 // Camera definitions
 //export const CAMERAS = envSettings.CAMERAS;
 
-// Camera command constants
-export const COMMAND_PREFIX = "COV"; // Client Observer. Combines with ObserverSide P/S
-export const COMMAND_STRINGS = {
-  cameraChangeCommand: "CAM",
-  exposureModeCommand: "EXP",
-  exposureModeOptions: ["AUTO", "MAN", "SP", "IP"],
-  shutterModeCommand: "SHU",
-  irisModeCommand: "IRS",
-  isoModeCommand: "ISO",
-  focusModeCommand: "FCM",
-  focusAF: "AF",
-  focusMF: "MF",
-  focusControlCommand: "FCS",
-  focusNearOneStop: "NS",
-  focusFarOneStop: "FS",
-  focusNearContinuos: "NC",
-  focusFarContinuos: "FC",
-  focusStop: "ST",
-  zoomControlCommand: "ZCS",
-  zoomNearOneStop: "TS",
-  zoomFarOneStop: "WS",
-  zoomNearContinuos: "TC",
-  zoomFarContinuos: "WC",
-  panTiltCommand: "PANTILT",
-  stillImageCaptureCommand: "SIC",
-  quickClickCommand: "QCV",
-  recordSourceCommand: "REC",
-  recordStopCommand: "ST",
-  routerIOCommand: "RTR",
-  whiteBalanceCommand: "WB",
-  whiteBalanceOptions: [
-    "AUTO",
-    "INDOOR",
-    "OUTDOOR",
-    "ONE_PUSH_WB",
-  ],
-  whiteBalanceOnePushCommandValue: "ONE_PUSH_TRIGGER",
-  captureIntervalCommand: "SIC",
-  captureIntervalOptions: [
-    "0",
-    "20",
-    "30",
-    "40",
-    "50",
-    "60",
-  ],
-};
 
 export const VIDEO_STREAM_CONFIG = {
   server: envSettings.VIDEO_STREAM_SERVER,
