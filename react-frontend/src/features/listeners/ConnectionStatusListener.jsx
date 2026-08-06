@@ -25,7 +25,6 @@ export default function ConnectionStatusListener({ station = null }) {
     () => getStationInfo(station || ownStationId),
     [station, ownStationId]
   );
-  const namespacePath = stationInfo.namespacePath;
 
   // Refs so the handler can track transitions without re-subscribing: only
   // post a "lost connection" once per outage, and only post a recovery
@@ -37,7 +36,7 @@ export default function ConnectionStatusListener({ station = null }) {
   useConnectionStatus(station || ownStationId, ({ status }) => {
     const label =
       STATION_LABELS[stationInfo.stationId] || stationInfo.stationId;
-    const lossId = `connection-loss:${namespacePath}`;
+    const lossId = `connection-loss:${stationInfo.stationId}`;
 
     if (status === "connected") {
       const wasLost = lossActiveRef.current;
@@ -47,7 +46,7 @@ export default function ConnectionStatusListener({ station = null }) {
       dispatch(dismissSystemMessage(lossId));
       dispatch(
         addSystemMessage({
-          correlation_id: `connection-restored:${namespacePath}`,
+          correlation_id: `connection-restored:${stationInfo.stationId}`,
           message: `Reconnected to imaging server (${label})`,
           level: "INFO",
           source: "connection",
