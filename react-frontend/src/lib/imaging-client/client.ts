@@ -226,6 +226,12 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
 
   const pool: ConnectionPool = createConnectionPool(getEndpoints);
 
+  // Sockets that have emitted at least one lifecycle event. Used by
+  // onConnectionStatus to replay a disconnected state to late subscribers:
+  // a fresh socket's first event is always imminent, so it gets no replay,
+  // but a pooled socket mid-outage must not look like "no news yet".
+  const everActiveSockets = new WeakSet<Socket>();
+
   function subscribe(
     namespace: string,
     apiVersion: string,
@@ -515,17 +521,32 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
 
       onConnectionStatus(cb) {
         const { socket, release } = pool.acquire(namespacePath, V1);
-        const onConnect = () => cb({ status: "connected" });
-        const onDisconnect = () => cb({ status: "disconnected" });
-        const onError = () => cb({ status: "error" });
+        const onConnect = () => {
+          everActiveSockets.add(socket);
+          cb({ status: "connected" });
+        };
+        const onDisconnect = () => {
+          everActiveSockets.add(socket);
+          cb({ status: "disconnected" });
+        };
+        const onError = () => {
+          everActiveSockets.add(socket);
+          cb({ status: "error" });
+        };
         socket.on("connect", onConnect);
         socket.on("disconnect", onDisconnect);
         socket.on("connect_error", onError);
 
-        // The pooled socket may already be connected (e.g. another consumer
+        // The pooled socket may predate this subscriber (another consumer
         // established it first); replay the current state so subscribers
-        // don't have to poll.
-        if (socket.connected) cb({ status: "connected" });
+        // don't have to poll. A socket with a lifecycle history that isn't
+        // connected now is mid-outage — replay that too, so a subscriber
+        // attaching during the outage doesn't wait for the next retry.
+        if (socket.connected) {
+          cb({ status: "connected" });
+        } else if (everActiveSockets.has(socket)) {
+          cb({ status: "disconnected" });
+        }
 
         return () => {
           try {
