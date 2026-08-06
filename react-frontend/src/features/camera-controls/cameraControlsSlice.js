@@ -51,10 +51,12 @@ const MIRRORED_COMMAND_KINDS = new Set([
   COMMAND_KINDS.SET_EXPOSURE_MODE,
 ]);
 
-// Predicate for Station.onCommandResult: only settled commands whose outcome
-// applyCommandResult actually applies are worth dispatching.
+// Predicate for Station.onCommandResult: deliver the outcomes the reducer
+// mirrors into state, plus every failure so it gets logged. Successful
+// high-frequency receipts — pan/tilt (10 Hz), focus, zoom, still capture —
+// never reach the store at all.
 export const commandResultAppliesToState = (result) =>
-  MIRRORED_COMMAND_KINDS.has(result?.kind);
+  MIRRORED_COMMAND_KINDS.has(result?.kind) || result?.isOk === false;
 
 export const cameraControlsSlice = createSlice({
   name: "cameraControls",
@@ -88,7 +90,7 @@ export const cameraControlsSlice = createSlice({
     applyCommandResult: (state, action) => {
       const { kind, value, isOk } = action.payload;
       if (!isOk) {
-        console.log("ERROR Received from AIS");
+        console.log("ERROR Received from AIS", kind, action.payload.receipt);
         return;
       }
       // A result can beat the first settings broadcast, in which case there
