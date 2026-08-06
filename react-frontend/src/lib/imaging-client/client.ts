@@ -585,9 +585,15 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       throw new Error(`No WS_ENDPOINTS entry for API version ${V1_5}`);
     }
     const base = `${endpoint.server}${endpoint.path}`.replace(/\/+$/, "");
-    await fetch(`${base}/encoder/${encodeURIComponent(name)}/${action}`, {
-      method: "POST",
-    });
+    const response = await fetch(
+      `${base}/encoder/${encodeURIComponent(name)}/${action}`,
+      { method: "POST" }
+    );
+    if (!response.ok) {
+      throw new Error(
+        `Encoder ${action} failed for ${name}: HTTP ${response.status}`
+      );
+    }
   }
 
   const client: ImagingClient = {
