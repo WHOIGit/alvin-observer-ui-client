@@ -6,11 +6,7 @@ import { green } from "@mui/material/colors";
 import { useObservedCamera } from "./ObservedCameraProvider";
 import useLongPress from "../../hooks/useLongPress";
 import { selectCamHeartbeatData } from "./cameraControlsSlice";
-import {
-  FOCUS_CONTROLS,
-  FOCUS_MODES,
-  ZOOM_CONTROLS,
-} from "../../lib/imaging-client";
+import { FOCUS_MODES } from "../../lib/imaging-client";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -40,7 +36,6 @@ export default function FocusZoomButton({
   sendActiveFocusZoomButtonToParent,
 }) {
   const classes = useStyles();
-  const timerRef = useRef(false);
   const camSettings = useSelector(selectCamHeartbeatData);
   const [isEnabled, setIsEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -59,41 +54,24 @@ export default function FocusZoomButton({
   };
 
   const camera = useObservedCamera();
+  // One drive for this button; the library pairs move and stop so a zoom
+  // button can never send the focus drive's stop (or vice versa).
+  const drive = camera.drive(buttonFunction);
 
   const handleZoomHold = () => {
-    drive(controlContinuous, continuousSpeed);
-    //// Set a Timeout to resend command every 1 sec //removed - 08oct2024 - mjs
+    drive.move(controlContinuous, continuousSpeed);
   };
 
   const handleStop = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-    const stopControl =
-      buttonFunction === "zoom" ? ZOOM_CONTROLS.STOP : FOCUS_CONTROLS.STOP;
-    // delay Stop message sending to avoid collisions with last button actions
-    setTimeout(() => { //changed to allow console.log 24oct2024 - mjs
-      //console.log(new Date().toISOString(), "FocusZoomButton - onStop - buttonID:", id, activeButton.current); //test only 24oct2024 - mjs
-      drive(stopControl);
-    }, 10); //was 100 - 28oct2024-mjs
+    drive.stop();
 
-    
-    
     // add a delay to UI to block aggressive user interactions
     setLoading(true);
     setTimeout(() => {
-      
-      handleActiveButton(null, id); //24oct2024 - mjs  
-      //console.log(new Date().toISOString(), "FocusZoomButton - onStop - blockRelease- buttonID:", id, activeButton.current); //test only 24oct2024 - mjs
-      
+      handleActiveButton(null, id); //24oct2024 - mjs
       buttonClickEvent.current = false; //29oct2024-mjs
-      
-      setLoading(false);       
-      
+      setLoading(false);
     }, loadingTime.current);  //was 1000 - changed 08oct2024 - mjs
-    
-    
-    
   };
 
   const btnProps = useLongPress({
@@ -104,8 +82,8 @@ export default function FocusZoomButton({
       
       handleActiveButton(id, id); //24oct2024 - mjs
       //console.log(new Date().toISOString(), "FocusZoomButton - onClick - buttonID:", id, activeButton.current); //test only 24oct2024 - mjs
-       
-      drive(controlOneStop)
+
+      drive.move(controlOneStop)
     },
 
     onLongPress: () => {
@@ -128,14 +106,6 @@ export default function FocusZoomButton({
 
     },
   });
-
-  const drive = (control, speed) => {
-    if (buttonFunction === "zoom") {
-      camera.zoom(control, speed);
-    } else {
-      camera.focus(control);
-    }
-  };
 
   useEffect(() => {
     // set enabled status from camSettings.focus_mode

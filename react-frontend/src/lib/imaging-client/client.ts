@@ -27,6 +27,7 @@ import {
 import { COMMAND_KINDS, CommandFailedError } from "./commands";
 import type { CommandKind } from "./commands";
 import type { StationId, StationIdInput } from "./protocol";
+import { FOCUS_CONTROLS, ZOOM_CONTROLS } from "./domain";
 import type { FocusControl, ZoomControl } from "./domain";
 import type {
   CommandResult,
@@ -81,6 +82,12 @@ const EVICTABLE_COMMAND_KINDS: ReadonlySet<CommandKind> = new Set([
  */
 const SEND_CONNECTION_LINGER_MS = 30_000;
 
+/**
+ * Delay before a drive's stop goes out, so it cannot collide with the move
+ * command sent just before it.
+ */
+const DRIVE_STOP_DELAY_MS = 10;
+
 /** Context shared by station-level commands. */
 export interface CommandContext {
   /** The station's active camera; becomes the payload's `camera` field. */
@@ -101,6 +108,23 @@ export interface RecordOptions extends CommandContext {
   as?: StationId;
 }
 
+export type DriveKind = "focus" | "zoom";
+
+/** A focus or zoom drive; see CameraHandle.drive. */
+export interface CameraDrive {
+  /**
+   * Send a drive control value (one-stop or continuous; speed applies only
+   * to continuous zoom).
+   */
+  move(control: FocusControl | ZoomControl | string, speed?: number): SentCommand;
+  /**
+   * End the current move with this drive's own stop value. The legacy
+   * protocol expects a stop after one-stop steps too; sending is delayed
+   * briefly so it cannot collide with the move it follows.
+   */
+  stop(): void;
+}
+
 export interface CameraHandle {
   readonly id: string | null;
   setIso(value: string): SentCommand;
@@ -118,6 +142,12 @@ export interface CameraHandle {
    * Speed applies only to the continuous controls.
    */
   zoom(control: ZoomControl | string, speed?: number): SentCommand;
+  /**
+   * A uniform handle for one drive: `move` routes to the matching control
+   * channel and `stop` sends that drive's own stop value, so callers can't
+   * mispair a drive with another drive's stop.
+   */
+  drive(kind: DriveKind): CameraDrive;
   /** Joystick pan/tilt; `value` is the nipplejs-shaped move descriptor. */
   panTilt(value: unknown): SentCommand;
   /**
@@ -458,6 +488,24 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       const setting = (kind: CommandKind, name: string) => (value: string) =>
         sendCommand(kind, { action: { name, value } }, context);
 
+      const focus = (control: FocusControl | string) =>
+        sendCommand(
+          COMMAND_KINDS.FOCUS,
+          { action: { name: ACTIONS.focusControl, value: control } },
+          context
+        );
+      const zoom = (control: ZoomControl | string, speed?: number) =>
+        sendCommand(
+          COMMAND_KINDS.ZOOM,
+          {
+            action: {
+              name: ACTIONS.zoomControl,
+              value: speed != null ? `${control}:${speed}` : control,
+            },
+          },
+          context
+        );
+
       return {
         id,
         setIso: setting(COMMAND_KINDS.SET_ISO, ACTIONS.iso),
@@ -483,23 +531,21 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
             },
             context
           ),
-        focus: (control) =>
-          sendCommand(
-            COMMAND_KINDS.FOCUS,
-            { action: { name: ACTIONS.focusControl, value: control } },
-            context
-          ),
-        zoom: (control, speed) =>
-          sendCommand(
-            COMMAND_KINDS.ZOOM,
-            {
-              action: {
-                name: ACTIONS.zoomControl,
-                value: speed != null ? `${control}:${speed}` : control,
-              },
-            },
-            context
-          ),
+        focus,
+        zoom,
+        drive: (kind) => ({
+          move: (control, speed) =>
+            kind === "zoom" ? zoom(control, speed) : focus(control),
+          stop: () => {
+            setTimeout(() => {
+              if (kind === "zoom") {
+                zoom(ZOOM_CONTROLS.STOP);
+              } else {
+                focus(FOCUS_CONTROLS.STOP);
+              }
+            }, DRIVE_STOP_DELAY_MS);
+          },
+        }),
         panTilt: (value) =>
           sendCommand(
             COMMAND_KINDS.PAN_TILT,

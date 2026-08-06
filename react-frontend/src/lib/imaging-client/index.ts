@@ -10,8 +10,10 @@
 
 export { createImagingClient, getSharedImagingClient } from "./client";
 export type {
+  CameraDrive,
   CameraHandle,
   CommandContext,
+  DriveKind,
   ImagingClient,
   ImagingClientOptions,
   RecordOptions,
