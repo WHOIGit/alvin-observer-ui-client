@@ -7,7 +7,7 @@ import {
   storeCamHeartbeat,
 } from "./cameraControlsSlice.js";
 import { createSocketIoHarness } from "../../../tests/socket.io-harness";
-import { makeCameraControlsStore } from "../../../tests/imaging-test-utils";
+import { emitTo, makeCameraControlsStore } from "../../../tests/imaging-test-utils";
 import { NEW_CAMERA_COMMAND_EVENT } from "../../config.js";
 import { ACTIONS } from "../../lib/imaging-client";
 import { SOCKET_USER_SCENARIOS } from "../../../tests/socket-user-scenarios";
@@ -61,6 +61,16 @@ test.each(SOCKET_USER_SCENARIOS)(
     );
 
     await h.connected;
+    // The library resolves the record command's previousCamera from the
+    // recorder heartbeat (display name) and the camera list.
+    emitTo(h, scenario.namespace, "RecorderHeartbeat", {
+      camera: "Cam 1",
+      recording: "true",
+      filename: "rec-file-001",
+    });
+    emitTo(h, scenario.namespace, NEW_CAMERA_COMMAND_EVENT, {
+      camera_array: allCameras,
+    });
     await user.click(getByText("Record Source"));
 
     const { namespace, args } = await h.gotCmd;

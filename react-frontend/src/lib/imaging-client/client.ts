@@ -89,8 +89,9 @@ export interface CommandContext {
 
 export interface RecordOptions extends CommandContext {
   /**
-   * The camera that was previously being recorded (from the recorder
-   * heartbeat); the legacy protocol requires it on record-source commands.
+   * Override for the previously recorded camera's ID, which the legacy
+   * protocol requires on non-delegated record-source commands. When
+   * omitted, the library resolves it from the recorder's own telemetry.
    */
   previousCamera?: string | null;
   /**
@@ -303,16 +304,36 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
     // legacy hook had — instead of resurrecting the connection.
     let lastSendSocket: Socket | null = null;
 
-    // The receipt-correlation listener rides on whatever socket currently
-    // backs this namespace, without holding a reference of its own. Sockets
-    // are recreated when the pool entry cycles, so track attachment per
-    // socket instance.
-    const ackListenerAttached = new WeakSet<Socket>();
-    function ensureAckListener(socket: Socket) {
-      if (ackListenerAttached.has(socket)) return;
-      ackListenerAttached.add(socket);
+    // Station-level telemetry the command builders draw on: the camera
+    // list (to resolve the recorder's display names to camera IDs) and the
+    // recorder's current source.
+    let latestCameraList: CameraArrayEntry[] = [];
+    let latestRecorderSource: string | null = null;
+
+    // These listeners ride on whatever socket currently backs this
+    // namespace, without holding a reference of their own. Sockets are
+    // recreated when the pool entry cycles, so track attachment per socket
+    // instance.
+    const stationListenersAttached = new WeakSet<Socket>();
+    function ensureStationListeners(socket: Socket) {
+      if (stationListenersAttached.has(socket)) return;
+      stationListenersAttached.add(socket);
+      socket.on(EVENTS.recorderHeartbeat, (msg) => {
+        const heartbeat = normalizeRecorderHeartbeat(msg);
+        // Only the observer-shaped heartbeat names the recorder's source.
+        if ("isRecording" in heartbeat) {
+          latestRecorderSource = heartbeat.camera ?? null;
+        }
+      });
       socket.on(EVENTS.newCameraCommand, (msg: unknown) => {
-        if (!msg || typeof msg !== "object" || isBroadcastShape(msg)) return;
+        if (!msg || typeof msg !== "object") return;
+        if (isBroadcastShape(msg)) {
+          if ("camera_array" in msg) {
+            latestCameraList = (msg as { camera_array: CameraArrayEntry[] })
+              .camera_array;
+          }
+          return;
+        }
         const receipt = msg as CommandReceipt;
         if (typeof receipt.eventId !== "string") return;
         const pending = pendingAcks.get(receipt.eventId);
@@ -395,7 +416,7 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         setTimeout(bootstrap.release, SEND_CONNECTION_LINGER_MS);
       }
       lastSendSocket = socket;
-      ensureAckListener(socket);
+      ensureStationListeners(socket);
       socket.emit(EVENTS.newCameraCommand, payload);
 
       return Object.assign(promise, {
@@ -404,11 +425,30 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       }) as SentCommand;
     }
 
+    // Station-scoped subscribe: same contract as subscribe(), plus it keeps
+    // the station's internal telemetry listeners attached to the socket.
+    function subscribeStation(
+      event: string,
+      handler: (...args: any[]) => void
+    ): Unsubscribe {
+      const { socket, release } = pool.acquire(namespacePath, V1);
+      ensureStationListeners(socket);
+      socket.on(event, handler);
+      return () => {
+        try {
+          socket.off(event, handler);
+        } catch (_) {
+          /* socket may already be gone */
+        }
+        release();
+      };
+    }
+
     function onCommandMessage(
       match: (msg: object) => boolean,
       deliver: (msg: any) => void
     ): Unsubscribe {
-      return subscribe(namespacePath, V1, EVENTS.newCameraCommand, (msg: unknown) => {
+      return subscribeStation(EVENTS.newCameraCommand, (msg: unknown) => {
         if (msg && typeof msg === "object" && match(msg)) deliver(msg);
       });
     }
@@ -501,7 +541,8 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       id,
 
       acquire() {
-        const { release } = pool.acquire(namespacePath, V1);
+        const { socket, release } = pool.acquire(namespacePath, V1);
+        ensureStationListeners(socket);
         return release;
       },
 
@@ -525,6 +566,17 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         };
         if (options.previousCamera !== undefined) {
           body.oldCamera = options.previousCamera;
+        } else if (options.as === undefined) {
+          // The legacy protocol validates that a non-delegated record names
+          // the previously recorded camera (the server never uses the
+          // value). The recorder heartbeat reports it by display name;
+          // resolve it against the camera list, falling back to the camera
+          // being recorded when the name is unknown (e.g. before the list
+          // arrives after a reconnect).
+          const previous = latestCameraList.find(
+            (entry) => entry.cam_name === latestRecorderSource
+          );
+          body.oldCamera = previous?.camera ?? cameraId;
         }
         if (options.as !== undefined) {
           body.observerSideOverride = delegationTarget(options.as);
@@ -555,13 +607,13 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       },
 
       onCamHeartbeat(cb) {
-        return subscribe(namespacePath, V1, EVENTS.camHeartbeat, (msg) =>
+        return subscribeStation(EVENTS.camHeartbeat, (msg) =>
           cb(normalizeCamHeartbeat(msg))
         );
       },
 
       onRecorderHeartbeat(cb) {
-        return subscribe(namespacePath, V1, EVENTS.recorderHeartbeat, (msg) =>
+        return subscribeStation(EVENTS.recorderHeartbeat, (msg) =>
           cb(normalizeRecorderHeartbeat(msg))
         );
       },
@@ -570,7 +622,7 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
         // New-clip detection as the legacy UI did it: a heartbeat reports a
         // filename different from the last one seen, while recording.
         let lastFilename: string | undefined;
-        return subscribe(namespacePath, V1, EVENTS.recorderHeartbeat, (msg) => {
+        return subscribeStation(EVENTS.recorderHeartbeat, (msg) => {
           const heartbeat = normalizeRecorderHeartbeat(msg);
           // The pilot-shaped heartbeat carries no per-clip filename.
           if (!("isRecording" in heartbeat)) return;
@@ -584,6 +636,7 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
 
       onConnectionStatus(cb) {
         const { socket, release } = pool.acquire(namespacePath, V1);
+        ensureStationListeners(socket);
         const onConnect = () => {
           everActiveSockets.add(socket);
           cb({ status: "connected" });

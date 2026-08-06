@@ -100,6 +100,61 @@ describe("station commands", () => {
     });
   });
 
+  test("record resolves the previous camera from recorder telemetry", async () => {
+    const h = createSocketIoHarness((h, expectEmit) => {
+      h.gotCmd = expectEmit("newCameraCommand");
+    });
+
+    const client = makeClient();
+    const station = client.station("P");
+    station.acquire();
+
+    const recs: any[] = [];
+    station.onRecorderHeartbeat((msg) => recs.push(msg));
+    const lists: any[] = [];
+    station.onCameraList((cameras) => lists.push(cameras));
+
+    await stationConnected(station);
+
+    emitTo(h, "/port", "RecorderHeartbeat", {
+      command: "SRVP",
+      camera: "Port Brow",
+      recording: "true",
+      filename: "clip_0001.mov",
+    });
+    emitTo(h, "/port", "newCameraCommand", {
+      camera_array: [
+        { camera: "port_brow_4k", cam_name: "Port Brow", owner: "none" },
+        { camera: "sci_cam", cam_name: "Sci Cam", owner: "none" },
+      ],
+    });
+    await vi.waitFor(() => {
+      expect(recs).toHaveLength(1);
+      expect(lists).toHaveLength(1);
+    });
+
+    station.record("sci_cam");
+
+    const { args } = await h.gotCmd;
+    expect(args[0].oldCamera).toBe("port_brow_4k");
+    expect(args[0].camera).toBe("port_brow_4k"); // oldCamera overrides context
+  });
+
+  test("record falls back to the recorded camera when the source is unknown", async () => {
+    const h = createSocketIoHarness((h, expectEmit) => {
+      h.gotCmd = expectEmit("newCameraCommand");
+    });
+
+    const client = makeClient();
+    client.station("P").record("sci_cam");
+
+    await h.connected;
+    const { args } = await h.gotCmd;
+    // No recorder heartbeat seen: the protocol still validates that a
+    // non-delegated record carries some previous camera ID.
+    expect(args[0].oldCamera).toBe("sci_cam");
+  });
+
   test("stopRecording sends the ST record action", async () => {
     const h = createSocketIoHarness((h, expectEmit) => {
       h.gotCmd = expectEmit("newCameraCommand");

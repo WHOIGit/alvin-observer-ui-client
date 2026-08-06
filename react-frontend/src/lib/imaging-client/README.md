@@ -188,9 +188,9 @@ commands can be sent at all.
 
 - `selectCamera(cameraId)` — switch the station's video source.
 - `record(cameraId, options)` — route the recorder to a camera and start
-  recording. `options.previousCamera` must carry the previously recording
-  camera (the `camera` field of the latest recorder heartbeat — a display
-  name); the protocol requires it on record-source commands.
+  recording. The legacy protocol requires the previously recording camera's
+  ID on non-delegated record commands; the library resolves it from the
+  recorder's own telemetry (`options.previousCamera` overrides).
   `options.as` (a `StationId`, e.g. `STATIONS.PORT`) is pilot-only delegation: the command is
   issued against the observer station's resources while still traveling over
   the pilot's connection.

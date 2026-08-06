@@ -5,13 +5,10 @@ import { Grid, Button, CircularProgress, Checkbox } from "@mui/material";
 import { green } from "@mui/material/colors";
 import { useObservedCamera, useObservedStation } from "./ObservedCameraProvider";
 import { useRecordingStarted } from "../../hooks/useImagingClient";
-import { getCameraConfigFromName } from "../../utils/getCamConfigFromName";
 import {
   selectActiveCameraConfig,
-  selectAllCameras,
   selectCamHeartbeatData,
   selectRecordControlsEnabled,
-  selectRecorderHeartbeatData,
   setRecorderError,
   setVideoSourceEnabled,
 } from "./cameraControlsSlice";
@@ -41,9 +38,7 @@ export default function CaptureButtons() {
   const classes = useStyles();
   const activeCamera = useSelector(selectActiveCameraConfig);
   const recordControlsEnabled = useSelector(selectRecordControlsEnabled);
-  const recorderHeartbeatData = useSelector(selectRecorderHeartbeatData);
   const camSettings = useSelector(selectCamHeartbeatData);
-  const allCameras = useSelector(selectAllCameras);
 
   const station = useObservedStation();
   const camera = useObservedCamera();
@@ -86,44 +81,21 @@ export default function CaptureButtons() {
     []
   );
 
-  const startRecording = () => {
-    // The record command must carry the previously recording camera's ID,
-    // which the heartbeat reports by display name.
-    const oldCamera = getCameraConfigFromName(
-      recorderHeartbeatData.camera,
-      allCameras
-    );
-    if (!oldCamera) {
-      // The recorder's reported source isn't in this station's camera list
-      // yet (e.g. the camera list hasn't arrived after a reconnect); don't
-      // send a malformed record command.
-      console.warn(
-        "Cannot start recording: unknown recorder source",
-        recorderHeartbeatData.camera
-      );
-      return false;
-    }
-    station.record(activeCamera.camera, { previousCamera: oldCamera.camera });
-    return true;
-  };
-
   const captureStillImage = () => {
     camera.captureStill();
   };
 
   const handleRecordAction = async () => {
-    if (!recorderHeartbeatData || !activeCamera) {
-      // No recorder heartbeat yet (recorder down or still starting) or no
-      // active camera selected; without them there is no record command to
-      // build. Bail before setLoading so the button can't wedge.
-      console.warn("Cannot start recording: recorder state not ready");
+    if (!activeCamera) {
+      // No active camera selected yet; there is nothing to record. Bail
+      // before setLoading so the button can't wedge.
+      console.warn("Cannot start recording: no active camera");
       return;
     }
     setLoading(true);
-    if (!startRecording()) {
-      setLoading(false);
-      return;
-    }
+    // The library resolves the legacy previousCamera requirement from the
+    // recorder's own telemetry.
+    station.record(activeCamera.camera);
     dispatch(setVideoSourceEnabled(false));
     dispatch(setRecorderError(false));
 
