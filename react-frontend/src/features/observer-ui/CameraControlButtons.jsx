@@ -29,7 +29,7 @@ export default function CameraControlButtons() {
   if (
     camSettings === null ||
     !isOwner ||
-    camSettings?.hasFault ||
+    camSettings?.faults?.exposure ||
     !recordControlsEnabled
   ) {
     return null;

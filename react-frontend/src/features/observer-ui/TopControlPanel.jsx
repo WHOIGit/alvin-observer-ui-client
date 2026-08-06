@@ -83,7 +83,7 @@ export default function TopControlPanel({
   
    
   const renderDynamicGridBox = () => {
-    if (camHeartbeat?.hasFault) return <ErrorCard />;
+    if (camHeartbeat?.faults?.focus_mode) return <ErrorCard />;
       
     return (
       <>

@@ -294,11 +294,13 @@ encodings never reach consumers.
 | `"y"` / `"n"` flags | booleans under predicate names (`hasPanTilt`, `isControllable`) |
 | `"true"` / `"false"` strings | booleans (`isRecording`, `isPortRecording`, `isStbdRecording`, `isProcessingComplete`) |
 | Null sentinels (`'NULL_PORT_ISO'`, `'null'`, ...) | `null` |
-| Driver-fault strings | `null`, with the fault reported via `hasFault` |
+| Driver-fault strings | `null`, with the fault reported via `faults` / `hasFault` |
 
-`hasFault` is true when any settings field carried a driver-fault value
-(e.g. a driver socket timeout) — as opposed to a merely absent setting, which
-is just `null` with `hasFault: false`.
+`faults` reports which settings fields carried a driver-fault value (e.g. a
+driver socket timeout) — as opposed to a merely absent setting, which is just
+`null` with `faults.<field>: false`. `hasFault` is their aggregate: true when
+any field faulted. Consumers should gate each control on its own field's
+fault, not the aggregate.
 
 ```ts
 interface CamHeartbeat {
@@ -315,7 +317,16 @@ interface CamHeartbeat {
   capture_interval?: string | null; // pilot heartbeat only
   hasPanTilt: boolean;
   isControllable: boolean;
-  hasFault: boolean;
+  faults: {                     // per-field driver-fault flags
+    iso: boolean;
+    shutter: boolean;
+    iris: boolean;
+    exposure: boolean;
+    focus_mode: boolean;
+    white_balance?: boolean;    // pilot heartbeat only
+    capture_interval?: boolean; // pilot heartbeat only
+  };
+  hasFault: boolean;            // true when any field faulted
   owner: "pilot" | "port" | "stbd" | "none";
   dive: string;
   cruise: string;

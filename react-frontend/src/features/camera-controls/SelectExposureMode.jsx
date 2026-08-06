@@ -73,7 +73,7 @@ export default function SelectExposureMode({ showLabel }) {
   if (
     !camSettings?.isControllable ||
     !isOwner ||
-    camSettings?.hasFault
+    camSettings?.faults?.exposure
   ) {
     return null;
   }

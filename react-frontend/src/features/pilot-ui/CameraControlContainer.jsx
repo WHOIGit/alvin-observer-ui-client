@@ -40,7 +40,7 @@ export default function CameraControlContainer() {
   const camSettings = useSelector(selectCamHeartbeatData);
 
   const renderDynamicGridBox = () => {
-    if (camSettings?.hasFault) return <ErrorCard />;
+    if (camSettings?.faults?.focus_mode) return <ErrorCard />;
     if (camSettings?.isControllable && isOwner) {
       return (
         <List>

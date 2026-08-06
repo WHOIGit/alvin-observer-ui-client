@@ -71,7 +71,7 @@ test("hides the control when the camera reports a driver fault", () => {
         isControllable: true,
         camera: "cam-1",
         owner: "port",
-        hasFault: true,
+        faults: { exposure: true },
       },
     },
     allCameras: [{ camera: "cam-1", cam_name: "Cam 1" }],

@@ -43,6 +43,18 @@ export interface CamHeartbeat
   white_balance?: string | null;
   /** Only present in the pilot's heartbeat. */
   capture_interval?: string | null;
+  /** Which settings fields carried a driver-fault value. */
+  faults: {
+    iso: boolean;
+    shutter: boolean;
+    iris: boolean;
+    exposure: boolean;
+    focus_mode: boolean;
+    /** Only present in the pilot's heartbeat. */
+    white_balance?: boolean;
+    /** Only present in the pilot's heartbeat. */
+    capture_interval?: boolean;
+  };
   /** Whether any settings field carried a driver-fault value. */
   hasFault: boolean;
 }
@@ -126,6 +138,20 @@ export function normalizeCamHeartbeat(message: WireCamHeartbeat): CamHeartbeat {
     ...rest
   } = message;
 
+  const faults: CamHeartbeat["faults"] = {
+    iso: isFault(iso),
+    shutter: isFault(shutter),
+    iris: isFault(iris),
+    exposure: isFault(exposure),
+    focus_mode: isFault(focus_mode),
+  };
+  if (white_balance !== undefined) {
+    faults.white_balance = isFault(white_balance);
+  }
+  if (capture_interval !== undefined) {
+    faults.capture_interval = isFault(capture_interval);
+  }
+
   const heartbeat: CamHeartbeat = {
     ...rest,
     hasPanTilt: yesNo(pantilt),
@@ -135,15 +161,8 @@ export function normalizeCamHeartbeat(message: WireCamHeartbeat): CamHeartbeat {
     iris: normalizeSetting(iris),
     exposure: normalizeSetting(exposure),
     focus_mode: normalizeSetting(focus_mode),
-    hasFault: [
-      iso,
-      shutter,
-      iris,
-      exposure,
-      focus_mode,
-      white_balance,
-      capture_interval,
-    ].some(isFault),
+    faults,
+    hasFault: Object.values(faults).some(Boolean),
   };
   // The pilot-only fields stay absent for observer heartbeats.
   if (white_balance !== undefined) {
