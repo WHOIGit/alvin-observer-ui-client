@@ -113,11 +113,11 @@ export const cameraControlsSlice = createSlice({
       }
     },
     // Stores a station's latest heartbeat. eventId/timestamp churn on every
-    // message, so they're stripped before the change check.
+    // message, so they're stripped — without mutating the action, which
+    // Immer does not draft — before the change check.
     storeCamHeartbeat: (state, action) => {
-      const { stationId, heartbeat } = action.payload;
-      delete heartbeat.eventId;
-      delete heartbeat.timestamp;
+      const { stationId } = action.payload;
+      const { eventId, timestamp, ...heartbeat } = action.payload.heartbeat;
 
       if (!state.initialCamHeartbeats[stationId]) {
         state.initialCamHeartbeats[stationId] = heartbeat;
@@ -132,9 +132,8 @@ export const cameraControlsSlice = createSlice({
     changeRecorderHeartbeat: (state, action) => {
       // get the original state to check Heartbeat data
       const currentState = original(state);
-      const data = action.payload;
-      delete data.eventId;
-      //delete data.timestamp;
+      // Strip the per-message eventId without mutating the action.
+      const { eventId, ...data } = action.payload;
       if (isEqual(currentState.recorderHeartbeatData, data)) {
         return state;
       }
