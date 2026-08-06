@@ -74,6 +74,13 @@ const EVICTABLE_COMMAND_KINDS: ReadonlySet<CommandKind> = new Set([
   COMMAND_KINDS.ZOOM,
 ]);
 
+/**
+ * How long a connection opened just to carry a command (no acquire held)
+ * lingers before it is released. Long enough for the emit to flush after
+ * connect; short enough that an unadopted connection doesn't leak.
+ */
+const SEND_CONNECTION_LINGER_MS = 30_000;
+
 /** Context shared by station-level commands. */
 export interface CommandContext {
   /** The station's active camera; becomes the payload's `camera` field. */
@@ -363,10 +370,15 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
       }
       pendingAcks.set(payload.eventId, { kind, payload, resolve, reject });
 
-      const socket =
-        pool.peek(namespacePath, V1) ??
-        lastSendSocket ??
-        pool.get(namespacePath, V1);
+      let socket = pool.peek(namespacePath, V1) ?? lastSendSocket;
+      if (!socket) {
+        // First send with no live connection: open one under a short-lived
+        // reference of its own, so a connection nothing adopts is released
+        // (good-bye + disconnect) instead of leaking for the page lifetime.
+        const bootstrap = pool.acquire(namespacePath, V1);
+        socket = bootstrap.socket;
+        setTimeout(bootstrap.release, SEND_CONNECTION_LINGER_MS);
+      }
       lastSendSocket = socket;
       ensureAckListener(socket);
       socket.emit(EVENTS.newCameraCommand, payload);
