@@ -187,6 +187,9 @@ commands can be sent at all.
 ### Station commands
 
 - `selectCamera(cameraId)` — switch the station's video source.
+- `requestCameraSettings(cameraId)` — make the server broadcast the
+  camera's settings options; the legacy protocol has no dedicated request,
+  so this re-selects the camera under the hood.
 - `record(cameraId, options)` — route the recorder to a camera and start
   recording. The legacy protocol requires the previously recording camera's
   ID on non-delegated record commands; the library resolves it from the

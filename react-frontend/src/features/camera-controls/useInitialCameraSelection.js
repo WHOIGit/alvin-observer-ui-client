@@ -6,10 +6,10 @@ import {
   selectInitialCamHeartbeatData,
 } from "./cameraControlsSlice";
 
-// On first load, seed the active camera from the initial heartbeat and ask the
-// station to select it (which makes the server broadcast that camera's settings
-// options). Runs once, while the active camera is still unset; no-ops until a
-// station and an initial heartbeat are both available.
+// On first load, seed the active camera from the initial heartbeat and ask
+// the server for that camera's settings options. Runs once, while the active
+// camera is still unset; no-ops until a station and an initial heartbeat are
+// both available.
 export function useInitialCameraSelection(station) {
   const dispatch = useDispatch();
   const activeCamera = useSelector(selectActiveCamera);
@@ -20,8 +20,6 @@ export function useInitialCameraSelection(station) {
       return;
     }
     dispatch(changeActiveCamera(initialCamHeartbeat));
-    station.selectCamera(initialCamHeartbeat.camera, {
-      activeCamera: initialCamHeartbeat.camera,
-    });
+    station.requestCameraSettings(initialCamHeartbeat.camera);
   }, [activeCamera, dispatch, station, initialCamHeartbeat]);
 }

@@ -208,6 +208,12 @@ export interface Station {
 
   // Commands
   selectCamera(cameraId: string, context?: CommandContext): SentCommand;
+  /**
+   * Ask the server to broadcast the camera's settings options
+   * (current_settings). The legacy protocol has no dedicated request;
+   * re-selecting the camera is what triggers the broadcast.
+   */
+  requestCameraSettings(cameraId: string): SentCommand;
   record(cameraId: string, options?: RecordOptions): SentCommand;
   stopRecording(options?: Omit<RecordOptions, "previousCamera">): SentCommand;
   takeRoute(input: string, output: string, context?: CommandContext): SentCommand;
@@ -668,6 +674,14 @@ export function createImagingClient(options: ImagingClientOptions = {}): Imaging
           COMMAND_KINDS.SELECT_CAMERA,
           { action: { name: ACTIONS.videoSource, value: cameraId } },
           context
+        );
+      },
+
+      requestCameraSettings(cameraId) {
+        return sendCommand(
+          COMMAND_KINDS.SELECT_CAMERA,
+          { action: { name: ACTIONS.videoSource, value: cameraId } },
+          { activeCamera: cameraId }
         );
       },
 
