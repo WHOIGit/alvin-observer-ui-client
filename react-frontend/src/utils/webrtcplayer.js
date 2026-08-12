@@ -18,6 +18,13 @@ const RECONNECT_MAX_MS = 10000;
 export const STATS_POLL_MS = 2000;
 export const STALL_LIMIT = 3; // consecutive idle polls (~6s) before reconnecting
 
+// A hidden tab stops decoding, so the counters freeze and the watchdog would
+// tear down a healthy connection. iOS does this on lock/background, which is
+// why the iPads reconnect all dive and the always-on pilot PC does not.
+export function documentHidden() {
+  return typeof document !== "undefined" && document.visibilityState === "hidden";
+}
+
 export default class WebRtcPlayer {
   static server = "http://127.0.0.1:8083";
   static protocol = "whep";
@@ -137,6 +144,13 @@ export default class WebRtcPlayer {
     if (this.closed || !this.webrtc) return;
     // Only meaningful once the transport claims to be up.
     if (this.webrtc.connectionState !== "connected") return;
+    // Drop the baseline while hidden so the first poll after a resume compares
+    // against fresh counters rather than pre-suspend ones.
+    if (documentHidden()) {
+      this.lastSample = null;
+      this.stalledChecks = 0;
+      return;
+    }
     if (typeof this.webrtc.getStats !== "function") return;
 
     let frames = null;
