@@ -35,6 +35,10 @@ export function useSocket(namespace = "/", { apiVersion = "1" } = {}) {
     return () => {
       const e = entryRef.current;
       if (!e) return;
+      // Clear first: otherwise a render after teardown hands out the socket we
+      // are about to disconnect, and that consumer listens to a dead one for
+      // the rest of the session.
+      entryRef.current = null;
       e.refCount -= 1;
       if (e.refCount <= 0) {
         pool.delete(e.key);
@@ -52,9 +56,9 @@ export function useSocket(namespace = "/", { apiVersion = "1" } = {}) {
     };
   }, [namespace, apiVersion]);
 
-  return entryRef.current
-    ? entryRef.current.socket
-    : getOrCreate(namespace, apiVersion).socket;
+  const live = entryRef.current;
+  if (live && pool.get(live.key) === live) return live.socket;
+  return getOrCreate(namespace, apiVersion).socket;
 }
 
 export function useSocketListener(
