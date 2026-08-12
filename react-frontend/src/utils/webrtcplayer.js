@@ -18,9 +18,8 @@ const RECONNECT_MAX_MS = 10000;
 export const STATS_POLL_MS = 2000;
 export const STALL_LIMIT = 3; // consecutive idle polls (~6s) before reconnecting
 
-// A hidden tab stops decoding, so the counters freeze and the watchdog would
-// tear down a healthy connection. iOS does this on lock/background, which is
-// why the iPads reconnect all dive and the always-on pilot PC does not.
+// A hidden tab stops decoding, so the counters freeze on a healthy stream;
+// iOS does this on lock/background.
 export function documentHidden() {
   return typeof document !== "undefined" && document.visibilityState === "hidden";
 }
@@ -144,8 +143,7 @@ export default class WebRtcPlayer {
     if (this.closed || !this.webrtc) return;
     // Only meaningful once the transport claims to be up.
     if (this.webrtc.connectionState !== "connected") return;
-    // Drop the baseline while hidden so the first poll after a resume compares
-    // against fresh counters rather than pre-suspend ones.
+    // Baseline is dropped so the first poll after a resume starts fresh.
     if (documentHidden()) {
       this.lastSample = null;
       this.stalledChecks = 0;

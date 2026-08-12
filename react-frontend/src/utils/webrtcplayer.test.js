@@ -1,8 +1,8 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import WebRtcPlayer, { STALL_LIMIT } from "./webrtcplayer";
 
-// Drives checkMediaProgress directly: the stall decision is the whole point,
-// and standing up a real RTCPeerConnection would test the browser instead.
+// Drives checkMediaProgress directly; a real RTCPeerConnection would only
+// test the browser.
 function playerWithFrozenStats() {
   const player = Object.create(WebRtcPlayer.prototype);
   player.closed = false;
@@ -42,8 +42,7 @@ describe("media-progress watchdog", () => {
   });
 
   it("does not reconnect while the tab is hidden", async () => {
-    // iOS stops decoding on lock/background, so the counters freeze on a
-    // perfectly healthy connection.
+    // iOS stops decoding on lock/background; the counters freeze regardless.
     const player = playerWithFrozenStats();
     setVisibility("hidden");
 

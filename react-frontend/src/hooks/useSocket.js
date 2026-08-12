@@ -35,9 +35,7 @@ export function useSocket(namespace = "/", { apiVersion = "1" } = {}) {
     return () => {
       const e = entryRef.current;
       if (!e) return;
-      // Clear first: otherwise a render after teardown hands out the socket we
-      // are about to disconnect, and that consumer listens to a dead one for
-      // the rest of the session.
+      // Clear first, or a render after teardown hands out the dead socket.
       entryRef.current = null;
       e.refCount -= 1;
       if (e.refCount <= 0) {

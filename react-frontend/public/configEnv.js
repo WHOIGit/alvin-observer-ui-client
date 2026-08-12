@@ -22,13 +22,3 @@ window.STBD_OBSERVER_VIDEO = "stbd_mon";
 window.STBD_RECORDER_VIDEO = "stbd_rec";
 window.PILOT_VIDEO = "pilot_mon";
 
-window.CAMERAS = [
-  { camera: "camera1", cam_name: "port_brow_4k", owner: "port" },
-  { camera: "camera2", cam_name: "port_patz", owner: "port" },
-  { camera: "camera3", cam_name: "stbd_brow_4k", owner: "stbd" },
-  { camera: "camera4", cam_name: "stbd_patz", owner: "stbd" },
-  { camera: "camera5", cam_name: "aft_cam", owner: "none" },
-  { camera: "camera6", cam_name: "down_cam", owner: "none" },
-  { camera: "camera7", cam_name: "brow_wide", owner: "pilot" },
-  { camera: "camera8", cam_name: "sci_cam", owner: "port" },
-];
