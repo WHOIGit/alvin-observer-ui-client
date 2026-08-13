@@ -15,12 +15,14 @@ WORKDIR /app
 # && update-ca-certificates
 ARG npm_config_cafile=/etc/ssl/certs/ca-certificates.crt 
 
-# Update NPM to latest version
-RUN npm i npm@latest -g
+# Pinned: npm@latest let a new npm release change the build under us. Bump
+# deliberately, and rebuild once when you do.
+RUN npm i npm@12.0.2 -g
 
-# Install all node packages
+# Install the build tree only; the test deps include a git dependency that
+# npm 12 refuses by default, and the image never runs tests.
 COPY ./react-frontend/package*.json /app/
-RUN npm install --no-audit
+RUN npm install --no-audit --omit=dev
 RUN npx update-browserslist-db@latest
 # Copy sources and build
 COPY ./react-frontend /app
