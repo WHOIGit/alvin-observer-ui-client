@@ -18,6 +18,12 @@ const RECONNECT_MAX_MS = 10000;
 export const STATS_POLL_MS = 2000;
 export const STALL_LIMIT = 3; // consecutive idle polls (~6s) before reconnecting
 
+// A hidden tab stops decoding, so the counters freeze on a healthy stream;
+// iOS does this on lock/background.
+export function documentHidden() {
+  return typeof document !== "undefined" && document.visibilityState === "hidden";
+}
+
 export default class WebRtcPlayer {
   static server = "http://127.0.0.1:8083";
   static protocol = "whep";
@@ -137,6 +143,12 @@ export default class WebRtcPlayer {
     if (this.closed || !this.webrtc) return;
     // Only meaningful once the transport claims to be up.
     if (this.webrtc.connectionState !== "connected") return;
+    // Baseline is dropped so the first poll after a resume starts fresh.
+    if (documentHidden()) {
+      this.lastSample = null;
+      this.stalledChecks = 0;
+      return;
+    }
     if (typeof this.webrtc.getStats !== "function") return;
 
     let frames = null;

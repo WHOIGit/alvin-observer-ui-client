@@ -15,9 +15,6 @@ export const CAM_HEARTBEAT = "CamHeartbeat";
 export const SENSOR_HEARTBEAT = "SensorHeartbeat";
 export const RECORDER_HEARTBEAT = "RecorderHeartbeat";
 
-// Camera definitions
-//export const CAMERAS = envSettings.CAMERAS;
-
 // Camera command constants
 export const COMMAND_PREFIX = "COV"; // Client Observer. Combines with ObserverSide P/S
 export const COMMAND_STRINGS = {
