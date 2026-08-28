@@ -8,6 +8,20 @@ export const WS_SERVER_NAMESPACE_STARBOARD = "stbd";
 export const WS_SERVER_NAMESPACE_PILOT = "pilot";
 // sealog url for iframe
 export const SEALOG_URL = envSettings.SEALOG_URL;
+
+// alvin-vitals system-health feed.
+// REST base for the GET /health fallback (Caddy proxies to vitals:4050).
+export const VITALS_REST_URL = envSettings.VITALS_URL;
+// useSocket pool key + namespace/event for the vitals socket push.
+export const VITALS_WS_APIVERSION = "vitals";
+export const VITALS_HEALTH_NAMESPACE = "/health";
+export const HEALTH_SNAPSHOT_EVENT = "HealthSnapshot";
+// Dev-only: seed the static fixture so the view renders without vitals running.
+// Gated on DEV so the fixture is stripped from a production build entirely, and
+// strict-equal so a stray "false" string in configEnv cannot switch it on.
+export const MOCK_HEALTH =
+  import.meta.env.DEV && envSettings.MOCK_HEALTH === true;
+
 // Web socket event names
 export const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
 export const NAV_HEARTBEAT = "NavHeartbeat";
@@ -72,4 +86,15 @@ export const VIDEO_STREAM_CONFIG = {
   portRecordVideo: envSettings.PORT_RECORDER_VIDEO,
   stbdRecordVideo: envSettings.STBD_RECORDER_VIDEO,
   pilotVideo: envSettings.PILOT_VIDEO,
+};
+
+// Suboptica encoder keys, used as the {name} in v1.5 /encoder/{name} REST
+// paths. Distinct from the video stream names above (MediaMTX paths) and fixed
+// by the Suboptica topology, so they live here rather than in configEnv.
+export const ENCODER_KEYS = {
+  portObserver: "port_mon_enc",
+  stbdObserver: "stbd_mon_enc",
+  pilot: "pilot_mon_enc",
+  portRecorder: "port_rec_enc",
+  stbdRecorder: "stbd_rec_enc",
 };

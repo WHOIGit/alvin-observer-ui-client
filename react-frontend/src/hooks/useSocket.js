@@ -24,13 +24,18 @@ function getOrCreate(namespace, apiVersion) {
   return entry;
 }
 
-export function useSocket(namespace = "/", { apiVersion = "1" } = {}) {
-  // Resolved during render. A ref only updates in the effect, which does not
-  // re-render, so consumers kept the previous namespace's socket after a side
-  // switch and never rebound their listeners.
-  const entry = getOrCreate(namespace, apiVersion);
+// Resolved during render. A ref only updates in the effect, which does not
+// re-render, so consumers kept the previous namespace's socket after a side
+// switch and never rebound their listeners. `enabled: false` skips the
+// connection entirely so a caller can opt out without breaking hook rules.
+export function useSocket(
+  namespace = "/",
+  { apiVersion = "1", enabled = true } = {}
+) {
+  const entry = enabled ? getOrCreate(namespace, apiVersion) : null;
 
   useEffect(() => {
+    if (!enabled) return undefined;
     const e = getOrCreate(namespace, apiVersion);
     e.refCount += 1;
 
@@ -50,18 +55,18 @@ export function useSocket(namespace = "/", { apiVersion = "1" } = {}) {
         e.socket.disconnect();
       }
     };
-  }, [namespace, apiVersion]);
+  }, [namespace, apiVersion, enabled]);
 
-  return entry.socket;
+  return entry ? entry.socket : null;
 }
 
 export function useSocketListener(
   namespace = "/",
   event,
   callback,
-  { apiVersion = "1" } = {}
+  { apiVersion = "1", enabled = true } = {}
 ) {
-  const socket = useSocket(namespace, { apiVersion });
+  const socket = useSocket(namespace, { apiVersion, enabled });
   const callbackRef = useRef(callback);
 
   useEffect(() => {
@@ -69,6 +74,7 @@ export function useSocketListener(
   }, [callback]);
 
   useEffect(() => {
+    if (!socket) return undefined;
     const handler = (msg) => {
       if (callbackRef.current) {
         callbackRef.current(msg);
