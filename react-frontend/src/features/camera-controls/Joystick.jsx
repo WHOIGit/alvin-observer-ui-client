@@ -174,8 +174,15 @@ export default function Joystick() {
     front.style.top = "0px";
   };
 
+  // Disabling only re-renders to null, it does not unmount, so the spitter
+  // survives unless something stops it.
+  useEffect(() => {
+    if (!isEnabled) stopSpitter();
+  }, [isEnabled]);
+
   const handleGamepad = (actionType) => (v) => {
-    if (!isEnabled) return;
+    // `end` always passes: it is what stops the spitter and sends the stop.
+    if (!isEnabled && actionType !== "end") return;
     const data = nippleDataFromVector(v.x, v.y, SIZE, nippleCenter(), THRESHOLD);
     // Route through the same builder as touch so the emitted payload is
     // identical — the backend rejects any extra fields.

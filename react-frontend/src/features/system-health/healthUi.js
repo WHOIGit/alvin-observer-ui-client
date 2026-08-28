@@ -35,7 +35,9 @@ const SEVERITY = { na: 0, ok: 1, unknown: 2, warn: 3, fault: 4 };
 export function worstOf(statuses) {
   let worst = STATUS.NA;
   for (const s of statuses) {
-    if ((SEVERITY[s] ?? 0) > (SEVERITY[worst] ?? 0)) worst = s;
+    // Unrecognized ranks as unknown, matching statusMeta's fallback; ranking it
+    // `na` would let an unfamiliar status hide a real fault.
+    if ((SEVERITY[s] ?? SEVERITY.unknown) > (SEVERITY[worst] ?? 0)) worst = s;
   }
   return worst;
 }

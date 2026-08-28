@@ -11,7 +11,7 @@ import bombIcon from "../../images/bomb.png";
 
 const RESTART_URL = `https://${window.location.hostname}/restart`;
 
-export default function RestartButton() {
+export default function RestartButton({ label = "Restart" }) {
   const [open, setOpen] = React.useState(false);
   const [restarting, setRestarting] = React.useState(false);
 
@@ -26,13 +26,16 @@ export default function RestartButton() {
 
   return (
     <>
-      <Tooltip title="Restart">
+      <Tooltip title={label}>
         <IconButton
           color="inherit"
-          aria-label="Restart"
+          aria-label={label}
           // Open on press: pilots used to the old hold-to-fire button would
           // otherwise wait on a release that does nothing.
           onPointerDown={(event) => {
+            // Primary button / first touch only: a right-click or a second
+            // finger must not raise a restart prompt.
+            if (event.button > 0 || event.isPrimary === false) return;
             event.preventDefault();
             setOpen(true);
           }}

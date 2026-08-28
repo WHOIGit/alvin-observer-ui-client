@@ -72,4 +72,31 @@ describe("useGamepad", () => {
     });
     expect(starts).toHaveLength(0);
   });
+
+  it("holds engagement through boundary jitter, and releases below it", () => {
+    const { starts, ends } = setup();
+
+    stick = [0.16, 0];       // just past the 0.15 engage threshold
+    act(() => flushFrames(1));
+    expect(starts.length).toBe(1);
+
+    stick = [0.12, 0];       // under engage, over the 0.09 release threshold
+    act(() => flushFrames(4));
+    expect(ends.length).toBe(0);
+    expect(starts.length).toBe(1);
+
+    stick = [0.02, 0];       // released
+    act(() => flushFrames(1));
+    expect(ends.length).toBe(1);
+  });
+
+  it("reads a later pad when the first is connected but resting", () => {
+    const second = [0.8, 0];
+    navigator.getGamepads = () => [{ axes: [0, 0] }, { axes: second }];
+    const { starts } = setup();
+
+    act(() => flushFrames(1));
+    expect(starts.length).toBe(1);
+    expect(starts[0].magnitude).toBeGreaterThan(0.5);
+  });
 });

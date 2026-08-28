@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
 const DEFAULT_DEADZONE = 0.15;
+// Release below a lower threshold than we engage at, or a stick resting on the
+// boundary chatters start/end at frame rate, each transition sending a command.
+const RELEASE_RATIO = 0.6;
 const AXIS_X = 0;
 const AXIS_Y = 1;
 
@@ -36,14 +39,19 @@ export function useGamepad({
     let raf;
     let active = false;
 
-    const readStick = () => {
+    const release = deadzone * RELEASE_RATIO;
+
+    const readStick = (engaged) => {
+      const threshold = engaged ? release : deadzone;
       for (const pad of navigator.getGamepads?.() ?? []) {
         if (!pad) continue;
         const x = pad.axes[AXIS_X] ?? 0;
         const y = pad.axes[AXIS_Y] ?? 0;
         const mag = Math.hypot(x, y);
-        if (mag < deadzone) return { x: 0, y: 0, magnitude: 0 };
-        const scaled = Math.min((mag - deadzone) / (1 - deadzone), 1);
+        // Skip rather than bail, so a second pad is still reachable when the
+        // first is connected but resting.
+        if (mag < threshold) continue;
+        const scaled = Math.min((mag - release) / (1 - release), 1);
         const k = scaled / mag;
         return { x: x * k, y: y * k, magnitude: scaled };
       }
@@ -51,7 +59,7 @@ export function useGamepad({
     };
 
     const loop = () => {
-      const v = readStick();
+      const v = readStick(active);
       if (v.magnitude > 0) {
         // A deflected stick is continuous input: emit every frame so the
         // command spitter always has the current deflection, even when the
