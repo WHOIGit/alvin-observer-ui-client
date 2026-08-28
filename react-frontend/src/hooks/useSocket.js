@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import socketIOClient from "socket.io-client";
 import { WS_ENDPOINTS } from "../config";
 
@@ -25,20 +25,18 @@ function getOrCreate(namespace, apiVersion) {
 }
 
 export function useSocket(namespace = "/", { apiVersion = "1" } = {}) {
-  const entryRef = useRef(null);
+  // Resolved during render. A ref only updates in the effect, which does not
+  // re-render, so consumers kept the previous namespace's socket after a side
+  // switch and never rebound their listeners.
+  const entry = getOrCreate(namespace, apiVersion);
 
   useEffect(() => {
-    const entry = getOrCreate(namespace, apiVersion);
-    entry.refCount += 1;
-    entryRef.current = entry;
+    const e = getOrCreate(namespace, apiVersion);
+    e.refCount += 1;
 
     return () => {
-      const e = entryRef.current;
-      if (!e) return;
-      // Clear first, or a render after teardown hands out the dead socket.
-      entryRef.current = null;
       e.refCount -= 1;
-      if (e.refCount <= 0) {
+      if (e.refCount <= 0 && pool.get(e.key) === e) {
         pool.delete(e.key);
 
         // Good bye message to server is a historical part of the ICS protocol
@@ -54,9 +52,7 @@ export function useSocket(namespace = "/", { apiVersion = "1" } = {}) {
     };
   }, [namespace, apiVersion]);
 
-  const live = entryRef.current;
-  if (live && pool.get(live.key) === live) return live.socket;
-  return getOrCreate(namespace, apiVersion).socket;
+  return entry.socket;
 }
 
 export function useSocketListener(
