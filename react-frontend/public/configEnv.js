@@ -2,7 +2,6 @@
 // Use in place of the REACT_APP style env variables.
 
 window.PILOT_MODE = false;
-window.MOCK_ALERTS = false;
 window.MOCK_HEALTH = false;
 
 // Web socket endpoints by backend API version.

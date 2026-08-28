@@ -7,6 +7,7 @@ import ServicesGrid from "./ServicesGrid";
 import HealthDetailDrawer from "./HealthDetailDrawer";
 import { useHealthContext } from "./HealthContext";
 import { formatAge } from "./healthUi";
+import { MOCK_HEALTH } from "../../config";
 
 // System health view: station-grouped matrix + services grid + cell detail
 // drawer. The overall status lives on the SYSTEM tab; here "updated Xs ago"
@@ -15,9 +16,37 @@ export default function SystemHealthPanel({ maxHeight = 520 }) {
   const { document, now, stale } = useHealthContext();
   const [selection, setSelection] = useState(null);
 
+  // Fixture data suppresses both live sources and re-stamps its own timestamp,
+  // so nothing else on this view can give it away. Say it plainly.
+  const mockBanner = MOCK_HEALTH ? (
+    <Box
+      data-testid="mock-health-banner"
+      sx={{
+        px: 1.5,
+        py: 0.75,
+        borderRadius: 1,
+        bgcolor: "#c62828",
+        border: "2px solid #ff5252",
+      }}
+    >
+      <Typography
+        sx={{
+          color: "#fff",
+          fontSize: 13,
+          fontWeight: 800,
+          letterSpacing: 0.5,
+        }}
+      >
+        MOCK DATA — NOT LIVE. This is a static fixture; the vitals feed is
+        disabled. Do not use for operational decisions.
+      </Typography>
+    </Box>
+  ) : null;
+
   if (!document) {
     return (
       <Box sx={{ p: 2 }}>
+        {mockBanner}
         <Typography sx={{ color: "grey.400" }}>
           Waiting for system health feed…
         </Typography>
@@ -29,6 +58,8 @@ export default function SystemHealthPanel({ maxHeight = 520 }) {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+      {mockBanner}
+
       {/* Stale / dropped feed banner (only when stale) */}
       {stale ? (
         <Box

@@ -17,7 +17,10 @@ export const VITALS_WS_APIVERSION = "vitals";
 export const VITALS_HEALTH_NAMESPACE = "/health";
 export const HEALTH_SNAPSHOT_EVENT = "HealthSnapshot";
 // Dev-only: seed the static fixture so the view renders without vitals running.
-export const MOCK_HEALTH = Boolean(envSettings.MOCK_HEALTH);
+// Gated on DEV so the fixture is stripped from a production build entirely, and
+// strict-equal so a stray "false" string in configEnv cannot switch it on.
+export const MOCK_HEALTH =
+  import.meta.env.DEV && envSettings.MOCK_HEALTH === true;
 
 // Web socket event names
 export const NEW_CAMERA_COMMAND_EVENT = "newCameraCommand";
