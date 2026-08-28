@@ -16,7 +16,7 @@ type ExpectEmitResult = {
 
 export type SocketIoHarness = {
   connected: Promise<void>;
-  emit(event: string, ...args: any[]): void;
+  emit(envelope: string | { event: string; namespace?: string }, ...args: any[]): void;
 
   // Allow attaching labeled expectations: h.someLabel = expectEmit("evt")
   [label: string]: any;
@@ -59,9 +59,9 @@ export function createSocketIoHarness(
   };
 
   const harness: SocketIoHarness = {
-    emit(event: string, ...args: any[]) {
+    emit(envelope: string | { event: string; namespace?: string }, ...args: any[]) {
       if (!io) throw new Error("Cannot emit - no connection yet");
-      io.client.emit(event, ...args); // as in server -> client
+      io.client.emit(envelope as any, ...args); // as in server -> client
     },
 
     // connected is a promise that gets resolved when the connection is

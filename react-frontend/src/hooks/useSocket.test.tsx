@@ -85,3 +85,38 @@ test("useSocketListener attaches and cleans up event handler", async () => {
   });
   expect(received).toBe(1);
 });
+
+function SideListener({
+  namespace,
+  onMessage,
+}: {
+  namespace: string;
+  onMessage: (m: any) => void;
+}) {
+  useSocketListener(namespace, "cam:heartbeat", onMessage);
+  return null;
+}
+
+test("useSocketListener rebinds when the namespace changes", async () => {
+  const h = createSocketIoHarness();
+  const seen: string[] = [];
+  const onMessage = (m: any) => seen.push(m.side);
+
+  const { rerender } = render(
+    <SideListener namespace="/port" onMessage={onMessage} />
+  );
+  await h.connected;
+
+  rerender(<SideListener namespace="/stbd" onMessage={onMessage} />);
+  await act(async () => {
+    await new Promise((r) => setTimeout(r, 20));
+  });
+
+  await act(async () => {
+    h.emit({ event: "cam:heartbeat", namespace: "/port" }, { side: "port" });
+    h.emit({ event: "cam:heartbeat", namespace: "/stbd" }, { side: "stbd" });
+    await new Promise((r) => setTimeout(r, 20));
+  });
+
+  expect(seen).toEqual(["stbd"]);
+});
