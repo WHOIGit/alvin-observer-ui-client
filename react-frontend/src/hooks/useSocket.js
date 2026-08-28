@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import socketIOClient from "socket.io-client";
 import { WS_ENDPOINTS } from "../config";
 
@@ -24,23 +24,24 @@ function getOrCreate(namespace, apiVersion) {
   return entry;
 }
 
-// `enabled: false` skips the connection entirely (returns null) so a caller can
-// opt out without breaking the rules of hooks — used when a feature's endpoint
-// is unconfigured or it's running off mock data.
-export function useSocket(namespace = "/", { apiVersion = "1", enabled = true } = {}) {
-  const entryRef = useRef(null);
+// Resolved during render. A ref only updates in the effect, which does not
+// re-render, so consumers kept the previous namespace's socket after a side
+// switch and never rebound their listeners. `enabled: false` skips the
+// connection entirely so a caller can opt out without breaking hook rules.
+export function useSocket(
+  namespace = "/",
+  { apiVersion = "1", enabled = true } = {}
+) {
+  const entry = enabled ? getOrCreate(namespace, apiVersion) : null;
 
   useEffect(() => {
     if (!enabled) return undefined;
-    const entry = getOrCreate(namespace, apiVersion);
-    entry.refCount += 1;
-    entryRef.current = entry;
+    const e = getOrCreate(namespace, apiVersion);
+    e.refCount += 1;
 
     return () => {
-      const e = entryRef.current;
-      if (!e) return;
       e.refCount -= 1;
-      if (e.refCount <= 0) {
+      if (e.refCount <= 0 && pool.get(e.key) === e) {
         pool.delete(e.key);
 
         // Good bye message to server is a historical part of the ICS protocol
@@ -56,10 +57,7 @@ export function useSocket(namespace = "/", { apiVersion = "1", enabled = true } 
     };
   }, [namespace, apiVersion, enabled]);
 
-  if (!enabled) return null;
-  return entryRef.current
-    ? entryRef.current.socket
-    : getOrCreate(namespace, apiVersion).socket;
+  return entry ? entry.socket : null;
 }
 
 export function useSocketListener(

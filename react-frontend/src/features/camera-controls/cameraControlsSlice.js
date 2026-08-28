@@ -47,6 +47,14 @@ export const cameraControlsSlice = createSlice({
   initialState: initialState,
   reducers: {
     setObserverSide: (state, action) => {
+      if (action.payload !== state.observerSide) {
+        // Heartbeat, active camera and settings belong to the station we are
+        // leaving; keep them and the new side renders the old one's cameras.
+        state.initialCamHeartbeat = null;
+        state.activeCamera = null;
+        state.camHeartbeatData = null;
+        state.currentCamData = null;
+      }
       state.observerSide = action.payload;
       if (action.payload === "P") {
         state.observerVideoSrc = VIDEO_STREAM_CONFIG.portObserverVideo;

@@ -4,6 +4,10 @@ FROM node:24-bullseye AS builder
 LABEL maintainer="Ethan Andrews <eandrews@whoi.edu>"
 
 ENV NPM_CONFIG_LOGLEVEL=error
+# The test deps include a git dependency that npm 12 refuses by default, and the
+# image never runs tests. Config, not a flag, so the npm install that
+# update-browserslist-db shells out to inherits it too.
+ENV NPM_CONFIG_OMIT=dev
 
 WORKDIR /app
 
@@ -15,10 +19,11 @@ WORKDIR /app
 # && update-ca-certificates
 ARG npm_config_cafile=/etc/ssl/certs/ca-certificates.crt 
 
-# Update NPM to latest version
-RUN npm i npm@latest -g
+# Pinned: npm@latest let a new npm release change the build under us. Bump
+# deliberately, and rebuild once when you do.
+RUN npm i npm@12.0.2 -g
 
-# Install all node packages
+# Install the build tree only (see NPM_CONFIG_OMIT above).
 COPY ./react-frontend/package*.json /app/
 RUN npm install --no-audit
 RUN npx update-browserslist-db@latest
